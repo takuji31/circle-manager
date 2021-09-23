@@ -1,0 +1,49 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Circle {
+  id        String   @id @db.VarChar(255)
+  name      String?
+  createdAt DateTime @default(now())
+  members   Member[]
+}
+
+model Member {
+  id          String     @id @db.VarChar(255)
+  circleRole  CircleRole @default(Member)
+  name        String     @db.VarChar(255)
+  trainerName String?     @db.VarChar(255)
+  trainerId   String?     @db.VarChar(255)
+  joinedAt    DateTime
+  leavedAt    DateTime?
+  circleId    String?    @db.VarChar(255)
+  circle      Circle?    @relation(fields: [circleId], references: [id])
+
+  @@index([leavedAt])
+  @@index([joinedAt])
+  @@index([circleId, circleRole, joinedAt])
+}
+
+enum CircleRole {
+  Leader
+  SubLeader
+  Member
+}
+
+model MonthCircle {
+  memberId String @db.VarChar(255)
+  month    String @db.Char(6)
+  circleId String @db.VarChar(255)
+
+  @@id([memberId, month])
+  @@index([month, circleId, memberId])
+}
