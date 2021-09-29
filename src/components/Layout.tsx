@@ -11,6 +11,7 @@ import { AppBar, IconButton, Toolbar, Typography } from "@mui/material";
 import { useSession } from "next-auth/react";
 import LoginButton from "./login_button";
 import Head from "next/head";
+import { NextLinkComposed } from "../Link";
 
 type LayoutProps = {
   children: React.ReactNode;
@@ -40,7 +41,9 @@ const Layout = ({ children, title = "Circle Manager" }: LayoutProps) => {
     <Box sx={{ flexGrow: 1 }}>
       <Head>
         <title>
-          {title == "Circle Manager" ? title : title + " - Circle Manager"}
+          {title == "シン・ウマ娘愛好会"
+            ? title
+            : title + " - シン・ウマ娘愛好会"}
         </title>
       </Head>
       <AppBar position="static">
@@ -74,14 +77,9 @@ const Layout = ({ children, title = "Circle Manager" }: LayoutProps) => {
           onKeyDown={toggleDrawer(false)}
         >
           <List>
-            {status == "authenticated" && (
-              <ListItem button>
-                <ListItemIcon>
-                  <Icons.Computer />
-                </ListItemIcon>
-                <ListItemText>サーバー一覧</ListItemText>
-              </ListItem>
-            )}
+            <ListItem>
+              <ListItemText>サークル一覧</ListItemText>
+            </ListItem>
             {status == "unauthenticated" && (
               <ListItem button>
                 <ListItemIcon>

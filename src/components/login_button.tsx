@@ -1,9 +1,10 @@
 import { Button } from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
 import { signIn, signOut, useSession } from "next-auth/react";
+import { useRouter } from "next/router";
 
 const LoginButton = () => {
-  const { data, status } = useSession();
+  const { status } = useSession();
   if (status == "loading") {
     return (
       <LoadingButton loading loadingIndicator="Loading..." color="inherit" />
@@ -15,10 +16,11 @@ const LoginButton = () => {
       </Button>
     );
   } else {
+    const router = useRouter();
     return (
       <Button
         color="inherit"
-        onClick={() => signIn("discord", { callbackUrl: "/guilds" })}
+        onClick={() => signIn("discord", { callbackUrl: router.pathname })}
       >
         Discordでログイン
       </Button>

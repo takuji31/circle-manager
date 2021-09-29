@@ -1,7 +1,17 @@
+import {
+  RESTGetAPICurrentUserGuildsResult,
+  Routes,
+} from "discord-api-types/v9";
+import { prisma } from "./../../../prisma";
+import { createDiscordRestClient } from "../../../discord";
 import NextAuth from "next-auth";
 import DiscordProvider from "next-auth/providers/discord";
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import { Guild } from "../../../model/guild";
+import { Permissions } from "discord.js";
 
 export default NextAuth({
+  adapter: PrismaAdapter(prisma),
   // Configure one or more authentication providers
   providers: [
     DiscordProvider({
@@ -31,13 +41,32 @@ export default NextAuth({
     },
     async jwt({ token, account }) {
       if (account) {
-        token.accessToken = account.access_token;
+        const accessToken = account.access_token as string;
+        token.accessToken = accessToken;
+        const rest = createDiscordRestClient(accessToken);
+        const guilds = (await rest.get(Routes.userGuilds(), {
+          authPrefix: "Bearer",
+        })) as RESTGetAPICurrentUserGuildsResult;
+        const guild = guilds.filter((guild) => guild.id == Guild.id)[0];
+        const isMember = guild != null;
+        const permissions = guild?.permissions;
+        const isAdmin =
+          permissions != null
+            ? new Permissions(BigInt(permissions)).has(
+                Permissions.FLAGS.ADMINISTRATOR
+              )
+            : false;
+        token.isMember = isMember;
+        token.isAdmin = isAdmin;
+        console.log("create new JWT %s %s", token, account);
       }
       return token;
     },
     async session({ session, token, user }) {
       // Send properties to the client, like an access_token from a provider.
       session.accessToken = token.accessToken;
+      session.isMember = token.isMember;
+      session.isAdmin = token.isAdmin;
       return session;
     },
   },

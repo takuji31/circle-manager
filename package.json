@@ -11,10 +11,8 @@
     "bot:start": "node build/src/bot/index.js",
     "bot:dev": "ts-node --compiler-options {\\\"module\\\":\\\"commonjs\\\"} src/bot/index.ts",
     "bot:watch": "nodemon",
-    "db:generate": "prisma generate"
-  },
-  "prisma": {
-    "seed": "ts-node --compiler-options {\"module\":\"commonjs\"} prisma/seed.ts"
+    "db:generate": "prisma generate",
+    "db:studio": "prisma studio"
   },
   "dependencies": {
     "@discordjs/builders": "^0.6.0",
@@ -26,6 +24,7 @@
     "@mui/icons-material": "^5.0.1",
     "@mui/lab": "^5.0.0-alpha.48",
     "@mui/material": "^5.0.1",
+    "@next-auth/prisma-adapter": "^0.5.2-next.15",
     "@prisma/client": "^3.1.1",
     "@types/node-fetch": "^2.5.12",
     "discord-api-types": "^0.23.1",
