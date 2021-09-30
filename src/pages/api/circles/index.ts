@@ -1,5 +1,5 @@
-import { RESTGetAPIGuildRolesResult, Routes } from "discord-api-types";
-import { NextApiHandler } from "next";
+import { RESTGetAPIGuildRolesResult, Routes } from "discord-api-types/v9";
+import { NextApiHandler, NextApiRequest, NextApiResponse } from "next";
 import { createDiscordRestClient } from "../../../discord";
 import { Circle } from "../../../model/circle";
 import { Guild } from "../../../model/guild";
@@ -9,7 +9,10 @@ export interface APICircles {
   circles: Array<Circle>;
 }
 
-export const handler: NextApiHandler<APICircles> = async (req, res) => {
+export default async (
+  req: NextApiRequest,
+  res: NextApiResponse<APICircles>
+) => {
   const hasCircles = await prisma.circle.count();
   if (!hasCircles) {
     const rest = createDiscordRestClient();

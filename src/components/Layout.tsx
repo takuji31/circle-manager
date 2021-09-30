@@ -12,6 +12,7 @@ import { useSession } from "next-auth/react";
 import LoginButton from "./login_button";
 import Head from "next/head";
 import { NextLinkComposed } from "../Link";
+import { CircleListItems } from "./CircleListItems";
 
 type LayoutProps = {
   children: React.ReactNode;
@@ -80,6 +81,8 @@ const Layout = ({ children, title = "Circle Manager" }: LayoutProps) => {
             <ListItem>
               <ListItemText>サークル一覧</ListItemText>
             </ListItem>
+            <ListItem divider />
+            <CircleListItems />
             {status == "unauthenticated" && (
               <ListItem button>
                 <ListItemIcon>
