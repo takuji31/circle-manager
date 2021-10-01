@@ -3,7 +3,7 @@ const prisma = new PrismaClient();
 
 async function main() {
   const now = new Date();
-  prisma.circle.createMany({
+  await prisma.circle.createMany({
     skipDuplicates: true,
     data: [
       {
