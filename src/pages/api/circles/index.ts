@@ -13,25 +13,6 @@ export default async (
   req: NextApiRequest,
   res: NextApiResponse<APICircles>
 ) => {
-  const hasCircles = await prisma.circle.count();
-  if (!hasCircles) {
-    const rest = createDiscordRestClient();
-    const roles = (await rest.get(
-      Routes.guildRoles(Guild.id)
-    )) as RESTGetAPIGuildRolesResult;
-    await prisma.circle.createMany({
-      data: roles
-        .filter((role) => Guild.circles.indexOf(role.id) != -1)
-        .map((role) => {
-          return {
-            id: role.id,
-            name: role.name,
-          };
-        }),
-      skipDuplicates: true,
-    });
-  }
-
   const circles = await prisma.circle.findMany({
     orderBy: {
       createdAt: "asc",
