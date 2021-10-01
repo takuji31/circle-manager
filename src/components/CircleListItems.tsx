@@ -36,6 +36,7 @@ export const CircleListButton = () => {
           {circles.map((circle) => {
             return (
               <MenuItem
+                key={`circles_menu_${circle.id}`}
                 component={NextLinkComposed}
                 to={`/circles/${circle.id}`}
                 onClick={popupState.close}
