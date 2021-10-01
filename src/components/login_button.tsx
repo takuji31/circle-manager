@@ -20,7 +20,7 @@ const LoginButton = () => {
     return (
       <Button
         color="inherit"
-        onClick={() => signIn("discord", { callbackUrl: router.pathname })}
+        onClick={() => signIn("discord", { callbackUrl: router.asPath })}
       >
         Discordでログイン
       </Button>
