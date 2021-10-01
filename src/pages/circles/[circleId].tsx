@@ -1,10 +1,5 @@
 import { Box } from "@mui/material";
-import {
-  NextPage,
-  InferGetStaticPropsType,
-  GetStaticProps,
-  GetStaticPaths,
-} from "next";
+import { NextPage, GetStaticProps, GetStaticPaths } from "next";
 import React from "react";
 import Layout from "../../components/Layout";
 import { Circle } from "../../model/circle";
@@ -12,12 +7,10 @@ import { prisma } from "../../prisma";
 
 interface Props extends Circle {}
 
-const CircleDetail: NextPage<Props> = ({
-      name,
-    }: InferGetStaticPropsType<typeof getStaticProps>) => {
+const CircleDetail: NextPage<Props> = ({ name, id }: Props) => {
   return (
     <Layout title={name}>
-      <Box />
+      <Box>{id}</Box>
     </Layout>
   );
 };
@@ -44,7 +37,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
   return {
     paths: (
       await prisma.circle.findMany({
-        orderBy: { id: "asc" },
+        orderBy: { createdAt: "asc" },
       })
     ).map((circle) => {
       return {

@@ -5,7 +5,7 @@
     }
   ],
   "settings": {
-    "WillLuke.nextjs.addTypesOnSave": true,
+    "WillLuke.nextjs.addTypesOnSave": false,
     "WillLuke.nextjs.hasPrompted": true
   }
 }
