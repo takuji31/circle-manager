@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 
 const LoginButton = () => {
   const { status } = useSession();
+  const router = useRouter();
   if (status == "loading") {
     return (
       <LoadingButton loading loadingIndicator="Loading..." color="inherit" />
@@ -16,7 +17,6 @@ const LoginButton = () => {
       </Button>
     );
   } else {
-    const router = useRouter();
     return (
       <Button
         color="inherit"
