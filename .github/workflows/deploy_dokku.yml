@@ -30,4 +30,5 @@ jobs:
           # enable verbose git output
           git_push_flags: "-vvv -f"
           git_remote_url: "ssh://dokku@takuji31.dev:22/shin-umamusume"
+          ssh_host_key: ${{ secrets.SSH_HOST_KEY }}
           ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
