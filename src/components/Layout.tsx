@@ -12,7 +12,8 @@ import { useSession } from "next-auth/react";
 import LoginButton from "./login_button";
 import Head from "next/head";
 import { NextLinkComposed } from "../Link";
-import { CircleListButton } from "./CircleListItems";
+import { CircleListButton } from "./circle_list_items";
+import { AdminMenu } from "./admin_menu";
 
 type LayoutProps = {
   children: React.ReactNode;
@@ -34,6 +35,7 @@ const Layout = ({ children, title = "シン・ウマ娘愛好会" }: LayoutProps
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             {title}
           </Typography>
+          <AdminMenu />
           <CircleListButton />
           <LoginButton />
         </Toolbar>

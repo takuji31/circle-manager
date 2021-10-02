@@ -8,7 +8,7 @@ import type { AppProps } from "next/app";
 import { getSession, SessionProvider } from "next-auth/react";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import Layout from "../components/Layout";
+import Layout from "../components/layout";
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache();
