@@ -14,7 +14,7 @@ import {
   bindTrigger,
   bindMenu,
 } from "material-ui-popup-state/hooks";
-import { NextLinkComposed } from "../Link";
+import { NextLinkComposed } from "./link2";
 
 export const CircleListButton = () => {
   const { circles, error, mutate } = useCircles();

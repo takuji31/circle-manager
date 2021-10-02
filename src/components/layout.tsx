@@ -11,7 +11,7 @@ import { AppBar, IconButton, Toolbar, Typography } from "@mui/material";
 import { useSession } from "next-auth/react";
 import LoginButton from "./login_button";
 import Head from "next/head";
-import { NextLinkComposed } from "../Link";
+import { NextLinkComposed } from "../components/link2";
 import { CircleListButton } from "./circle_list_items";
 import { AdminMenu } from "./admin_menu";
 
