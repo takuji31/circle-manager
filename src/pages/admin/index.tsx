@@ -15,7 +15,7 @@ import { Box } from "@mui/system";
 import { GetStaticProps, NextPage } from "next";
 import React from "react";
 import { AdminLayout } from "../../components/admin_filter";
-import { NextLinkComposed } from "../../components/link";
+import { NextLinkComposed } from "../../components/link2";
 
 const AdminIndex: NextPage = () => {
   return (

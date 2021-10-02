@@ -7,7 +7,7 @@ import {
   bindTrigger,
   bindMenu,
 } from "material-ui-popup-state/hooks";
-import { NextLinkComposed } from "../components/link";
+import { NextLinkComposed } from "./link2";
 import useUser from "../hooks/user";
 import * as Icons from "@mui/icons-material";
 import { updateMembers } from "../admin/commands/update_members";
