@@ -46,7 +46,12 @@ const MemberMonthCircle: NextPage<Props> = ({
           value={circles.find((circle) => circle.selected)?.id}
         >
           {circles.map((circle) => (
-            <ToggleButton value={circle.id}>{circle.name}</ToggleButton>
+            <ToggleButton
+              value={circle.id}
+              key={`month_circle_toggle_${circle.id}`}
+            >
+              {circle.name}
+            </ToggleButton>
           ))}
         </ToggleButtonGroup>
       </Stack>
