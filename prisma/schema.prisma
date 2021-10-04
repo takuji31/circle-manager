@@ -18,15 +18,16 @@ model Circle {
 }
 
 model Member {
-  id          String     @id @db.VarChar(255)
-  circleRole  CircleRole @default(Member)
-  name        String     @db.VarChar(255)
-  trainerName String?    @db.VarChar(255)
-  trainerId   String?    @db.VarChar(255)
-  joinedAt    DateTime
-  leavedAt    DateTime?
-  circleId    String?    @db.VarChar(255)
-  circle      Circle?    @relation(fields: [circleId], references: [id])
+  id           String        @id @db.VarChar(255)
+  circleRole   CircleRole    @default(Member)
+  name         String        @db.VarChar(255)
+  trainerName  String?       @db.VarChar(255)
+  trainerId    String?       @db.VarChar(255)
+  joinedAt     DateTime
+  leavedAt     DateTime?
+  circleId     String?       @db.VarChar(255)
+  circle       Circle?       @relation(fields: [circleId], references: [id])
+  monthCircles MonthCircle[]
 
   @@index([leavedAt])
   @@index([joinedAt])
@@ -42,6 +43,7 @@ enum CircleRole {
 model MonthCircle {
   id       String                 @id @default(cuid())
   memberId String                 @db.VarChar(255)
+  member   Member                 @relation(fields: [memberId], references: [id])
   year     String                 @db.Char(4)
   month    String                 @db.Char(2)
   state    MonthCircleAnswerState @default(NoAnswer)
