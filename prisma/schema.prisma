@@ -21,8 +21,8 @@ model Member {
   id          String     @id @db.VarChar(255)
   circleRole  CircleRole @default(Member)
   name        String     @db.VarChar(255)
-  trainerName String?     @db.VarChar(255)
-  trainerId   String?     @db.VarChar(255)
+  trainerName String?    @db.VarChar(255)
+  trainerId   String?    @db.VarChar(255)
   joinedAt    DateTime
   leavedAt    DateTime?
   circleId    String?    @db.VarChar(255)
@@ -40,12 +40,21 @@ enum CircleRole {
 }
 
 model MonthCircle {
-  memberId String @db.VarChar(255)
-  month    String @db.Char(6)
-  circleId String @db.VarChar(255)
+  id       String                 @id @default(cuid())
+  memberId String                 @db.VarChar(255)
+  year     String                 @db.Char(4)
+  month    String                 @db.Char(2)
+  state    MonthCircleAnswerState @default(NoAnswer)
+  circleId String?                @default(dbgenerated("NULL")) @db.VarChar(255)
 
-  @@id([memberId, month])
-  @@index([month, circleId, memberId])
+  @@index([memberId, year, month, circleId])
+  @@index([year, month, circleId, memberId])
+}
+
+enum MonthCircleAnswerState {
+  NoAnswer
+  Answered
+  Retired
 }
 
 // for NextAuth
@@ -95,4 +104,5 @@ model VerificationToken {
 
   @@unique([identifier, token])
 }
+
 // end for NextAuth
