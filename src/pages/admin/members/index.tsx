@@ -1,12 +1,20 @@
 import { CircleRole } from ".prisma/client";
 import { List, ListItem, ListItemText } from "@mui/material";
+import {
+  DataGrid,
+  GridColDef,
+  GridToolbar,
+  GridValueFormatterParams,
+} from "@mui/x-data-grid";
 import { GetServerSideProps, NextPage } from "next";
 import { getSession } from "next-auth/react";
+import React from "react";
 import { AdminLayout } from "../../../components/admin_filter";
 import useUser from "../../../hooks/user";
 import { prisma } from "../../../prisma";
 
 interface Member {
+  id: string;
   name: string;
   circleName: string;
   role: CircleRole;
@@ -16,18 +24,52 @@ export interface Props {
   members?: Array<Member>;
 }
 
+const columns: Array<GridColDef> = [
+  {
+    field: "name",
+    headerName: "トレーナー名",
+    width: 200,
+  },
+  {
+    field: "circleName",
+    headerName: "サークル名",
+    width: 200,
+  },
+  {
+    field: "role",
+    headerName: "役職",
+    width: 200,
+    type: "singleSelect",
+    valueOptions: [CircleRole.Leader, CircleRole.SubLeader, CircleRole.Member],
+    valueFormatter: (params: GridValueFormatterParams) => {
+      params.value as string;
+      switch (params.value) {
+        case CircleRole.Leader:
+          return "リーダー";
+        case CircleRole.SubLeader:
+          return "サブリーダー";
+        default:
+          return "メンバー";
+      }
+    },
+  },
+];
+
 const MemberList: NextPage<Props> = ({ members }) => {
   return (
     <AdminLayout title="メンバー一覧">
-      <List>
-        {members?.map((member) => {
-          return (
-            <ListItem>
-              <ListItemText>{member.name}</ListItemText>
-            </ListItem>
-          );
-        })}
-      </List>
+      <div style={{ height: 400, width: "100%" }}>
+        {members && (
+          <DataGrid
+            components={{
+              Toolbar: GridToolbar,
+            }}
+            autoHeight
+            rows={members}
+            columns={columns}
+          />
+        )}
+      </div>
     </AdminLayout>
   );
 };
@@ -38,7 +80,9 @@ export const getServerSideProps: GetServerSideProps<Props> = async (
   const session = await getSession(context);
   if (session?.isAdmin != true) {
     return {
-      props: {},
+      props: {
+        members: [],
+      },
     };
   } else {
     const members = await prisma.member.findMany({
@@ -63,9 +107,11 @@ export const getServerSideProps: GetServerSideProps<Props> = async (
       props: {
         members: members.map((member) => {
           return {
+            id: member.id,
             name: member.name,
             circleName:
-              member.circle?.name ?? member.leavedAt ? "脱退済" : "未所属",
+              member.circle?.name ?? (member.leavedAt ? "脱退済" : "未所属"),
+            role: member.circleRole,
           };
         }),
       },
