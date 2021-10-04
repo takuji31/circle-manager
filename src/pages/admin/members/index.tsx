@@ -1,8 +1,9 @@
 import { CircleRole } from ".prisma/client";
-import { List, ListItem, ListItemText } from "@mui/material";
+import { Button, List, ListItem, ListItemText } from "@mui/material";
 import {
   DataGrid,
   GridColDef,
+  GridRenderCellParams,
   GridToolbar,
   GridValueFormatterParams,
 } from "@mui/x-data-grid";
@@ -10,6 +11,7 @@ import { GetServerSideProps, NextPage } from "next";
 import { getSession } from "next-auth/react";
 import React from "react";
 import { AdminLayout } from "../../../components/admin_filter";
+import { NextLinkComposed } from "../../../components/link2";
 import useUser from "../../../hooks/user";
 import { prisma } from "../../../prisma";
 
@@ -51,6 +53,18 @@ const columns: Array<GridColDef> = [
         default:
           return "メンバー";
       }
+    },
+  },
+  {
+    field: "id",
+    headerName: "action",
+    flex: 1,
+    renderCell: (params: GridRenderCellParams) => {
+      return (
+        <Button component={NextLinkComposed} to={`/members/${params.value}`}>
+          Action
+        </Button>
+      );
     },
   },
 ];
