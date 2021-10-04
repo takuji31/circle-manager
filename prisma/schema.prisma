@@ -11,10 +11,11 @@ generator client {
 }
 
 model Circle {
-  id        String   @id @db.VarChar(255)
-  name      String
-  createdAt DateTime @default(now())
-  members   Member[]
+  id          String        @id @db.VarChar(255)
+  name        String
+  createdAt   DateTime      @default(now())
+  members     Member[]
+  MonthCircle MonthCircle[]
 }
 
 model Member {
@@ -48,6 +49,7 @@ model MonthCircle {
   month    String                 @db.Char(2)
   state    MonthCircleAnswerState @default(NoAnswer)
   circleId String?                @default(dbgenerated("NULL")) @db.VarChar(255)
+  circle   Circle?                @relation(fields: [circleId], references: [id])
 
   @@index([memberId, year, month, circleId])
   @@index([year, month, circleId, memberId])

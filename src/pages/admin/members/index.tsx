@@ -20,6 +20,8 @@ interface Member {
   name: string;
   circleName: string;
   role: CircleRole;
+  thisMonthCircle: string | null;
+  nextMonthCircle: string | null;
 }
 
 export interface Props {
@@ -53,6 +55,38 @@ const columns: Array<GridColDef> = [
         default:
           return "メンバー";
       }
+    },
+  },
+  {
+    field: "thisMonthCircle",
+    headerName: "今月のサークル",
+    width: 200,
+    renderCell: (params: GridRenderCellParams) => {
+      const value = params.value as string;
+      const memberId = params.row.id;
+      return (
+        <>
+          {value ? (
+            value
+          ) : (
+            <Button
+              component={NextLinkComposed}
+              to={`/members/${memberId}/month_circles/2021/11`}
+            >
+              リマインド
+            </Button>
+          )}
+        </>
+      );
+    },
+  },
+  {
+    field: "nextMonthCircle",
+    headerName: "来月のサークル",
+    width: 200,
+    renderCell: (params: GridRenderCellParams) => {
+      const value = params.value as string;
+      return <>{value ? value : <Button>リマインド</Button>}</>;
     },
   },
   {
@@ -99,9 +133,31 @@ export const getServerSideProps: GetServerSideProps<Props> = async (
       },
     };
   } else {
+    const year = new Date().getFullYear();
+    const month = new Date().getMonth() + 1;
+
+    const nextYear = month == 12 ? year + 1 : year;
+    const nextMonth = month == 12 ? 1 : month + 1;
     const members = await prisma.member.findMany({
       include: {
         circle: true,
+        monthCircles: {
+          where: {
+            OR: [
+              {
+                year: year.toString(),
+                month: month.toString(),
+              },
+              {
+                year: nextYear.toString(),
+                month: nextMonth.toString(),
+              },
+            ],
+          },
+          include: {
+            circle: true,
+          },
+        },
       },
       orderBy: [
         {
@@ -126,6 +182,20 @@ export const getServerSideProps: GetServerSideProps<Props> = async (
             circleName:
               member.circle?.name ?? (member.leavedAt ? "脱退済" : "未所属"),
             role: member.circleRole,
+            thisMonthCircle:
+              member.monthCircles.find((monthCircle) => {
+                return (
+                  monthCircle.year == year.toString() &&
+                  monthCircle.month == month.toString()
+                );
+              })?.circle?.name ?? null,
+            nextMonthCircle:
+              member.monthCircles.find((monthCircle) => {
+                return (
+                  monthCircle.year == nextYear.toString() &&
+                  monthCircle.month == nextMonth.toString()
+                );
+              })?.circle?.name ?? null,
           };
         }),
       },
