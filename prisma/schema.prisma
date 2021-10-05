@@ -51,8 +51,9 @@ model MonthCircle {
   circleId String?                @default(dbgenerated("NULL")) @db.VarChar(255)
   circle   Circle?                @relation(fields: [circleId], references: [id])
 
-  @@index([memberId, year, month, circleId])
-  @@index([year, month, circleId, memberId])
+  @@index([memberId])
+  @@index([year, month, circleId])
+  @@unique([year, month, memberId])
 }
 
 enum MonthCircleAnswerState {

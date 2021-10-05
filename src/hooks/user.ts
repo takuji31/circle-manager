@@ -6,6 +6,7 @@ export default function useUser() {
     return { status };
   }
   const user = {
+    id: data.id as string,
     name: data.name as string,
     isAdmin: data.isAdmin as boolean,
     isMember: data.isMember as boolean,

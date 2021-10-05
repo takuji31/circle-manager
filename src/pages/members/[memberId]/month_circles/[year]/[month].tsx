@@ -11,6 +11,7 @@ import { GetStaticPaths, GetStaticProps, NextPage } from "next";
 import { ParsedUrlQuery } from "querystring";
 import React from "react";
 import Layout from "../../../../../components/layout";
+import { useMonthCircle } from "../../../../../hooks/month_circle";
 import { prisma } from "../../../../../prisma";
 
 interface PathParams extends ParsedUrlQuery {
@@ -28,32 +29,40 @@ interface Circle {
 interface Props {
   year: string;
   month: string;
-  memberName: string;
-  circles: Array<Circle>;
+  member: {
+    id: string;
+    name: string;
+  };
 }
 
-const MemberMonthCircle: NextPage<Props> = ({
-  year,
-  month,
-  memberName,
-  circles,
-}) => {
+const MemberMonthCircle: NextPage<Props> = ({ year, month, member }) => {
+  const { monthCircle, error, onUpdate } = useMonthCircle(
+    member.id,
+    year,
+    month
+  );
   return (
-    <Layout title={`${year}年${month}月の${memberName}さんの在籍希望`}>
+    <Layout title={`${year}年${month}月の${member.name}さんの在籍希望`}>
       <Stack p={2} spacing={2}>
         <Typography variant="body1">在籍希望を選択してください。</Typography>
-        <ToggleButtonGroup
-          value={circles.find((circle) => circle.selected)?.id}
-        >
-          {circles.map((circle) => (
-            <ToggleButton
-              value={circle.id}
-              key={`month_circle_toggle_${circle.id}`}
-            >
-              {circle.name}
-            </ToggleButton>
-          ))}
-        </ToggleButtonGroup>
+        {!monthCircle && <p>Loading...</p>}
+        {monthCircle && (
+          <ToggleButtonGroup
+            value={monthCircle.circles.find((circle) => circle.selected)?.id}
+          >
+            {monthCircle.circles.map((circle) => (
+              <ToggleButton
+                value={circle.id}
+                key={`month_circle_toggle_${circle.id}`}
+                onClick={() => {
+                  onUpdate(circle.id).finally(() => {});
+                }}
+              >
+                {circle.name}
+              </ToggleButton>
+            ))}
+          </ToggleButtonGroup>
+        )}
       </Stack>
     </Layout>
   );
@@ -93,48 +102,14 @@ export const getStaticProps: GetStaticProps<Props, PathParams> = async ({
     };
   }
 
-  const monthCircleOrNull = await prisma.monthCircle.findFirst({
-    where: {
-      memberId: params.memberId,
-      year: year,
-      month: month,
-    },
-  });
-
-  const monthCircle = monthCircleOrNull
-    ? monthCircleOrNull
-    : await prisma.monthCircle.create({
-        data: {
-          memberId: params.memberId,
-          year: year,
-          month: month,
-        },
-      });
-
-  const circles: Array<Circle> = (
-    await prisma.circle.findMany({
-      orderBy: {
-        createdAt: "asc",
-      },
-    })
-  ).map((circle) => ({
-    id: circle.id,
-    name: circle.name,
-    selected: circle.id == monthCircle.circleId,
-  }));
-
-  const leaveCircle: Circle = {
-    id: "leave",
-    name: "脱退",
-    selected: monthCircle.state == MonthCircleAnswerState.Retired,
-  };
-
   return {
     props: {
       year: year,
       month: month,
-      memberName: member.trainerName ?? member.name,
-      circles: [...circles, leaveCircle],
+      member: {
+        id: member.id,
+        name: member.trainerName ?? member.name,
+      },
     },
   };
 };
