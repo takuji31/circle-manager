@@ -1,7 +1,7 @@
 import { MonthCircle } from ".prisma/client";
 import { MonthCircleAnswerState } from "@prisma/client";
 import { NextApiHandler } from "next";
-import { prisma } from "../../../../../../prisma";
+import prisma from "../../../../../../prisma";
 
 export interface Circle {
   id: string;

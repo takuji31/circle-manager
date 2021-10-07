@@ -10,6 +10,10 @@ generator client {
   provider = "prisma-client-js"
 }
 
+generator nexusPrisma {
+   provider = "nexus-prisma"
+}
+
 model Circle {
   id          String        @id @db.VarChar(255)
   name        String

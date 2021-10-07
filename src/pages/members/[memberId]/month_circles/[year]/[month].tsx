@@ -12,7 +12,7 @@ import { ParsedUrlQuery } from "querystring";
 import React from "react";
 import Layout from "../../../../../components/layout";
 import { useMonthCircle } from "../../../../../hooks/month_circle";
-import { prisma } from "../../../../../prisma";
+import prisma from "../../../../../prisma";
 
 interface PathParams extends ParsedUrlQuery {
   memberId: string;

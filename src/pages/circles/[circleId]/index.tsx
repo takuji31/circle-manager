@@ -3,7 +3,7 @@ import { NextPage, GetStaticProps, GetStaticPaths } from "next";
 import React from "react";
 import Layout from "../../../components/layout";
 import { Circle } from "../../../model/circle";
-import { prisma } from "../../../prisma";
+import prisma from "../../../prisma";
 
 interface Props extends Circle {}
 

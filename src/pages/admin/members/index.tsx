@@ -1,19 +1,22 @@
 import { CircleRole } from ".prisma/client";
-import { Button, List, ListItem, ListItemText } from "@mui/material";
+import { Button, List, ListItem, ListItemText, Stack } from "@mui/material";
 import {
   DataGrid,
+  GridActionsCellItem,
   GridColDef,
   GridRenderCellParams,
+  GridRowParams,
   GridToolbar,
   GridValueFormatterParams,
 } from "@mui/x-data-grid";
 import { GetServerSideProps, NextPage } from "next";
 import { getSession } from "next-auth/react";
-import React from "react";
+import React, { useMemo } from "react";
 import { AdminLayout } from "../../../components/admin_filter";
 import { NextLinkComposed } from "../../../components/link2";
 import useUser from "../../../hooks/user";
-import { prisma } from "../../../prisma";
+import prisma from "../../../prisma";
+import * as Icons from "@mui/icons-material";
 
 interface Member {
   id: string;
@@ -26,84 +29,103 @@ interface Member {
 
 export interface Props {
   members?: Array<Member>;
+  monthCircleNames: Array<string>;
 }
 
-const columns: Array<GridColDef> = [
-  {
-    field: "name",
-    headerName: "トレーナー名",
-    width: 200,
-  },
-  {
-    field: "circleName",
-    headerName: "サークル名",
-    width: 200,
-  },
-  {
-    field: "role",
-    headerName: "役職",
-    width: 200,
-    type: "singleSelect",
-    valueOptions: [CircleRole.Leader, CircleRole.SubLeader, CircleRole.Member],
-    valueFormatter: (params: GridValueFormatterParams) => {
-      params.value as string;
-      switch (params.value) {
-        case CircleRole.Leader:
-          return "リーダー";
-        case CircleRole.SubLeader:
-          return "サブリーダー";
-        default:
-          return "メンバー";
-      }
-    },
-  },
-  {
-    field: "thisMonthCircle",
-    headerName: "今月のサークル",
-    width: 200,
-    renderCell: (params: GridRenderCellParams) => {
-      const value = params.value as string;
-      const memberId = params.row.id;
-      return (
-        <>
-          {value ? (
-            value
-          ) : (
-            <Button
-              component={NextLinkComposed}
-              to={`/members/${memberId}/month_circles/2021/11`}
-            >
-              リマインド
-            </Button>
-          )}
-        </>
-      );
-    },
-  },
-  {
-    field: "nextMonthCircle",
-    headerName: "来月のサークル",
-    width: 200,
-    renderCell: (params: GridRenderCellParams) => {
-      const value = params.value as string;
-      return <>{value ? value : <Button>リマインド</Button>}</>;
-    },
-  },
-  {
-    field: "id",
-    headerName: "action",
-    flex: 1,
-    renderCell: (params: GridRenderCellParams) => {
-      return (
-        <Button component={NextLinkComposed} to={`/members/${params.value}`}>
-          Action
-        </Button>
-      );
-    },
-  },
-];
-
-const MemberList: NextPage<Props> = ({ members }) => {
+const MemberList: NextPage<Props> = ({ members, monthCircleNames }) => {
+  const columns: Array<GridColDef> = useMemo(
+    () => [
+      {
+        field: "name",
+        headerName: "トレーナー名",
+        width: 200,
+      },
+      {
+        field: "circleName",
+        headerName: "サークル名",
+        width: 200,
+      },
+      {
+        field: "role",
+        headerName: "役職",
+        width: 200,
+        type: "singleSelect",
+        valueOptions: [
+          CircleRole.Leader,
+          CircleRole.SubLeader,
+          CircleRole.Member,
+        ],
+        valueFormatter: (params: GridValueFormatterParams) => {
+          params.value as string;
+          switch (params.value) {
+            case CircleRole.Leader:
+              return "リーダー";
+            case CircleRole.SubLeader:
+              return "サブリーダー";
+            default:
+              return "メンバー";
+          }
+        },
+      },
+      {
+        field: "thisMonthCircle",
+        headerName: "今月のサークル",
+        width: 200,
+        type: "singleSelect",
+        valueOptions: monthCircleNames,
+        renderCell: (params: GridRenderCellParams) => {
+          const value = params.value as string;
+          return <>{value ?? "未回答"}</>;
+        },
+      },
+      {
+        field: "nextMonthCircle",
+        headerName: "来月のサークル",
+        width: 200,
+        type: "singleSelect",
+        valueOptions: monthCircleNames,
+        renderCell: (params: GridRenderCellParams) => {
+          const value = params.value as string;
+          return <>{value ?? "未回答"}</>;
+        },
+      },
+      {
+        field: "actions",
+        type: "actions",
+        getActions: (params: GridRowParams) => {
+          const actions = [];
+          return [
+            <GridActionsCellItem
+              onClick={() => {}}
+              label="Delete"
+              showInMenu
+            />,
+            <GridActionsCellItem
+              onClick={() => {}}
+              label="Delete"
+              showInMenu
+            />,
+            <GridActionsCellItem
+              onClick={() => {}}
+              label="Delete"
+              showInMenu
+            />,
+            <GridActionsCellItem
+              onClick={() => {}}
+              label="Delete"
+              showInMenu
+            />,
+            <GridActionsCellItem
+              onClick={() => {}}
+              label="Delete"
+              showInMenu
+            />,
+          ];
+        },
+      },
+    ],
+    monthCircleNames
+  );
   return (
     <AdminLayout title="メンバー一覧">
       <div style={{ height: 400, width: "100%" }}>
@@ -130,6 +152,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async (
     return {
       props: {
         members: [],
+        monthCircleNames: [],
       },
     };
   } else {
@@ -198,6 +221,13 @@ export const getServerSideProps: GetServerSideProps<Props> = async (
               })?.circle?.name ?? null,
           };
         }),
+        monthCircleNames: [
+          ...(await (
+            await prisma.circle.findMany({ orderBy: { createdAt: "asc" } })
+          ).map((circle) => circle.name)),
+          "脱退",
+          "未回答",
+        ],
       },
     };
   }

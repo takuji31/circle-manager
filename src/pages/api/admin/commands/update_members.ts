@@ -3,7 +3,7 @@ import { Guild } from "./../../../../model/guild";
 import { RESTGetAPIGuildMembersResult, Routes } from "discord-api-types/v9";
 import { NextApiRequest, NextApiResponse } from "next";
 import { createDiscordRestClient } from "../../../../discord";
-import { prisma } from "../../../../prisma";
+import prisma from "../../../../prisma";
 import { CircleRole } from ".prisma/client";
 
 interface Result {}

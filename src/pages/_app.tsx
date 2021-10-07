@@ -2,13 +2,13 @@ import * as React from "react";
 import Head from "next/head";
 import CssBaseline from "@mui/material/CssBaseline";
 import { CacheProvider, EmotionCache } from "@emotion/react";
-import theme from "../theme";
 import createEmotionCache from "../createEmotionCache";
 import type { AppProps } from "next/app";
 import { getSession, SessionProvider } from "next-auth/react";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import Layout from "../components/layout";
+import { ApolloProvider } from "@apollo/client";
+import { useApollo } from "../apollo_client";
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache();
@@ -34,19 +34,26 @@ export default function MyApp({
     [prefersDarkMode]
   );
 
+  const apolloClient = useApollo(pageProps);
+
   return (
     <SessionProvider session={pageProps.session}>
-      <CacheProvider value={emotionCache}>
-        <Head>
-          <title>My page</title>
-          <meta name="viewport" content="initial-scale=1, width=device-width" />
-        </Head>
-        <ThemeProvider theme={theme}>
-          {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
-          <CssBaseline />
-          <Component {...pageProps} />
-        </ThemeProvider>
-      </CacheProvider>
+      <ApolloProvider client={apolloClient}>
+        <CacheProvider value={emotionCache}>
+          <Head>
+            <title>My page</title>
+            <meta
+              name="viewport"
+              content="initial-scale=1, width=device-width"
+            />
+          </Head>
+          <ThemeProvider theme={theme}>
+            {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+            <CssBaseline />
+            <Component {...pageProps} />
+          </ThemeProvider>
+        </CacheProvider>
+      </ApolloProvider>
     </SessionProvider>
   );
 }

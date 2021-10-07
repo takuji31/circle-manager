@@ -1,9 +1,6 @@
-import { RESTGetAPIGuildRolesResult, Routes } from "discord-api-types/v9";
-import { NextApiHandler, NextApiRequest, NextApiResponse } from "next";
-import { createDiscordRestClient } from "../../../discord";
+import { NextApiRequest, NextApiResponse } from "next";
 import { Circle } from "../../../model/circle";
-import { Guild } from "../../../model/guild";
-import { prisma } from "../../../prisma";
+import prisma from "../../../prisma";
 
 export interface APICircles {
   circles: Array<Circle>;
