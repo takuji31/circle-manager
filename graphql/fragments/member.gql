@@ -1,0 +1,8 @@
+fragment MemberMonthCircle on MonthCircle {
+  id
+  circle {
+    id
+    name
+  }
+  state
+}

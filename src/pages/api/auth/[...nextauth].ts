@@ -56,6 +56,7 @@ export default NextAuth({
                 Permissions.FLAGS.ADMINISTRATOR
               )
             : false;
+        token.id = account.providerAccountId;
         token.isMember = isMember;
         token.isAdmin = isAdmin;
         // console.log("create new JWT %s %s", token, account);
@@ -64,11 +65,12 @@ export default NextAuth({
     },
     async session({ session, token, user }) {
       // Send properties to the client, like an access_token from a provider.
+      session.id = token.id;
       session.accessToken = token.accessToken;
       session.name = token.name ?? "";
       session.isMember = token.isMember;
       session.isAdmin = token.isAdmin;
-      // console.log("session %s", session);
+      // console.log("session %s token: %s", session, token);
       return session;
     },
   },

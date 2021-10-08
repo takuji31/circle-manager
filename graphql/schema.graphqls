@@ -65,4 +65,5 @@ enum MonthCircleAnswerState {
 
 type Query {
   member(id: String!): Member
+  members: [Member]
 }

@@ -6,6 +6,9 @@
   ],
   "settings": {
     "WillLuke.nextjs.addTypesOnSave": false,
-    "WillLuke.nextjs.hasPrompted": true
+    "WillLuke.nextjs.hasPrompted": true,
+    "yaml.schemas": {
+      "https://unpkg.com/graphql-config@4.0.1/config-schema.json": "graphql.config.yml"
+    }
   }
 }

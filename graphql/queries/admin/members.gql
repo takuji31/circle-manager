@@ -1,0 +1,22 @@
+query AdminMembers(
+  $thisYear: String!
+  $thisMonth: String!
+  $nextYear: String!
+  $nextMonth: String!
+) {
+  members {
+    id
+    name
+    circle {
+      id
+      name
+    }
+    circleRole
+    thisMonthCircle: monthCircle(year: $thisYear, month: $thisMonth) {
+      ...MemberMonthCircle
+    }
+    nextMonthCircle: monthCircle(year: $nextYear, month: $nextMonth) {
+      ...MemberMonthCircle
+    }
+  }
+}
