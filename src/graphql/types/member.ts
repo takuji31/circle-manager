@@ -94,7 +94,7 @@ export const UpdateMembers = mutationField("updateMembers", {
         id: "asc",
       },
     });
-    const circleIds = circles.map((circle) => circle.id);
+    const circleIds = circles.map((circle: { id: string }) => circle.id);
 
     const members = (await rest.get(
       `${Routes.guildMembers(Guild.id)}?limit=1000`
