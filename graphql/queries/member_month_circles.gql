@@ -1,17 +1,13 @@
-query AdminMembers {
-  members {
-    id
-    name
-    circle {
-      id
-      name
-    }
-    circleRole
+query MemberMonthCircles($memberId: String!) {
+  member(id: $memberId) {
     thisMonthCircle {
       ...MemberMonthCircle
     }
     nextMonthCircle {
       ...MemberMonthCircle
     }
+  }
+  circles {
+    ...ListedCircle
   }
 }

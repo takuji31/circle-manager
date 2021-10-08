@@ -1,6 +1,8 @@
+import { nextMonth } from "./../../date/year_month";
 import * as Nexus from "nexus-prisma";
 import { enumType, nonNull, objectType, stringArg } from "nexus";
 import { MonthCircle } from ".";
+import { thisMonth } from "../../date/year_month";
 export const Member = objectType({
   name: Nexus.Member.$name,
   description: Nexus.Member.$description,
@@ -14,18 +16,26 @@ export const Member = objectType({
     t.field(m.joinedAt);
     t.field(m.leavedAt);
     t.field(m.circle);
-    t.field("monthCircle", {
+    t.field("thisMonthCircle", {
       type: MonthCircle,
-      args: {
-        year: nonNull(stringArg()),
-        month: nonNull(stringArg()),
-      },
-      async resolve(parent, args, ctx) {
+      async resolve(parent, _, ctx) {
         return ctx.prisma.monthCircle.findUnique({
           where: {
             year_month_memberId: {
-              year: args.year,
-              month: args.month,
+              ...thisMonth(),
+              memberId: parent.id,
+            },
+          },
+        });
+      },
+    });
+    t.field("nextMonthCircle", {
+      type: MonthCircle,
+      async resolve(parent, _, ctx) {
+        return ctx.prisma.monthCircle.findUnique({
+          where: {
+            year_month_memberId: {
+              ...nextMonth(),
               memberId: parent.id,
             },
           },

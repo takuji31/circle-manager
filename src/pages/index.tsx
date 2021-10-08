@@ -1,14 +1,20 @@
 import type { NextPage } from "next";
 import * as React from "react";
-import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
+import { Box, Typography } from "@mui/material";
+import MuiAlert, { AlertProps } from "@mui/material/Alert";
 import Layout from "../components/layout";
 import useUser from "../hooks/user";
-import { LinearProgress } from "@mui/material";
+import {
+  CircularProgress,
+  LinearProgress,
+  Snackbar,
+  Stack,
+} from "@mui/material";
 import Link from "../components/link2";
-import { useTopQuery } from "../generated/graphql";
 import { UserWithSession } from "../model/user";
-import { thisAndNextMonth } from "../date/year_month";
+import { nextMonth, thisAndNextMonth, thisMonth } from "../date/year_month";
+import { MemberMonthCircle } from "../components/member_month_circle";
+import { useMemberMonthCirclesQuery } from "../generated/graphql";
 
 const Home: NextPage = (props) => {
   const { user, status } = useUser();
@@ -45,39 +51,34 @@ interface TopContentProps {
 }
 
 const TopContent = ({ user }: TopContentProps) => {
-  console.log(user);
-  const { data, loading, error } = useTopQuery({
+  const { data, loading, error } = useMemberMonthCirclesQuery({
     variables: {
       memberId: user.id,
-      ...thisAndNextMonth(),
     },
   });
   const member = data?.member;
-
-  if (loading) {
-    return (
-      <Box sx={{ width: "100%" }}>
-        <LinearProgress />
-      </Box>
-    );
-  }
-
-  if (error) {
-    <Box p={2}>
-      <Typography variant="body1">
-        エラーが発生しました {error.message}
-      </Typography>
-    </Box>;
-  }
-
-  if (!member) {
-    return <Box />;
-  }
-
-  const name = member.trainerName ?? member.name;
+  const circles = data?.circles;
   return (
     <Box p={2}>
-      <Typography variant="body1">{name}さん</Typography>
+      {!data && loading && <CircularProgress />}
+      {member && circles && (
+        <Stack spacing={2}>
+          {member.thisMonthCircle && (
+            <MemberMonthCircle
+              memberId={user.id}
+              monthCircle={member.thisMonthCircle}
+              circles={circles}
+            />
+          )}
+          {member.nextMonthCircle && (
+            <MemberMonthCircle
+              memberId={user.id}
+              monthCircle={member.nextMonthCircle}
+              circles={circles}
+            />
+          )}
+        </Stack>
+      )}
     </Box>
   );
 };

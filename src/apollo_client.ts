@@ -1,3 +1,4 @@
+import { MonthCircle } from "./generated/graphql";
 import { useMemo } from "react";
 import { ApolloClient, InMemoryCache } from "@apollo/client";
 import { NormalizedCacheObject } from "@apollo/client/cache/inmemory/types";
@@ -26,7 +27,17 @@ function createApolloClient() {
   return new ApolloClient({
     ssrMode: typeof window === "undefined",
     link: createIsomorphLink(),
-    cache: new InMemoryCache(),
+    cache: new InMemoryCache({
+      typePolicies: {
+        Member: {
+          fields: {
+            monthCircle: {
+              merge: false,
+            },
+          },
+        },
+      },
+    }),
   });
 }
 

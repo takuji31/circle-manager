@@ -48,16 +48,11 @@ export type Member = {
   id: Scalars['ID'];
   joinedAt: Scalars['DateTime'];
   leavedAt?: Maybe<Scalars['DateTime']>;
-  monthCircle?: Maybe<MonthCircle>;
   name: Scalars['String'];
+  nextMonthCircle?: Maybe<MonthCircle>;
+  thisMonthCircle?: Maybe<MonthCircle>;
   trainerId?: Maybe<Scalars['String']>;
   trainerName?: Maybe<Scalars['String']>;
-};
-
-
-export type MemberMonthCircleArgs = {
-  month: Scalars['String'];
-  year: Scalars['String'];
 };
 
 export type MonthCircle = {
@@ -75,10 +70,24 @@ export enum MonthCircleAnswerState {
   Retired = 'Retired'
 }
 
+export type Mutation = {
+  __typename?: 'Mutation';
+  updateMemberMonthCircle?: Maybe<UpdateMemberMonthCirclePayload>;
+};
+
+
+export type MutationUpdateMemberMonthCircleArgs = {
+  circleId: Scalars['String'];
+  memberId: Scalars['String'];
+  month: Scalars['String'];
+  year: Scalars['String'];
+};
+
 export type Query = {
   __typename?: 'Query';
+  circles: Array<Circle>;
   member?: Maybe<Member>;
-  members?: Maybe<Array<Maybe<Member>>>;
+  members: Array<Member>;
 };
 
 
@@ -86,32 +95,48 @@ export type QueryMemberArgs = {
   id: Scalars['String'];
 };
 
-export type MemberMonthCircleFragment = { __typename?: 'MonthCircle', id: string, state: MonthCircleAnswerState, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined };
+export type UpdateMemberMonthCirclePayload = {
+  __typename?: 'UpdateMemberMonthCirclePayload';
+  monthCircle: MonthCircle;
+};
 
-export type AdminMembersQueryVariables = Exact<{
-  thisYear: Scalars['String'];
-  thisMonth: Scalars['String'];
-  nextYear: Scalars['String'];
-  nextMonth: Scalars['String'];
-}>;
+export type ListedCircleFragment = { __typename?: 'Circle', id: string, name: string };
 
+export type MemberMonthCircleFragment = { __typename?: 'MonthCircle', id: string, year: string, month: string, state: MonthCircleAnswerState, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined };
 
-export type AdminMembersQuery = { __typename?: 'Query', members?: Array<{ __typename?: 'Member', id: string, name: string, circleRole: CircleRole, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined, thisMonthCircle?: { __typename?: 'MonthCircle', id: string, state: MonthCircleAnswerState, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined } | null | undefined, nextMonthCircle?: { __typename?: 'MonthCircle', id: string, state: MonthCircleAnswerState, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined } | null | undefined } | null | undefined> | null | undefined };
-
-export type TopQueryVariables = Exact<{
+export type UpdateMemberMonthCircleMutationVariables = Exact<{
   memberId: Scalars['String'];
-  thisYear: Scalars['String'];
-  thisMonth: Scalars['String'];
-  nextYear: Scalars['String'];
-  nextMonth: Scalars['String'];
+  year: Scalars['String'];
+  month: Scalars['String'];
+  circleId: Scalars['String'];
 }>;
 
 
-export type TopQuery = { __typename?: 'Query', member?: { __typename?: 'Member', id: string, name: string, trainerId?: string | null | undefined, trainerName?: string | null | undefined, circleRole: CircleRole, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined, thisMonthCircle?: { __typename?: 'MonthCircle', id: string, state: MonthCircleAnswerState, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined } | null | undefined, nextMonthCircle?: { __typename?: 'MonthCircle', id: string, state: MonthCircleAnswerState, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined } | null | undefined } | null | undefined };
+export type UpdateMemberMonthCircleMutation = { __typename?: 'Mutation', updateMemberMonthCircle?: { __typename?: 'UpdateMemberMonthCirclePayload', monthCircle: { __typename?: 'MonthCircle', id: string, year: string, month: string, state: MonthCircleAnswerState, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined } } | null | undefined };
 
+export type AdminMembersQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type AdminMembersQuery = { __typename?: 'Query', members: Array<{ __typename?: 'Member', id: string, name: string, circleRole: CircleRole, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined, thisMonthCircle?: { __typename?: 'MonthCircle', id: string, year: string, month: string, state: MonthCircleAnswerState, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined } | null | undefined, nextMonthCircle?: { __typename?: 'MonthCircle', id: string, year: string, month: string, state: MonthCircleAnswerState, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined } | null | undefined }> };
+
+export type MemberMonthCirclesQueryVariables = Exact<{
+  memberId: Scalars['String'];
+}>;
+
+
+export type MemberMonthCirclesQuery = { __typename?: 'Query', member?: { __typename?: 'Member', thisMonthCircle?: { __typename?: 'MonthCircle', id: string, year: string, month: string, state: MonthCircleAnswerState, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined } | null | undefined, nextMonthCircle?: { __typename?: 'MonthCircle', id: string, year: string, month: string, state: MonthCircleAnswerState, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined } | null | undefined } | null | undefined, circles: Array<{ __typename?: 'Circle', id: string, name: string }> };
+
+export const ListedCircleFragmentDoc = gql`
+    fragment ListedCircle on Circle {
+  id
+  name
+}
+    `;
 export const MemberMonthCircleFragmentDoc = gql`
     fragment MemberMonthCircle on MonthCircle {
   id
+  year
+  month
   circle {
     id
     name
@@ -119,8 +144,51 @@ export const MemberMonthCircleFragmentDoc = gql`
   state
 }
     `;
+export const UpdateMemberMonthCircleDocument = gql`
+    mutation UpdateMemberMonthCircle($memberId: String!, $year: String!, $month: String!, $circleId: String!) {
+  updateMemberMonthCircle(
+    memberId: $memberId
+    year: $year
+    month: $month
+    circleId: $circleId
+  ) {
+    monthCircle {
+      ...MemberMonthCircle
+    }
+  }
+}
+    ${MemberMonthCircleFragmentDoc}`;
+export type UpdateMemberMonthCircleMutationFn = Apollo.MutationFunction<UpdateMemberMonthCircleMutation, UpdateMemberMonthCircleMutationVariables>;
+
+/**
+ * __useUpdateMemberMonthCircleMutation__
+ *
+ * To run a mutation, you first call `useUpdateMemberMonthCircleMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateMemberMonthCircleMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateMemberMonthCircleMutation, { data, loading, error }] = useUpdateMemberMonthCircleMutation({
+ *   variables: {
+ *      memberId: // value for 'memberId'
+ *      year: // value for 'year'
+ *      month: // value for 'month'
+ *      circleId: // value for 'circleId'
+ *   },
+ * });
+ */
+export function useUpdateMemberMonthCircleMutation(baseOptions?: Apollo.MutationHookOptions<UpdateMemberMonthCircleMutation, UpdateMemberMonthCircleMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateMemberMonthCircleMutation, UpdateMemberMonthCircleMutationVariables>(UpdateMemberMonthCircleDocument, options);
+      }
+export type UpdateMemberMonthCircleMutationHookResult = ReturnType<typeof useUpdateMemberMonthCircleMutation>;
+export type UpdateMemberMonthCircleMutationResult = Apollo.MutationResult<UpdateMemberMonthCircleMutation>;
+export type UpdateMemberMonthCircleMutationOptions = Apollo.BaseMutationOptions<UpdateMemberMonthCircleMutation, UpdateMemberMonthCircleMutationVariables>;
 export const AdminMembersDocument = gql`
-    query AdminMembers($thisYear: String!, $thisMonth: String!, $nextYear: String!, $nextMonth: String!) {
+    query AdminMembers {
   members {
     id
     name
@@ -129,10 +197,10 @@ export const AdminMembersDocument = gql`
       name
     }
     circleRole
-    thisMonthCircle: monthCircle(year: $thisYear, month: $thisMonth) {
+    thisMonthCircle {
       ...MemberMonthCircle
     }
-    nextMonthCircle: monthCircle(year: $nextYear, month: $nextMonth) {
+    nextMonthCircle {
       ...MemberMonthCircle
     }
   }
@@ -151,14 +219,10 @@ export const AdminMembersDocument = gql`
  * @example
  * const { data, loading, error } = useAdminMembersQuery({
  *   variables: {
- *      thisYear: // value for 'thisYear'
- *      thisMonth: // value for 'thisMonth'
- *      nextYear: // value for 'nextYear'
- *      nextMonth: // value for 'nextMonth'
  *   },
  * });
  */
-export function useAdminMembersQuery(baseOptions: Apollo.QueryHookOptions<AdminMembersQuery, AdminMembersQueryVariables>) {
+export function useAdminMembersQuery(baseOptions?: Apollo.QueryHookOptions<AdminMembersQuery, AdminMembersQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
         return Apollo.useQuery<AdminMembersQuery, AdminMembersQueryVariables>(AdminMembersDocument, options);
       }
@@ -169,56 +233,47 @@ export function useAdminMembersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptio
 export type AdminMembersQueryHookResult = ReturnType<typeof useAdminMembersQuery>;
 export type AdminMembersLazyQueryHookResult = ReturnType<typeof useAdminMembersLazyQuery>;
 export type AdminMembersQueryResult = Apollo.QueryResult<AdminMembersQuery, AdminMembersQueryVariables>;
-export const TopDocument = gql`
-    query Top($memberId: String!, $thisYear: String!, $thisMonth: String!, $nextYear: String!, $nextMonth: String!) {
+export const MemberMonthCirclesDocument = gql`
+    query MemberMonthCircles($memberId: String!) {
   member(id: $memberId) {
-    id
-    name
-    trainerId
-    trainerName
-    circleRole
-    circle {
-      id
-      name
-    }
-    thisMonthCircle: monthCircle(year: $thisYear, month: $thisMonth) {
+    thisMonthCircle {
       ...MemberMonthCircle
     }
-    nextMonthCircle: monthCircle(year: $nextYear, month: $nextMonth) {
+    nextMonthCircle {
       ...MemberMonthCircle
     }
   }
+  circles {
+    ...ListedCircle
+  }
 }
-    ${MemberMonthCircleFragmentDoc}`;
+    ${MemberMonthCircleFragmentDoc}
+${ListedCircleFragmentDoc}`;
 
 /**
- * __useTopQuery__
+ * __useMemberMonthCirclesQuery__
  *
- * To run a query within a React component, call `useTopQuery` and pass it any options that fit your needs.
- * When your component renders, `useTopQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useMemberMonthCirclesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useMemberMonthCirclesQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useTopQuery({
+ * const { data, loading, error } = useMemberMonthCirclesQuery({
  *   variables: {
  *      memberId: // value for 'memberId'
- *      thisYear: // value for 'thisYear'
- *      thisMonth: // value for 'thisMonth'
- *      nextYear: // value for 'nextYear'
- *      nextMonth: // value for 'nextMonth'
  *   },
  * });
  */
-export function useTopQuery(baseOptions: Apollo.QueryHookOptions<TopQuery, TopQueryVariables>) {
+export function useMemberMonthCirclesQuery(baseOptions: Apollo.QueryHookOptions<MemberMonthCirclesQuery, MemberMonthCirclesQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<TopQuery, TopQueryVariables>(TopDocument, options);
+        return Apollo.useQuery<MemberMonthCirclesQuery, MemberMonthCirclesQueryVariables>(MemberMonthCirclesDocument, options);
       }
-export function useTopLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<TopQuery, TopQueryVariables>) {
+export function useMemberMonthCirclesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MemberMonthCirclesQuery, MemberMonthCirclesQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<TopQuery, TopQueryVariables>(TopDocument, options);
+          return Apollo.useLazyQuery<MemberMonthCirclesQuery, MemberMonthCirclesQueryVariables>(MemberMonthCirclesDocument, options);
         }
-export type TopQueryHookResult = ReturnType<typeof useTopQuery>;
-export type TopLazyQueryHookResult = ReturnType<typeof useTopLazyQuery>;
-export type TopQueryResult = Apollo.QueryResult<TopQuery, TopQueryVariables>;
+export type MemberMonthCirclesQueryHookResult = ReturnType<typeof useMemberMonthCirclesQuery>;
+export type MemberMonthCirclesLazyQueryHookResult = ReturnType<typeof useMemberMonthCirclesLazyQuery>;
+export type MemberMonthCirclesQueryResult = Apollo.QueryResult<MemberMonthCirclesQuery, MemberMonthCirclesQueryVariables>;

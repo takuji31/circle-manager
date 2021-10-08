@@ -1,5 +1,6 @@
+import { Query } from "./query";
 import * as Nexus from "nexus-prisma";
-import { objectType } from "nexus";
+import { list, nonNull, objectType, queryField, queryType } from "nexus";
 export const Circle = objectType({
   name: Nexus.Circle.$name,
   description: Nexus.Circle.$description,
@@ -9,5 +10,16 @@ export const Circle = objectType({
     t.field(c.name);
     t.field(c.createdAt);
     t.field(c.members);
+  },
+});
+
+export const CirclesQueryField = queryField("circles", {
+  type: nonNull(list(nonNull(Circle))),
+  resolve(parent, args, ctx) {
+    return ctx.prisma.circle.findMany({
+      orderBy: {
+        createdAt: "asc",
+      },
+    });
   },
 });

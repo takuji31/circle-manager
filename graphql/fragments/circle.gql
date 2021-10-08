@@ -1,0 +1,4 @@
+fragment ListedCircle on Circle {
+  id
+  name
+}

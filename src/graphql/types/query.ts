@@ -15,7 +15,7 @@ export const Query = queryType({
         });
       },
     });
-    t.list.field("members", {
+    t.nonNull.list.nonNull.field("members", {
       type: Member,
       resolve(parens, args, ctx) {
         return ctx.prisma.member.findMany({

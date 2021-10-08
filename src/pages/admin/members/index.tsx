@@ -1,12 +1,10 @@
 import { CircleRole } from ".prisma/client";
-import { gql, useQuery } from "@apollo/client";
 import { LinearProgress } from "@mui/material";
 import { Box } from "@mui/system";
 import {
   DataGrid,
   GridActionsCellItem,
   GridColDef,
-  GridRenderCellParams,
   GridRowParams,
   GridRowsProp,
   GridToolbar,
@@ -152,8 +150,9 @@ const MemberList: NextPage<Props> = ({ monthCircleNames }) => {
           <LinearProgress />
         </Box>
       )}
-      <div style={{ height: 400, width: "100%" }}>
-        {members && (
+      {error && <p>エラーが起きました {error.message}</p>}
+      {members && (
+        <div style={{ height: 400, width: "100%" }}>
           <DataGrid
             components={{
               Toolbar: GridToolbar,
@@ -162,8 +161,8 @@ const MemberList: NextPage<Props> = ({ monthCircleNames }) => {
             rows={members}
             columns={columns}
           />
-        )}
-      </div>
+        </div>
+      )}
     </AdminLayout>
   );
 };

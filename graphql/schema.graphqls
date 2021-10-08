@@ -43,8 +43,9 @@ type Member {
   id: ID!
   joinedAt: DateTime!
   leavedAt: DateTime
-  monthCircle(month: String!, year: String!): MonthCircle
   name: String!
+  nextMonthCircle: MonthCircle
+  thisMonthCircle: MonthCircle
   trainerId: String
   trainerName: String
 }
@@ -63,7 +64,16 @@ enum MonthCircleAnswerState {
   Retired
 }
 
+type Mutation {
+  updateMemberMonthCircle(circleId: String!, memberId: String!, month: String!, year: String!): UpdateMemberMonthCirclePayload
+}
+
 type Query {
+  circles: [Circle!]!
   member(id: String!): Member
-  members: [Member]
+  members: [Member!]!
+}
+
+type UpdateMemberMonthCirclePayload {
+  monthCircle: MonthCircle!
 }

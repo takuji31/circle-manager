@@ -1,5 +1,4 @@
 import { Circle } from "./circle";
-import { User } from "discord.js";
 export class Member {
   readonly trainerName: string;
   constructor(
