@@ -73,6 +73,7 @@ export enum MonthCircleAnswerState {
 export type Mutation = {
   __typename?: 'Mutation';
   updateMemberMonthCircle?: Maybe<UpdateMemberMonthCirclePayload>;
+  updateMembers: Array<Member>;
 };
 
 

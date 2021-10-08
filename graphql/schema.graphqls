@@ -66,6 +66,7 @@ enum MonthCircleAnswerState {
 
 type Mutation {
   updateMemberMonthCircle(circleId: String!, memberId: String!, month: String!, year: String!): UpdateMemberMonthCirclePayload
+  updateMembers: [Member!]!
 }
 
 type Query {

@@ -15,25 +15,5 @@ export const Query = queryType({
         });
       },
     });
-    t.nonNull.list.nonNull.field("members", {
-      type: Member,
-      resolve(parens, args, ctx) {
-        return ctx.prisma.member.findMany({
-          orderBy: [
-            {
-              circle: {
-                createdAt: "asc",
-              },
-            },
-            {
-              circleRole: "asc",
-            },
-            {
-              joinedAt: "asc",
-            },
-          ],
-        });
-      },
-    });
   },
 });
