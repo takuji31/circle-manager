@@ -100,47 +100,45 @@ const MemberList: NextPage<Props> = ({ monthCircleNames }) => {
           }
         },
       },
-      {
-        field: "actions",
-        type: "actions",
-        getActions: (params: GridRowParams) => {
-          const actions = [];
-          return [
-            <GridActionsCellItem
-              onClick={() => {}}
-              label="Delete"
-              showInMenu
-            />,
-            <GridActionsCellItem
-              onClick={() => {}}
-              label="Delete"
-              showInMenu
-            />,
-            <GridActionsCellItem
-              onClick={() => {}}
-              label="Delete"
-              showInMenu
-            />,
-            <GridActionsCellItem
-              onClick={() => {}}
-              label="Delete"
-              showInMenu
-            />,
-            <GridActionsCellItem
-              onClick={() => {}}
-              label="Delete"
-              showInMenu
-            />,
-          ];
-        },
-      },
+      // {
+      //   field: "actions",
+      //   type: "actions",
+      //   getActions: (params: GridRowParams) => {
+      //     const actions = [];
+      //     return [
+      //       <GridActionsCellItem
+      //         onClick={() => {}}
+      //         label="Delete"
+      //         showInMenu
+      //       />,
+      //       <GridActionsCellItem
+      //         onClick={() => {}}
+      //         label="Delete"
+      //         showInMenu
+      //       />,
+      //       <GridActionsCellItem
+      //         onClick={() => {}}
+      //         label="Delete"
+      //         showInMenu
+      //       />,
+      //       <GridActionsCellItem
+      //         onClick={() => {}}
+      //         label="Delete"
+      //         showInMenu
+      //       />,
+      //       <GridActionsCellItem
+      //         onClick={() => {}}
+      //         label="Delete"
+      //         showInMenu
+      //       />,
+      //     ];
+      //   },
+      // },
     ],
     monthCircleNames
   );
 
-  const { data, error, loading } = useAdminMembersQuery({
-    variables: thisAndNextMonth(),
-  });
+  const { data, error, loading } = useAdminMembersQuery();
   const members = data?.members as GridRowsProp;
 
   return (
