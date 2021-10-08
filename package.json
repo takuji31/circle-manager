@@ -6,7 +6,7 @@
     "dev": "NODE_OPTIONS='--inspect' next dev",
     "prebuild": "prisma migrate deploy",
     "build:nexus-typegen": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' --transpile-only src/graphql",
-    "build": "yarn run build:nexus-typegen && next build",
+    "build": "yarn run db:generate && yarn run build:nexus-typegen && next build",
     "start": "next start",
     "lint": "next lint",
     "ts-node": "ts-node --compiler-options {\\\"module\\\":\\\"commonjs\\\"}",
