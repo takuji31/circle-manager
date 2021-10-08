@@ -4,11 +4,11 @@ import React, { useState } from "react";
 import { NextLinkComposed } from "./link2";
 import useUser from "../hooks/user";
 import * as Icons from "@mui/icons-material";
-import { updateMembers } from "../admin/commands/update_members";
+import { useUpdateMembersMutation } from "../generated/graphql";
 
 export const AdminMenu = () => {
   const { user } = useUser();
-  const [loading, setLoading] = useState(false);
+  const [mutation, { data, loading, error }] = useUpdateMembersMutation();
   if (!user || !user.isMember || !user.isAdmin) {
     return <></>;
   } else {
@@ -19,8 +19,7 @@ export const AdminMenu = () => {
           color="inherit"
           startIcon={<Icons.AdminPanelSettings />}
           onClick={() => {
-            setLoading(true);
-            updateMembers().finally(() => setLoading(false));
+            mutation().then(() => {});
           }}
         >
           メンバー表更新

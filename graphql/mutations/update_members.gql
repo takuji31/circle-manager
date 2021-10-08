@@ -1,0 +1,17 @@
+mutation UpdateMembers {
+  updateMembers {
+    id
+    name
+    trainerId
+    trainerName
+    circle {
+      ...ListedCircle
+    }
+    thisMonthCircle {
+      ...MemberMonthCircle
+    }
+    nextMonthCircle {
+      ...MemberMonthCircle
+    }
+  }
+}

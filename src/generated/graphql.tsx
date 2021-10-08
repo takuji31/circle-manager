@@ -115,6 +115,11 @@ export type UpdateMemberMonthCircleMutationVariables = Exact<{
 
 export type UpdateMemberMonthCircleMutation = { __typename?: 'Mutation', updateMemberMonthCircle?: { __typename?: 'UpdateMemberMonthCirclePayload', monthCircle: { __typename?: 'MonthCircle', id: string, year: string, month: string, state: MonthCircleAnswerState, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined } } | null | undefined };
 
+export type UpdateMembersMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type UpdateMembersMutation = { __typename?: 'Mutation', updateMembers: Array<{ __typename?: 'Member', id: string, name: string, trainerId?: string | null | undefined, trainerName?: string | null | undefined, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined, thisMonthCircle?: { __typename?: 'MonthCircle', id: string, year: string, month: string, state: MonthCircleAnswerState, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined } | null | undefined, nextMonthCircle?: { __typename?: 'MonthCircle', id: string, year: string, month: string, state: MonthCircleAnswerState, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined } | null | undefined }> };
+
 export type AdminMembersQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -188,6 +193,51 @@ export function useUpdateMemberMonthCircleMutation(baseOptions?: Apollo.Mutation
 export type UpdateMemberMonthCircleMutationHookResult = ReturnType<typeof useUpdateMemberMonthCircleMutation>;
 export type UpdateMemberMonthCircleMutationResult = Apollo.MutationResult<UpdateMemberMonthCircleMutation>;
 export type UpdateMemberMonthCircleMutationOptions = Apollo.BaseMutationOptions<UpdateMemberMonthCircleMutation, UpdateMemberMonthCircleMutationVariables>;
+export const UpdateMembersDocument = gql`
+    mutation UpdateMembers {
+  updateMembers {
+    id
+    name
+    trainerId
+    trainerName
+    circle {
+      ...ListedCircle
+    }
+    thisMonthCircle {
+      ...MemberMonthCircle
+    }
+    nextMonthCircle {
+      ...MemberMonthCircle
+    }
+  }
+}
+    ${ListedCircleFragmentDoc}
+${MemberMonthCircleFragmentDoc}`;
+export type UpdateMembersMutationFn = Apollo.MutationFunction<UpdateMembersMutation, UpdateMembersMutationVariables>;
+
+/**
+ * __useUpdateMembersMutation__
+ *
+ * To run a mutation, you first call `useUpdateMembersMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateMembersMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateMembersMutation, { data, loading, error }] = useUpdateMembersMutation({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useUpdateMembersMutation(baseOptions?: Apollo.MutationHookOptions<UpdateMembersMutation, UpdateMembersMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateMembersMutation, UpdateMembersMutationVariables>(UpdateMembersDocument, options);
+      }
+export type UpdateMembersMutationHookResult = ReturnType<typeof useUpdateMembersMutation>;
+export type UpdateMembersMutationResult = Apollo.MutationResult<UpdateMembersMutation>;
+export type UpdateMembersMutationOptions = Apollo.BaseMutationOptions<UpdateMembersMutation, UpdateMembersMutationVariables>;
 export const AdminMembersDocument = gql`
     query AdminMembers {
   members {
