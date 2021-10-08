@@ -135,7 +135,7 @@ const MemberList: NextPage<Props> = ({ monthCircleNames }) => {
       //   },
       // },
     ],
-    monthCircleNames
+    [monthCircleNames]
   );
 
   const { data, error, loading } = useAdminMembersQuery();
