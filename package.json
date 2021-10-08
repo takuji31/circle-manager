@@ -15,7 +15,8 @@
     "bot:watch": "nodemon",
     "db:generate": "prisma generate",
     "db:studio": "prisma studio",
-    "graphql:codegen": "graphql-codegen --config codegen.yml"
+    "graphql:codegen": "graphql-codegen --config codegen.yml",
+    "bot:deploy_commands": "ts-node --compiler-options {\\\"module\\\":\\\"commonjs\\\"} src/deploy-commands.ts"
   },
   "prisma": {
     "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} src/db/seed.ts"

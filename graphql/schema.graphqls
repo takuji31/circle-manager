@@ -53,6 +53,7 @@ type Member {
 type MonthCircle {
   circle: Circle
   id: ID!
+  member: Member!
   month: String!
   state: MonthCircleAnswerState!
   year: String!
@@ -73,6 +74,7 @@ type Query {
   circles: [Circle!]!
   member(id: String!): Member
   members: [Member!]!
+  monthCircle(monthCircleId: String!): MonthCircle
 }
 
 type UpdateMemberMonthCirclePayload {

@@ -59,6 +59,7 @@ export type MonthCircle = {
   __typename?: 'MonthCircle';
   circle?: Maybe<Circle>;
   id: Scalars['ID'];
+  member: Member;
   month: Scalars['String'];
   state: MonthCircleAnswerState;
   year: Scalars['String'];
@@ -89,11 +90,17 @@ export type Query = {
   circles: Array<Circle>;
   member?: Maybe<Member>;
   members: Array<Member>;
+  monthCircle?: Maybe<MonthCircle>;
 };
 
 
 export type QueryMemberArgs = {
   id: Scalars['String'];
+};
+
+
+export type QueryMonthCircleArgs = {
+  monthCircleId: Scalars['String'];
 };
 
 export type UpdateMemberMonthCirclePayload = {
@@ -131,6 +138,13 @@ export type MemberMonthCirclesQueryVariables = Exact<{
 
 
 export type MemberMonthCirclesQuery = { __typename?: 'Query', member?: { __typename?: 'Member', thisMonthCircle?: { __typename?: 'MonthCircle', id: string, year: string, month: string, state: MonthCircleAnswerState, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined } | null | undefined, nextMonthCircle?: { __typename?: 'MonthCircle', id: string, year: string, month: string, state: MonthCircleAnswerState, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined } | null | undefined } | null | undefined, circles: Array<{ __typename?: 'Circle', id: string, name: string }> };
+
+export type MonthCircleQueryVariables = Exact<{
+  monthCircleId: Scalars['String'];
+}>;
+
+
+export type MonthCircleQuery = { __typename?: 'Query', monthCircle?: { __typename?: 'MonthCircle', id: string, year: string, month: string, state: MonthCircleAnswerState, member: { __typename?: 'Member', id: string, name: string }, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined } | null | undefined, circles: Array<{ __typename?: 'Circle', id: string, name: string }> };
 
 export const ListedCircleFragmentDoc = gql`
     fragment ListedCircle on Circle {
@@ -328,3 +342,46 @@ export function useMemberMonthCirclesLazyQuery(baseOptions?: Apollo.LazyQueryHoo
 export type MemberMonthCirclesQueryHookResult = ReturnType<typeof useMemberMonthCirclesQuery>;
 export type MemberMonthCirclesLazyQueryHookResult = ReturnType<typeof useMemberMonthCirclesLazyQuery>;
 export type MemberMonthCirclesQueryResult = Apollo.QueryResult<MemberMonthCirclesQuery, MemberMonthCirclesQueryVariables>;
+export const MonthCircleDocument = gql`
+    query MonthCircle($monthCircleId: String!) {
+  monthCircle(monthCircleId: $monthCircleId) {
+    ...MemberMonthCircle
+    member {
+      id
+      name
+    }
+  }
+  circles {
+    ...ListedCircle
+  }
+}
+    ${MemberMonthCircleFragmentDoc}
+${ListedCircleFragmentDoc}`;
+
+/**
+ * __useMonthCircleQuery__
+ *
+ * To run a query within a React component, call `useMonthCircleQuery` and pass it any options that fit your needs.
+ * When your component renders, `useMonthCircleQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useMonthCircleQuery({
+ *   variables: {
+ *      monthCircleId: // value for 'monthCircleId'
+ *   },
+ * });
+ */
+export function useMonthCircleQuery(baseOptions: Apollo.QueryHookOptions<MonthCircleQuery, MonthCircleQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<MonthCircleQuery, MonthCircleQueryVariables>(MonthCircleDocument, options);
+      }
+export function useMonthCircleLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MonthCircleQuery, MonthCircleQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<MonthCircleQuery, MonthCircleQueryVariables>(MonthCircleDocument, options);
+        }
+export type MonthCircleQueryHookResult = ReturnType<typeof useMonthCircleQuery>;
+export type MonthCircleLazyQueryHookResult = ReturnType<typeof useMonthCircleLazyQuery>;
+export type MonthCircleQueryResult = Apollo.QueryResult<MonthCircleQuery, MonthCircleQueryVariables>;

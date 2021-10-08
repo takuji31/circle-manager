@@ -3,7 +3,14 @@ import {
   MonthCircleAnswerState as _MonthCircleAnswerState,
 } from "nexus-prisma";
 import { MonthCircleAnswerState as PrismaMonthCircleAnswerState } from "@prisma/client";
-import { enumType, mutationField, nonNull, objectType, stringArg } from "nexus";
+import {
+  enumType,
+  mutationField,
+  nonNull,
+  objectType,
+  queryField,
+  stringArg,
+} from "nexus";
 
 export const MonthCircle = objectType({
   name: _MonthCircle.$name,
@@ -14,6 +21,7 @@ export const MonthCircle = objectType({
     t.field(_MonthCircle.month);
     t.field(_MonthCircle.state);
     t.field(_MonthCircle.circle);
+    t.field(_MonthCircle.member);
   },
 });
 
@@ -24,6 +32,20 @@ export const UpdateMemberMonthCirclePayload = objectType({
   definition(t) {
     t.field("monthCircle", {
       type: nonNull(MonthCircle),
+    });
+  },
+});
+
+export const MonthCircleQuery = queryField("monthCircle", {
+  type: MonthCircle,
+  args: {
+    monthCircleId: nonNull(stringArg()),
+  },
+  resolve(parent, { monthCircleId }, ctx) {
+    return ctx.prisma.monthCircle.findUnique({
+      where: {
+        id: monthCircleId,
+      },
     });
   },
 });
