@@ -86,13 +86,15 @@ export const UpdateMembers = mutationField("updateMembers", {
       throw new Error("updateMembers not supported");
     }
     const rest = createDiscordRestClient();
-    const cirdleIds = (
-      await ctx.prisma.circle.findMany({
-        orderBy: {
-          id: "asc",
-        },
-      })
-    ).map((circle) => circle.id);
+    const circles = await ctx.prisma.circle.findMany({
+      select: {
+        id: true,
+      },
+      orderBy: {
+        id: "asc",
+      },
+    });
+    const circleIds = circles.map((circle) => circle.id);
 
     const members = (await rest.get(
       `${Routes.guildMembers(Guild.id)}?limit=1000`
@@ -103,7 +105,7 @@ export const UpdateMembers = mutationField("updateMembers", {
         .map((member) => {
           const user = member.user!;
           const circleIdOrNull = member.roles.filter(
-            (role) => cirdleIds.indexOf(role) != -1
+            (role) => circleIds.indexOf(role) != -1
           )[0];
           const circleRole = member.roles.includes(Guild.roleId.leader)
             ? PrismaCircleRole.Leader
