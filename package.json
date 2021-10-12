@@ -19,7 +19,8 @@
     "db:push": "prisma db push",
     "db:migrate:dev": "prisma migrate dev",
     "db:migrate:deploy": "prisma migrate deploy",
-    "ts-node": "TS_NODE_PROJECT=tsconfig.node.json ts-node -r tsconfig-paths/register"
+    "ts-node": "TS_NODE_PROJECT=tsconfig.node.json ts-node -r tsconfig-paths/register",
+    "bot:start": "node dist/apps/bot/main.js"
   },
   "prisma": {
     "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} src/db/seed.ts",
