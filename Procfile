@@ -1,2 +1,2 @@
-web: yarn nx serve web
-bot: yarn nx serve bot
+web: yarn nx web:serve:production
+bot: yarn nx bot:serve:production
