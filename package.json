@@ -4,7 +4,7 @@
   "license": "MIT",
   "scripts": {
     "start": "nx serve",
-    "prebuild": "nx run database:migrations && yarn run gen",
+    "prebuild": "yarn run db:migrate:deploy && yarn run gen",
     "build": "nx build web && nx build bot",
     "test": "nx test",
     "gen": "nx run database:generate && yarn run graphql:schemagen && yarn run graphql:codegen",
@@ -18,6 +18,7 @@
     "db:format": "prisma format",
     "db:push": "prisma db push",
     "db:migrate:dev": "prisma migrate dev",
+    "db:migrate:deploy": "prisma migrate deploy",
     "ts-node": "TS_NODE_PROJECT=tsconfig.node.json ts-node -r tsconfig-paths/register"
   },
   "prisma": {
