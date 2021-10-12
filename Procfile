@@ -1,2 +1,2 @@
-web: yarn run start
-bot: yarn run bot:start
+web: yarn npx serve web
+bot: yarn npx serve bot
