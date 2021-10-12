@@ -3,7 +3,7 @@ import { Box } from '@mui/system';
 import { GetStaticPaths, GetStaticProps, NextPage } from 'next';
 import React from 'react';
 import Layout from '../../components/layout';
-import { MemberMonthCircle } from '../../components/member_month_circle';
+import MemberMonthCircle from '../../components/member_month_circle';
 import { nextMonth, thisMonth } from '@circle-manager/model';
 import { useMonthCircleQuery } from '../../apollo';
 import { prisma } from '@circle-manager/database';
@@ -35,6 +35,9 @@ const MemberMonthCirclePage: NextPage<Props> = ({ monthCircleId }) => {
             memberId={monthCircle.member.id}
             monthCircle={monthCircle}
             circles={circles}
+            year={monthCircle.year}
+            month={monthCircle.month}
+            canEdit={true}
           />
         </Box>
       )}
