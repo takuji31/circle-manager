@@ -1,2 +1,2 @@
-web: yarn nx web:serve:production
-bot: yarn nx bot:serve:production
+web: yarn nx run web:serve:production
+bot: yarn nx run bot:serve:production
