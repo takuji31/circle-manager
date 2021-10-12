@@ -5,7 +5,7 @@
   "scripts": {
     "start": "nx serve",
     "prebuild": "nx run database:migrations && yarn run gen",
-    "build": "nx build",
+    "build": "nx build web && nx build bot",
     "test": "nx test",
     "gen": "nx run database:generate && yarn run graphql:schemagen && yarn run graphql:codegen",
     "graphql:codegen": "graphql-codegen --config codegen.yml",

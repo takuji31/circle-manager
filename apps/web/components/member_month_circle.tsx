@@ -12,22 +12,23 @@ import {
   useUpdateMemberMonthCircleMutation,
 } from '../apollo';
 
-export const MemberMonthCircle = ({
-  memberId,
-  year,
-  month,
-  circles,
-  canEdit,
-  ...pageProps
-}: {
+export interface Props {
   memberId: string;
   year: string;
   month: string;
   monthCircle: MemberMonthCircleFragment | null;
   circles: Array<ListedCircleFragment>;
   canEdit: boolean;
-}) => {
-  const monthCircle = pageProps.monthCircle as MemberMonthCircleFragment | null;
+}
+
+export default function MemberMonthCircle({
+  memberId,
+  year,
+  month,
+  monthCircle,
+  circles,
+  canEdit,
+}: Props) {
   const [mutation] = useUpdateMemberMonthCircleMutation();
   return (
     <Stack spacing={2}>
@@ -95,4 +96,4 @@ export const MemberMonthCircle = ({
       )}
     </Stack>
   );
-};
+}

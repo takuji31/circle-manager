@@ -57,17 +57,17 @@ const TopContent = ({ user }: TopContentProps) => {
         <Stack spacing={2}>
           <MemberMonthCircle
             memberId={user.id}
-            {...thisMonth()}
             monthCircle={member.thisMonthCircle}
             circles={circles}
             canEdit={false}
+            {...thisMonth()}
           />
           <MemberMonthCircle
             memberId={user.id}
-            {...nextMonth()}
             monthCircle={member.nextMonthCircle}
             circles={circles}
             canEdit={true}
+            {...nextMonth()}
           />
         </Stack>
       )}
