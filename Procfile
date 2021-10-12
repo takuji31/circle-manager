@@ -1,2 +1,2 @@
-web: yarn npx serve web
-bot: yarn npx serve bot
+web: yarn nx serve web
+bot: yarn nx serve bot

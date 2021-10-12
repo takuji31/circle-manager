@@ -189,8 +189,7 @@
           "configurations": {
             "production": {
               "buildTarget": "web:build:production",
-              "dev": false,
-              "port": null
+              "dev": false
             }
           }
         },
