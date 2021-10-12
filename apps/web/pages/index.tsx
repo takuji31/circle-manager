@@ -5,7 +5,7 @@ import Layout from '../components/layout';
 import useUser from '../hooks/user';
 import { CircularProgress, LinearProgress, Stack } from '@mui/material';
 import { nextMonth, thisMonth, UserWithSession } from '@circle-manager/model';
-import { MemberMonthCircle } from '../components/member_month_circle';
+import MemberMonthCircle from '../components/member_month_circle';
 import { useMemberMonthCirclesQuery } from '../apollo';
 
 const Home: NextPage = (props) => {
