@@ -4,7 +4,7 @@
   "license": "MIT",
   "scripts": {
     "start": "nx serve",
-    "prebuild": "yarn run db:migrate:deploy && yarn run gen",
+    "prebuild": "yarn run db:migrate:deploy && yarn run gen && yarn run ts-node libs/database/src/onetime/member_pathname.ts",
     "build": "nx build web && nx build bot",
     "test": "nx test",
     "gen": "nx run database:generate && yarn run graphql:schemagen && yarn run graphql:codegen",
@@ -23,7 +23,7 @@
     "bot:start": "node dist/apps/bot/main.js"
   },
   "prisma": {
-    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} src/db/seed.ts",
+    "seed": "yarn run nx seed database",
     "schema": "libs/database/prisma/schema.prisma"
   },
   "private": true,
@@ -63,6 +63,7 @@
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "regenerator-runtime": "0.13.7",
+    "scuid": "^1.1.0",
     "swr": "^1.0.1",
     "ts-node": "^10.2.1",
     "tslib": "^2.0.0"
