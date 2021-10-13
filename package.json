@@ -4,7 +4,7 @@
   "license": "MIT",
   "scripts": {
     "start": "nx serve",
-    "prebuild": "yarn run db:migrate:deploy && yarn run gen && yarn run ts-node libs/database/src/onetime/member_pathname.ts",
+    "prebuild": "yarn run db:migrate:deploy && yarn run gen",
     "build": "nx build web && nx build bot",
     "test": "nx test",
     "gen": "nx run database:generate && yarn run graphql:schemagen && yarn run graphql:codegen",
