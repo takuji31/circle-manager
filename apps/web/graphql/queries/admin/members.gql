@@ -1,6 +1,8 @@
 query AdminMembers {
   members {
     id
+    pathname
+    trainerName
     name
     circle {
       id

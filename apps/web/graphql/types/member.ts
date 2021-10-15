@@ -20,6 +20,7 @@ export const Member = objectType({
   definition: (t) => {
     const m = Nexus.Member;
     t.field(m.id);
+    t.field(m.pathname);
     t.field(m.circleRole);
     t.field(m.name);
     t.field(m.trainerName);

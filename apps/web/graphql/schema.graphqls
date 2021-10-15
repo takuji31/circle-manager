@@ -24,6 +24,10 @@ enum CircleRole {
   SubLeader
 }
 
+type CreateNextMonthSurveyPayload {
+  monthSurvey: MonthSurvey!
+}
+
 """
 A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
 """
@@ -45,9 +49,16 @@ type Member {
   leavedAt: DateTime
   name: String!
   nextMonthCircle: MonthCircle
+  pathname: String!
   thisMonthCircle: MonthCircle
   trainerId: String
   trainerName: String
+}
+
+type Month {
+  month: String!
+  survey: MonthSurvey
+  year: String!
 }
 
 type MonthCircle {
@@ -65,6 +76,16 @@ enum MonthCircleAnswerState {
   Retired
 }
 
+"""在籍希望アンケート"""
+type MonthSurvey {
+  expiredAt: DateTime!
+
+  """アンケートのメッセージID"""
+  id: ID!
+  month: String!
+  year: String!
+}
+
 type Mutation {
   updateMemberMonthCircle(circleId: String!, memberId: String!, month: String!, year: String!): UpdateMemberMonthCirclePayload
   updateMembers: [Member!]!
@@ -75,6 +96,8 @@ type Query {
   member(id: String!): Member
   members: [Member!]!
   monthCircle(monthCircleId: String!): MonthCircle
+  nextMonth: Month!
+  thisMonth: Month!
 }
 
 type UpdateMemberMonthCirclePayload {

@@ -9,6 +9,9 @@ const commands = [
   new SlashCommandBuilder()
     .setName('month_survey_url')
     .setDescription('[開発中]来月の異動アンケートURLを発行します。'),
+  new SlashCommandBuilder()
+    .setName('month_survey_url')
+    .setDescription('[開発中]来月の異動アンケートURLを発行します。'),
 ].map((command) => command.toJSON());
 
 const rest = createDiscordRestClient();

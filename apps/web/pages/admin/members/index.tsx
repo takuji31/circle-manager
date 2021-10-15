@@ -22,6 +22,7 @@ import {
   useAdminMembersQuery,
 } from '../../../apollo';
 import { prisma } from '@circle-manager/database';
+import { NextLinkComposed } from '../../../components/link';
 
 export interface Props {
   monthCircleNames: Array<string>;
@@ -100,40 +101,24 @@ const MemberList: NextPage<Props> = ({ monthCircleNames }) => {
           }
         },
       },
-      // {
-      //   field: "actions",
-      //   type: "actions",
-      //   getActions: (params: GridRowParams) => {
-      //     const actions = [];
-      //     return [
-      //       <GridActionsCellItem
-      //         onClick={() => {}}
-      //         label="Delete"
-      //         showInMenu
-      //       />,
-      //       <GridActionsCellItem
-      //         onClick={() => {}}
-      //         label="Delete"
-      //         showInMenu
-      //       />,
-      //       <GridActionsCellItem
-      //         onClick={() => {}}
-      //         label="Delete"
-      //         showInMenu
-      //       />,
-      //       <GridActionsCellItem
-      //         onClick={() => {}}
-      //         label="Delete"
-      //         showInMenu
-      //       />,
-      //       <GridActionsCellItem
-      //         onClick={() => {}}
-      //         label="Delete"
-      //         showInMenu
-      //       />,
-      //     ];
-      //   },
-      // },
+      {
+        field: 'actions',
+        type: 'actions',
+        getActions: (params: GridRowParams) => {
+          const actions = [];
+          const pathname = params.row.pathname;
+          console.log(params.row);
+          return [
+            <GridActionsCellItem
+              key="members_pathname_url"
+              component={NextLinkComposed}
+              to={`/members/path/${pathname}`}
+              label="基本情報登録ページを開く"
+              showInMenu
+            />,
+          ];
+        },
+      },
     ],
     [monthCircleNames]
   );

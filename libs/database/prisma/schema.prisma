@@ -18,6 +18,7 @@ model Circle {
   id             String          @id @db.VarChar(255)
   name           String
   createdAt      DateTime        @default(now())
+  emoji          String?
   members        Member[]
   monthCircles   MonthCircle[]
   monthTransfers MonthTransfer[]
@@ -37,6 +38,7 @@ model Member {
   monthCircles   MonthCircle[]
   monthTransfers MonthTransfer[]
 
+  @@unique([pathname])
   @@index([leavedAt])
   @@index([joinedAt])
   @@index([circleId, circleRole, joinedAt])
@@ -55,7 +57,7 @@ model MonthCircle {
   year           String                 @db.Char(4)
   month          String                 @db.Char(2)
   state          MonthCircleAnswerState @default(NoAnswer)
-  circleId       String?                @default(dbgenerated("NULL")) @db.VarChar(255)
+  circleId       String?                @db.VarChar(255)
   circle         Circle?                @relation(fields: [circleId], references: [id])
   monthTransfers MonthTransfer[]
 
@@ -68,6 +70,16 @@ enum MonthCircleAnswerState {
   NoAnswer
   Answered
   Retired
+}
+
+/// 在籍希望アンケート
+model MonthSurvey {
+  id    String @id @db.VarChar(255) /// アンケートのメッセージID
+  year  String @db.VarChar(4)
+  month String @db.VarChar(2)
+  expiredAt DateTime
+
+  @@unique([year, month])
 }
 
 model MonthTransfer {

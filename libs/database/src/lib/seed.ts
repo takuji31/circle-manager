@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
@@ -7,18 +7,21 @@ async function main() {
     skipDuplicates: true,
     data: [
       {
-        id: "863398236474834944",
-        name: "シン・ウマ娘愛好会",
+        id: '863398236474834944',
+        name: 'シン・ウマ娘愛好会',
+        emoji: 'regional_indicator_a',
         createdAt: new Date(now.getTime() - 2000),
       },
       {
-        id: "870950796479594556",
-        name: "ウマ娘新愛好会：破",
+        id: '870950796479594556',
+        name: 'ウマ娘新愛好会：破',
+        emoji: 'regional_indicator_b',
         createdAt: new Date(now.getTime() - 1000),
       },
       {
-        id: "863398725920227339",
-        name: "ウマ娘新愛好会：序",
+        id: '863398725920227339',
+        name: 'ウマ娘新愛好会：序',
+        emoji: 'regional_indicator_c',
         createdAt: now,
       },
     ],
