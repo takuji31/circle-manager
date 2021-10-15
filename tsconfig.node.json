@@ -1,8 +1,0 @@
-// https://github.com/nrwl/nx/issues/1230#issuecomment-634455420
-{
-  "extends": "./tsconfig.base.json",
-  "compilerOptions": {
-    "module": "commonjs",
-    "esModuleInterop": true
-  }
-}

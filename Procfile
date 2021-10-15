@@ -1,2 +1,2 @@
-web: yarn nx run web:serve:production --port $PORT
+web: yarn run start
 bot: yarn run bot:start
