@@ -1,4 +1,4 @@
-import { MonthCircleAnswerState } from '@prisma/client';
+import { MonthCircleAnswerState, Circle } from '@prisma/client';
 import { Member } from './member';
 import { Temporal } from 'proposal-temporal';
 import { createDiscordRestClient } from '../../discord';
@@ -136,9 +136,8 @@ export const CreateNextMonthSurveyMutation = mutationField(
       const circles = await prisma.circle.findMany({
         orderBy: { createdAt: 'asc' },
       });
-      circles.map((circle) => {
+      circles.forEach((circle: Circle) => {
         embed.addField(`${circle.name} 希望の場合`, `${circle.emoji}`);
-        return;
       });
 
       embed.addField(`脱退予定の場合`, Emojis.leave);
