@@ -3,6 +3,27 @@ fragment MonthAndSurvey on Month {
   month
   survey {
     id
+    year
+    month
     expiredAt
+  }
+}
+
+fragment MonthAndSurveyWithMembers on Month {
+  year
+  month
+  survey {
+    id
+    year
+    month
+    expiredAt
+    answeredMembers {
+      id
+      name
+    }
+    noAnswerMembers {
+      id
+      name
+    }
   }
 }

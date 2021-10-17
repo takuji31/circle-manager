@@ -43,7 +43,7 @@ export enum CircleRole {
 
 export type CreateNextMonthSurveyPayload = {
   __typename?: 'CreateNextMonthSurveyPayload';
-  monthSurvey: MonthSurvey;
+  nextMonth: Month;
 };
 
 export type Member = {
@@ -87,10 +87,12 @@ export enum MonthCircleAnswerState {
 /** 在籍希望アンケート */
 export type MonthSurvey = {
   __typename?: 'MonthSurvey';
+  answeredMembers: Array<Maybe<Member>>;
   expiredAt: Scalars['DateTime'];
   /** アンケートのメッセージID */
   id: Scalars['ID'];
   month: Scalars['String'];
+  noAnswerMembers: Array<Maybe<Member>>;
   year: Scalars['String'];
 };
 
@@ -116,6 +118,7 @@ export type Query = {
   members: Array<Member>;
   monthCircle?: Maybe<MonthCircle>;
   nextMonth: Month;
+  siteMetadata: SiteMetadata;
   thisMonth: Month;
 };
 
@@ -129,6 +132,12 @@ export type QueryMonthCircleArgs = {
   monthCircleId: Scalars['String'];
 };
 
+export type SiteMetadata = {
+  __typename?: 'SiteMetadata';
+  maxMembers: Scalars['Int'];
+  totalMembers: Scalars['Int'];
+};
+
 export type UpdateMemberMonthCirclePayload = {
   __typename?: 'UpdateMemberMonthCirclePayload';
   monthCircle: MonthCircle;
@@ -138,12 +147,14 @@ export type ListedCircleFragment = { __typename?: 'Circle', id: string, name: st
 
 export type MemberMonthCircleFragment = { __typename?: 'MonthCircle', id: string, year: string, month: string, state: MonthCircleAnswerState, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined };
 
-export type MonthAndSurveyFragment = { __typename?: 'Month', year: string, month: string, survey?: { __typename?: 'MonthSurvey', id: string, expiredAt: any } | null | undefined };
+export type MonthAndSurveyFragment = { __typename?: 'Month', year: string, month: string, survey?: { __typename?: 'MonthSurvey', id: string, year: string, month: string, expiredAt: any } | null | undefined };
+
+export type MonthAndSurveyWithMembersFragment = { __typename?: 'Month', year: string, month: string, survey?: { __typename?: 'MonthSurvey', id: string, year: string, month: string, expiredAt: any, answeredMembers: Array<{ __typename?: 'Member', id: string, name: string } | null | undefined>, noAnswerMembers: Array<{ __typename?: 'Member', id: string, name: string } | null | undefined> } | null | undefined };
 
 export type CreateNextMonthSurveyMutationVariables = Exact<{ [key: string]: never; }>;
 
 
-export type CreateNextMonthSurveyMutation = { __typename?: 'Mutation', createNextMonthSurvey?: { __typename?: 'CreateNextMonthSurveyPayload', monthSurvey: { __typename?: 'MonthSurvey', id: string, year: string, month: string, expiredAt: any } } | null | undefined };
+export type CreateNextMonthSurveyMutation = { __typename?: 'Mutation', createNextMonthSurvey?: { __typename?: 'CreateNextMonthSurveyPayload', nextMonth: { __typename?: 'Month', year: string, month: string, survey?: { __typename?: 'MonthSurvey', id: string, year: string, month: string, expiredAt: any } | null | undefined } } | null | undefined };
 
 export type UpdateMemberMonthCircleMutationVariables = Exact<{
   memberId: Scalars['String'];
@@ -168,7 +179,7 @@ export type AdminMembersQuery = { __typename?: 'Query', members: Array<{ __typen
 export type AdminTopQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type AdminTopQuery = { __typename?: 'Query', thisMonth: { __typename?: 'Month', year: string, month: string, survey?: { __typename?: 'MonthSurvey', id: string, expiredAt: any } | null | undefined }, nextMonth: { __typename?: 'Month', year: string, month: string, survey?: { __typename?: 'MonthSurvey', id: string, expiredAt: any } | null | undefined } };
+export type AdminTopQuery = { __typename?: 'Query', thisMonth: { __typename?: 'Month', year: string, month: string, survey?: { __typename?: 'MonthSurvey', id: string, year: string, month: string, expiredAt: any } | null | undefined }, nextMonth: { __typename?: 'Month', year: string, month: string, survey?: { __typename?: 'MonthSurvey', id: string, year: string, month: string, expiredAt: any, answeredMembers: Array<{ __typename?: 'Member', id: string, name: string } | null | undefined>, noAnswerMembers: Array<{ __typename?: 'Member', id: string, name: string } | null | undefined> } | null | undefined }, siteMetadata: { __typename?: 'SiteMetadata', totalMembers: number } };
 
 export type MemberMonthCirclesQueryVariables = Exact<{
   memberId: Scalars['String'];
@@ -208,22 +219,41 @@ export const MonthAndSurveyFragmentDoc = gql`
   month
   survey {
     id
+    year
+    month
     expiredAt
+  }
+}
+    `;
+export const MonthAndSurveyWithMembersFragmentDoc = gql`
+    fragment MonthAndSurveyWithMembers on Month {
+  year
+  month
+  survey {
+    id
+    year
+    month
+    expiredAt
+    answeredMembers {
+      id
+      name
+    }
+    noAnswerMembers {
+      id
+      name
+    }
   }
 }
     `;
 export const CreateNextMonthSurveyDocument = gql`
     mutation CreateNextMonthSurvey {
   createNextMonthSurvey {
-    monthSurvey {
-      id
-      year
-      month
-      expiredAt
+    nextMonth {
+      ...MonthAndSurvey
     }
   }
 }
-    `;
+    ${MonthAndSurveyFragmentDoc}`;
 export type CreateNextMonthSurveyMutationFn = Apollo.MutationFunction<CreateNextMonthSurveyMutation, CreateNextMonthSurveyMutationVariables>;
 
 /**
@@ -391,10 +421,14 @@ export const AdminTopDocument = gql`
     ...MonthAndSurvey
   }
   nextMonth {
-    ...MonthAndSurvey
+    ...MonthAndSurveyWithMembers
+  }
+  siteMetadata {
+    totalMembers
   }
 }
-    ${MonthAndSurveyFragmentDoc}`;
+    ${MonthAndSurveyFragmentDoc}
+${MonthAndSurveyWithMembersFragmentDoc}`;
 
 /**
  * __useAdminTopQuery__

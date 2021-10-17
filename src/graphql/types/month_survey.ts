@@ -1,14 +1,17 @@
+import { MonthCircleAnswerState } from '@prisma/client';
+import { Member } from './member';
 import { Temporal } from 'proposal-temporal';
 import { createDiscordRestClient } from '../../discord';
 import { nextMonth } from '../../model';
 import { MonthSurvey as _MonthSurvey } from 'nexus-prisma';
-import { mutationField, nonNull, objectType } from 'nexus';
+import { mutationField, nonNull, objectType, list } from 'nexus';
 import { MessageEmbed } from 'discord.js';
 import {
   RESTPostAPIWebhookWithTokenWaitResult,
   Routes,
 } from 'discord-api-types/v9';
 import { Emojis } from '../../model/emoji';
+import { Month } from './month';
 
 export const MonthSurvey = objectType({
   name: _MonthSurvey.$name,
@@ -18,14 +21,70 @@ export const MonthSurvey = objectType({
     t.field(_MonthSurvey.year);
     t.field(_MonthSurvey.month);
     t.field(_MonthSurvey.expiredAt);
+    t.field('answeredMembers', {
+      type: nonNull(list(Member)),
+      resolve(parent, _, { prisma }) {
+        return prisma.member.findMany({
+          where: {
+            AND: [
+              { circleId: { not: null } },
+              {
+                monthCircles: {
+                  some: {
+                    year: parent.year,
+                    month: parent.month,
+                    circleId: {
+                      not: null,
+                    },
+                    state: {
+                      not: MonthCircleAnswerState.NoAnswer,
+                    },
+                  },
+                },
+              },
+            ],
+          },
+        });
+      },
+    });
+    t.field('noAnswerMembers', {
+      type: nonNull(list(Member)),
+      resolve(parent, _, { prisma }) {
+        return prisma.member.findMany({
+          where: {
+            AND: [
+              {
+                circleId: {
+                  not: null,
+                },
+              },
+              {
+                monthCircles: {
+                  none: {
+                    year: parent.year,
+                    month: parent.month,
+                    circleId: {
+                      not: null,
+                    },
+                    state: {
+                      not: MonthCircleAnswerState.NoAnswer,
+                    },
+                  },
+                },
+              },
+            ],
+          },
+        });
+      },
+    });
   },
 });
 
 export const CreateNextMonthSurveyPayload = objectType({
   name: 'CreateNextMonthSurveyPayload',
   definition(t) {
-    t.field('monthSurvey', {
-      type: nonNull(MonthSurvey),
+    t.field('nextMonth', {
+      type: nonNull(Month),
     });
   },
 });
@@ -86,7 +145,7 @@ export const CreateNextMonthSurveyMutation = mutationField(
       embed.addField('未回答の場合', '***除名となります。***');
       embed.addField(
         '回答状態の確認方法',
-        '任意のチャンネルで `/month_survey_url` と送信して表示されるURLで確認できます。'
+        '任意のチャンネルで `/next_month_circle` と送信すると確認できます。'
       );
 
       const { id: messageId, channel_id: channelId } = (await rest.post(
@@ -127,7 +186,11 @@ export const CreateNextMonthSurveyMutation = mutationField(
       });
 
       return {
-        monthSurvey,
+        nextMonth: {
+          year,
+          month,
+          survey: monthSurvey,
+        },
       };
     },
   }

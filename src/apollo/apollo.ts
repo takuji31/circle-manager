@@ -31,12 +31,11 @@ function createApolloClient() {
     link: createIsomorphLink(),
     cache: new InMemoryCache({
       typePolicies: {
-        Member: {
-          fields: {
-            monthCircle: {
-              merge: false,
-            },
-          },
+        Month: {
+          keyFields: ['year', 'month'],
+        },
+        MonthSurvey: {
+          keyFields: ['year', 'month'],
         },
       },
     }),

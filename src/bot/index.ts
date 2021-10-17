@@ -40,7 +40,7 @@ client.on('ready', async () => {
 client.on('interactionCreate', async (interaction) => {
   try {
     if (!interaction.isCommand()) return;
-    if (interaction.commandName == 'month_survey_url') {
+    if (interaction.commandName == 'next_month_circle') {
       await interaction.deferReply({ ephemeral: true });
       const memberId = interaction.user.id;
       const month = nextMonth();
@@ -56,23 +56,28 @@ client.on('interactionCreate', async (interaction) => {
         return;
       }
 
-      const monthCircle = await prisma.monthCircle.upsert({
+      const monthCircle = await prisma.monthCircle.findUnique({
         where: {
           year_month_memberId: {
             ...month,
             memberId,
           },
         },
-        create: {
-          memberId,
-          ...month,
-          state: MonthCircleAnswerState.NoAnswer,
+        include: {
+          circle: true,
         },
-        update: {},
       });
 
       interaction.editReply({
-        content: `${process.env.BASE_URL}/month_circles/${monthCircle.id}`,
+        content: `${month.year}年${month.month}月の在籍希望は「${
+          monthCircle
+            ? monthCircle.state == MonthCircleAnswerState.Retired
+              ? '脱退'
+              : monthCircle.state == MonthCircleAnswerState.Answered
+              ? monthCircle.circle?.name
+              : '未回答'
+            : '未回答'
+        }」です。変更は在籍希望アンケートのメッセージにリアクションで行ってください。`,
       });
     }
     if (interaction.commandName == 'register_trainer_id') {

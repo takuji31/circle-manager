@@ -1,6 +1,14 @@
 import type { NextPage } from 'next';
 import * as React from 'react';
-import { Box, Container, Typography } from '@mui/material';
+import {
+  Box,
+  Container,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+  Typography,
+} from '@mui/material';
 import Layout from '../components/layout';
 import useUser from '../hooks/user';
 import { LinearProgress, Stack } from '@mui/material';
@@ -39,10 +47,12 @@ const Home: NextPage = (props) => {
         </Box>
       )}
       {status == 'authenticated' && user && user?.isMember && (
-        <Stack p={2} spacing={4}>
-          <TopContent user={user} />
-          {user.isAdmin && <AdminTopContent />}
-        </Stack>
+        <Container maxWidth="md">
+          <Stack p={2} spacing={4}>
+            <TopContent user={user} />
+            {user.isAdmin && <AdminTopContent />}
+          </Stack>
+        </Container>
       )}
     </Layout>
   );
@@ -67,26 +77,24 @@ const TopContent = ({ user }: TopContentProps) => {
           <LinearProgress />
         </Box>
       )}
-      <Container maxWidth="md">
-        {member && circles && (
-          <Stack spacing={2}>
-            <MemberMonthCircle
-              memberId={user.id}
-              monthCircle={member.thisMonthCircle}
-              circles={circles}
-              canEdit={false}
-              {...thisMonth()}
-            />
-            <MemberMonthCircle
-              memberId={user.id}
-              monthCircle={member.nextMonthCircle}
-              circles={circles}
-              canEdit={true}
-              {...nextMonth()}
-            />
-          </Stack>
-        )}
-      </Container>
+      {member && circles && (
+        <Stack spacing={2}>
+          <MemberMonthCircle
+            memberId={user.id}
+            monthCircle={member.thisMonthCircle}
+            circles={circles}
+            canEdit={false}
+            {...thisMonth()}
+          />
+          <MemberMonthCircle
+            memberId={user.id}
+            monthCircle={member.nextMonthCircle}
+            circles={circles}
+            canEdit={true}
+            {...nextMonth()}
+          />
+        </Stack>
+      )}
     </>
   );
 };
@@ -117,49 +125,58 @@ const AdminTopContent = () => {
     }
   }, [data?.nextMonth?.survey?.expiredAt]);
   return (
-    <Container maxWidth="md">
-      <Stack spacing={2}>
-        <Typography variant="h5">管理メニュー</Typography>
-        {thisMonth && (
-          <>
-            <Typography variant="h6">
-              今月({thisMonth.year}年{thisMonth.month}月)の状況
-            </Typography>
-          </>
-        )}
-        {nextMonth && (
-          <>
-            <Typography variant="h6">
-              今月({nextMonth.year}年{nextMonth.month}月)の状況
-            </Typography>
+    <Stack spacing={2}>
+      <Typography variant="h5">管理メニュー</Typography>
+      {thisMonth && (
+        <>
+          <Typography variant="h6">
+            今月({thisMonth.year}年{thisMonth.month}月)の状況
+          </Typography>
+        </>
+      )}
+      {nextMonth && (
+        <>
+          <Typography variant="h6">
+            今月({nextMonth.year}年{nextMonth.month}月)の状況
+          </Typography>
 
-            <Stack spacing={2}>
-              <Typography variant="subtitle1">在籍希望アンケート</Typography>
+          <Stack spacing={2}>
+            <List>
+              <ListItem>
+                <ListItemText>在籍希望アンケート</ListItemText>
+              </ListItem>
               {!nextMonth.survey && (
                 <>
-                  <Typography variant="body1">まだ開始していません</Typography>
-                  <LoadingButton
-                    variant="contained"
-                    color="primary"
-                    loading={creating}
-                    onClick={() => mutation().then()}
-                  >
-                    開始する
-                  </LoadingButton>
+                  <ListItem>
+                    <ListItemText>まだ開始していません</ListItemText>
+                  </ListItem>
+                  <ListItem>
+                    <ListItemButton onClick={() => mutation().then()}>
+                      開始する
+                    </ListItemButton>
+                  </ListItem>
                 </>
               )}
               {nextMonth.survey && (
                 <>
-                  <Typography variant="body1">
-                    開始済み(期限: {expiredAtString ?? ''})
-                  </Typography>
+                  <ListItem>
+                    <ListItemText>
+                      開始済み(期限: {expiredAtString ?? ''})
+                    </ListItemText>
+                  </ListItem>
+                  <ListItem>
+                    <ListItemText>
+                      回答済み {nextMonth.survey.answeredMembers.length}/
+                      {data.siteMetadata.totalMembers}
+                    </ListItemText>
+                  </ListItem>
                 </>
               )}
-            </Stack>
-          </>
-        )}
-      </Stack>
-    </Container>
+            </List>
+          </Stack>
+        </>
+      )}
+    </Stack>
   );
 };
 

@@ -8,6 +8,7 @@ import {
   nonNull,
   objectType,
   queryField,
+  stringArg,
 } from 'nexus';
 import { MonthCircle } from '.';
 import { createDiscordRestClient } from '../../discord';
@@ -67,6 +68,20 @@ export const Member = objectType({
 });
 
 export const CircleRole = enumType(Nexus.CircleRole);
+
+export const MemberField = queryField('member', {
+  type: Member,
+  args: {
+    id: nonNull(stringArg()),
+  },
+  resolve(_, args, ctx) {
+    return ctx.prisma.member.findUnique({
+      where: {
+        id: args.id,
+      },
+    });
+  },
+});
 
 export const MembersField = queryField('members', {
   type: nonNull(list(nonNull(Member))),

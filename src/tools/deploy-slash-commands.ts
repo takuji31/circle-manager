@@ -10,8 +10,8 @@ config();
 
 const commands = [
   new SlashCommandBuilder()
-    .setName('month_survey_url')
-    .setDescription('[開発中]来月の異動アンケートURLを発行します。'),
+    .setName('next_month_circle')
+    .setDescription('[開発中]来月の在籍希望アンケートの回答を表示します。'),
   new SlashCommandBuilder()
     .setName('register_trainer_id')
     .setDescription('[開発中]異動のために必要なトレーナーIDを登録します')

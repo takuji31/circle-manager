@@ -25,7 +25,7 @@ enum CircleRole {
 }
 
 type CreateNextMonthSurveyPayload {
-  monthSurvey: MonthSurvey!
+  nextMonth: Month!
 }
 
 """
@@ -78,11 +78,13 @@ enum MonthCircleAnswerState {
 
 """在籍希望アンケート"""
 type MonthSurvey {
+  answeredMembers: [Member]!
   expiredAt: DateTime!
 
   """アンケートのメッセージID"""
   id: ID!
   month: String!
+  noAnswerMembers: [Member]!
   year: String!
 }
 
@@ -98,7 +100,13 @@ type Query {
   members: [Member!]!
   monthCircle(monthCircleId: String!): MonthCircle
   nextMonth: Month!
+  siteMetadata: SiteMetadata!
   thisMonth: Month!
+}
+
+type SiteMetadata {
+  maxMembers: Int!
+  totalMembers: Int!
 }
 
 type UpdateMemberMonthCirclePayload {

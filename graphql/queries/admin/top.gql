@@ -3,6 +3,9 @@ query AdminTop {
     ...MonthAndSurvey
   }
   nextMonth {
-    ...MonthAndSurvey
+    ...MonthAndSurveyWithMembers
+  }
+  siteMetadata {
+    totalMembers
   }
 }
