@@ -87,6 +87,7 @@ type MonthSurvey {
 }
 
 type Mutation {
+  createNextMonthSurvey: CreateNextMonthSurveyPayload
   updateMemberMonthCircle(circleId: String!, memberId: String!, month: String!, year: String!): UpdateMemberMonthCirclePayload
   updateMembers: [Member!]!
 }

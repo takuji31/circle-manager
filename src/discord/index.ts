@@ -1,5 +1,8 @@
 import { REST } from '@discordjs/rest';
-import { Routes } from 'discord-api-types/v9';
+import {
+  RESTPostAPIWebhookWithTokenWaitResult,
+  Routes,
+} from 'discord-api-types/v9';
 
 export function createDiscordRestClient(
   accessToken: string = process.env.DISCORD_BOT_TOKEN as string
@@ -19,5 +22,5 @@ export const sendBotNotificationMessage = (message: string) => {
         content: message,
       },
     }
-  );
+  ) as Promise<RESTPostAPIWebhookWithTokenWaitResult>;
 };

@@ -1,0 +1,10 @@
+mutation CreateNextMonthSurvey {
+  createNextMonthSurvey {
+    monthSurvey {
+      id
+      year
+      month
+      expiredAt
+    }
+  }
+}

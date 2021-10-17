@@ -1,4 +1,7 @@
-import { SlashCommandBuilder } from '@discordjs/builders';
+import {
+  SlashCommandBuilder,
+  SlashCommandStringOption,
+} from '@discordjs/builders';
 import { Routes } from 'discord-api-types/v9';
 import { createDiscordRestClient } from '../discord';
 import { config } from 'dotenv';
@@ -10,8 +13,14 @@ const commands = [
     .setName('month_survey_url')
     .setDescription('[開発中]来月の異動アンケートURLを発行します。'),
   new SlashCommandBuilder()
-    .setName('month_survey_url')
-    .setDescription('[開発中]来月の異動アンケートURLを発行します。'),
+    .setName('register_trainer_id')
+    .setDescription('[開発中]異動のために必要なトレーナーIDを登録します')
+    .addStringOption(
+      new SlashCommandStringOption()
+        .setName('trainer_id')
+        .setRequired(true)
+        .setDescription('トレーナーID')
+    ),
 ].map((command) => command.toJSON());
 
 const rest = createDiscordRestClient();

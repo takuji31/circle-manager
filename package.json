@@ -10,7 +10,7 @@
     "test": "jest",
     "gen": "yarn run db:generate && yarn run graphql:schemagen && yarn run graphql:codegen",
     "graphql:codegen": "graphql-codegen --config codegen.yml",
-    "bot:deploy_commands": "yarn run ts-node tools/deploy-commands.ts",
+    "bot:deploy_commands": "yarn run ts-node src/tools/deploy-slash-commands.ts",
     "lint": "next lint",
     "bot:start": "yarn run ts-node --transpile-only src/bot/index.js",
     "bot:dev": "yarn run ts-node src/bot/index.ts",

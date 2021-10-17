@@ -1,13 +1,14 @@
+import { Temporal } from 'proposal-temporal';
+import { createDiscordRestClient } from '../../discord';
+import { nextMonth } from '../../model';
 import { MonthSurvey as _MonthSurvey } from 'nexus-prisma';
+import { mutationField, nonNull, objectType } from 'nexus';
+import { MessageEmbed } from 'discord.js';
 import {
-  enumType,
-  intArg,
-  mutationField,
-  nonNull,
-  objectType,
-  queryField,
-  stringArg,
-} from 'nexus';
+  RESTPostAPIWebhookWithTokenWaitResult,
+  Routes,
+} from 'discord-api-types/v9';
+import { Emojis } from '../../model/emoji';
 
 export const MonthSurvey = objectType({
   name: _MonthSurvey.$name,
@@ -29,78 +30,105 @@ export const CreateNextMonthSurveyPayload = objectType({
   },
 });
 
-// export const CreateNextMonthSurveyMutation = mutationField(
-//   'createNextMonthSurvey',
-//   {
-//     type: CreateNextMonthSurveyPayload,
-//     args: {
-//       year: nonNull(stringArg()),
-//       month: nonNull(stringArg()),
-//       expiredDay: nonNull(intArg()),
-//     },
-//     async resolve(
-//       parent,
-//       { year, month, memberId, circleId: circleIdOrRetired },
-//       ctx
-//     ) {
-//       if (ctx.user?.id != memberId || !ctx.user.isAdmin) {
-//         throw new Error("Cannot update this user's month circle.");
-//       }
-//       const state =
-//         circleIdOrRetired == 'retired'
-//           ? PrismaMonthCircleAnswerState.Retired
-//           : PrismaMonthCircleAnswerState.Answered;
-//       const circleId =
-//         circleIdOrRetired != 'retired' ? circleIdOrRetired : null;
-//       const monthCircle = await ctx.prisma.monthCircle.upsert({
-//         where: {
-//           year_month_memberId: {
-//             year,
-//             month,
-//             memberId,
-//           },
-//         },
-//         create: {
-//           year,
-//           month,
-//           memberId,
-//           circleId,
-//           state,
-//         },
-//         update: {
-//           year,
-//           month,
-//           memberId,
-//           circleId,
-//           state,
-//         },
-//       });
+export const CreateNextMonthSurveyMutation = mutationField(
+  'createNextMonthSurvey',
+  {
+    type: CreateNextMonthSurveyPayload,
+    async resolve(parent, args, { prisma, user }) {
+      if (!user?.isAdmin) {
+        throw new Error('Cannot crate month survey.');
+      }
 
-//       // const member = await prisma.member.findUnique({
-//       //   where: {
-//       //     id: memberId,
-//       //   },
-//       // });
-//       // const rest = createDiscordRestClient();
-//       // await rest.post(
-//       //   `${Routes.webhook(
-//       //     '897470834162155560',
-//       //     'i76bItNbaecp5Rn1J0vO4jAbb4RVMf32S4ZHWeu1BiAPwq_8X1CtnoHWXlyUg_kcef9G'
-//       //   )}?wait=true`,
-//       //   {
-//       //     body: {
-//       //       content: `${
-//       //         member?.trainerName ?? member?.name
-//       //       } さんが ${year}年${month}月の在籍希望に回答しました。 ${
-//       //         process.env.BASE_URL
-//       //       }/month_circles/${monthCircle.id}`,
-//       //     },
-//       //   }
-//       // );
+      const { year, month } = nextMonth();
+      const expiredAt = Temporal.PlainDate.from({
+        year: parseInt(year),
+        month: parseInt(month),
+        day: 1,
+      })
+        .subtract(Temporal.Duration.from({ days: 4 }))
+        .toZonedDateTime({
+          timeZone: 'Asia/Tokyo',
+          plainTime: Temporal.PlainTime.from({ hour: 0, minute: 0, second: 0 }),
+        });
 
-//       return {
-//         monthCircle,
-//       };
-//     },
-//   }
-// );
+      if (await prisma.monthSurvey.count({ where: { year, month } })) {
+        throw new Error('Next month survey already started');
+      }
+
+      const rest = createDiscordRestClient();
+
+      const embed = new MessageEmbed()
+        .setTitle(`${year}年${month}月の在籍希望アンケート`)
+        .setDescription(
+          '来月の在籍希望に関するアンケートです。\n**来月も同じサークルに所属する場合も**必ずご回答ください！\n回答を受け付けたら**リアクションは消えます**、ご注意ください。'
+        )
+        .addField(
+          '期限',
+          `${expiredAt.toLocaleString('ja-JP', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            weekday: 'short',
+            hour: 'numeric',
+          })}まで`
+        )
+        .addField('回答方法', 'このメッセージにリアクション');
+
+      const circles = await prisma.circle.findMany({
+        orderBy: { createdAt: 'asc' },
+      });
+      circles.forEach((circle) => {
+        embed.addField(`${circle.name} 希望の場合`, `${circle.emoji}`);
+      });
+
+      embed.addField(`脱退予定の場合`, Emojis.leave);
+
+      embed.addField('未回答の場合', '***除名となります。***');
+      embed.addField(
+        '回答状態の確認方法',
+        '任意のチャンネルで `/month_survey_url` と送信して表示されるURLで確認できます。'
+      );
+
+      const { id: messageId, channel_id: channelId } = (await rest.post(
+        `${Routes.webhook(
+          '897470834162155560',
+          'i76bItNbaecp5Rn1J0vO4jAbb4RVMf32S4ZHWeu1BiAPwq_8X1CtnoHWXlyUg_kcef9G'
+        )}?wait=true`,
+        {
+          body: {
+            // content: '@everyone',
+            embeds: [embed],
+            allowed_mentions: {
+              parse: ['everyone'],
+            },
+          },
+        }
+      )) as RESTPostAPIWebhookWithTokenWaitResult;
+
+      const monthSurvey = await prisma.monthSurvey.create({
+        data: {
+          id: messageId,
+          year,
+          month,
+          expiredAt: new Date(expiredAt.epochMilliseconds),
+        },
+      });
+
+      const emojiNames = [
+        ...circles.map((circle) => circle.emoji),
+        Emojis.leave,
+      ];
+      emojiNames.forEach(async (emoji) => {
+        if (emoji) {
+          await rest.put(
+            Routes.channelMessageOwnReaction(channelId, messageId, `${emoji}`)
+          );
+        }
+      });
+
+      return {
+        monthSurvey,
+      };
+    },
+  }
+);

@@ -16,7 +16,7 @@ export interface Props {
   memberId: string;
   year: string;
   month: string;
-  monthCircle: MemberMonthCircleFragment | null;
+  monthCircle: MemberMonthCircleFragment | null | undefined;
   circles: Array<ListedCircleFragment>;
   canEdit: boolean;
 }

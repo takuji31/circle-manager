@@ -96,6 +96,7 @@ export type MonthSurvey = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  createNextMonthSurvey?: Maybe<CreateNextMonthSurveyPayload>;
   updateMemberMonthCircle?: Maybe<UpdateMemberMonthCirclePayload>;
   updateMembers: Array<Member>;
 };
@@ -137,6 +138,13 @@ export type ListedCircleFragment = { __typename?: 'Circle', id: string, name: st
 
 export type MemberMonthCircleFragment = { __typename?: 'MonthCircle', id: string, year: string, month: string, state: MonthCircleAnswerState, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined };
 
+export type MonthAndSurveyFragment = { __typename?: 'Month', year: string, month: string, survey?: { __typename?: 'MonthSurvey', id: string, expiredAt: any } | null | undefined };
+
+export type CreateNextMonthSurveyMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type CreateNextMonthSurveyMutation = { __typename?: 'Mutation', createNextMonthSurvey?: { __typename?: 'CreateNextMonthSurveyPayload', monthSurvey: { __typename?: 'MonthSurvey', id: string, year: string, month: string, expiredAt: any } } | null | undefined };
+
 export type UpdateMemberMonthCircleMutationVariables = Exact<{
   memberId: Scalars['String'];
   year: Scalars['String'];
@@ -156,6 +164,11 @@ export type AdminMembersQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type AdminMembersQuery = { __typename?: 'Query', members: Array<{ __typename?: 'Member', id: string, pathname: string, trainerName?: string | null | undefined, name: string, circleRole: CircleRole, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined, thisMonthCircle?: { __typename?: 'MonthCircle', id: string, year: string, month: string, state: MonthCircleAnswerState, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined } | null | undefined, nextMonthCircle?: { __typename?: 'MonthCircle', id: string, year: string, month: string, state: MonthCircleAnswerState, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined } | null | undefined }> };
+
+export type AdminTopQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type AdminTopQuery = { __typename?: 'Query', thisMonth: { __typename?: 'Month', year: string, month: string, survey?: { __typename?: 'MonthSurvey', id: string, expiredAt: any } | null | undefined }, nextMonth: { __typename?: 'Month', year: string, month: string, survey?: { __typename?: 'MonthSurvey', id: string, expiredAt: any } | null | undefined } };
 
 export type MemberMonthCirclesQueryVariables = Exact<{
   memberId: Scalars['String'];
@@ -189,6 +202,53 @@ export const MemberMonthCircleFragmentDoc = gql`
   state
 }
     `;
+export const MonthAndSurveyFragmentDoc = gql`
+    fragment MonthAndSurvey on Month {
+  year
+  month
+  survey {
+    id
+    expiredAt
+  }
+}
+    `;
+export const CreateNextMonthSurveyDocument = gql`
+    mutation CreateNextMonthSurvey {
+  createNextMonthSurvey {
+    monthSurvey {
+      id
+      year
+      month
+      expiredAt
+    }
+  }
+}
+    `;
+export type CreateNextMonthSurveyMutationFn = Apollo.MutationFunction<CreateNextMonthSurveyMutation, CreateNextMonthSurveyMutationVariables>;
+
+/**
+ * __useCreateNextMonthSurveyMutation__
+ *
+ * To run a mutation, you first call `useCreateNextMonthSurveyMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateNextMonthSurveyMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createNextMonthSurveyMutation, { data, loading, error }] = useCreateNextMonthSurveyMutation({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useCreateNextMonthSurveyMutation(baseOptions?: Apollo.MutationHookOptions<CreateNextMonthSurveyMutation, CreateNextMonthSurveyMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateNextMonthSurveyMutation, CreateNextMonthSurveyMutationVariables>(CreateNextMonthSurveyDocument, options);
+      }
+export type CreateNextMonthSurveyMutationHookResult = ReturnType<typeof useCreateNextMonthSurveyMutation>;
+export type CreateNextMonthSurveyMutationResult = Apollo.MutationResult<CreateNextMonthSurveyMutation>;
+export type CreateNextMonthSurveyMutationOptions = Apollo.BaseMutationOptions<CreateNextMonthSurveyMutation, CreateNextMonthSurveyMutationVariables>;
 export const UpdateMemberMonthCircleDocument = gql`
     mutation UpdateMemberMonthCircle($memberId: String!, $year: String!, $month: String!, $circleId: String!) {
   updateMemberMonthCircle(
@@ -325,6 +385,43 @@ export function useAdminMembersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptio
 export type AdminMembersQueryHookResult = ReturnType<typeof useAdminMembersQuery>;
 export type AdminMembersLazyQueryHookResult = ReturnType<typeof useAdminMembersLazyQuery>;
 export type AdminMembersQueryResult = Apollo.QueryResult<AdminMembersQuery, AdminMembersQueryVariables>;
+export const AdminTopDocument = gql`
+    query AdminTop {
+  thisMonth {
+    ...MonthAndSurvey
+  }
+  nextMonth {
+    ...MonthAndSurvey
+  }
+}
+    ${MonthAndSurveyFragmentDoc}`;
+
+/**
+ * __useAdminTopQuery__
+ *
+ * To run a query within a React component, call `useAdminTopQuery` and pass it any options that fit your needs.
+ * When your component renders, `useAdminTopQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useAdminTopQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useAdminTopQuery(baseOptions?: Apollo.QueryHookOptions<AdminTopQuery, AdminTopQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<AdminTopQuery, AdminTopQueryVariables>(AdminTopDocument, options);
+      }
+export function useAdminTopLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<AdminTopQuery, AdminTopQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<AdminTopQuery, AdminTopQueryVariables>(AdminTopDocument, options);
+        }
+export type AdminTopQueryHookResult = ReturnType<typeof useAdminTopQuery>;
+export type AdminTopLazyQueryHookResult = ReturnType<typeof useAdminTopLazyQuery>;
+export type AdminTopQueryResult = Apollo.QueryResult<AdminTopQuery, AdminTopQueryVariables>;
 export const MemberMonthCirclesDocument = gql`
     query MemberMonthCircles($memberId: String!) {
   member(id: $memberId) {

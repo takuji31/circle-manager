@@ -1,0 +1,8 @@
+query AdminTop {
+  thisMonth {
+    ...MonthAndSurvey
+  }
+  nextMonth {
+    ...MonthAndSurvey
+  }
+}

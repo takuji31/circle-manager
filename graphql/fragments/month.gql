@@ -1,0 +1,8 @@
+fragment MonthAndSurvey on Month {
+  year
+  month
+  survey {
+    id
+    expiredAt
+  }
+}
