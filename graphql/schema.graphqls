@@ -52,7 +52,6 @@ type Member {
   pathname: String!
   thisMonthCircle: MonthCircle
   trainerId: String
-  trainerName: String
 }
 
 type Month {

@@ -23,7 +23,6 @@ export const Member = objectType({
     t.field(m.pathname);
     t.field(m.circleRole);
     t.field(m.name);
-    t.field(m.trainerName);
     t.field(m.trainerId);
     t.field(m.joinedAt);
     t.field(m.leavedAt);

@@ -29,7 +29,6 @@ model Member {
   pathname       String          @default(cuid()) @db.VarChar(255)
   circleRole     CircleRole      @default(Member)
   name           String          @db.VarChar(255)
-  trainerName    String?         @db.VarChar(255)
   trainerId      String?         @db.VarChar(255)
   joinedAt       DateTime
   leavedAt       DateTime?
