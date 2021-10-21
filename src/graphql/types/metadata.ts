@@ -16,6 +16,18 @@ export const SiteMetadata = objectType({
         return await prisma.member.count();
       },
     });
+    t.nonNull.field('activeMembers', {
+      type: 'Int',
+      async resolve(_, __, { prisma }) {
+        return await prisma.member.count({
+          where: {
+            circleId: {
+              not: null,
+            },
+          },
+        });
+      },
+    });
   },
 });
 

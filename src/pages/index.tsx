@@ -167,7 +167,7 @@ const AdminTopContent = () => {
                   <ListItem>
                     <ListItemText>
                       回答済み {nextMonth.survey.answeredMembers.length}/
-                      {data.siteMetadata.totalMembers}
+                      {data.siteMetadata.activeMembers}
                     </ListItemText>
                   </ListItem>
                 </>

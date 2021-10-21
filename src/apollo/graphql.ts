@@ -133,6 +133,7 @@ export type QueryMonthCircleArgs = {
 
 export type SiteMetadata = {
   __typename?: 'SiteMetadata';
+  activeMembers: Scalars['Int'];
   maxMembers: Scalars['Int'];
   totalMembers: Scalars['Int'];
 };
@@ -178,7 +179,7 @@ export type AdminMembersQuery = { __typename?: 'Query', members: Array<{ __typen
 export type AdminTopQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type AdminTopQuery = { __typename?: 'Query', thisMonth: { __typename?: 'Month', year: string, month: string, survey?: { __typename?: 'MonthSurvey', id: string, year: string, month: string, expiredAt: any } | null | undefined }, nextMonth: { __typename?: 'Month', year: string, month: string, survey?: { __typename?: 'MonthSurvey', id: string, year: string, month: string, expiredAt: any, answeredMembers: Array<{ __typename?: 'Member', id: string, name: string } | null | undefined>, noAnswerMembers: Array<{ __typename?: 'Member', id: string, name: string } | null | undefined> } | null | undefined }, siteMetadata: { __typename?: 'SiteMetadata', totalMembers: number } };
+export type AdminTopQuery = { __typename?: 'Query', thisMonth: { __typename?: 'Month', year: string, month: string, survey?: { __typename?: 'MonthSurvey', id: string, year: string, month: string, expiredAt: any } | null | undefined }, nextMonth: { __typename?: 'Month', year: string, month: string, survey?: { __typename?: 'MonthSurvey', id: string, year: string, month: string, expiredAt: any, answeredMembers: Array<{ __typename?: 'Member', id: string, name: string } | null | undefined>, noAnswerMembers: Array<{ __typename?: 'Member', id: string, name: string } | null | undefined> } | null | undefined }, siteMetadata: { __typename?: 'SiteMetadata', activeMembers: number } };
 
 export type MemberMonthCirclesQueryVariables = Exact<{
   memberId: Scalars['String'];
@@ -421,7 +422,7 @@ export const AdminTopDocument = gql`
     ...MonthAndSurveyWithMembers
   }
   siteMetadata {
-    totalMembers
+    activeMembers
   }
 }
     ${MonthAndSurveyFragmentDoc}

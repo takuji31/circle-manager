@@ -6,6 +6,6 @@ query AdminTop {
     ...MonthAndSurveyWithMembers
   }
   siteMetadata {
-    totalMembers
+    activeMembers
   }
 }

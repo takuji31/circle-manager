@@ -104,6 +104,7 @@ type Query {
 }
 
 type SiteMetadata {
+  activeMembers: Int!
   maxMembers: Int!
   totalMembers: Int!
 }
