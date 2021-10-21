@@ -1,3 +1,4 @@
+import { prisma } from './../../database/prisma';
 import { nextMonth, thisMonth, Guild } from '../../model';
 import { Context } from './../context';
 import * as Nexus from 'nexus-prisma';
@@ -123,8 +124,12 @@ export const UpdateMembers = mutationField('updateMembers', {
     const members = (await rest.get(
       `${Routes.guildMembers(Guild.id)}?limit=1000`
     )) as RESTGetAPIGuildMembersResult;
-    ctx.prisma.$transaction(
-      members
+    ctx.prisma.$transaction([
+      prisma.member.update({
+        where: {},
+        data: { circleId: null },
+      }),
+      ...members
         .filter((member) => !member.user?.bot && member.user)
         .map((member) => {
           const user = member.user!;
@@ -154,8 +159,8 @@ export const UpdateMembers = mutationField('updateMembers', {
               joinedAt: member.joined_at,
             },
           });
-        })
-    );
+        }),
+    ]);
 
     return ctx.prisma.member.findMany({
       orderBy: [
