@@ -9,19 +9,19 @@ async function main() {
       {
         id: '863398236474834944',
         name: 'シン・ウマ娘愛好会',
-        emoji: 'regional_indicator_a',
+        emoji: '🇦',
         createdAt: new Date(now.getTime() - 2000),
       },
       {
         id: '870950796479594556',
         name: 'ウマ娘新愛好会：破',
-        emoji: 'regional_indicator_b',
+        emoji: '🇧',
         createdAt: new Date(now.getTime() - 1000),
       },
       {
         id: '863398725920227339',
         name: 'ウマ娘新愛好会：序',
-        emoji: 'regional_indicator_c',
+        emoji: '🇨',
         createdAt: now,
       },
     ],

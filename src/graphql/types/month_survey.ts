@@ -149,10 +149,7 @@ export const CreateNextMonthSurveyMutation = mutationField(
       );
 
       const { id: messageId, channel_id: channelId } = (await rest.post(
-        `${Routes.webhook(
-          '897470834162155560',
-          'i76bItNbaecp5Rn1J0vO4jAbb4RVMf32S4ZHWeu1BiAPwq_8X1CtnoHWXlyUg_kcef9G'
-        )}?wait=true`,
+        Routes.channelMessages(process.env.DISCORD_MESSAGE_CHANNEL_ID),
         {
           body: {
             // content: '@everyone',

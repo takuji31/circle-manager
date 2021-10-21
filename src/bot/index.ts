@@ -122,6 +122,7 @@ client.on('interactionCreate', async (interaction) => {
 
 client.on('messageReactionAdd', async (reaction, user) => {
   try {
+    console.log('messageReactionAdd %s %s', reaction, user);
     if (reaction.me) {
       return;
     }
