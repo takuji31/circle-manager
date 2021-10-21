@@ -98,28 +98,6 @@ export const UpdateMemberMonthCircleMutation = mutationField(
         },
       });
 
-      // const member = await prisma.member.findUnique({
-      //   where: {
-      //     id: memberId,
-      //   },
-      // });
-      // const rest = createDiscordRestClient();
-      // await rest.post(
-      //   `${Routes.webhook(
-      //     '897470834162155560',
-      //     'i76bItNbaecp5Rn1J0vO4jAbb4RVMf32S4ZHWeu1BiAPwq_8X1CtnoHWXlyUg_kcef9G'
-      //   )}?wait=true`,
-      //   {
-      //     body: {
-      //       content: `${
-      //         member?.trainerName ?? member?.name
-      //       } さんが ${year}年${month}月の在籍希望に回答しました。 ${
-      //         process.env.BASE_URL
-      //       }/month_circles/${monthCircle.id}`,
-      //     },
-      //   }
-      // );
-
       return {
         monthCircle,
       };
