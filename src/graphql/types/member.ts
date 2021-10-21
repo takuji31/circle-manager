@@ -125,8 +125,12 @@ export const UpdateMembers = mutationField('updateMembers', {
       `${Routes.guildMembers(Guild.id)}?limit=1000`
     )) as RESTGetAPIGuildMembersResult;
     ctx.prisma.$transaction([
-      prisma.member.update({
-        where: {},
+      prisma.member.updateMany({
+        where: {
+          circleId: {
+            not: null,
+          },
+        },
         data: { circleId: null },
       }),
       ...members
