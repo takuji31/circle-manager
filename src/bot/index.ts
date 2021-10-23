@@ -1,10 +1,9 @@
 import { Emojis } from './../model/emoji';
-import { nextMonth, thisMonth } from '../model';
+import { nextMonth } from '../model';
 import { PrismaClient, MonthCircleAnswerState } from '@prisma/client';
-import { Client, Emoji, Intents, TextChannel, User } from 'discord.js';
+import { Client, Intents } from 'discord.js';
 import { Temporal } from 'proposal-temporal';
 import { config } from 'dotenv';
-import { DateTime } from 'nexus-prisma/scalars';
 
 config();
 
@@ -19,15 +18,6 @@ const client = new Client({
   ],
 });
 
-const calendar = Temporal.Calendar.from('iso8601');
-const timeZone = Temporal.TimeZone.from('Asia/Tokyo');
-const joinedAtFormatter = new Intl.DateTimeFormat('ja-JP', {
-  year: 'numeric',
-  month: '2-digit',
-  day: '2-digit',
-  timeZone: 'Asia/Tokyo',
-});
-
 const prisma = new PrismaClient();
 
 client.on('guildUpdate', async (guild) => {
@@ -36,6 +26,42 @@ client.on('guildUpdate', async (guild) => {
 
 client.on('ready', async () => {
   console.log('ready');
+});
+
+client.on('guildMemberRemove', async (member) => {
+  console.log('Member removed %s', member);
+  try {
+    await prisma.member.update({
+      where: { id: member.id },
+      data: {
+        circleId: null,
+        leavedAt: new Date(),
+      },
+    });
+  } catch (e) {
+    console.log('Error when guildMemberRemove %s', e);
+  }
+});
+
+client.on('guildMemberAdd', async (member) => {
+  console.log('Member added %s', member);
+  try {
+    await prisma.member.upsert({
+      where: { id: member.id },
+      create: {
+        id: member.id,
+        joinedAt: member.joinedAt ?? new Date(),
+        name: member.nickname ?? member.user.username,
+      },
+      update: {},
+    });
+  } catch (e) {
+    console.log('Error when guildMemberRemove %s', e);
+  }
+});
+
+client.on('messageCreate', async () => {
+  console.log('messageCreated');
 });
 
 client.on('interactionCreate', async (interaction) => {
