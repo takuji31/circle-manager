@@ -1,6 +1,5 @@
 import { prisma } from './../../database/prisma';
 import { nextMonth, thisMonth, Guild } from '../../model';
-import { Context } from './../context';
 import * as Nexus from 'nexus-prisma';
 import {
   enumType,
@@ -31,58 +30,26 @@ export const Member = objectType({
     t.field('thisMonthCircle', {
       type: MonthCircle,
       async resolve(parent, _, ctx) {
-        const member = await ctx.prisma.member.findUnique({
-          where: {
-            id: parent.id,
-          },
-        });
-
-        if (!member) {
-          throw new Error('member not found');
-        }
-
-        return await ctx.prisma.monthCircle.upsert({
+        return await ctx.prisma.monthCircle.findUnique({
           where: {
             year_month_memberId: {
               ...thisMonth(),
               memberId: parent.id,
             },
           },
-          create: {
-            ...thisMonth(),
-            memberId: parent.id,
-            currentCircleId: member.circleId,
-          },
-          update: {},
         });
       },
     });
     t.field('nextMonthCircle', {
       type: MonthCircle,
       async resolve(parent, _, ctx) {
-        const member = await ctx.prisma.member.findUnique({
-          where: {
-            id: parent.id,
-          },
-        });
-
-        if (!member) {
-          throw new Error('member not found');
-        }
-
-        return ctx.prisma.monthCircle.upsert({
+        return ctx.prisma.monthCircle.findUnique({
           where: {
             year_month_memberId: {
               ...nextMonth(),
               memberId: parent.id,
             },
           },
-          create: {
-            ...nextMonth(),
-            memberId: parent.id,
-            currentCircleId: member.circleId,
-          },
-          update: {},
         });
       },
     });

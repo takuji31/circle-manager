@@ -187,7 +187,12 @@ client.on('messageReactionAdd', async (reaction, user) => {
     }
 
     const { year, month } = survey;
-    const memberId = member.id;
+    const { id: memberId, circleId } = member;
+
+    if (!circleId) {
+      await user.send('サークルに所属していません。');
+      return;
+    }
 
     if (emoji == Emojis.leave) {
       await prisma.monthCircle.upsert({
@@ -199,7 +204,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
           month,
           memberId,
           circleId: null,
-          currentCircleId: member.circleId,
+          currentCircleId: circleId,
           state: MonthCircleAnswerState.Retired,
         },
         update: {
@@ -207,7 +212,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
           month,
           memberId,
           circleId: null,
-          currentCircleId: member.circleId,
+          currentCircleId: circleId,
           state: MonthCircleAnswerState.Retired,
         },
       });
@@ -232,7 +237,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
           month,
           memberId,
           circleId: circle.id,
-          currentCircleId: member.circleId,
+          currentCircleId: circleId,
           state: MonthCircleAnswerState.Answered,
         },
         update: {
@@ -240,7 +245,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
           month,
           memberId,
           circleId: circle.id,
-          currentCircleId: member.circleId,
+          currentCircleId: circleId,
           state: MonthCircleAnswerState.Answered,
         },
       });

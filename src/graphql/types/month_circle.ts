@@ -83,6 +83,11 @@ export const UpdateMemberMonthCircleMutation = mutationField(
         throw new Error('member not found');
       }
 
+      const { circleId: currentCircleId } = member;
+      if (!currentCircleId) {
+        throw new Error('This member was leaved');
+      }
+
       const monthCircle = await ctx.prisma.monthCircle.upsert({
         where: {
           year_month_memberId: {
@@ -97,7 +102,7 @@ export const UpdateMemberMonthCircleMutation = mutationField(
           memberId,
           circleId,
           state,
-          currentCircleId: member.circleId,
+          currentCircleId,
         },
         update: {
           year,
@@ -105,7 +110,7 @@ export const UpdateMemberMonthCircleMutation = mutationField(
           memberId,
           circleId,
           state,
-          currentCircleId: member.circleId,
+          currentCircleId,
         },
       });
 
