@@ -1,3 +1,4 @@
+import { prisma } from './../../database/prisma';
 import {
   MonthCircle as _MonthCircle,
   MonthCircleAnswerState as _MonthCircleAnswerState,
@@ -41,7 +42,7 @@ export const MonthCircleQuery = queryField('monthCircle', {
   args: {
     monthCircleId: nonNull(stringArg()),
   },
-  resolve(parent, { monthCircleId }, ctx) {
+  resolve(_, { monthCircleId }, ctx) {
     return ctx.prisma.monthCircle.findUnique({
       where: {
         id: monthCircleId,
@@ -74,6 +75,14 @@ export const UpdateMemberMonthCircleMutation = mutationField(
           : PrismaMonthCircleAnswerState.Answered;
       const circleId =
         circleIdOrRetired != 'retired' ? circleIdOrRetired : null;
+      const member = await prisma.member.findUnique({
+        where: { id: memberId },
+      });
+
+      if (!member) {
+        throw new Error('member not found');
+      }
+
       const monthCircle = await ctx.prisma.monthCircle.upsert({
         where: {
           year_month_memberId: {
@@ -88,6 +97,7 @@ export const UpdateMemberMonthCircleMutation = mutationField(
           memberId,
           circleId,
           state,
+          currentCircleId: member.circleId,
         },
         update: {
           year,
@@ -95,6 +105,7 @@ export const UpdateMemberMonthCircleMutation = mutationField(
           memberId,
           circleId,
           state,
+          currentCircleId: member.circleId,
         },
       });
 

@@ -199,6 +199,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
           month,
           memberId,
           circleId: null,
+          currentCircleId: member.circleId,
           state: MonthCircleAnswerState.Retired,
         },
         update: {
@@ -206,6 +207,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
           month,
           memberId,
           circleId: null,
+          currentCircleId: member.circleId,
           state: MonthCircleAnswerState.Retired,
         },
       });
@@ -230,6 +232,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
           month,
           memberId,
           circleId: circle.id,
+          currentCircleId: member.circleId,
           state: MonthCircleAnswerState.Answered,
         },
         update: {
@@ -237,6 +240,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
           month,
           memberId,
           circleId: circle.id,
+          currentCircleId: member.circleId,
           state: MonthCircleAnswerState.Answered,
         },
       });

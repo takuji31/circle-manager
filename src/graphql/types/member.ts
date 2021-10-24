@@ -30,8 +30,18 @@ export const Member = objectType({
     t.field(m.circle);
     t.field('thisMonthCircle', {
       type: MonthCircle,
-      async resolve(parent, _, context: Context) {
-        return context.prisma.monthCircle.upsert({
+      async resolve(parent, _, ctx) {
+        const member = await ctx.prisma.member.findUnique({
+          where: {
+            id: parent.id,
+          },
+        });
+
+        if (!member) {
+          throw new Error('member not found');
+        }
+
+        return await ctx.prisma.monthCircle.upsert({
           where: {
             year_month_memberId: {
               ...thisMonth(),
@@ -41,6 +51,7 @@ export const Member = objectType({
           create: {
             ...thisMonth(),
             memberId: parent.id,
+            currentCircleId: member.circleId,
           },
           update: {},
         });
@@ -49,6 +60,16 @@ export const Member = objectType({
     t.field('nextMonthCircle', {
       type: MonthCircle,
       async resolve(parent, _, ctx) {
+        const member = await ctx.prisma.member.findUnique({
+          where: {
+            id: parent.id,
+          },
+        });
+
+        if (!member) {
+          throw new Error('member not found');
+        }
+
         return ctx.prisma.monthCircle.upsert({
           where: {
             year_month_memberId: {
@@ -59,6 +80,7 @@ export const Member = objectType({
           create: {
             ...nextMonth(),
             memberId: parent.id,
+            currentCircleId: member.circleId,
           },
           update: {},
         });
