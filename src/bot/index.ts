@@ -1,3 +1,4 @@
+import { selectCircleReaction } from './select_circle';
 import { monthSurveyReaction } from './month_survey';
 import { Guild } from './../model/guild';
 import { registerTrainerIdCommand } from './register_trainer_id';
@@ -90,7 +91,11 @@ client.on('messageReactionAdd', async (reaction, user) => {
       return;
     }
 
-    monthSurveyReaction(reaction, user, emoji);
+    if (reaction.message.id == Guild.messageIds.circleSelect) {
+      selectCircleReaction(reaction, user, emoji);
+    } else {
+      monthSurveyReaction(reaction, user, emoji);
+    }
   } catch (e) {
     console.log('Error when messageReactionAdd %s', e);
   }

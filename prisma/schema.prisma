@@ -22,6 +22,7 @@ model Circle {
   members             Member[]
   monthCircles        MonthCircle[]
   currentMonthCircles MonthCircle[] @relation("currentCircle")
+  MemberJoin          MemberJoin?
 }
 
 model Member {
@@ -83,6 +84,16 @@ model MonthSurvey {
   expiredAt DateTime
 
   @@unique([year, month])
+}
+
+/// 加入申請
+model MemberJoin {
+  id       String  @id @db.VarChar(255) /// DiscordのユーザーID
+  circleId String  @db.VarChar(255)@unique
+  circle   Circle  @relation(fields: [circleId], references: [id])
+  joined   Boolean @default(false)
+
+  @@index([joined])
 }
 
 // for NextAuth
