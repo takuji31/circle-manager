@@ -115,6 +115,23 @@ const AdminTopContent = () => {
     useCreateNextMonthSurveyMutation();
   const thisMonth = data?.thisMonth;
   const nextMonth = data?.nextMonth;
+  const circles = data?.circles;
+  const answers = data?.nextMonth.survey?.answers;
+  const circleIdToMemberCount: { [id: string]: number } = useMemo(() => {
+    if (!circles || !answers) {
+      return {};
+    } else {
+      const data: { [id: string]: number } = {};
+
+      circles.forEach((circle) => {
+        data[circle.id] = answers.filter(
+          (answer) => answer?.circle?.id == circle.id
+        ).length;
+      });
+
+      return data;
+    }
+  }, [circles, answers]);
   const expiredAtString = useMemo(() => {
     const expiredAt = data?.nextMonth?.survey?.expiredAt as string;
     if (!expiredAt) {
@@ -185,10 +202,36 @@ const AdminTopContent = () => {
                   <Typography variant="body1">
                     開始済み(期限: {expiredAtString ?? ''})
                   </Typography>
-                  <Typography variant="body1">
-                    回答済み {nextMonth.survey.answeredMembers.length}/
-                    {data.siteMetadata.activeMembers}
-                  </Typography>
+                  <TableContainer>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>サークル</TableCell>
+                        <TableCell>回答数/最大人数</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {circles &&
+                        circles.map((circle) => {
+                          return (
+                            <TableRow
+                              key={`month_survey_answer_count_${circle.id}`}
+                            >
+                              <TableCell>{circle.name}</TableCell>
+                              <TableCell>
+                                {circleIdToMemberCount[circle.id] ?? 0} / 30
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
+                      <TableRow>
+                        <TableCell>回答済み合計</TableCell>
+                        <TableCell>
+                          {nextMonth.survey.answers.length}/
+                          {data.siteMetadata.activeMembers}
+                        </TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </TableContainer>
                 </>
               )}
             </Stack>

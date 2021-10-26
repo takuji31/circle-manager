@@ -17,9 +17,11 @@ fragment MonthAndSurveyWithMembers on Month {
     year
     month
     expiredAt
-    answeredMembers {
-      id
-      name
+    answers {
+      ...MemberMonthCircle
+      member {
+        ...ListedMember
+      }
     }
     noAnswerMembers {
       id

@@ -1,3 +1,4 @@
+import { MonthCircle } from './month_circle';
 import { MonthCircleAnswerState, Circle } from '@prisma/client';
 import { Member } from './member';
 import { Temporal } from 'proposal-temporal';
@@ -21,28 +22,22 @@ export const MonthSurvey = objectType({
     t.field(_MonthSurvey.year);
     t.field(_MonthSurvey.month);
     t.field(_MonthSurvey.expiredAt);
-    t.field('answeredMembers', {
-      type: nonNull(list(Member)),
+    t.field('answers', {
+      type: nonNull(list(MonthCircle)),
       resolve(parent, _, { prisma }) {
-        return prisma.member.findMany({
+        return prisma.monthCircle.findMany({
           where: {
-            AND: [
-              { circleId: { not: null } },
-              {
-                monthCircles: {
-                  some: {
-                    year: parent.year,
-                    month: parent.month,
-                    circleId: {
-                      not: null,
-                    },
-                    state: {
-                      not: MonthCircleAnswerState.NoAnswer,
-                    },
-                  },
-                },
-              },
-            ],
+            member: {
+              circleId: { not: null },
+            },
+            year: parent.year,
+            month: parent.month,
+            circleId: {
+              not: null,
+            },
+            state: {
+              not: MonthCircleAnswerState.NoAnswer,
+            },
           },
         });
       },
