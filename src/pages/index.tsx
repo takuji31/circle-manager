@@ -2,7 +2,10 @@ import type { NextPage } from 'next';
 import * as React from 'react';
 import {
   Box,
+  Button,
   Container,
+  Grid,
+  GridSize,
   List,
   ListItem,
   ListItemButton,
@@ -30,6 +33,7 @@ import {
 import { LoadingButton } from '@mui/lab';
 import { useMemo } from 'react';
 import { Temporal } from 'proposal-temporal';
+import Link from '../components/link';
 
 const Home: NextPage = (props) => {
   const { user, status } = useUser();
@@ -55,12 +59,10 @@ const Home: NextPage = (props) => {
         </Box>
       )}
       {status == 'authenticated' && user && user?.isMember && (
-        <Container maxWidth="md">
-          <Stack p={2} spacing={4}>
-            <TopContent user={user} />
-            {user.isAdmin && <AdminTopContent />}
-          </Stack>
-        </Container>
+        <Stack p={2} spacing={4}>
+          {/* <TopContent user={user} /> */}
+          {user.isAdmin && <AdminTopContent />}
+        </Stack>
       )}
     </Layout>
   );
@@ -133,86 +135,86 @@ const AdminTopContent = () => {
     }
   }, [data?.nextMonth?.survey?.expiredAt]);
   return (
-    <Stack spacing={2}>
-      <Typography variant="h5">管理メニュー</Typography>
-      <Typography variant="h6">加入申請</Typography>
-      {data?.signUps && (
-        <TableContainer>
-          <TableHead>
-            <TableCell>名前</TableCell>
-            <TableCell>サークル</TableCell>
-            <TableCell>トレーナーID</TableCell>
-            <TableCell>勧誘送信済み</TableCell>
-            <TableCell>加入済み</TableCell>
-          </TableHead>
-          <TableBody>
-            {data.signUps.map((signUp) => {
-              return (
-                <TableRow key={`signup_${signUp.id}`}>
-                  <TableCell>{signUp.member.name}</TableCell>
-                  <TableCell>{signUp.circle.name}</TableCell>
-                  <TableCell>{signUp.member.trainerId ?? '未入力'}</TableCell>
-                  <TableCell>{signUp.invited}</TableCell>
-                  <TableCell>{signUp.joined}</TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </TableContainer>
-      )}
-      {data?.signUps && !data.signUps.length && (
-        <Typography variant="body1">加入申請はありません</Typography>
-      )}
-      {thisMonth && (
-        <>
-          <Typography variant="h6">
-            今月({thisMonth.year}年{thisMonth.month}月)の状況
-          </Typography>
-        </>
-      )}
-      {nextMonth && (
-        <>
-          <Typography variant="h6">
-            今月({nextMonth.year}年{nextMonth.month}月)の状況
-          </Typography>
-
-          <Stack spacing={2}>
-            <List>
-              <ListItem>
-                <ListItemText>在籍希望アンケート</ListItemText>
-              </ListItem>
+    <Grid container spacing={2}>
+      <Grid item xs={12}>
+        <Typography variant="h5">管理メニュー</Typography>
+      </Grid>
+      <Grid item xs={12} lg={6}>
+        <Typography variant="h6">加入申請</Typography>
+        {data?.signUps && (
+          <TableContainer>
+            <TableHead>
+              <TableCell>名前</TableCell>
+              <TableCell>サークル</TableCell>
+              <TableCell>トレーナーID</TableCell>
+              <TableCell>勧誘送信済み</TableCell>
+              <TableCell>加入済み</TableCell>
+            </TableHead>
+            <TableBody>
+              {data.signUps.map((signUp) => {
+                return (
+                  <TableRow key={`signup_${signUp.id}`}>
+                    <TableCell>{signUp.member.name}</TableCell>
+                    <TableCell>{signUp.circle.name}</TableCell>
+                    <TableCell>{signUp.member.trainerId ?? '未入力'}</TableCell>
+                    <TableCell>{signUp.invited}</TableCell>
+                    <TableCell>{signUp.joined}</TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </TableContainer>
+        )}
+        {data?.signUps && !data.signUps.length && (
+          <Typography variant="body1">加入申請はありません</Typography>
+        )}
+      </Grid>
+      <Grid item xs={12} lg={6}>
+        {nextMonth && (
+          <>
+            <Stack spacing={2}>
+              <Typography variant="h6">在籍希望アンケート</Typography>
               {!nextMonth.survey && (
                 <>
-                  <ListItem>
-                    <ListItemText>まだ開始していません</ListItemText>
-                  </ListItem>
-                  <ListItem>
-                    <ListItemButton onClick={() => mutation().then()}>
-                      開始する
-                    </ListItemButton>
-                  </ListItem>
+                  <Typography variant="body1">まだ開始していません</Typography>
+                  <Button onClick={() => mutation().then()}>開始する</Button>
                 </>
               )}
               {nextMonth.survey && (
                 <>
-                  <ListItem>
-                    <ListItemText>
-                      開始済み(期限: {expiredAtString ?? ''})
-                    </ListItemText>
-                  </ListItem>
-                  <ListItem>
-                    <ListItemText>
-                      回答済み {nextMonth.survey.answeredMembers.length}/
-                      {data.siteMetadata.activeMembers}
-                    </ListItemText>
-                  </ListItem>
+                  <Typography variant="body1">
+                    開始済み(期限: {expiredAtString ?? ''})
+                  </Typography>
+                  <Typography variant="body1">
+                    回答済み {nextMonth.survey.answeredMembers.length}/
+                    {data.siteMetadata.activeMembers}
+                  </Typography>
                 </>
               )}
-            </List>
-          </Stack>
-        </>
-      )}
-    </Stack>
+            </Stack>
+          </>
+        )}
+      </Grid>
+      <Grid item xs={12} lg={6}>
+        <Stack spacing={2}>
+          <Typography variant="h6">移籍表</Typography>
+          {nextMonth && (
+            <Link
+              href={`/admin/month_circles/${nextMonth.year}/${nextMonth.month}`}
+            >
+              {nextMonth.year}年{nextMonth.month}月
+            </Link>
+          )}
+          {thisMonth && (
+            <Link
+              href={`/admin/month_circles/${thisMonth.year}/${thisMonth.month}`}
+            >
+              {thisMonth.year}年{thisMonth.month}月
+            </Link>
+          )}
+        </Stack>
+      </Grid>
+    </Grid>
   );
 };
 
