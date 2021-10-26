@@ -8,3 +8,9 @@ fragment MemberMonthCircle on MonthCircle {
   }
   state
 }
+
+fragment ListedMember on Member {
+  id
+  name
+  trainerId
+}

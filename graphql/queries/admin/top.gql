@@ -8,4 +8,8 @@ query AdminTop {
   siteMetadata {
     activeMembers
   }
+
+  signUps {
+    ...ListedSignUp
+  }
 }

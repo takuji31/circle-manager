@@ -99,8 +99,20 @@ type Query {
   members: [Member!]!
   monthCircle(monthCircleId: String!): MonthCircle
   nextMonth: Month!
+  signUps: [SignUp!]!
   siteMetadata: SiteMetadata!
   thisMonth: Month!
+}
+
+"""加入申請"""
+type SignUp {
+  circle: Circle!
+
+  """DiscordのユーザーID"""
+  id: ID!
+  invited: Boolean!
+  joined: Boolean!
+  member: Member!
 }
 
 type SiteMetadata {

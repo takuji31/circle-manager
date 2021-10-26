@@ -37,7 +37,7 @@ export const selectCircleReaction: ReactionHandler = async (
     return;
   }
 
-  const memberJoin = await prisma.memberJoin.upsert({
+  await prisma.signUp.upsert({
     where: {
       id: member.id,
     },

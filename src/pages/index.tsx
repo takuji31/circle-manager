@@ -7,11 +7,19 @@ import {
   ListItem,
   ListItemButton,
   ListItemText,
+  TableRow,
   Typography,
 } from '@mui/material';
 import Layout from '../components/layout';
 import useUser from '../hooks/user';
-import { LinearProgress, Stack } from '@mui/material';
+import {
+  LinearProgress,
+  Stack,
+  TableContainer,
+  TableHead,
+  TableBody,
+  TableCell,
+} from '@mui/material';
 import { nextMonth, thisMonth, UserWithSession } from '../model';
 import MemberMonthCircle from '../components/member_month_circle';
 import {
@@ -127,6 +135,34 @@ const AdminTopContent = () => {
   return (
     <Stack spacing={2}>
       <Typography variant="h5">管理メニュー</Typography>
+      <Typography variant="h6">加入申請</Typography>
+      {data?.signUps && (
+        <TableContainer>
+          <TableHead>
+            <TableCell>名前</TableCell>
+            <TableCell>サークル</TableCell>
+            <TableCell>トレーナーID</TableCell>
+            <TableCell>勧誘送信済み</TableCell>
+            <TableCell>加入済み</TableCell>
+          </TableHead>
+          <TableBody>
+            {data.signUps.map((signUp) => {
+              return (
+                <TableRow key={`signup_${signUp.id}`}>
+                  <TableCell>{signUp.member.name}</TableCell>
+                  <TableCell>{signUp.circle.name}</TableCell>
+                  <TableCell>{signUp.member.trainerId ?? '未入力'}</TableCell>
+                  <TableCell>{signUp.invited}</TableCell>
+                  <TableCell>{signUp.joined}</TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </TableContainer>
+      )}
+      {data?.signUps && !data.signUps.length && (
+        <Typography variant="body1">加入申請はありません</Typography>
+      )}
       {thisMonth && (
         <>
           <Typography variant="h6">

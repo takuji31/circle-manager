@@ -117,6 +117,7 @@ export type Query = {
   members: Array<Member>;
   monthCircle?: Maybe<MonthCircle>;
   nextMonth: Month;
+  signUps: Array<SignUp>;
   siteMetadata: SiteMetadata;
   thisMonth: Month;
 };
@@ -129,6 +130,17 @@ export type QueryMemberArgs = {
 
 export type QueryMonthCircleArgs = {
   monthCircleId: Scalars['String'];
+};
+
+/** 加入申請 */
+export type SignUp = {
+  __typename?: 'SignUp';
+  circle: Circle;
+  /** DiscordのユーザーID */
+  id: Scalars['ID'];
+  invited: Scalars['Boolean'];
+  joined: Scalars['Boolean'];
+  member: Member;
 };
 
 export type SiteMetadata = {
@@ -147,9 +159,13 @@ export type ListedCircleFragment = { __typename?: 'Circle', id: string, name: st
 
 export type MemberMonthCircleFragment = { __typename?: 'MonthCircle', id: string, year: string, month: string, state: MonthCircleAnswerState, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined };
 
+export type ListedMemberFragment = { __typename?: 'Member', id: string, name: string, trainerId?: string | null | undefined };
+
 export type MonthAndSurveyFragment = { __typename?: 'Month', year: string, month: string, survey?: { __typename?: 'MonthSurvey', id: string, year: string, month: string, expiredAt: any } | null | undefined };
 
 export type MonthAndSurveyWithMembersFragment = { __typename?: 'Month', year: string, month: string, survey?: { __typename?: 'MonthSurvey', id: string, year: string, month: string, expiredAt: any, answeredMembers: Array<{ __typename?: 'Member', id: string, name: string } | null | undefined>, noAnswerMembers: Array<{ __typename?: 'Member', id: string, name: string } | null | undefined> } | null | undefined };
+
+export type ListedSignUpFragment = { __typename?: 'SignUp', id: string, invited: boolean, joined: boolean, member: { __typename?: 'Member', id: string, name: string, trainerId?: string | null | undefined }, circle: { __typename?: 'Circle', id: string, name: string } };
 
 export type CreateNextMonthSurveyMutationVariables = Exact<{ [key: string]: never; }>;
 
@@ -179,7 +195,7 @@ export type AdminMembersQuery = { __typename?: 'Query', members: Array<{ __typen
 export type AdminTopQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type AdminTopQuery = { __typename?: 'Query', thisMonth: { __typename?: 'Month', year: string, month: string, survey?: { __typename?: 'MonthSurvey', id: string, year: string, month: string, expiredAt: any } | null | undefined }, nextMonth: { __typename?: 'Month', year: string, month: string, survey?: { __typename?: 'MonthSurvey', id: string, year: string, month: string, expiredAt: any, answeredMembers: Array<{ __typename?: 'Member', id: string, name: string } | null | undefined>, noAnswerMembers: Array<{ __typename?: 'Member', id: string, name: string } | null | undefined> } | null | undefined }, siteMetadata: { __typename?: 'SiteMetadata', activeMembers: number } };
+export type AdminTopQuery = { __typename?: 'Query', thisMonth: { __typename?: 'Month', year: string, month: string, survey?: { __typename?: 'MonthSurvey', id: string, year: string, month: string, expiredAt: any } | null | undefined }, nextMonth: { __typename?: 'Month', year: string, month: string, survey?: { __typename?: 'MonthSurvey', id: string, year: string, month: string, expiredAt: any, answeredMembers: Array<{ __typename?: 'Member', id: string, name: string } | null | undefined>, noAnswerMembers: Array<{ __typename?: 'Member', id: string, name: string } | null | undefined> } | null | undefined }, siteMetadata: { __typename?: 'SiteMetadata', activeMembers: number }, signUps: Array<{ __typename?: 'SignUp', id: string, invited: boolean, joined: boolean, member: { __typename?: 'Member', id: string, name: string, trainerId?: string | null | undefined }, circle: { __typename?: 'Circle', id: string, name: string } }> };
 
 export type MemberMonthCirclesQueryVariables = Exact<{
   memberId: Scalars['String'];
@@ -195,12 +211,6 @@ export type MonthCircleQueryVariables = Exact<{
 
 export type MonthCircleQuery = { __typename?: 'Query', monthCircle?: { __typename?: 'MonthCircle', id: string, year: string, month: string, state: MonthCircleAnswerState, member: { __typename?: 'Member', id: string, name: string }, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined } | null | undefined, circles: Array<{ __typename?: 'Circle', id: string, name: string }> };
 
-export const ListedCircleFragmentDoc = gql`
-    fragment ListedCircle on Circle {
-  id
-  name
-}
-    `;
 export const MemberMonthCircleFragmentDoc = gql`
     fragment MemberMonthCircle on MonthCircle {
   id
@@ -245,6 +255,33 @@ export const MonthAndSurveyWithMembersFragmentDoc = gql`
   }
 }
     `;
+export const ListedMemberFragmentDoc = gql`
+    fragment ListedMember on Member {
+  id
+  name
+  trainerId
+}
+    `;
+export const ListedCircleFragmentDoc = gql`
+    fragment ListedCircle on Circle {
+  id
+  name
+}
+    `;
+export const ListedSignUpFragmentDoc = gql`
+    fragment ListedSignUp on SignUp {
+  id
+  member {
+    ...ListedMember
+  }
+  circle {
+    ...ListedCircle
+  }
+  invited
+  joined
+}
+    ${ListedMemberFragmentDoc}
+${ListedCircleFragmentDoc}`;
 export const CreateNextMonthSurveyDocument = gql`
     mutation CreateNextMonthSurvey {
   createNextMonthSurvey {
@@ -424,9 +461,13 @@ export const AdminTopDocument = gql`
   siteMetadata {
     activeMembers
   }
+  signUps {
+    ...ListedSignUp
+  }
 }
     ${MonthAndSurveyFragmentDoc}
-${MonthAndSurveyWithMembersFragmentDoc}`;
+${MonthAndSurveyWithMembersFragmentDoc}
+${ListedSignUpFragmentDoc}`;
 
 /**
  * __useAdminTopQuery__

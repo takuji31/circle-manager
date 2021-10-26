@@ -1,0 +1,11 @@
+fragment ListedSignUp on SignUp {
+  id
+  member {
+    ...ListedMember
+  }
+  circle {
+    ...ListedCircle
+  }
+  invited
+  joined
+}
