@@ -158,7 +158,7 @@ const AdminTopContent = () => {
       </Grid>
       <Grid item xs={12} lg={6}>
         <Typography variant="h6">加入申請</Typography>
-        {data?.signUps && data.signUps.length && (
+        {data?.signUps && !!data.signUps.length && (
           <TableContainer>
             <TableHead>
               <TableCell>名前</TableCell>
