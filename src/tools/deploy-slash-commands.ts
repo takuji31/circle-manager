@@ -10,14 +10,14 @@ config();
 
 const commands = [
   new SlashCommandBuilder()
-    .setName('next_month_circle')
-    .setDescription('[開発中]来月の在籍希望アンケートの回答を表示します。'),
+    .setName('next-month-circle')
+    .setDescription('来月の在籍希望アンケートの回答を表示します。'),
   new SlashCommandBuilder()
-    .setName('register_trainer_id')
-    .setDescription('[開発中]異動のために必要なトレーナーIDを登録します')
+    .setName('register-trainer-id')
+    .setDescription('異動のために必要なトレーナーIDを登録します')
     .addStringOption(
       new SlashCommandStringOption()
-        .setName('trainer_id')
+        .setName('id')
         .setRequired(true)
         .setDescription('トレーナーID')
     ),

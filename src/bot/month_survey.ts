@@ -119,7 +119,7 @@ export const monthSurveyReaction: ReactionHandler = async (
       );
     } else {
       await user.send(
-        `${year}年${month}月の在籍希望アンケートを「${circle.name}」への異動で受け付けました。異動にはトレーナーIDの入力が必要です。ゲームのプロフィール画面の「IDコピー」を押してDiscordのサーバー上で \`/register_trainer_id\` と入力してトレーナーIDを登録してください。`
+        `${year}年${month}月の在籍希望アンケートを「${circle.name}」への異動で受け付けました。異動にはトレーナーIDの入力が必要です。ゲームのプロフィール画面の「IDコピー」を押してDiscordのサーバー上で \`/register-trainer-id\` と入力してトレーナーIDを登録してください。`
       );
     }
   }

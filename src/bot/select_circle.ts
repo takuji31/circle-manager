@@ -52,6 +52,6 @@ export const selectCircleReaction: ReactionHandler = async (
 
   await user.send(
     `ようこそ、「${circle.name}」への加入申請を受け付けました。次にゲームのプロフィール画面で「IDコピー」を押してトレーナーIDをコピーし、Discordの任意のチャンネルで` +
-      '`/register_trainer_id`と入力してトレーナーIDを登録してください。`/register_trainer_id`はコピペするとうまくいかないことがあるので、`/re`くらいまで手で入力して出てくるポップアップから選んでください。'
+      '`/register-trainer-id`と入力してトレーナーIDを登録してください。'
   );
 };

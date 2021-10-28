@@ -140,7 +140,7 @@ export const CreateNextMonthSurveyMutation = mutationField(
       embed.addField('未回答の場合', '***除名となります。***');
       embed.addField(
         '回答状態の確認方法',
-        '任意のチャンネルで `/next_month_circle` と送信すると確認できます。'
+        '任意のチャンネルで `/next-month-circle` と送信すると確認できます。'
       );
 
       const { id: messageId, channel_id: channelId } = (await rest.post(

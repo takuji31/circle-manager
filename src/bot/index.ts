@@ -69,10 +69,10 @@ client.on('messageCreate', async () => {
 client.on('interactionCreate', async (interaction) => {
   try {
     if (!interaction.isCommand()) return;
-    if (interaction.commandName == 'next_month_circle') {
+    if (interaction.commandName == 'next-month-circle') {
       nextMonthCircleCommand(interaction);
     }
-    if (interaction.commandName == 'register_trainer_id') {
+    if (interaction.commandName == 'register-trainer-id') {
       registerTrainerIdCommand(interaction);
     }
   } catch (e) {
