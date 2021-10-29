@@ -5,6 +5,7 @@ import {
   DataGrid,
   GridActionsCellItem,
   GridColDef,
+  GridRenderCellParams,
   GridRowParams,
   GridRowsProp,
   GridToolbar,
@@ -22,7 +23,7 @@ import {
   useAdminMembersQuery,
 } from '../../../apollo';
 import { prisma } from '../../../database';
-import { NextLinkComposed } from '../../../components/link';
+import Link, { NextLinkComposed } from '../../../components/link';
 
 export interface Props {
   monthCircleNames: Array<string>;
@@ -83,6 +84,17 @@ const MemberList: NextPage<Props> = ({ monthCircleNames }) => {
             return value.circle?.name ?? '';
           }
         },
+        renderCell: (params: GridRenderCellParams) => {
+          const value = params.value as MonthCircle;
+          if (!value) {
+            return params.formattedValue;
+          }
+          return (
+            <Link href={`/month_circles/${value.id}`}>
+              {params.formattedValue}
+            </Link>
+          );
+        },
       },
       {
         field: 'nextMonthCircle',
@@ -99,6 +111,17 @@ const MemberList: NextPage<Props> = ({ monthCircleNames }) => {
           } else {
             return value.circle?.name ?? '';
           }
+        },
+        renderCell: (params: GridRenderCellParams) => {
+          const value = params.value as MonthCircle;
+          if (!value) {
+            return params.formattedValue;
+          }
+          return (
+            <Link href={`/month_circles/${value.id}`}>
+              {params.formattedValue}
+            </Link>
+          );
         },
       },
       {
