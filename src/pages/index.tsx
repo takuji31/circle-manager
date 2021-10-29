@@ -3,6 +3,8 @@ import * as React from 'react';
 import {
   Box,
   Button,
+  Checkbox,
+  CircularProgress,
   Container,
   Grid,
   GridSize,
@@ -29,11 +31,13 @@ import {
   useAdminTopQuery,
   useCreateNextMonthSurveyMutation,
   useMemberMonthCirclesQuery,
+  useUpdateSignUpMutation,
 } from '../apollo';
 import { LoadingButton } from '@mui/lab';
 import { useMemo } from 'react';
 import { Temporal } from 'proposal-temporal';
 import Link from '../components/link';
+import { load } from 'dotenv';
 
 const Home: NextPage = (props) => {
   const { user, status } = useUser();
@@ -174,8 +178,18 @@ const AdminTopContent = () => {
                     <TableCell>{signUp.member.name}</TableCell>
                     <TableCell>{signUp.circle.name}</TableCell>
                     <TableCell>{signUp.member.trainerId ?? '未入力'}</TableCell>
-                    <TableCell>{signUp.invited}</TableCell>
-                    <TableCell>{signUp.joined}</TableCell>
+                    <TableCell>
+                      <InvitedCheckBox
+                        invited={signUp.invited}
+                        memberId={signUp.member.id}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <JoinedCheckBox
+                        invited={signUp.joined}
+                        memberId={signUp.member.id}
+                      />
+                    </TableCell>
                   </TableRow>
                 );
               })}
@@ -258,6 +272,56 @@ const AdminTopContent = () => {
         </Stack>
       </Grid>
     </Grid>
+  );
+};
+
+const InvitedCheckBox: (props: {
+  invited: boolean;
+  memberId: string;
+}) => JSX.Element = ({ invited, memberId }) => {
+  const [mutation, { loading }] = useUpdateSignUpMutation();
+  return (
+    <LoadingCheckBox
+      checked={invited}
+      loading={loading}
+      onCheckChanged={(checked) =>
+        mutation({ variables: { memberId, invited: checked } })
+      }
+    />
+  );
+};
+
+const JoinedCheckBox: (props: {
+  joined: boolean;
+  memberId: string;
+}) => JSX.Element = ({ joined, memberId }) => {
+  const [mutation, { loading }] = useUpdateSignUpMutation();
+  return (
+    <LoadingCheckBox
+      checked={joined}
+      loading={loading}
+      onCheckChanged={(checked) =>
+        mutation({ variables: { memberId, joined: checked } })
+      }
+    />
+  );
+};
+
+const LoadingCheckBox: (props: {
+  checked: boolean;
+  loading: boolean;
+  onCheckChanged: (checked: boolean) => void;
+}) => JSX.Element = ({ checked, loading, onCheckChanged }) => {
+  if (loading) {
+    return <CircularProgress />;
+  }
+  return (
+    <Checkbox
+      checked={checked}
+      onChange={(e) => {
+        onCheckChanged(e.target.checked);
+      }}
+    />
   );
 };
 

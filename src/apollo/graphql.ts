@@ -100,6 +100,7 @@ export type Mutation = {
   createNextMonthSurvey?: Maybe<CreateNextMonthSurveyPayload>;
   updateMemberMonthCircle?: Maybe<UpdateMemberMonthCirclePayload>;
   updateMembers: Array<Member>;
+  updateSignUp: SignUp;
 };
 
 
@@ -108,6 +109,13 @@ export type MutationUpdateMemberMonthCircleArgs = {
   memberId: Scalars['String'];
   month: Scalars['String'];
   year: Scalars['String'];
+};
+
+
+export type MutationUpdateSignUpArgs = {
+  invited?: Maybe<Scalars['Boolean']>;
+  joined?: Maybe<Scalars['Boolean']>;
+  memberId: Scalars['String'];
 };
 
 export type Query = {
@@ -186,6 +194,15 @@ export type UpdateMembersMutationVariables = Exact<{ [key: string]: never; }>;
 
 
 export type UpdateMembersMutation = { __typename?: 'Mutation', updateMembers: Array<{ __typename?: 'Member', id: string, name: string, trainerId?: string | null | undefined, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined, thisMonthCircle?: { __typename?: 'MonthCircle', id: string, year: string, month: string, state: MonthCircleAnswerState, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined } | null | undefined, nextMonthCircle?: { __typename?: 'MonthCircle', id: string, year: string, month: string, state: MonthCircleAnswerState, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined } | null | undefined }> };
+
+export type UpdateSignUpMutationVariables = Exact<{
+  memberId: Scalars['String'];
+  invited?: Maybe<Scalars['Boolean']>;
+  joined?: Maybe<Scalars['Boolean']>;
+}>;
+
+
+export type UpdateSignUpMutation = { __typename?: 'Mutation', updateSignUp: { __typename?: 'SignUp', id: string, invited: boolean, joined: boolean, member: { __typename?: 'Member', id: string, name: string, trainerId?: string | null | undefined }, circle: { __typename?: 'Circle', id: string, name: string } } };
 
 export type AdminMembersQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -406,6 +423,41 @@ export function useUpdateMembersMutation(baseOptions?: Apollo.MutationHookOption
 export type UpdateMembersMutationHookResult = ReturnType<typeof useUpdateMembersMutation>;
 export type UpdateMembersMutationResult = Apollo.MutationResult<UpdateMembersMutation>;
 export type UpdateMembersMutationOptions = Apollo.BaseMutationOptions<UpdateMembersMutation, UpdateMembersMutationVariables>;
+export const UpdateSignUpDocument = gql`
+    mutation UpdateSignUp($memberId: String!, $invited: Boolean, $joined: Boolean) {
+  updateSignUp(memberId: $memberId, invited: $invited, joined: $joined) {
+    ...ListedSignUp
+  }
+}
+    ${ListedSignUpFragmentDoc}`;
+export type UpdateSignUpMutationFn = Apollo.MutationFunction<UpdateSignUpMutation, UpdateSignUpMutationVariables>;
+
+/**
+ * __useUpdateSignUpMutation__
+ *
+ * To run a mutation, you first call `useUpdateSignUpMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateSignUpMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateSignUpMutation, { data, loading, error }] = useUpdateSignUpMutation({
+ *   variables: {
+ *      memberId: // value for 'memberId'
+ *      invited: // value for 'invited'
+ *      joined: // value for 'joined'
+ *   },
+ * });
+ */
+export function useUpdateSignUpMutation(baseOptions?: Apollo.MutationHookOptions<UpdateSignUpMutation, UpdateSignUpMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateSignUpMutation, UpdateSignUpMutationVariables>(UpdateSignUpDocument, options);
+      }
+export type UpdateSignUpMutationHookResult = ReturnType<typeof useUpdateSignUpMutation>;
+export type UpdateSignUpMutationResult = Apollo.MutationResult<UpdateSignUpMutation>;
+export type UpdateSignUpMutationOptions = Apollo.BaseMutationOptions<UpdateSignUpMutation, UpdateSignUpMutationVariables>;
 export const AdminMembersDocument = gql`
     query AdminMembers {
   members {
