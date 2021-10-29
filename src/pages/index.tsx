@@ -186,7 +186,7 @@ const AdminTopContent = () => {
                     </TableCell>
                     <TableCell>
                       <JoinedCheckBox
-                        invited={signUp.joined}
+                        joined={signUp.joined}
                         memberId={signUp.member.id}
                       />
                     </TableCell>
