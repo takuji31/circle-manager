@@ -66,7 +66,7 @@ export const UpdateMemberMonthCircleMutation = mutationField(
       { year, month, memberId, circleId: circleIdOrRetired },
       ctx
     ) {
-      if (ctx.user?.id != memberId || !ctx.user.isAdmin) {
+      if (ctx.user?.id != memberId && !ctx?.user?.isAdmin) {
         throw new Error("Cannot update this user's month circle.");
       }
       const state =
