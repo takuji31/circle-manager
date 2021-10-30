@@ -78,6 +78,7 @@ export const MonthCircleList: PageMonthSurveyComp = ({ data }) => {
                     <TableCell>
                       <MonthCircleStateCheckbox
                         checked={monthCircle.kicked}
+                        disabled={monthCircle.kicked && monthCircle.invited}
                         variablesBuilder={(kicked) => ({
                           id: monthCircle.id,
                           kicked,
@@ -87,6 +88,7 @@ export const MonthCircleList: PageMonthSurveyComp = ({ data }) => {
                     <TableCell>
                       <MonthCircleStateCheckbox
                         checked={monthCircle.invited}
+                        disabled={!monthCircle.kicked || monthCircle.joined}
                         variablesBuilder={(invited) => ({
                           id: monthCircle.id,
                           invited,
@@ -96,6 +98,7 @@ export const MonthCircleList: PageMonthSurveyComp = ({ data }) => {
                     <TableCell>
                       <MonthCircleStateCheckbox
                         checked={monthCircle.joined}
+                        disabled={!monthCircle.kicked || !monthCircle.invited}
                         variablesBuilder={(joined) => ({
                           id: monthCircle.id,
                           joined,
@@ -166,9 +169,11 @@ export const MonthCircleList: PageMonthSurveyComp = ({ data }) => {
 
 const MonthCircleStateCheckbox = ({
   checked,
+  disabled,
   variablesBuilder,
 }: {
   checked: boolean;
+  disabled?: boolean;
   variablesBuilder: (checked: boolean) => UpdateMonthCircleMutationInput;
 }) => {
   const [mutation, { loading }] = useUpdateMonthCircleMutation();
@@ -176,6 +181,7 @@ const MonthCircleStateCheckbox = ({
     <LoadingCheckBox
       checked={checked}
       loading={loading}
+      disabled={disabled}
       onCheckChanged={(checked) => {
         mutation({
           variables: {
