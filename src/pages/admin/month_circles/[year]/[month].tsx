@@ -42,7 +42,7 @@ export const MonthCircleList: PageMonthSurveyComp = ({ data }) => {
   }
   return (
     <AdminLayout title={`${monthSurvey.year}年${monthSurvey.month}月の移籍表`}>
-      <Stack p={2}>
+      <Stack p={2} spacing={4}>
         <Typography variant="h6">移籍</Typography>
         <TableContainer>
           <TableHead>
