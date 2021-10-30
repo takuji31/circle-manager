@@ -58,18 +58,27 @@ export const MonthSurvey = objectType({
                 },
               },
               {
-                monthCircles: {
-                  none: {
-                    year: parent.year,
-                    month: parent.month,
-                    circleId: {
-                      not: null,
-                    },
-                    state: {
-                      not: MonthCircleAnswerState.NoAnswer,
+                OR: [
+                  {
+                    monthCircles: {
+                      none: {
+                        year: parent.year,
+                        month: parent.month,
+                      },
                     },
                   },
-                },
+                  {
+                    monthCircles: {
+                      none: {
+                        year: parent.year,
+                        month: parent.month,
+                        state: {
+                          not: MonthCircleAnswerState.NoAnswer,
+                        },
+                      },
+                    },
+                  },
+                ],
               },
             ],
           },
