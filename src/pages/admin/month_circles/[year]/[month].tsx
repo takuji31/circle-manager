@@ -16,8 +16,15 @@ import {
   NextPage,
 } from 'next';
 import { ParsedUrlQuery } from 'querystring';
+import React from 'react';
+import {
+  UpdateMonthCircleMutationInput,
+  UpdateMonthCircleMutationVariables,
+  useUpdateMonthCircleMutation,
+} from '../../../../apollo';
 import { PageMonthSurveyComp, ssrMonthSurvey } from '../../../../apollo/page';
 import { AdminLayout } from '../../../../components/admin_filter';
+import { LoadingCheckBox } from '../../../../components/loading_checkbox';
 import { prisma } from '../../../../database';
 import { nextMonth, thisMonth } from '../../../../model';
 
@@ -69,13 +76,31 @@ export const MonthCircleList: PageMonthSurveyComp = ({ data }) => {
                     <TableCell>{monthCircle.circle?.name}</TableCell>
                     <TableCell>{monthCircle.member.trainerId}</TableCell>
                     <TableCell>
-                      <Checkbox checked={monthCircle.kicked} />
+                      <MonthCircleStateCheckbox
+                        checked={monthCircle.kicked}
+                        variablesBuilder={(kicked) => ({
+                          id: monthCircle.id,
+                          kicked,
+                        })}
+                      />
                     </TableCell>
                     <TableCell>
-                      <Checkbox checked={monthCircle.invited} />
+                      <MonthCircleStateCheckbox
+                        checked={monthCircle.invited}
+                        variablesBuilder={(invited) => ({
+                          id: monthCircle.id,
+                          invited,
+                        })}
+                      />
                     </TableCell>
                     <TableCell>
-                      <Checkbox checked={monthCircle.joined} />
+                      <MonthCircleStateCheckbox
+                        checked={monthCircle.joined}
+                        variablesBuilder={(joined) => ({
+                          id: monthCircle.id,
+                          joined,
+                        })}
+                      />
                     </TableCell>
                   </TableRow>
                 );
@@ -83,11 +108,13 @@ export const MonthCircleList: PageMonthSurveyComp = ({ data }) => {
           </TableBody>
         </TableContainer>
         <Typography variant="h6">脱退予定者</Typography>
+        <Typography variant="body1">
+          Discordからkickするとリストから消えます。先にサークルから除名してください
+        </Typography>
         <TableContainer>
           <TableHead>
             <TableCell>名前</TableCell>
             <TableCell>現サークル</TableCell>
-            <TableCell>除名済み</TableCell>
           </TableHead>
           <TableBody>
             {monthSurvey.answers
@@ -97,20 +124,19 @@ export const MonthCircleList: PageMonthSurveyComp = ({ data }) => {
                   <TableRow key={`retired_${monthCircle.id}`}>
                     <TableCell>{monthCircle.member.name}</TableCell>
                     <TableCell>{monthCircle.currentCircle.name}</TableCell>
-                    <TableCell>
-                      <Checkbox checked={monthCircle.kicked} />
-                    </TableCell>
                   </TableRow>
                 );
               })}
           </TableBody>
         </TableContainer>
-        <Typography variant="h6">未回答者</Typography>
+        <Typography variant="h6">未回答者(除名)</Typography>
+        <Typography variant="body1">
+          Discordからkickするとリストから消えます。先にサークルから除名してください
+        </Typography>
         <TableContainer>
           <TableHead>
             <TableCell>名前</TableCell>
             <TableCell>現サークル</TableCell>
-            <TableCell>除名済み</TableCell>
           </TableHead>
           <TableBody>
             {monthSurvey.answers
@@ -120,9 +146,6 @@ export const MonthCircleList: PageMonthSurveyComp = ({ data }) => {
                   <TableRow key={`no_answer_${monthCircle.id}`}>
                     <TableCell>{monthCircle.member.name}</TableCell>
                     <TableCell>{monthCircle.currentCircle.name}</TableCell>
-                    <TableCell>
-                      <Checkbox checked={monthCircle.kicked} />
-                    </TableCell>
                   </TableRow>
                 );
               })}
@@ -131,9 +154,6 @@ export const MonthCircleList: PageMonthSurveyComp = ({ data }) => {
                 <TableRow key={`no_answer_${member.id}`}>
                   <TableCell>{member.name}</TableCell>
                   <TableCell>{member.circle?.name}</TableCell>
-                  <TableCell>
-                    <Checkbox checked={false} />
-                  </TableCell>
                 </TableRow>
               );
             })}
@@ -141,6 +161,31 @@ export const MonthCircleList: PageMonthSurveyComp = ({ data }) => {
         </TableContainer>
       </Stack>
     </AdminLayout>
+  );
+};
+
+const MonthCircleStateCheckbox = ({
+  checked,
+  variablesBuilder,
+}: {
+  checked: boolean;
+  variablesBuilder: (checked: boolean) => UpdateMonthCircleMutationInput;
+}) => {
+  const [mutation, { loading }] = useUpdateMonthCircleMutation();
+  return (
+    <LoadingCheckBox
+      checked={checked}
+      loading={loading}
+      onCheckChanged={(checked) => {
+        mutation({
+          variables: {
+            data: {
+              ...variablesBuilder(checked),
+            },
+          },
+        });
+      }}
+    />
   );
 };
 

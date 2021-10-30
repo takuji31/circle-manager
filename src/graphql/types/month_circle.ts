@@ -5,7 +5,10 @@ import {
 } from 'nexus-prisma';
 import { MonthCircleAnswerState as PrismaMonthCircleAnswerState } from '@prisma/client';
 import {
+  arg,
+  booleanArg,
   enumType,
+  inputObjectType,
   mutationField,
   nonNull,
   objectType,
@@ -124,3 +127,50 @@ export const UpdateMemberMonthCircleMutation = mutationField(
     },
   }
 );
+
+export const UpdateMonthCircleMutationInput = inputObjectType({
+  name: 'UpdateMonthCircleMutationInput',
+  definition(t) {
+    t.nonNull.string('id');
+    t.boolean('kicked', { default: null });
+    t.boolean('invited', { default: null });
+    t.boolean('joined', { default: null });
+  },
+});
+
+export const UpdateMonthCircleMutation = mutationField('updateMonthCircle', {
+  type: UpdateMemberMonthCirclePayload,
+  args: { data: nonNull(UpdateMonthCircleMutationInput.asArg()) },
+  async resolve(parent, { data: { id, kicked, invited, joined } }, { prisma }) {
+    if (kicked != null) {
+      await prisma.monthCircle.update({
+        where: { id },
+        data: { kicked },
+      });
+    }
+
+    if (invited != null) {
+      await prisma.monthCircle.update({
+        where: { id },
+        data: { invited },
+      });
+    }
+
+    if (joined != null) {
+      await prisma.monthCircle.update({
+        where: { id },
+        data: { joined },
+      });
+    }
+
+    let monthCircle = await prisma.monthCircle.findUnique({ where: { id } });
+
+    if (!monthCircle) {
+      throw new Error('not found');
+    }
+
+    return {
+      monthCircle,
+    };
+  },
+});

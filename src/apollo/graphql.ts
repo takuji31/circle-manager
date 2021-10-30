@@ -105,6 +105,7 @@ export type Mutation = {
   createNextMonthSurvey?: Maybe<CreateNextMonthSurveyPayload>;
   updateMemberMonthCircle?: Maybe<UpdateMemberMonthCirclePayload>;
   updateMembers: Array<Member>;
+  updateMonthCircle?: Maybe<UpdateMemberMonthCirclePayload>;
   updateSignUp: SignUp;
 };
 
@@ -114,6 +115,11 @@ export type MutationUpdateMemberMonthCircleArgs = {
   memberId: Scalars['String'];
   month: Scalars['String'];
   year: Scalars['String'];
+};
+
+
+export type MutationUpdateMonthCircleArgs = {
+  data: UpdateMonthCircleMutationInput;
 };
 
 
@@ -175,6 +181,13 @@ export type UpdateMemberMonthCirclePayload = {
   monthCircle: MonthCircle;
 };
 
+export type UpdateMonthCircleMutationInput = {
+  id: Scalars['String'];
+  invited?: Maybe<Scalars['Boolean']>;
+  joined?: Maybe<Scalars['Boolean']>;
+  kicked?: Maybe<Scalars['Boolean']>;
+};
+
 export type ListedCircleFragment = { __typename?: 'Circle', id: string, name: string };
 
 export type MemberMonthCircleFragment = { __typename?: 'MonthCircle', id: string, year: string, month: string, state: MonthCircleAnswerState, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined };
@@ -206,6 +219,13 @@ export type UpdateMembersMutationVariables = Exact<{ [key: string]: never; }>;
 
 
 export type UpdateMembersMutation = { __typename?: 'Mutation', updateMembers: Array<{ __typename?: 'Member', id: string, name: string, trainerId?: string | null | undefined, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined, thisMonthCircle?: { __typename?: 'MonthCircle', id: string, year: string, month: string, state: MonthCircleAnswerState, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined } | null | undefined, nextMonthCircle?: { __typename?: 'MonthCircle', id: string, year: string, month: string, state: MonthCircleAnswerState, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined } | null | undefined }> };
+
+export type UpdateMonthCircleMutationVariables = Exact<{
+  data: UpdateMonthCircleMutationInput;
+}>;
+
+
+export type UpdateMonthCircleMutation = { __typename?: 'Mutation', updateMonthCircle?: { __typename?: 'UpdateMemberMonthCirclePayload', monthCircle: { __typename?: 'MonthCircle', kicked: boolean, invited: boolean, joined: boolean, id: string, year: string, month: string, state: MonthCircleAnswerState, currentCircle: { __typename?: 'Circle', id: string, name: string }, member: { __typename?: 'Member', id: string, name: string, trainerId?: string | null | undefined, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined }, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined } } | null | undefined };
 
 export type UpdateSignUpMutationVariables = Exact<{
   memberId: Scalars['String'];
@@ -443,6 +463,56 @@ export function useUpdateMembersMutation(baseOptions?: Apollo.MutationHookOption
 export type UpdateMembersMutationHookResult = ReturnType<typeof useUpdateMembersMutation>;
 export type UpdateMembersMutationResult = Apollo.MutationResult<UpdateMembersMutation>;
 export type UpdateMembersMutationOptions = Apollo.BaseMutationOptions<UpdateMembersMutation, UpdateMembersMutationVariables>;
+export const UpdateMonthCircleDocument = gql`
+    mutation UpdateMonthCircle($data: UpdateMonthCircleMutationInput!) {
+  updateMonthCircle(data: $data) {
+    monthCircle {
+      ...MemberMonthCircle
+      currentCircle {
+        id
+        name
+      }
+      member {
+        ...ListedMember
+        circle {
+          id
+          name
+        }
+      }
+      kicked
+      invited
+      joined
+    }
+  }
+}
+    ${MemberMonthCircleFragmentDoc}
+${ListedMemberFragmentDoc}`;
+export type UpdateMonthCircleMutationFn = Apollo.MutationFunction<UpdateMonthCircleMutation, UpdateMonthCircleMutationVariables>;
+
+/**
+ * __useUpdateMonthCircleMutation__
+ *
+ * To run a mutation, you first call `useUpdateMonthCircleMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateMonthCircleMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateMonthCircleMutation, { data, loading, error }] = useUpdateMonthCircleMutation({
+ *   variables: {
+ *      data: // value for 'data'
+ *   },
+ * });
+ */
+export function useUpdateMonthCircleMutation(baseOptions?: Apollo.MutationHookOptions<UpdateMonthCircleMutation, UpdateMonthCircleMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateMonthCircleMutation, UpdateMonthCircleMutationVariables>(UpdateMonthCircleDocument, options);
+      }
+export type UpdateMonthCircleMutationHookResult = ReturnType<typeof useUpdateMonthCircleMutation>;
+export type UpdateMonthCircleMutationResult = Apollo.MutationResult<UpdateMonthCircleMutation>;
+export type UpdateMonthCircleMutationOptions = Apollo.BaseMutationOptions<UpdateMonthCircleMutation, UpdateMonthCircleMutationVariables>;
 export const UpdateSignUpDocument = gql`
     mutation UpdateSignUp($memberId: String!, $invited: Boolean, $joined: Boolean) {
   updateSignUp(memberId: $memberId, invited: $invited, joined: $joined) {
@@ -777,11 +847,12 @@ export type MonthSurveyFieldPolicy = {
 	noAnswerMembers?: FieldPolicy<any> | FieldReadFunction<any>,
 	year?: FieldPolicy<any> | FieldReadFunction<any>
 };
-export type MutationKeySpecifier = ('createNextMonthSurvey' | 'updateMemberMonthCircle' | 'updateMembers' | 'updateSignUp' | MutationKeySpecifier)[];
+export type MutationKeySpecifier = ('createNextMonthSurvey' | 'updateMemberMonthCircle' | 'updateMembers' | 'updateMonthCircle' | 'updateSignUp' | MutationKeySpecifier)[];
 export type MutationFieldPolicy = {
 	createNextMonthSurvey?: FieldPolicy<any> | FieldReadFunction<any>,
 	updateMemberMonthCircle?: FieldPolicy<any> | FieldReadFunction<any>,
 	updateMembers?: FieldPolicy<any> | FieldReadFunction<any>,
+	updateMonthCircle?: FieldPolicy<any> | FieldReadFunction<any>,
 	updateSignUp?: FieldPolicy<any> | FieldReadFunction<any>
 };
 export type QueryKeySpecifier = ('circles' | 'member' | 'members' | 'monthCircle' | 'monthSurvey' | 'nextMonth' | 'signUps' | 'siteMetadata' | 'thisMonth' | QueryKeySpecifier)[];
