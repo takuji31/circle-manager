@@ -1,3 +1,5 @@
+import { Guild } from './../../model/guild';
+import { Routes } from 'discord-api-types/v9';
 import { prisma } from './../../database/prisma';
 import {
   MonthCircle as _MonthCircle,
@@ -15,6 +17,7 @@ import {
   queryField,
   stringArg,
 } from 'nexus';
+import { createDiscordRestClient } from '../../discord';
 
 export const MonthCircle = objectType({
   name: _MonthCircle.$name,
@@ -163,10 +166,30 @@ export const UpdateMonthCircleMutation = mutationField('updateMonthCircle', {
       });
     }
 
-    let monthCircle = await prisma.monthCircle.findUnique({ where: { id } });
+    const monthCircle = await prisma.monthCircle.findUnique({ where: { id } });
 
     if (!monthCircle) {
       throw new Error('not found');
+    }
+
+    const circleId = monthCircle.circleId;
+    if (joined && circleId) {
+      try {
+        const rest = createDiscordRestClient();
+        const roleIds = Guild.roleIds.circleIds;
+        roleIds
+          .filter((id) => id != monthCircle.circleId)
+          .forEach(async (id) => {
+            await rest.delete(
+              Routes.guildMemberRole(Guild.id, monthCircle.memberId, id)
+            );
+          });
+        await rest.put(
+          Routes.guildMemberRole(Guild.id, monthCircle.memberId, circleId)
+        );
+      } catch (e) {
+        console.log(e);
+      }
     }
 
     return {

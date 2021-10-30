@@ -129,9 +129,9 @@ export const UpdateMembers = mutationField('updateMembers', {
           const circleIdOrNull = member.roles.filter(
             (role) => circleIds.indexOf(role) != -1
           )[0];
-          const circleRole = member.roles.includes(Guild.roleId.leader)
+          const circleRole = member.roles.includes(Guild.roleIds.leader)
             ? PrismaCircleRole.Leader
-            : member.roles.includes(Guild.roleId.subLeader)
+            : member.roles.includes(Guild.roleIds.subLeader)
             ? PrismaCircleRole.SubLeader
             : PrismaCircleRole.Member;
           return ctx.prisma.member.upsert({
