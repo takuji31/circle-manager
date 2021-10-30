@@ -31,6 +31,7 @@ import { useMemo } from 'react';
 import { Temporal } from 'proposal-temporal';
 import Link from '../components/link';
 import { ssrAdminMembers, ssrAdminTop } from '../apollo/page';
+import { LoadingCheckBox } from '../components/loading_checkbox';
 
 const Home: NextPage = (props) => {
   const { user, status } = useUser();
@@ -296,24 +297,6 @@ const JoinedCheckBox: (props: {
       onCheckChanged={(checked) =>
         mutation({ variables: { memberId, joined: checked } })
       }
-    />
-  );
-};
-
-const LoadingCheckBox: (props: {
-  checked: boolean;
-  loading: boolean;
-  onCheckChanged: (checked: boolean) => void;
-}) => JSX.Element = ({ checked, loading, onCheckChanged }) => {
-  if (loading) {
-    return <CircularProgress />;
-  }
-  return (
-    <Checkbox
-      checked={checked}
-      onChange={(e) => {
-        onCheckChanged(e.target.checked);
-      }}
     />
   );
 };
