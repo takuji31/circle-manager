@@ -1,9 +1,10 @@
-import { GetStaticPaths, GetStaticProps } from 'next';
+import { GetServerSideProps } from 'next';
 import { ParsedUrlQuery } from 'querystring';
 import { prisma } from '../../../../../database';
-import { nextMonth, thisMonth } from '../../../../../model';
 
-export const getStaticProps: GetStaticProps<{}, PathParams> = async (ctx) => {
+export const getServerSideProps: GetServerSideProps<{}, PathParams> = async (
+  ctx
+) => {
   const { memberId, year, month } = ctx.params!!;
   const member = await prisma.member.findUnique({ where: { id: memberId } });
   if (!member || !member.circleId) {
@@ -40,26 +41,6 @@ interface PathParams extends ParsedUrlQuery {
   year: string;
   month: string;
 }
-
-export const getStaticPaths: GetStaticPaths<PathParams> = async () => {
-  return {
-    paths: (await prisma.member.findMany({})).flatMap((member) => [
-      {
-        params: {
-          memberId: member.id,
-          ...thisMonth(),
-        },
-      },
-      {
-        params: {
-          memberId: member.id,
-          ...nextMonth(),
-        },
-      },
-    ]),
-    fallback: 'blocking',
-  };
-};
 
 export default function MonthCircleRedirect() {
   return <p></p>;
