@@ -22,7 +22,11 @@ export const MonthCircle = objectType({
     t.field(_MonthCircle.month);
     t.field(_MonthCircle.state);
     t.field(_MonthCircle.circle);
+    t.field(_MonthCircle.currentCircle);
     t.field(_MonthCircle.member);
+    t.field(_MonthCircle.kicked);
+    t.field(_MonthCircle.invited);
+    t.field(_MonthCircle.joined);
   },
 });
 

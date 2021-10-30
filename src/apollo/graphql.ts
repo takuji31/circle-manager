@@ -1,5 +1,6 @@
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
+import { FieldPolicy, FieldReadFunction, TypePolicies, TypePolicy } from '@apollo/client/cache';
 export type Maybe<T> = T | null;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
@@ -70,7 +71,11 @@ export type Month = {
 export type MonthCircle = {
   __typename?: 'MonthCircle';
   circle?: Maybe<Circle>;
+  currentCircle: Circle;
   id: Scalars['ID'];
+  invited: Scalars['Boolean'];
+  joined: Scalars['Boolean'];
+  kicked: Scalars['Boolean'];
   member: Member;
   month: Scalars['String'];
   state: MonthCircleAnswerState;
@@ -86,12 +91,12 @@ export enum MonthCircleAnswerState {
 /** 在籍希望アンケート */
 export type MonthSurvey = {
   __typename?: 'MonthSurvey';
-  answers: Array<Maybe<MonthCircle>>;
+  answers: Array<MonthCircle>;
   expiredAt: Scalars['DateTime'];
   /** アンケートのメッセージID */
   id: Scalars['ID'];
   month: Scalars['String'];
-  noAnswerMembers: Array<Maybe<Member>>;
+  noAnswerMembers: Array<Member>;
   year: Scalars['String'];
 };
 
@@ -124,6 +129,7 @@ export type Query = {
   member?: Maybe<Member>;
   members: Array<Member>;
   monthCircle?: Maybe<MonthCircle>;
+  monthSurvey?: Maybe<MonthSurvey>;
   nextMonth: Month;
   signUps: Array<SignUp>;
   siteMetadata: SiteMetadata;
@@ -138,6 +144,12 @@ export type QueryMemberArgs = {
 
 export type QueryMonthCircleArgs = {
   monthCircleId: Scalars['String'];
+};
+
+
+export type QueryMonthSurveyArgs = {
+  month: Scalars['String'];
+  year: Scalars['String'];
 };
 
 /** 加入申請 */
@@ -171,7 +183,7 @@ export type ListedMemberFragment = { __typename?: 'Member', id: string, name: st
 
 export type MonthAndSurveyFragment = { __typename?: 'Month', year: string, month: string, survey?: { __typename?: 'MonthSurvey', id: string, year: string, month: string, expiredAt: any } | null | undefined };
 
-export type MonthAndSurveyWithMembersFragment = { __typename?: 'Month', year: string, month: string, survey?: { __typename?: 'MonthSurvey', id: string, year: string, month: string, expiredAt: any, answers: Array<{ __typename?: 'MonthCircle', id: string, year: string, month: string, state: MonthCircleAnswerState, member: { __typename?: 'Member', id: string, name: string, trainerId?: string | null | undefined }, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined } | null | undefined>, noAnswerMembers: Array<{ __typename?: 'Member', id: string, name: string } | null | undefined> } | null | undefined };
+export type MonthAndSurveyWithMembersFragment = { __typename?: 'Month', year: string, month: string, survey?: { __typename?: 'MonthSurvey', id: string, year: string, month: string, expiredAt: any, answers: Array<{ __typename?: 'MonthCircle', id: string, year: string, month: string, state: MonthCircleAnswerState, member: { __typename?: 'Member', id: string, name: string, trainerId?: string | null | undefined }, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined }>, noAnswerMembers: Array<{ __typename?: 'Member', id: string, name: string }> } | null | undefined };
 
 export type ListedSignUpFragment = { __typename?: 'SignUp', id: string, invited: boolean, joined: boolean, member: { __typename?: 'Member', id: string, name: string, trainerId?: string | null | undefined }, circle: { __typename?: 'Circle', id: string, name: string } };
 
@@ -209,10 +221,18 @@ export type AdminMembersQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type AdminMembersQuery = { __typename?: 'Query', members: Array<{ __typename?: 'Member', id: string, pathname: string, name: string, circleRole: CircleRole, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined, thisMonthCircle?: { __typename?: 'MonthCircle', id: string, year: string, month: string, state: MonthCircleAnswerState, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined } | null | undefined, nextMonthCircle?: { __typename?: 'MonthCircle', id: string, year: string, month: string, state: MonthCircleAnswerState, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined } | null | undefined }> };
 
+export type MonthSurveyQueryVariables = Exact<{
+  year: Scalars['String'];
+  month: Scalars['String'];
+}>;
+
+
+export type MonthSurveyQuery = { __typename?: 'Query', monthSurvey?: { __typename?: 'MonthSurvey', id: string, year: string, month: string, expiredAt: any, answers: Array<{ __typename?: 'MonthCircle', kicked: boolean, invited: boolean, joined: boolean, id: string, year: string, month: string, state: MonthCircleAnswerState, currentCircle: { __typename?: 'Circle', id: string, name: string }, member: { __typename?: 'Member', id: string, name: string, trainerId?: string | null | undefined, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined }, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined }>, noAnswerMembers: Array<{ __typename?: 'Member', id: string, name: string, trainerId?: string | null | undefined, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined }> } | null | undefined };
+
 export type AdminTopQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type AdminTopQuery = { __typename?: 'Query', thisMonth: { __typename?: 'Month', year: string, month: string, survey?: { __typename?: 'MonthSurvey', id: string, year: string, month: string, expiredAt: any } | null | undefined }, nextMonth: { __typename?: 'Month', year: string, month: string, survey?: { __typename?: 'MonthSurvey', id: string, year: string, month: string, expiredAt: any, answers: Array<{ __typename?: 'MonthCircle', id: string, year: string, month: string, state: MonthCircleAnswerState, member: { __typename?: 'Member', id: string, name: string, trainerId?: string | null | undefined }, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined } | null | undefined>, noAnswerMembers: Array<{ __typename?: 'Member', id: string, name: string } | null | undefined> } | null | undefined }, siteMetadata: { __typename?: 'SiteMetadata', activeMembers: number }, signUps: Array<{ __typename?: 'SignUp', id: string, invited: boolean, joined: boolean, member: { __typename?: 'Member', id: string, name: string, trainerId?: string | null | undefined }, circle: { __typename?: 'Circle', id: string, name: string } }>, circles: Array<{ __typename?: 'Circle', id: string, name: string }> };
+export type AdminTopQuery = { __typename?: 'Query', thisMonth: { __typename?: 'Month', year: string, month: string, survey?: { __typename?: 'MonthSurvey', id: string, year: string, month: string, expiredAt: any } | null | undefined }, nextMonth: { __typename?: 'Month', year: string, month: string, survey?: { __typename?: 'MonthSurvey', id: string, year: string, month: string, expiredAt: any, answers: Array<{ __typename?: 'MonthCircle', id: string, year: string, month: string, state: MonthCircleAnswerState, member: { __typename?: 'Member', id: string, name: string, trainerId?: string | null | undefined }, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined }>, noAnswerMembers: Array<{ __typename?: 'Member', id: string, name: string }> } | null | undefined }, siteMetadata: { __typename?: 'SiteMetadata', activeMembers: number }, signUps: Array<{ __typename?: 'SignUp', id: string, invited: boolean, joined: boolean, member: { __typename?: 'Member', id: string, name: string, trainerId?: string | null | undefined }, circle: { __typename?: 'Circle', id: string, name: string } }>, circles: Array<{ __typename?: 'Circle', id: string, name: string }> };
 
 export type MemberMonthCirclesQueryVariables = Exact<{
   memberId: Scalars['String'];
@@ -505,6 +525,70 @@ export function useAdminMembersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptio
 export type AdminMembersQueryHookResult = ReturnType<typeof useAdminMembersQuery>;
 export type AdminMembersLazyQueryHookResult = ReturnType<typeof useAdminMembersLazyQuery>;
 export type AdminMembersQueryResult = Apollo.QueryResult<AdminMembersQuery, AdminMembersQueryVariables>;
+export const MonthSurveyDocument = gql`
+    query MonthSurvey($year: String!, $month: String!) {
+  monthSurvey(year: $year, month: $month) {
+    id
+    year
+    month
+    expiredAt
+    answers {
+      ...MemberMonthCircle
+      currentCircle {
+        id
+        name
+      }
+      member {
+        ...ListedMember
+        circle {
+          id
+          name
+        }
+      }
+      kicked
+      invited
+      joined
+    }
+    noAnswerMembers {
+      ...ListedMember
+      circle {
+        id
+        name
+      }
+    }
+  }
+}
+    ${MemberMonthCircleFragmentDoc}
+${ListedMemberFragmentDoc}`;
+
+/**
+ * __useMonthSurveyQuery__
+ *
+ * To run a query within a React component, call `useMonthSurveyQuery` and pass it any options that fit your needs.
+ * When your component renders, `useMonthSurveyQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useMonthSurveyQuery({
+ *   variables: {
+ *      year: // value for 'year'
+ *      month: // value for 'month'
+ *   },
+ * });
+ */
+export function useMonthSurveyQuery(baseOptions: Apollo.QueryHookOptions<MonthSurveyQuery, MonthSurveyQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<MonthSurveyQuery, MonthSurveyQueryVariables>(MonthSurveyDocument, options);
+      }
+export function useMonthSurveyLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MonthSurveyQuery, MonthSurveyQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<MonthSurveyQuery, MonthSurveyQueryVariables>(MonthSurveyDocument, options);
+        }
+export type MonthSurveyQueryHookResult = ReturnType<typeof useMonthSurveyQuery>;
+export type MonthSurveyLazyQueryHookResult = ReturnType<typeof useMonthSurveyLazyQuery>;
+export type MonthSurveyQueryResult = Apollo.QueryResult<MonthSurveyQuery, MonthSurveyQueryVariables>;
 export const AdminTopDocument = gql`
     query AdminTop {
   thisMonth {
@@ -641,3 +725,139 @@ export function useMonthCircleLazyQuery(baseOptions?: Apollo.LazyQueryHookOption
 export type MonthCircleQueryHookResult = ReturnType<typeof useMonthCircleQuery>;
 export type MonthCircleLazyQueryHookResult = ReturnType<typeof useMonthCircleLazyQuery>;
 export type MonthCircleQueryResult = Apollo.QueryResult<MonthCircleQuery, MonthCircleQueryVariables>;
+export type CircleKeySpecifier = ('createdAt' | 'id' | 'members' | 'name' | CircleKeySpecifier)[];
+export type CircleFieldPolicy = {
+	createdAt?: FieldPolicy<any> | FieldReadFunction<any>,
+	id?: FieldPolicy<any> | FieldReadFunction<any>,
+	members?: FieldPolicy<any> | FieldReadFunction<any>,
+	name?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type CreateNextMonthSurveyPayloadKeySpecifier = ('nextMonth' | CreateNextMonthSurveyPayloadKeySpecifier)[];
+export type CreateNextMonthSurveyPayloadFieldPolicy = {
+	nextMonth?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type MemberKeySpecifier = ('circle' | 'circleRole' | 'id' | 'joinedAt' | 'leavedAt' | 'name' | 'nextMonthCircle' | 'pathname' | 'thisMonthCircle' | 'trainerId' | MemberKeySpecifier)[];
+export type MemberFieldPolicy = {
+	circle?: FieldPolicy<any> | FieldReadFunction<any>,
+	circleRole?: FieldPolicy<any> | FieldReadFunction<any>,
+	id?: FieldPolicy<any> | FieldReadFunction<any>,
+	joinedAt?: FieldPolicy<any> | FieldReadFunction<any>,
+	leavedAt?: FieldPolicy<any> | FieldReadFunction<any>,
+	name?: FieldPolicy<any> | FieldReadFunction<any>,
+	nextMonthCircle?: FieldPolicy<any> | FieldReadFunction<any>,
+	pathname?: FieldPolicy<any> | FieldReadFunction<any>,
+	thisMonthCircle?: FieldPolicy<any> | FieldReadFunction<any>,
+	trainerId?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type MonthKeySpecifier = ('month' | 'survey' | 'year' | MonthKeySpecifier)[];
+export type MonthFieldPolicy = {
+	month?: FieldPolicy<any> | FieldReadFunction<any>,
+	survey?: FieldPolicy<any> | FieldReadFunction<any>,
+	year?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type MonthCircleKeySpecifier = ('circle' | 'currentCircle' | 'id' | 'invited' | 'joined' | 'kicked' | 'member' | 'month' | 'state' | 'year' | MonthCircleKeySpecifier)[];
+export type MonthCircleFieldPolicy = {
+	circle?: FieldPolicy<any> | FieldReadFunction<any>,
+	currentCircle?: FieldPolicy<any> | FieldReadFunction<any>,
+	id?: FieldPolicy<any> | FieldReadFunction<any>,
+	invited?: FieldPolicy<any> | FieldReadFunction<any>,
+	joined?: FieldPolicy<any> | FieldReadFunction<any>,
+	kicked?: FieldPolicy<any> | FieldReadFunction<any>,
+	member?: FieldPolicy<any> | FieldReadFunction<any>,
+	month?: FieldPolicy<any> | FieldReadFunction<any>,
+	state?: FieldPolicy<any> | FieldReadFunction<any>,
+	year?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type MonthSurveyKeySpecifier = ('answers' | 'expiredAt' | 'id' | 'month' | 'noAnswerMembers' | 'year' | MonthSurveyKeySpecifier)[];
+export type MonthSurveyFieldPolicy = {
+	answers?: FieldPolicy<any> | FieldReadFunction<any>,
+	expiredAt?: FieldPolicy<any> | FieldReadFunction<any>,
+	id?: FieldPolicy<any> | FieldReadFunction<any>,
+	month?: FieldPolicy<any> | FieldReadFunction<any>,
+	noAnswerMembers?: FieldPolicy<any> | FieldReadFunction<any>,
+	year?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type MutationKeySpecifier = ('createNextMonthSurvey' | 'updateMemberMonthCircle' | 'updateMembers' | 'updateSignUp' | MutationKeySpecifier)[];
+export type MutationFieldPolicy = {
+	createNextMonthSurvey?: FieldPolicy<any> | FieldReadFunction<any>,
+	updateMemberMonthCircle?: FieldPolicy<any> | FieldReadFunction<any>,
+	updateMembers?: FieldPolicy<any> | FieldReadFunction<any>,
+	updateSignUp?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type QueryKeySpecifier = ('circles' | 'member' | 'members' | 'monthCircle' | 'monthSurvey' | 'nextMonth' | 'signUps' | 'siteMetadata' | 'thisMonth' | QueryKeySpecifier)[];
+export type QueryFieldPolicy = {
+	circles?: FieldPolicy<any> | FieldReadFunction<any>,
+	member?: FieldPolicy<any> | FieldReadFunction<any>,
+	members?: FieldPolicy<any> | FieldReadFunction<any>,
+	monthCircle?: FieldPolicy<any> | FieldReadFunction<any>,
+	monthSurvey?: FieldPolicy<any> | FieldReadFunction<any>,
+	nextMonth?: FieldPolicy<any> | FieldReadFunction<any>,
+	signUps?: FieldPolicy<any> | FieldReadFunction<any>,
+	siteMetadata?: FieldPolicy<any> | FieldReadFunction<any>,
+	thisMonth?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type SignUpKeySpecifier = ('circle' | 'id' | 'invited' | 'joined' | 'member' | SignUpKeySpecifier)[];
+export type SignUpFieldPolicy = {
+	circle?: FieldPolicy<any> | FieldReadFunction<any>,
+	id?: FieldPolicy<any> | FieldReadFunction<any>,
+	invited?: FieldPolicy<any> | FieldReadFunction<any>,
+	joined?: FieldPolicy<any> | FieldReadFunction<any>,
+	member?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type SiteMetadataKeySpecifier = ('activeMembers' | 'maxMembers' | 'totalMembers' | SiteMetadataKeySpecifier)[];
+export type SiteMetadataFieldPolicy = {
+	activeMembers?: FieldPolicy<any> | FieldReadFunction<any>,
+	maxMembers?: FieldPolicy<any> | FieldReadFunction<any>,
+	totalMembers?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type UpdateMemberMonthCirclePayloadKeySpecifier = ('monthCircle' | UpdateMemberMonthCirclePayloadKeySpecifier)[];
+export type UpdateMemberMonthCirclePayloadFieldPolicy = {
+	monthCircle?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type StrictTypedTypePolicies = {
+	Circle?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | CircleKeySpecifier | (() => undefined | CircleKeySpecifier),
+		fields?: CircleFieldPolicy,
+	},
+	CreateNextMonthSurveyPayload?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | CreateNextMonthSurveyPayloadKeySpecifier | (() => undefined | CreateNextMonthSurveyPayloadKeySpecifier),
+		fields?: CreateNextMonthSurveyPayloadFieldPolicy,
+	},
+	Member?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | MemberKeySpecifier | (() => undefined | MemberKeySpecifier),
+		fields?: MemberFieldPolicy,
+	},
+	Month?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | MonthKeySpecifier | (() => undefined | MonthKeySpecifier),
+		fields?: MonthFieldPolicy,
+	},
+	MonthCircle?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | MonthCircleKeySpecifier | (() => undefined | MonthCircleKeySpecifier),
+		fields?: MonthCircleFieldPolicy,
+	},
+	MonthSurvey?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | MonthSurveyKeySpecifier | (() => undefined | MonthSurveyKeySpecifier),
+		fields?: MonthSurveyFieldPolicy,
+	},
+	Mutation?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | MutationKeySpecifier | (() => undefined | MutationKeySpecifier),
+		fields?: MutationFieldPolicy,
+	},
+	Query?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | QueryKeySpecifier | (() => undefined | QueryKeySpecifier),
+		fields?: QueryFieldPolicy,
+	},
+	SignUp?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | SignUpKeySpecifier | (() => undefined | SignUpKeySpecifier),
+		fields?: SignUpFieldPolicy,
+	},
+	SiteMetadata?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | SiteMetadataKeySpecifier | (() => undefined | SiteMetadataKeySpecifier),
+		fields?: SiteMetadataFieldPolicy,
+	},
+	UpdateMemberMonthCirclePayload?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | UpdateMemberMonthCirclePayloadKeySpecifier | (() => undefined | UpdateMemberMonthCirclePayloadKeySpecifier),
+		fields?: UpdateMemberMonthCirclePayloadFieldPolicy,
+	}
+};
+export type TypedTypePolicies = StrictTypedTypePolicies & TypePolicies;

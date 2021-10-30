@@ -5,7 +5,14 @@ import { Temporal } from 'proposal-temporal';
 import { createDiscordRestClient } from '../../discord';
 import { nextMonth } from '../../model';
 import { MonthSurvey as _MonthSurvey } from 'nexus-prisma';
-import { mutationField, nonNull, objectType, list } from 'nexus';
+import {
+  mutationField,
+  nonNull,
+  objectType,
+  list,
+  queryField,
+  stringArg,
+} from 'nexus';
 import { MessageEmbed } from 'discord.js';
 import {
   RESTPostAPIWebhookWithTokenWaitResult,
@@ -23,7 +30,7 @@ export const MonthSurvey = objectType({
     t.field(_MonthSurvey.month);
     t.field(_MonthSurvey.expiredAt);
     t.field('answers', {
-      type: nonNull(list(MonthCircle)),
+      type: nonNull(list(nonNull(MonthCircle))),
       resolve(parent, _, { prisma }) {
         return prisma.monthCircle.findMany({
           where: {
@@ -32,9 +39,6 @@ export const MonthSurvey = objectType({
             },
             year: parent.year,
             month: parent.month,
-            circleId: {
-              not: null,
-            },
             state: {
               not: MonthCircleAnswerState.NoAnswer,
             },
@@ -43,7 +47,7 @@ export const MonthSurvey = objectType({
       },
     });
     t.field('noAnswerMembers', {
-      type: nonNull(list(Member)),
+      type: nonNull(list(nonNull(Member))),
       resolve(parent, _, { prisma }) {
         return prisma.member.findMany({
           where: {
@@ -80,6 +84,19 @@ export const CreateNextMonthSurveyPayload = objectType({
   definition(t) {
     t.field('nextMonth', {
       type: nonNull(Month),
+    });
+  },
+});
+
+export const MonthSurveyQueryField = queryField('monthSurvey', {
+  type: MonthSurvey,
+  args: {
+    year: nonNull(stringArg()),
+    month: nonNull(stringArg()),
+  },
+  resolve(_, { year, month }, ctx) {
+    return ctx.prisma.monthSurvey.findUnique({
+      where: { year_month: { year, month } },
     });
   },
 });

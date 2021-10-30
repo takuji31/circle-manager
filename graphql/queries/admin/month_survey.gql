@@ -1,0 +1,32 @@
+query MonthSurvey($year: String!, $month: String!) {
+  monthSurvey(year: $year, month: $month) {
+    id
+    year
+    month
+    expiredAt
+    answers {
+      ...MemberMonthCircle
+      currentCircle {
+        id
+        name
+      }
+      member {
+        ...ListedMember
+        circle {
+          id
+          name
+        }
+      }
+      kicked
+      invited
+      joined
+    }
+    noAnswerMembers {
+      ...ListedMember
+      circle {
+        id
+        name
+      }
+    }
+  }
+}

@@ -1,17 +1,11 @@
-import type { NextPage } from 'next';
+import type { GetServerSideProps, NextPage } from 'next';
 import * as React from 'react';
 import {
   Box,
   Button,
   Checkbox,
   CircularProgress,
-  Container,
   Grid,
-  GridSize,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemText,
   TableRow,
   Typography,
 } from '@mui/material';
@@ -33,11 +27,10 @@ import {
   useMemberMonthCirclesQuery,
   useUpdateSignUpMutation,
 } from '../apollo';
-import { LoadingButton } from '@mui/lab';
 import { useMemo } from 'react';
 import { Temporal } from 'proposal-temporal';
 import Link from '../components/link';
-import { load } from 'dotenv';
+import { ssrAdminMembers, ssrAdminTop } from '../apollo/page';
 
 const Home: NextPage = (props) => {
   const { user, status } = useUser();
@@ -114,7 +107,7 @@ const TopContent = ({ user }: TopContentProps) => {
 };
 
 const AdminTopContent = () => {
-  const { data, loading, error } = useAdminTopQuery();
+  const { data } = ssrAdminTop.usePage();
   const [mutation, { loading: creating, error: mutationError }] =
     useCreateNextMonthSurveyMutation();
   const thisMonth = data?.thisMonth;
@@ -323,6 +316,10 @@ const LoadingCheckBox: (props: {
       }}
     />
   );
+};
+
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  return await ssrAdminMembers.getServerPage();
 };
 
 export default Home;

@@ -1,3 +1,4 @@
+import { Context as GraphQLContext } from '../graphql/context';
 import { useMemo } from 'react';
 import { ApolloClient, InMemoryCache } from '@apollo/client';
 import { NormalizedCacheObject } from '@apollo/client/cache/inmemory/types';
@@ -14,7 +15,8 @@ function createIsomorphLink() {
   if (typeof window === 'undefined') {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const { schema } = require('../graphql');
-    return new SchemaLink({ schema });
+    const { createContext } = require('../graphql/context');
+    return new SchemaLink({ schema, context: createContext });
   } else {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const { HttpLink } = require('@apollo/client/link/http');
@@ -42,7 +44,10 @@ function createApolloClient() {
   });
 }
 
-export function initializeApollo(initialState: PageProps | null = null) {
+export function getApolloClient(
+  _ctx: Context | null | undefined,
+  initialState: PageProps | null | undefined = null
+) {
   const _apolloClient = apolloClient ?? createApolloClient();
 
   // If your page has Next.js data fetching methods that use Apollo Client, the initial state
@@ -58,7 +63,12 @@ export function initializeApollo(initialState: PageProps | null = null) {
   return _apolloClient;
 }
 
+export type Context = GraphQLContext;
+
 export function useApollo(initialState: PageProps) {
-  const store = useMemo(() => initializeApollo(initialState), [initialState]);
+  const store = useMemo(
+    () => getApolloClient(null, initialState),
+    [initialState]
+  );
   return store;
 }

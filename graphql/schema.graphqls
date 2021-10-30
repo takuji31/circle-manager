@@ -62,7 +62,11 @@ type Month {
 
 type MonthCircle {
   circle: Circle
+  currentCircle: Circle!
   id: ID!
+  invited: Boolean!
+  joined: Boolean!
+  kicked: Boolean!
   member: Member!
   month: String!
   state: MonthCircleAnswerState!
@@ -77,13 +81,13 @@ enum MonthCircleAnswerState {
 
 """在籍希望アンケート"""
 type MonthSurvey {
-  answers: [MonthCircle]!
+  answers: [MonthCircle!]!
   expiredAt: DateTime!
 
   """アンケートのメッセージID"""
   id: ID!
   month: String!
-  noAnswerMembers: [Member]!
+  noAnswerMembers: [Member!]!
   year: String!
 }
 
@@ -99,6 +103,7 @@ type Query {
   member(id: String!): Member
   members: [Member!]!
   monthCircle(monthCircleId: String!): MonthCircle
+  monthSurvey(month: String!, year: String!): MonthSurvey
   nextMonth: Month!
   signUps: [SignUp!]!
   siteMetadata: SiteMetadata!

@@ -7,3 +7,27 @@ generates:
       - 'typescript'
       - 'typescript-operations'
       - 'typescript-react-apollo'
+      - 'typescript-apollo-client-helpers'
+    config:
+      reactApolloVersion: 3
+      withHooks: true
+      withHOC: false
+      withComponent: false
+      exportFragmentSpreadSubTypes: true
+      documentMode: graphQLTag
+
+  src/apollo/page.tsx:
+    plugins:
+      - 'graphql-codegen-apollo-next-ssr'
+    config:
+      documentMode: external
+      importDocumentNodeExternallyFrom: ./graphql
+      reactApolloVersion: 3
+      withHooks: true
+      contextType: 'Context'
+      contextTypeRequired: false
+      apolloClientInstanceImport: '../apollo'
+      # apolloStateKey: '__APOLLO_STATE__'
+    preset: import-types
+    presetConfig:
+      typesPath: ./graphql
