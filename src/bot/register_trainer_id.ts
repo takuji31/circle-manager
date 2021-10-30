@@ -19,7 +19,7 @@ export const registerTrainerIdCommand = async (
     return;
   }
 
-  const trainerId = interaction.options.getString('trainer_id');
+  const trainerId = interaction.options.getString('id');
   if (!trainerId || !trainerId?.match(/^[0-9]+$/)) {
     interaction.editReply({
       content: 'トレーナーIDは数字で入力してください',
