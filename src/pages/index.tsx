@@ -319,7 +319,7 @@ const LoadingCheckBox: (props: {
 };
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  return await ssrAdminMembers.getServerPage();
+  return await ssrAdminMembers.getServerPage({});
 };
 
 export default Home;
