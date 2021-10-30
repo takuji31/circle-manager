@@ -15,7 +15,7 @@ import { GetServerSideProps, NextPage } from 'next';
 import { getSession } from 'next-auth/react';
 import React, { useMemo } from 'react';
 import { AdminLayout } from '../../../components/admin_filter';
-import { thisAndNextMonth } from '../../../model';
+import { nextMonth, thisAndNextMonth, thisMonth } from '../../../model';
 import {
   Circle,
   MonthCircle,
@@ -86,14 +86,12 @@ const MemberList: NextPage<Props> = ({ monthCircleNames }) => {
         },
         renderCell: (params: GridRenderCellParams) => {
           const value = params.value as MonthCircle;
-          if (!value) {
-            return params.formattedValue;
-          }
-          return (
-            <Link href={`/month_circles/${value.id}`}>
-              {params.formattedValue}
-            </Link>
-          );
+          const memberId = params.row.id;
+          const { year, month } = thisMonth();
+          const href = value
+            ? `/month_circles/${value.id}`
+            : `/members/${memberId}/month_circles/${year}/${month}`;
+          return <Link href={href}>{params.formattedValue}</Link>;
         },
       },
       {
@@ -114,14 +112,12 @@ const MemberList: NextPage<Props> = ({ monthCircleNames }) => {
         },
         renderCell: (params: GridRenderCellParams) => {
           const value = params.value as MonthCircle;
-          if (!value) {
-            return params.formattedValue;
-          }
-          return (
-            <Link href={`/month_circles/${value.id}`}>
-              {params.formattedValue}
-            </Link>
-          );
+          const memberId = params.row.id;
+          const { year, month } = nextMonth();
+          const href = value
+            ? `/month_circles/${value.id}`
+            : `/members/${memberId}/month_circles/${year}/${month}`;
+          return <Link href={href}>{params.formattedValue}</Link>;
         },
       },
       {
