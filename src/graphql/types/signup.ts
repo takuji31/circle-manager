@@ -1,3 +1,4 @@
+import { Routes } from 'discord-api-types';
 import {
   objectType,
   queryField,
@@ -9,6 +10,8 @@ import {
 } from 'nexus';
 import { SignUp as T } from 'nexus-prisma';
 import { resolve } from 'path/posix';
+import { createDiscordRestClient } from '../../discord';
+import { Guild } from '../../model';
 export const SignUp = objectType({
   name: T.$name,
   description: T.$description,
@@ -53,6 +56,22 @@ export const UpdateSignUpMutation = mutationField('updateSignUp', {
     }
     if (joined != null) {
       data.joined = joined;
+    }
+
+    const circleId = signUp.circleId;
+    if (joined) {
+      try {
+        const rest = createDiscordRestClient();
+        const roleIds = Guild.roleIds.circleIds;
+        roleIds
+          .filter((id) => id != circleId)
+          .forEach(async (id) => {
+            await rest.delete(Routes.guildMemberRole(Guild.id, memberId, id));
+          });
+        await rest.put(Routes.guildMemberRole(Guild.id, memberId, circleId));
+      } catch (e) {
+        console.log(e);
+      }
     }
 
     return await ctx.prisma.signUp.update({
