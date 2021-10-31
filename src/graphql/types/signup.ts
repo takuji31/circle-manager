@@ -1,4 +1,4 @@
-import { Routes } from 'discord-api-types';
+import { Routes } from 'discord-api-types/v9';
 import {
   objectType,
   queryField,
@@ -9,7 +9,6 @@ import {
   booleanArg,
 } from 'nexus';
 import { SignUp as T } from 'nexus-prisma';
-import { resolve } from 'path/posix';
 import { createDiscordRestClient } from '../../discord';
 import { Guild } from '../../model';
 export const SignUp = objectType({
