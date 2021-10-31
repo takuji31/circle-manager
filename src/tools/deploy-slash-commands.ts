@@ -1,3 +1,4 @@
+import { prisma } from './../database/prisma';
 import {
   SlashCommandBuilder,
   SlashCommandStringOption,
@@ -8,25 +9,42 @@ import { config } from 'dotenv';
 
 config();
 
-const commands = [
-  new SlashCommandBuilder()
-    .setName('next-month-circle')
-    .setDescription('来月の在籍希望アンケートの回答を表示します。'),
-  new SlashCommandBuilder()
-    .setName('register-trainer-id')
-    .setDescription('異動のために必要なトレーナーIDを登録します')
-    .addStringOption(
-      new SlashCommandStringOption()
-        .setName('id')
-        .setRequired(true)
-        .setDescription('トレーナーID')
-    ),
-].map((command) => command.toJSON());
-
-const rest = createDiscordRestClient();
-
 (async () => {
   try {
+    const circles = await prisma.circle.findMany({
+      orderBy: { createdAt: 'asc' },
+    });
+
+    const nextMonthCircleCommand = new SlashCommandBuilder()
+      .setName('register-next-month-circle')
+      .setDescription('[開発中]来月の在籍希望アンケートを先行して回答します');
+    const circleOption = new SlashCommandStringOption()
+      .setName('circle')
+      .setRequired(true)
+      .setDescription('所属したいサークル');
+
+    circles.map((circle) => {
+      circleOption.addChoice(circle.name, circle.id);
+    });
+
+    const commands = [
+      new SlashCommandBuilder()
+        .setName('next-month-circle')
+        .setDescription('来月の在籍希望アンケートの回答を表示します。'),
+      new SlashCommandBuilder()
+        .setName('register-trainer-id')
+        .setDescription('異動のために必要なトレーナーIDを登録します')
+        .addStringOption(
+          new SlashCommandStringOption()
+            .setName('id')
+            .setRequired(true)
+            .setDescription('トレーナーID')
+        ),
+      nextMonthCircleCommand.addStringOption(circleOption),
+    ].map((command) => command.toJSON());
+
+    const rest = createDiscordRestClient();
+
     await rest.put(
       Routes.applicationGuildCommands(
         process.env.DISCORD_CLIENT_ID as string,

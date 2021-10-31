@@ -1,3 +1,4 @@
+import { registerNextMonthCircleCommand } from './register_next_month_circle';
 import { selectCircleReaction } from './select_circle';
 import { monthSurveyReaction } from './month_survey';
 import { Guild } from './../model/guild';
@@ -74,6 +75,9 @@ client.on('interactionCreate', async (interaction) => {
     }
     if (interaction.commandName == 'register-trainer-id') {
       registerTrainerIdCommand(interaction);
+    }
+    if (interaction.commandName == 'register-next-month-circle') {
+      registerNextMonthCircleCommand(interaction);
     }
   } catch (e) {
     console.log('Error when interactionCreate %s', e);
