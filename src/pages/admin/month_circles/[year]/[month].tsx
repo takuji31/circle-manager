@@ -1,5 +1,4 @@
 import {
-  Checkbox,
   Stack,
   TableBody,
   TableCell,
@@ -8,25 +7,16 @@ import {
   TableRow,
   Typography,
 } from '@mui/material';
-import { Box } from '@mui/system';
-import {
-  GetServerSideProps,
-  GetStaticPaths,
-  GetStaticProps,
-  NextPage,
-} from 'next';
+import { GetServerSideProps } from 'next';
 import { ParsedUrlQuery } from 'querystring';
 import React from 'react';
 import {
   UpdateMonthCircleMutationInput,
-  UpdateMonthCircleMutationVariables,
   useUpdateMonthCircleMutation,
 } from '../../../../apollo';
 import { PageMonthSurveyComp, ssrMonthSurvey } from '../../../../apollo/page';
 import { AdminLayout } from '../../../../components/admin_filter';
 import { LoadingCheckBox } from '../../../../components/loading_checkbox';
-import { prisma } from '../../../../database';
-import { nextMonth, thisMonth } from '../../../../model';
 
 interface MemberWithMonthCircle {
   id: string;
@@ -42,10 +32,12 @@ interface Props {
   members: Array<MemberWithMonthCircle>;
 }
 
-export const MonthCircleList: PageMonthSurveyComp = ({ data }) => {
+export const MonthCircleList: PageMonthSurveyComp = ({ data, error }) => {
   const monthSurvey = data?.monthSurvey;
-  if (!monthSurvey) {
-    return <p>not found</p>;
+  if (error) {
+    return <p>{error.message}</p>;
+  } else if (!monthSurvey) {
+    return <p></p>;
   }
   return (
     <AdminLayout title={`${monthSurvey.year}年${monthSurvey.month}月の移籍表`}>
