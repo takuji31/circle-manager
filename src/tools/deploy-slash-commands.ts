@@ -1,3 +1,4 @@
+import { Guild } from './../model/guild';
 import { prisma } from './../database/prisma';
 import {
   SlashCommandBuilder,
@@ -48,7 +49,7 @@ config();
     await rest.put(
       Routes.applicationGuildCommands(
         process.env.DISCORD_CLIENT_ID as string,
-        process.env.DISCORD_GUILD_ID as string
+        Guild.id
       ),
       {
         body: commands,

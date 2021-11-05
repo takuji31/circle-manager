@@ -1,3 +1,4 @@
+import { Guild } from './../../model/guild';
 import { MonthCircle } from './month_circle';
 import { MonthCircleAnswerState, Circle } from '@prisma/client';
 import { Member } from './member';
@@ -170,7 +171,7 @@ export const CreateNextMonthSurveyMutation = mutationField(
       );
 
       const { id: messageId, channel_id: channelId } = (await rest.post(
-        Routes.channelMessages(process.env.DISCORD_MESSAGE_CHANNEL_ID),
+        Routes.channelMessages(Guild.channelIds.all),
         {
           body: {
             content: '@everyone',
