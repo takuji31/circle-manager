@@ -239,7 +239,7 @@ export type UpdateSignUpMutation = { __typename?: 'Mutation', updateSignUp: { __
 export type AdminMembersQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type AdminMembersQuery = { __typename?: 'Query', members: Array<{ __typename?: 'Member', id: string, pathname: string, name: string, circleRole: CircleRole, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined, thisMonthCircle?: { __typename?: 'MonthCircle', id: string, year: string, month: string, state: MonthCircleAnswerState, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined } | null | undefined, nextMonthCircle?: { __typename?: 'MonthCircle', id: string, year: string, month: string, state: MonthCircleAnswerState, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined } | null | undefined }> };
+export type AdminMembersQuery = { __typename?: 'Query', members: Array<{ __typename?: 'Member', id: string, pathname: string, name: string, trainerId?: string | null | undefined, circleRole: CircleRole, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined, thisMonthCircle?: { __typename?: 'MonthCircle', id: string, year: string, month: string, state: MonthCircleAnswerState, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined } | null | undefined, nextMonthCircle?: { __typename?: 'MonthCircle', id: string, year: string, month: string, state: MonthCircleAnswerState, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined } | null | undefined }> };
 
 export type MonthSurveyQueryVariables = Exact<{
   year: Scalars['String'];
@@ -554,6 +554,7 @@ export const AdminMembersDocument = gql`
     id
     pathname
     name
+    trainerId
     circle {
       id
       name

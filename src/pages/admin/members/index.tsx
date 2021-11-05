@@ -69,30 +69,9 @@ const MemberList: NextPage<Props> = ({ monthCircleNames }) => {
         },
       },
       {
-        field: 'thisMonthCircle',
-        headerName: '今月のサークル',
+        field: 'trainerId',
+        headerName: 'トレーナーID',
         width: 200,
-        type: 'singleSelect',
-        valueOptions: [...monthCircleNames, '未回答', '脱退'],
-        valueFormatter: (params: GridValueFormatterParams) => {
-          const value = params.value as MonthCircle;
-          if (!value || value.state == MonthCircleAnswerState.NoAnswer) {
-            return '未回答';
-          } else if (value.state == MonthCircleAnswerState.Retired) {
-            return '脱退';
-          } else {
-            return value.circle?.name ?? '';
-          }
-        },
-        renderCell: (params: GridRenderCellParams) => {
-          const value = params.value as MonthCircle;
-          const memberId = params.row.id;
-          const { year, month } = thisMonth();
-          const href = value
-            ? `/month_circles/${value.id}`
-            : `/members/${memberId}/month_circles/${year}/${month}`;
-          return <Link href={href}>{params.formattedValue}</Link>;
-        },
       },
       {
         field: 'nextMonthCircle',
@@ -120,24 +99,24 @@ const MemberList: NextPage<Props> = ({ monthCircleNames }) => {
           return <Link href={href}>{params.formattedValue}</Link>;
         },
       },
-      {
-        field: 'actions',
-        type: 'actions',
-        getActions: (params: GridRowParams) => {
-          const actions = [];
-          const pathname = params.row.pathname;
-          console.log(params.row);
-          return [
-            <GridActionsCellItem
-              key="members_pathname_url"
-              component={NextLinkComposed}
-              to={`/members/path/${pathname}`}
-              label="基本情報登録ページを開く"
-              showInMenu
-            />,
-          ];
-        },
-      },
+      // {
+      //   field: 'actions',
+      //   type: 'actions',
+      //   getActions: (params: GridRowParams) => {
+      //     const actions = [];
+      //     const pathname = params.row.pathname;
+      //     console.log(params.row);
+      //     return [
+      //       <GridActionsCellItem
+      //         key="members_pathname_url"
+      //         component={NextLinkComposed}
+      //         to={`/members/path/${pathname}`}
+      //         label="基本情報登録ページを開く"
+      //         showInMenu
+      //       />,
+      //     ];
+      //   },
+      // },
     ],
     [monthCircleNames]
   );

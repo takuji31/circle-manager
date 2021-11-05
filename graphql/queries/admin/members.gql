@@ -3,6 +3,7 @@ query AdminMembers {
     id
     pathname
     name
+    trainerId
     circle {
       id
       name
