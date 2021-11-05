@@ -34,13 +34,16 @@ config();
         .setDescription('来月の在籍希望アンケートの回答を表示します。'),
       new SlashCommandBuilder()
         .setName('register-trainer-id')
-        .setDescription('異動のために必要なトレーナーIDを登録します')
+        .setDescription('トレーナーIDを登録します。')
         .addStringOption(
           new SlashCommandStringOption()
             .setName('id')
             .setRequired(true)
             .setDescription('トレーナーID')
         ),
+      new SlashCommandBuilder()
+        .setName('trainer-id')
+        .setDescription('登録されているあなたのトレーナーIDを表示します。'),
       nextMonthCircleCommand.addStringOption(circleOption),
     ].map((command) => command.toJSON());
 

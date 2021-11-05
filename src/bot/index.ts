@@ -1,3 +1,4 @@
+import { trainerIdCommand } from './member/trainer_id';
 import { updateMemberNicknameEvent } from './member/update_member_nickname';
 import { registerNextMonthCircleCommand } from './register_next_month_circle';
 import { selectCircleReaction } from './select_circle';
@@ -82,6 +83,9 @@ client.on('interactionCreate', async (interaction) => {
     }
     if (interaction.commandName == 'register-trainer-id') {
       registerTrainerIdCommand(interaction);
+    }
+    if (interaction.commandName == 'trainer-id') {
+      trainerIdCommand(interaction);
     }
     if (interaction.commandName == 'register-next-month-circle') {
       registerNextMonthCircleCommand(interaction);
