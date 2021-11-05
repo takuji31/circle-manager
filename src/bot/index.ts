@@ -1,3 +1,4 @@
+import { updateMemberNicknameEvent } from './member/update_member_nickname';
 import { registerNextMonthCircleCommand } from './register_next_month_circle';
 import { selectCircleReaction } from './select_circle';
 import { monthSurveyReaction } from './month_survey';
@@ -63,6 +64,10 @@ client.on('guildMemberAdd', async (member) => {
   } catch (e) {
     console.log('Error when guildMemberRemove %s', e);
   }
+});
+
+client.on('guildMemberUpdate', async (oldMember, newMember) => {
+  await updateMemberNicknameEvent(oldMember, newMember);
 });
 
 client.on('messageCreate', async () => {
