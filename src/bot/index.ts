@@ -56,7 +56,9 @@ client.on('guildMemberAdd', async (member) => {
         joinedAt: member.joinedAt ?? new Date(),
         name: member.nickname ?? member.user.username,
       },
-      update: {},
+      update: {
+        leavedAt: null,
+      },
     });
   } catch (e) {
     console.log('Error when guildMemberRemove %s', e);
