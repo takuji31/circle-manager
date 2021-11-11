@@ -13,18 +13,8 @@ import { GetServerSideProps, NextPage } from 'next';
 import { getSession } from 'next-auth/react';
 import React, { useMemo } from 'react';
 import { AdminLayout } from '../../../components/admin_filter';
-import {
-  Circles,
-  getCircleName,
-  isLeaveCircle,
-  nextMonth,
-} from '../../../model';
-import {
-  Circle,
-  MonthCircle,
-  MonthCircleAnswerState,
-  useAdminMembersQuery,
-} from '../../../apollo';
+import { Circles, getCircleName, nextMonth } from '../../../model';
+import { Circle, MonthCircle, useAdminMembersQuery } from '../../../apollo';
 import { prisma } from '../../../database';
 import Link from '../../../components/link';
 
