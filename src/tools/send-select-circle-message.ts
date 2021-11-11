@@ -1,3 +1,4 @@
+import { Guild } from './../model/guild';
 import { prisma } from '../database';
 import { nextMonth } from '../model';
 import { RESTPostAPIChannelMessageResult, Routes } from 'discord-api-types/v9';
@@ -23,14 +24,15 @@ const rest = createDiscordRestClient();
       .addField('回答方法', 'このメッセージにリアクション');
 
     const circles = await prisma.circle.findMany({
-      orderBy: { createdAt: 'asc' },
+      where: { selectableByUser: true },
+      orderBy: { order: 'asc' },
     });
     circles.forEach((circle) => {
       embed.addField(`${circle.name} 希望の場合`, `${circle.emoji}`);
     });
 
     const { id: messageId, channel_id: channelId } = (await rest.post(
-      Routes.channelMessages('889836038221099038'),
+      Routes.channelMessages(Guild.channelIds.circleSelect),
       {
         body: {
           embeds: [embed],

@@ -25,6 +25,6 @@ export const Guild = {
     circleSelect: isProduction ? Channels.circleSelect : Channels.botTest,
   },
   messageIds: {
-    circleSelect: '902466218890510347',
+    circleSelect: isProduction ? '902466218890510347' : '908316632995209256',
   },
 };

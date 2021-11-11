@@ -7,7 +7,10 @@ export const Circle = objectType({
     const c = Nexus.Circle;
     t.field(c.id);
     t.field(c.name);
-    t.field(c.createdAt);
+    t.field(c.order);
+    t.field(c.selectableByUser);
+    t.field(c.selectableByAdmin);
+    t.field(c.selectableInSurvey);
     t.field(c.members);
   },
 });
@@ -17,7 +20,7 @@ export const CirclesQueryField = queryField('circles', {
   resolve(parent, args, ctx) {
     return ctx.prisma.circle.findMany({
       orderBy: {
-        createdAt: 'asc',
+        order: 'asc',
       },
     });
   },

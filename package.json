@@ -16,16 +16,18 @@
     "bot:dev": "yarn run ts-node src/bot/index.ts",
     "bot:watch": "nodemon",
     "graphql:schemagen": "yarn run ts-node --transpile-only src/graphql",
+    "db:seed": "prisma db seed",
     "db:generate": "prisma generate",
     "db:studio": "prisma studio",
     "db:format": "prisma format",
     "db:push": "prisma db push",
     "db:migrate:dev": "prisma migrate dev",
     "db:migrate:deploy": "prisma migrate deploy",
+    "send-select-circle-message": "yarn run ts-node src/tools/send-select-circle-message.ts",
     "ts-node": "ts-node --compiler-options {\\\"module\\\":\\\"commonjs\\\"} "
   },
   "prisma": {
-    "seed": "yarn run ts-node src/database/seeds.ts"
+    "seed": "yarn run ts-node src/database/seed.ts"
   },
   "private": true,
   "dependencies": {

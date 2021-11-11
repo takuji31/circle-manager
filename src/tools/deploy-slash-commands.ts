@@ -13,7 +13,8 @@ config();
 (async () => {
   try {
     const circles = await prisma.circle.findMany({
-      orderBy: { createdAt: 'asc' },
+      where: { selectableByUser: true },
+      orderBy: { order: 'asc' },
     });
 
     const nextMonthCircleCommand = new SlashCommandBuilder()

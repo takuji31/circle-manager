@@ -17,26 +17,35 @@ generator nexusPrisma {
 model Circle {
   id                  String        @id @db.VarChar(255)
   name                String
-  createdAt           DateTime      @default(now())
   emoji               String?
+  order               Int           @default(0)
+  selectableByUser    Boolean       @default(true)
+  selectableByAdmin   Boolean       @default(true)
+  selectableInSurvey  Boolean       @default(true)
   members             Member[]
   monthCircles        MonthCircle[]
   currentMonthCircles MonthCircle[] @relation("currentCircle")
   signUps             SignUp[]
+
+  @@index([order])
+  @@index([selectableByAdmin, order])
+  @@index([selectableByUser, order])
+  @@index([selectableInSurvey, order])
 }
 
 model Member {
-  id           String        @id @db.VarChar(255)
-  pathname     String        @default(cuid()) @db.VarChar(255)
-  circleRole   CircleRole    @default(Member)
-  name         String        @db.VarChar(255)
-  trainerId    String?       @db.VarChar(255)
-  joinedAt     DateTime
-  leavedAt     DateTime?
-  circleId     String?       @db.VarChar(255)
-  circle       Circle?       @relation(fields: [circleId], references: [id])
-  monthCircles MonthCircle[]
-  signUp       SignUp?
+  id               String        @id @db.VarChar(255)
+  pathname         String        @default(cuid()) @db.VarChar(255)
+  circleRole       CircleRole    @default(Member)
+  name             String        @db.VarChar(255)
+  trainerId        String?       @db.VarChar(255)
+  messageChannelId String?       @db.VarChar(255)
+  joinedAt         DateTime
+  leavedAt         DateTime?
+  circleId         String?       @db.VarChar(255)
+  circle           Circle?       @relation(fields: [circleId], references: [id])
+  monthCircles     MonthCircle[]
+  signUp           SignUp?
 
   @@unique([pathname])
   @@index([leavedAt])
@@ -89,12 +98,12 @@ model MonthSurvey {
 
 /// 加入申請
 model SignUp {
-  id       String  @id @db.VarChar(255) /// DiscordのユーザーID
-  member   Member  @relation(fields: [id], references: [id])
-  circleId String  @db.VarChar(255)
-  circle   Circle  @relation(fields: [circleId], references: [id])
-  invited  Boolean @default(false)
-  joined   Boolean @default(false)
+  id        String   @id @db.VarChar(255) /// DiscordのユーザーID
+  member    Member   @relation(fields: [id], references: [id])
+  circleId  String   @db.VarChar(255)
+  circle    Circle   @relation(fields: [circleId], references: [id])
+  invited   Boolean  @default(false)
+  joined    Boolean  @default(false)
   createdAt DateTime @default(now())
 
   @@index([joined])

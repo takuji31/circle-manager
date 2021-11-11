@@ -79,7 +79,7 @@ export const MembersField = queryField('members', {
       orderBy: [
         {
           circle: {
-            createdAt: 'asc',
+            order: 'asc',
           },
         },
         {
@@ -159,7 +159,7 @@ export const UpdateMembers = mutationField('updateMembers', {
       orderBy: [
         {
           circle: {
-            createdAt: 'asc',
+            order: 'asc',
           },
         },
         {

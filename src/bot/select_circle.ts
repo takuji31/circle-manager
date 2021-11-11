@@ -6,7 +6,6 @@ export const selectCircleReaction: ReactionHandler = async (
   emoji
 ) => {
   // ignore when develop
-  if (process.env.NODE_ENV != 'production') return;
 
   await reaction.users.remove(user.id);
 
@@ -30,7 +29,7 @@ export const selectCircleReaction: ReactionHandler = async (
     return;
   }
 
-  if (member.circle) {
+  if (member.circle && member.circle.selectableByUser) {
     await user.send(
       '既にサークル加入済みです。未加入のはずなのにこのメッセージが出る場合は幹部までお知らせください。'
     );
@@ -51,7 +50,7 @@ export const selectCircleReaction: ReactionHandler = async (
   });
 
   await user.send(
-    `ようこそ、「${circle.name}」への加入申請を受け付けました。次にゲームのプロフィール画面で「IDコピー」を押してトレーナーIDをコピーし、Discordの任意のチャンネルで` +
-      '`/register-trainer-id`と入力してトレーナーIDを登録してください。'
+    `ようこそ、「${circle.name}」への加入申請を受け付けました。次にゲームのプロフィール画面で「IDコピー」を押してトレーナーIDをコピーし、Discordの<#908319798700703794>で` +
+      '`/register-trainer-id id:`と入力してトレーナーIDを登録してください。'
   );
 };

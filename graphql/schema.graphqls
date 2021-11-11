@@ -12,10 +12,13 @@ scalar BigInt
 scalar Bytes
 
 type Circle {
-  createdAt: DateTime!
   id: ID!
   members: [Member!]!
   name: String!
+  order: Int!
+  selectableByAdmin: Boolean!
+  selectableByUser: Boolean!
+  selectableInSurvey: Boolean!
 }
 
 enum CircleRole {

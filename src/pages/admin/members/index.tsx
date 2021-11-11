@@ -162,7 +162,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async (
     return {
       props: {
         monthCircleNames: await (
-          await prisma.circle.findMany({ orderBy: { createdAt: 'asc' } })
+          await prisma.circle.findMany({ orderBy: { order: 'asc' } })
         ).map((circle) => circle.name),
       },
     };

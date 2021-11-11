@@ -156,7 +156,7 @@ export const CreateNextMonthSurveyMutation = mutationField(
         .addField('回答方法', 'このメッセージにリアクション');
 
       const circles: Array<Circle> = await prisma.circle.findMany({
-        orderBy: { createdAt: 'asc' },
+        orderBy: { order: 'asc' },
       });
       circles.forEach((circle) => {
         embed.addField(`${circle.name} 希望の場合`, `${circle.emoji}`);

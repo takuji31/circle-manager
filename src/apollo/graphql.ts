@@ -30,10 +30,13 @@ export type Scalars = {
 
 export type Circle = {
   __typename?: 'Circle';
-  createdAt: Scalars['DateTime'];
   id: Scalars['ID'];
   members: Array<Member>;
   name: Scalars['String'];
+  order: Scalars['Int'];
+  selectableByAdmin: Scalars['Boolean'];
+  selectableByUser: Scalars['Boolean'];
+  selectableInSurvey: Scalars['Boolean'];
 };
 
 export enum CircleRole {
@@ -796,12 +799,15 @@ export function useMonthCircleLazyQuery(baseOptions?: Apollo.LazyQueryHookOption
 export type MonthCircleQueryHookResult = ReturnType<typeof useMonthCircleQuery>;
 export type MonthCircleLazyQueryHookResult = ReturnType<typeof useMonthCircleLazyQuery>;
 export type MonthCircleQueryResult = Apollo.QueryResult<MonthCircleQuery, MonthCircleQueryVariables>;
-export type CircleKeySpecifier = ('createdAt' | 'id' | 'members' | 'name' | CircleKeySpecifier)[];
+export type CircleKeySpecifier = ('id' | 'members' | 'name' | 'order' | 'selectableByAdmin' | 'selectableByUser' | 'selectableInSurvey' | CircleKeySpecifier)[];
 export type CircleFieldPolicy = {
-	createdAt?: FieldPolicy<any> | FieldReadFunction<any>,
 	id?: FieldPolicy<any> | FieldReadFunction<any>,
 	members?: FieldPolicy<any> | FieldReadFunction<any>,
-	name?: FieldPolicy<any> | FieldReadFunction<any>
+	name?: FieldPolicy<any> | FieldReadFunction<any>,
+	order?: FieldPolicy<any> | FieldReadFunction<any>,
+	selectableByAdmin?: FieldPolicy<any> | FieldReadFunction<any>,
+	selectableByUser?: FieldPolicy<any> | FieldReadFunction<any>,
+	selectableInSurvey?: FieldPolicy<any> | FieldReadFunction<any>
 };
 export type CreateNextMonthSurveyPayloadKeySpecifier = ('nextMonth' | CreateNextMonthSurveyPayloadKeySpecifier)[];
 export type CreateNextMonthSurveyPayloadFieldPolicy = {
