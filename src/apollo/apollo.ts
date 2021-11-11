@@ -5,7 +5,6 @@ import { NormalizedCacheObject } from '@apollo/client/cache/inmemory/types';
 import { SchemaLink } from '@apollo/client/link/schema';
 
 interface PageProps {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   props?: Record<string, any>;
 }
 
@@ -13,12 +12,10 @@ let apolloClient: ApolloClient<NormalizedCacheObject> | null = null;
 
 function createIsomorphLink() {
   if (typeof window === 'undefined') {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const { schema } = require('../graphql');
     const { createContext } = require('../graphql/context');
     return new SchemaLink({ schema, context: createContext });
   } else {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const { HttpLink } = require('@apollo/client/link/http');
     return new HttpLink({
       uri: '/api/graphql',
