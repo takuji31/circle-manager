@@ -178,7 +178,7 @@ export const CreateNextMonthSurveyMutation = mutationField(
         Routes.channelMessages(Guild.channelIds.all),
         {
           body: {
-            content: '@everyone',
+            content: process.env.NODE_ENV == 'production' ? '@everyone' : '',
             embeds: [embed],
             allowed_mentions: {
               parse: ['everyone'],
