@@ -5,6 +5,8 @@
 
 */
 
+INSERT INTO "Circle"("id", "name") VALUES('7777777777777777777', '')
+INSERT INTO "Circle"("id", "name") VALUES('9999999999999999999', '')
 UPDATE "MonthCircle" SET "circleId" = '7777777777777777777' WHERE "state" = 'Retired';
 UPDATE "MonthCircle" SET "circleId" = '9999999999999999999' WHERE "state" = 'NoAnswer';
 

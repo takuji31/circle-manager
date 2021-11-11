@@ -5,7 +5,7 @@
   "scripts": {
     "start": "next start",
     "dev": "next dev",
-    "prebuild": "yarn run db:migrate:deploy && yarn run gen",
+    "prebuild": "yarn run prisma migrate resolve --rolled-back '20211111115740_remove_month_circle_state' && yarn run db:migrate:deploy && yarn run gen",
     "build": "next build",
     "test": "jest",
     "gen": "yarn run db:generate && yarn run graphql:schemagen && yarn run graphql:codegen",
