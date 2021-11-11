@@ -5,5 +5,8 @@
 
 */
 
+UPDATE "MonthCircle" SET "circleId" = '7777777777777777777' WHERE "state" = 'Retired';
+UPDATE "MonthCircle" SET "circleId" = '9999999999999999999' WHERE "state" = 'NoAnswer';
+
 -- AlterTable
 ALTER TABLE "MonthCircle" DROP COLUMN "state";
