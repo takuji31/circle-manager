@@ -26,6 +26,6 @@ export const Guild = {
     commandExecutor: '908319798700703794',
   },
   messageIds: {
-    circleSelect: isProduction ? '902466218890510347' : '908316632995209256',
+    circleSelect: isProduction ? '908362316339359774' : '908316632995209256',
   },
 };
