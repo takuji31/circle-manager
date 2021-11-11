@@ -6,7 +6,6 @@ fragment MemberMonthCircle on MonthCircle {
     id
     name
   }
-  state
 }
 
 fragment ListedMember on Member {

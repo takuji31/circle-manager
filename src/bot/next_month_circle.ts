@@ -1,4 +1,4 @@
-import { MonthCircleAnswerState } from '@prisma/client';
+import { getCircleName } from './../model/circle';
 import { CommandInteraction } from 'discord.js';
 import { prisma } from '../database';
 import { nextMonth } from '../model';
@@ -38,13 +38,7 @@ export const nextMonthCircleCommand = async (
 
   interaction.editReply({
     content: `${month.year}年${month.month}月の在籍希望は「${
-      monthCircle
-        ? monthCircle.state == MonthCircleAnswerState.Retired
-          ? '脱退'
-          : monthCircle.state == MonthCircleAnswerState.Answered
-          ? monthCircle.circle?.name
-          : '未回答'
-        : '未回答'
+      monthCircle?.circle ? getCircleName(monthCircle.circle) : '未回答'
     }」です。変更は在籍希望アンケートのメッセージにリアクションで行ってください。`,
   });
 };

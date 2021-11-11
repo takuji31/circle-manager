@@ -65,7 +65,6 @@ model MonthCircle {
   member          Member                 @relation(fields: [memberId], references: [id])
   year            String                 @db.Char(4)
   month           String                 @db.Char(2)
-  state           MonthCircleAnswerState @default(NoAnswer)
   circleId        String?                @db.VarChar(255)
   circle          Circle?                @relation(fields: [circleId], references: [id])
   currentCircleId String                 @db.VarChar(255)
@@ -78,12 +77,6 @@ model MonthCircle {
   @@index([memberId])
   @@index([year, month, circleId])
   @@index([kicked, invited, joined, memberId])
-}
-
-enum MonthCircleAnswerState {
-  NoAnswer
-  Answered
-  Retired
 }
 
 /// 在籍希望アンケート

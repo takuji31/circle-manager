@@ -1,10 +1,11 @@
+import { getCircleName } from './../../model/circle';
 import { Guild } from './../../model/guild';
 import { MonthCircle } from './month_circle';
-import { MonthCircleAnswerState, Circle } from '@prisma/client';
+import { Circle } from '@prisma/client';
 import { Member } from './member';
 import { Temporal } from 'proposal-temporal';
 import { createDiscordRestClient } from '../../discord';
-import { nextMonth } from '../../model';
+import { Circles, nextMonth } from '../../model';
 import { MonthSurvey as _MonthSurvey } from 'nexus-prisma';
 import {
   mutationField,
@@ -19,7 +20,6 @@ import {
   RESTPostAPIWebhookWithTokenWaitResult,
   Routes,
 } from 'discord-api-types/v9';
-import { Emojis } from '../../model/emoji';
 import { Month } from './month';
 
 export const MonthSurvey = objectType({
@@ -40,8 +40,8 @@ export const MonthSurvey = objectType({
             },
             year: parent.year,
             month: parent.month,
-            state: {
-              not: MonthCircleAnswerState.NoAnswer,
+            circleId: {
+              not: Circles.specialIds.noAnswer,
             },
           },
         });
@@ -73,8 +73,8 @@ export const MonthSurvey = objectType({
                       none: {
                         year: parent.year,
                         month: parent.month,
-                        state: {
-                          not: MonthCircleAnswerState.NoAnswer,
+                        circleId: {
+                          not: Circles.specialIds.noAnswer,
                         },
                       },
                     },
@@ -156,18 +156,22 @@ export const CreateNextMonthSurveyMutation = mutationField(
         .addField('回答方法', 'このメッセージにリアクション');
 
       const circles: Array<Circle> = await prisma.circle.findMany({
+        where: { selectableInSurvey: true },
         orderBy: { order: 'asc' },
       });
       circles.forEach((circle) => {
-        embed.addField(`${circle.name} 希望の場合`, `${circle.emoji}`);
+        embed.addField(
+          `${getCircleName(circle)} 希望の場合`,
+          `${circle.emoji}`
+        );
       });
-
-      embed.addField(`脱退予定の場合`, Emojis.leave);
 
       embed.addField('未回答の場合', '***除名となります。***');
       embed.addField(
         '回答状態の確認方法',
-        '任意のチャンネルで `/next-month-circle` と送信すると確認できます。'
+        `任意のチャンネル(例: <#${
+          Guild.channelIds.commandExecutor
+        }>)で ${'`/next-month-circle`'} と送信すると確認できます。`
       );
 
       const { id: messageId, channel_id: channelId } = (await rest.post(
@@ -192,10 +196,7 @@ export const CreateNextMonthSurveyMutation = mutationField(
         },
       });
 
-      const emojiNames = [
-        ...circles.map((circle) => circle.emoji),
-        Emojis.leave,
-      ];
+      const emojiNames = [...circles.map((circle) => circle.emoji)];
       emojiNames.forEach(async (emoji) => {
         if (emoji) {
           await rest.put(

@@ -3,10 +3,8 @@ import { LinearProgress } from '@mui/material';
 import { Box } from '@mui/system';
 import {
   DataGrid,
-  GridActionsCellItem,
   GridColDef,
   GridRenderCellParams,
-  GridRowParams,
   GridRowsProp,
   GridToolbar,
   GridValueFormatterParams,
@@ -15,7 +13,12 @@ import { GetServerSideProps, NextPage } from 'next';
 import { getSession } from 'next-auth/react';
 import React, { useMemo } from 'react';
 import { AdminLayout } from '../../../components/admin_filter';
-import { nextMonth, thisAndNextMonth, thisMonth } from '../../../model';
+import {
+  Circles,
+  getCircleName,
+  isLeaveCircle,
+  nextMonth,
+} from '../../../model';
 import {
   Circle,
   MonthCircle,
@@ -23,7 +26,7 @@ import {
   useAdminMembersQuery,
 } from '../../../apollo';
 import { prisma } from '../../../database';
-import Link, { NextLinkComposed } from '../../../components/link';
+import Link from '../../../components/link';
 
 export interface Props {
   monthCircleNames: Array<string>;
@@ -81,12 +84,10 @@ const MemberList: NextPage<Props> = ({ monthCircleNames }) => {
         valueOptions: monthCircleNames,
         valueFormatter: (params: GridValueFormatterParams) => {
           const value = params.value as MonthCircle;
-          if (!value || value.state == MonthCircleAnswerState.NoAnswer) {
+          if (!value || value.circle?.id == Circles.specialIds.noAnswer) {
             return '未回答';
-          } else if (value.state == MonthCircleAnswerState.Retired) {
-            return '脱退';
           } else {
-            return value.circle?.name ?? '';
+            return value.circle ? getCircleName(value.circle) : '';
           }
         },
         renderCell: (params: GridRenderCellParams) => {

@@ -8,9 +8,9 @@ import React from 'react';
 import {
   ListedCircleFragment,
   MemberMonthCircleFragment,
-  MonthCircleAnswerState,
   useUpdateMemberMonthCircleMutation,
 } from '../apollo';
+import { getCircleName } from '../model';
 
 export interface Props {
   memberId: string;
@@ -35,24 +35,14 @@ export default function MemberMonthCircle({
       <Typography variant="h6">{`${year}年${month}月の在籍希望`}</Typography>
       {!canEdit && (
         <Typography variant="body1">
-          {monthCircle?.circle?.name ??
-            (monthCircle?.state == MonthCircleAnswerState.Retired
-              ? '脱退'
-              : '未回答')}
+          {monthCircle?.circle ? getCircleName(monthCircle.circle) : '未回答'}
         </Typography>
       )}
       {canEdit && (
         <>
           <Typography variant="body1">在籍希望を選択してください。</Typography>
           {circles && (
-            <ToggleButtonGroup
-              value={
-                monthCircle?.circle?.id ??
-                (monthCircle?.state == MonthCircleAnswerState.Retired
-                  ? 'retired'
-                  : null)
-              }
-            >
+            <ToggleButtonGroup value={monthCircle?.circle?.id}>
               {circles.map((circle) => (
                 <ToggleButton
                   value={circle.id}
@@ -70,26 +60,9 @@ export default function MemberMonthCircle({
                     });
                   }}
                 >
-                  {circle.name}
+                  {getCircleName(circle)}
                 </ToggleButton>
               ))}
-              <ToggleButton
-                value="retired"
-                onClick={() => {
-                  mutation({
-                    variables: {
-                      circleId: 'retired',
-                      memberId,
-                      year,
-                      month,
-                    },
-                  }).then(() => {
-                    return;
-                  });
-                }}
-              >
-                脱退
-              </ToggleButton>
             </ToggleButtonGroup>
           )}
         </>

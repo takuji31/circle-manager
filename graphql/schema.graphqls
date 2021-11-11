@@ -72,14 +72,7 @@ type MonthCircle {
   kicked: Boolean!
   member: Member!
   month: String!
-  state: MonthCircleAnswerState!
   year: String!
-}
-
-enum MonthCircleAnswerState {
-  Answered
-  NoAnswer
-  Retired
 }
 
 """在籍希望アンケート"""

@@ -49,10 +49,10 @@ config();
           });
           channelId = messsageChannel.id;
         }
-        rest.post(Routes.channelMessages(channelId), {});
+        await rest.post(Routes.channelMessages(channelId), {});
         result += 'OK';
       } catch (e) {
-        result += e.toString();
+        // result += e.toString();
       }
     } else {
       message = `${member.name} : OK`;

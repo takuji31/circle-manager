@@ -1,4 +1,5 @@
 import {
+  Checkbox,
   Stack,
   TableBody,
   TableCell,
@@ -17,6 +18,7 @@ import {
 import { PageMonthSurveyComp, ssrMonthSurvey } from '../../../../apollo/page';
 import { AdminLayout } from '../../../../components/admin_filter';
 import { LoadingCheckBox } from '../../../../components/loading_checkbox';
+import { Circles, isLeaveCircle, shouldLeaveGuild } from '../../../../model';
 
 interface MemberWithMonthCircle {
   id: string;
@@ -57,8 +59,7 @@ export const MonthCircleList: PageMonthSurveyComp = ({ data, error }) => {
             {monthSurvey.answers
               .filter(
                 (monthCicle) =>
-                  monthCicle.state == 'Answered' &&
-                  monthCicle.circle?.id != monthCicle.currentCircle.id
+                  monthCicle.circle && !isLeaveCircle(monthCicle.circle)
               )
               .map((monthCircle) => {
                 return (
@@ -103,28 +104,49 @@ export const MonthCircleList: PageMonthSurveyComp = ({ data, error }) => {
           </TableBody>
         </TableContainer>
         <Typography variant="h6">脱退予定者</Typography>
-        <Typography variant="body1">
-          Discordからkickするとリストから消えます。先にサークルから除名してください
-        </Typography>
+        <Typography variant="h6">移籍</Typography>
         <TableContainer>
           <TableHead>
             <TableCell>名前</TableCell>
             <TableCell>現サークル</TableCell>
+            <TableCell>除名済み</TableCell>
+            <TableCell>Discord残留</TableCell>
           </TableHead>
           <TableBody>
             {monthSurvey.answers
-              .filter((monthCicle) => monthCicle.state == 'Retired')
+              .filter(
+                (monthCicle) =>
+                  monthCicle.circle && isLeaveCircle(monthCicle.circle)
+              )
               .map((monthCircle) => {
                 return (
-                  <TableRow key={`retired_${monthCircle.id}`}>
+                  <TableRow key={`leave_${monthCircle.id}`}>
                     <TableCell>{monthCircle.member.name}</TableCell>
                     <TableCell>{monthCircle.currentCircle.name}</TableCell>
+                    <TableCell>
+                      <MonthCircleStateCheckbox
+                        checked={monthCircle.kicked}
+                        disabled={monthCircle.kicked && monthCircle.invited}
+                        variablesBuilder={(kicked) => ({
+                          id: monthCircle.id,
+                          kicked,
+                        })}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Checkbox
+                        checked={
+                          monthCircle.circle?.id == Circles.specialIds.ob
+                        }
+                        disabled={true}
+                      />
+                    </TableCell>
                   </TableRow>
                 );
               })}
           </TableBody>
         </TableContainer>
-        <Typography variant="h6">未回答者(除名)</Typography>
+        <Typography variant="h6">除名者(未回答含む)</Typography>
         <Typography variant="body1">
           Discordからkickするとリストから消えます。先にサークルから除名してください
         </Typography>
@@ -135,7 +157,11 @@ export const MonthCircleList: PageMonthSurveyComp = ({ data, error }) => {
           </TableHead>
           <TableBody>
             {monthSurvey.answers
-              .filter((monthCicle) => monthCicle.state == 'NoAnswer')
+              .filter(
+                (monthCicle) =>
+                  !monthCicle.circle ||
+                  monthCicle.circle.id == Circles.specialIds.kick
+              )
               .map((monthCircle) => {
                 return (
                   <TableRow key={`no_answer_${monthCircle.id}`}>

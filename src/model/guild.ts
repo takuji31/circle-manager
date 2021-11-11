@@ -23,6 +23,7 @@ export const Guild = {
     all: isProduction ? Channels.all : Channels.botTest,
     admin: isProduction ? Channels.botNotification : Channels.botTest,
     circleSelect: isProduction ? Channels.circleSelect : Channels.botTest,
+    commandExecutor: '908319798700703794',
   },
   messageIds: {
     circleSelect: isProduction ? '902466218890510347' : '908316632995209256',

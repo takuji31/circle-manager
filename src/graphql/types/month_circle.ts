@@ -1,11 +1,7 @@
 import { Guild } from './../../model/guild';
 import { Routes } from 'discord-api-types/v9';
 import { prisma } from './../../database/prisma';
-import {
-  MonthCircle as _MonthCircle,
-  MonthCircleAnswerState as _MonthCircleAnswerState,
-} from 'nexus-prisma';
-import { MonthCircleAnswerState as PrismaMonthCircleAnswerState } from '@prisma/client';
+import { MonthCircle as _MonthCircle } from 'nexus-prisma';
 import {
   arg,
   booleanArg,
@@ -26,7 +22,6 @@ export const MonthCircle = objectType({
     t.field(_MonthCircle.id);
     t.field(_MonthCircle.year);
     t.field(_MonthCircle.month);
-    t.field(_MonthCircle.state);
     t.field(_MonthCircle.circle);
     t.field(_MonthCircle.currentCircle);
     t.field(_MonthCircle.member);
@@ -35,8 +30,6 @@ export const MonthCircle = objectType({
     t.field(_MonthCircle.joined);
   },
 });
-
-export const MonthCircleAnswerState = enumType(_MonthCircleAnswerState);
 
 export const UpdateMemberMonthCirclePayload = objectType({
   name: 'UpdateMemberMonthCirclePayload',
@@ -71,20 +64,10 @@ export const UpdateMemberMonthCircleMutation = mutationField(
       month: nonNull(stringArg()),
       circleId: nonNull(stringArg()),
     },
-    async resolve(
-      parent,
-      { year, month, memberId, circleId: circleIdOrRetired },
-      ctx
-    ) {
+    async resolve(parent, { year, month, memberId, circleId }, ctx) {
       if (ctx.user?.id != memberId && !ctx?.user?.isAdmin) {
         throw new Error("Cannot update this user's month circle.");
       }
-      const state =
-        circleIdOrRetired == 'retired'
-          ? PrismaMonthCircleAnswerState.Retired
-          : PrismaMonthCircleAnswerState.Answered;
-      const circleId =
-        circleIdOrRetired != 'retired' ? circleIdOrRetired : null;
       const member = await prisma.member.findUnique({
         where: { id: memberId },
       });
@@ -111,7 +94,6 @@ export const UpdateMemberMonthCircleMutation = mutationField(
           month,
           memberId,
           circleId,
-          state,
           currentCircleId,
         },
         update: {
@@ -119,7 +101,6 @@ export const UpdateMemberMonthCircleMutation = mutationField(
           month,
           memberId,
           circleId,
-          state,
           currentCircleId,
         },
       });
