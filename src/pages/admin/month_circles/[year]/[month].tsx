@@ -41,6 +41,12 @@ export const MonthCircleList: PageMonthSurveyComp = ({ data, error }) => {
   } else if (!monthSurvey) {
     return <p></p>;
   }
+
+  const movingAnswers = monthSurvey.answers.filter((answer) => {
+    answer.circle &&
+      answer.currentCircle &&
+      answer.circle.id != answer.currentCircle.id;
+  });
   return (
     <AdminLayout title={`${monthSurvey.year}年${monthSurvey.month}月の移籍表`}>
       <Stack p={2} spacing={4}>
@@ -56,7 +62,7 @@ export const MonthCircleList: PageMonthSurveyComp = ({ data, error }) => {
             <TableCell>加入済み</TableCell>
           </TableHead>
           <TableBody>
-            {monthSurvey.answers
+            {movingAnswers
               .filter(
                 (monthCicle) =>
                   monthCicle.circle && !isLeaveCircle(monthCicle.circle)
@@ -113,7 +119,7 @@ export const MonthCircleList: PageMonthSurveyComp = ({ data, error }) => {
             <TableCell>Discord残留</TableCell>
           </TableHead>
           <TableBody>
-            {monthSurvey.answers
+            {movingAnswers
               .filter(
                 (monthCicle) =>
                   monthCicle.circle && isLeaveCircle(monthCicle.circle)
@@ -156,7 +162,7 @@ export const MonthCircleList: PageMonthSurveyComp = ({ data, error }) => {
             <TableCell>現サークル</TableCell>
           </TableHead>
           <TableBody>
-            {monthSurvey.answers
+            {movingAnswers
               .filter(
                 (monthCicle) =>
                   !monthCicle.circle ||
