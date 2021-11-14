@@ -6,7 +6,7 @@ import { monthSurveyReaction } from './month_survey';
 import { Guild } from './../model/guild';
 import { registerTrainerIdCommand } from './register_trainer_id';
 import { PrismaClient } from '@prisma/client';
-import { Channel, Client, Intents } from 'discord.js';
+import { Channel, Client, Intents, Options } from 'discord.js';
 import { config } from 'dotenv';
 import { nextMonthCircleCommand } from './next_month_circle';
 
@@ -21,6 +21,7 @@ const client = new Client({
     Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
     Intents.FLAGS.GUILD_PRESENCES,
   ],
+  makeCache: Options.cacheEverything(),
 });
 
 const prisma = new PrismaClient();
