@@ -107,7 +107,7 @@ client.on('interactionCreate', async (interaction) => {
 
 client.on('messageReactionAdd', async (reaction, user) => {
   try {
-    if (reaction.me) {
+    if (user.bot) {
       return;
     }
     const emoji = reaction.emoji.name;
