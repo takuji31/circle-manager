@@ -6,7 +6,7 @@ import { monthSurveyReaction } from './month_survey';
 import { Guild } from './../model/guild';
 import { registerTrainerIdCommand } from './register_trainer_id';
 import { PrismaClient } from '@prisma/client';
-import { Client, Intents } from 'discord.js';
+import { Channel, Client, Intents } from 'discord.js';
 import { config } from 'dotenv';
 import { nextMonthCircleCommand } from './next_month_circle';
 
@@ -71,8 +71,17 @@ client.on('guildMemberUpdate', async (oldMember, newMember) => {
   await updateMemberNicknameEvent(oldMember, newMember);
 });
 
-client.on('messageCreate', async () => {
-  console.log('messageCreated');
+client.on('messageCreate', async (message) => {
+  console.log('messageCreated %s', message);
+  const channel: Channel | null =
+    client.channels.cache.get(message.channelId) ??
+    (await client.channels.fetch(message.channelId));
+  if (!channel) {
+    return;
+  }
+  if (channel.isText()) {
+    await channel.messages.fetch(message.id, { cache: true });
+  }
 });
 
 client.on('interactionCreate', async (interaction) => {
