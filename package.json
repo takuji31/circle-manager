@@ -23,7 +23,8 @@
     "db:push": "prisma db push",
     "db:migrate:dev": "prisma migrate dev",
     "db:migrate:deploy": "prisma migrate deploy",
-    "send-select-circle-message": "yarn run ts-node src/tools/send-select-circle-message.ts",
+    "send-select-circle-message": "yarn run ts-node src/tools/send-select-circle-message",
+    "cron:month-survey-reminder": "yarn run ts-node src/cron/month-survey-reminder",
     "ts-node": "ts-node --compiler-options {\\\"module\\\":\\\"commonjs\\\"} "
   },
   "prisma": {
