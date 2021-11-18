@@ -3393,6 +3393,31 @@ csstype@^3.0.2, csstype@^3.0.9:
   resolved "https://registry.yarnpkg.com/csstype/-/csstype-3.0.10.tgz#2ad3a7bed70f35b965707c092e5f30b327c290e5"
   integrity sha512-2u44ZG2OcNUO9HDp/Jl8C07x6pU/eTR3ncV91SiK3dhG9TWvRVsCoJw14Ckx5DgWkzGA3waZWO3d7pgqpUI/XA==
 
+csv-generate@^4.0.1:
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/csv-generate/-/csv-generate-4.0.1.tgz#c5aaab795afe8bb0c22f405b8e7fed749890c288"
+  integrity sha512-gLWZJpNpI2VJnBoKk+zjdDWpndx+1XAdlSM2oVQ9uD/caB2uRStuyPCnSPDz44Q3i5tXo0aerlVZ17zlN9CF+A==
+
+csv-parse@^5.0.1:
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/csv-parse/-/csv-parse-5.0.1.tgz#01368a30152023022dce67f653505bcbb29322e5"
+  integrity sha512-K1WfnyENJincXFtyHEA6DSe16+/aVdU6TCTqvJw+BouVNiovn1hBpO3BCGFPIhVnndy7c+2IOMMNEFir6Snh4Q==
+
+csv-stringify@^6.0.1:
+  version "6.0.1"
+  resolved "https://registry.yarnpkg.com/csv-stringify/-/csv-stringify-6.0.1.tgz#de812cb1be1f2931ca7d71f1279ce4d43fb0fc7a"
+  integrity sha512-w9XpZZxOPa79s27DqIOI1xH/8SE6gRiQLZrTavD0DummNyTAWDR/teLKlaujpcz7ZlUaYFfu7THP57ArOqnY3A==
+
+csv@^6.0.1:
+  version "6.0.1"
+  resolved "https://registry.yarnpkg.com/csv/-/csv-6.0.1.tgz#0fcdeb80b6590334a07cf4281881408dba9eb82e"
+  integrity sha512-dsrvAs5kzkUSBK/ykT/c4A1nlRilpROMM/bzl8vY6iJhFnApns5WTlDrxgddmVnHgGM8Kl3Hxs0L8ZsetIFIwQ==
+  dependencies:
+    csv-generate "^4.0.1"
+    csv-parse "^5.0.1"
+    csv-stringify "^6.0.1"
+    stream-transform "^3.0.1"
+
 damerau-levenshtein@^1.0.6:
   version "1.0.7"
   resolved "https://registry.yarnpkg.com/damerau-levenshtein/-/damerau-levenshtein-1.0.7.tgz#64368003512a1a6992593741a09a9d31a836f55d"
@@ -7620,6 +7645,11 @@ stream-parser@^0.3.1:
   integrity sha1-FhhUhpRCACGhGC/wrxkRwSl2F3M=
   dependencies:
     debug "2"
+
+stream-transform@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/stream-transform/-/stream-transform-3.0.1.tgz#efc8cec311fabeb23dd79dbf8338cffd3e88ade3"
+  integrity sha512-UvjGPmlQwIfLTiY8TqgA9kQSJj8T7cFBQTDsaiIRVZx3ZSoMLEluRmoXoArEbRpKhvsTkCWOskZpur/dgAeSRg==
 
 string-env-interpolation@1.0.1, string-env-interpolation@^1.0.1:
   version "1.0.1"
