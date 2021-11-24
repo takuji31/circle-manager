@@ -43,9 +43,11 @@ export const MonthCircleList: PageMonthSurveyComp = ({ data, error }) => {
   }
 
   const movingAnswers = monthSurvey.answers.filter((answer) => {
-    answer.circle &&
+    return (
+      answer.circle &&
       answer.currentCircle &&
-      answer.circle.id != answer.currentCircle.id;
+      answer.circle.id != answer.currentCircle.id
+    );
   });
   return (
     <AdminLayout title={`${monthSurvey.year}年${monthSurvey.month}月の移籍表`}>
@@ -110,7 +112,6 @@ export const MonthCircleList: PageMonthSurveyComp = ({ data, error }) => {
           </TableBody>
         </TableContainer>
         <Typography variant="h6">脱退予定者</Typography>
-        <Typography variant="h6">移籍</Typography>
         <TableContainer>
           <TableHead>
             <TableCell>名前</TableCell>
