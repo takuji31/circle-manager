@@ -71,6 +71,10 @@ export const UpdateSignUpMutation = mutationField('updateSignUp', {
       } catch (e) {
         console.log(e);
       }
+      await ctx.prisma.member.update({
+        where: { id: memberId },
+        data: { circleId },
+      });
     }
 
     return await ctx.prisma.signUp.update({
