@@ -1,3 +1,4 @@
+import { Guild } from './../model/guild';
 import { Circles } from './../model/circle';
 import { ReactionHandler } from './types';
 import { Temporal } from 'proposal-temporal';
@@ -36,10 +37,17 @@ export const monthSurveyReaction: ReactionHandler = async (
   }
 
   const { year, month } = survey;
-  const { id: memberId, circleId } = member;
+  const { id: memberId, circleId, circle: currentCircle } = member;
 
   if (!circleId) {
     await user.send('サークルに所属していません。');
+    return;
+  }
+
+  if (currentCircle?.id == Circles.specialIds.notJoined) {
+    await user.send(
+      'サークルに未加入です。先に<#889836038221099038>をしてください。加入申請が承認されると回答できるようになります。'
+    );
     return;
   }
 
