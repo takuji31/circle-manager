@@ -156,6 +156,9 @@ export const UpdateMonthCircleMutation = mutationField('updateMonthCircle', {
     const circleId = monthCircle.circleId;
     if (joined && circleId) {
       try {
+        if (process.env.NODE_ENV != 'production') {
+          throw new Error('Update role ignored in develop');
+        }
         const rest = createDiscordRestClient();
         const roleIds = Guild.roleIds.circleIds;
         roleIds

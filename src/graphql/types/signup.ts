@@ -60,6 +60,9 @@ export const UpdateSignUpMutation = mutationField('updateSignUp', {
     const circleId = signUp.circleId;
     if (joined) {
       try {
+        if (process.env.NODE_ENV != 'production') {
+          throw new Error('Update role ignored in develop');
+        }
         const rest = createDiscordRestClient();
         const roleIds = Guild.roleIds.circleIds;
         roleIds
