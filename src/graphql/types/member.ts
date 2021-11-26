@@ -201,7 +201,7 @@ export const UpdateMember = mutationField('updateMember', {
   },
   async resolve(parent, { input }, { prisma, user }) {
     const { id } = input;
-    if (!user?.isAdmin && id != user.id) {
+    if (!user?.isAdmin && id != user?.id) {
       throw new Error('Cannot modify other member.');
     }
     const member = await prisma.member.findUnique({ where: { id } });
