@@ -40,12 +40,14 @@ class DMSendResult {
   }
 }
 
-export const sendDirectMessagesIfPossible = async (
-  recipents: Array<DirectMessageRecipient>,
-  contentProducer: (recipient: DirectMessageRecipient) => string,
+export async function sendDirectMessagesIfPossible<
+  T extends DirectMessageRecipient = DirectMessageRecipient
+>(
+  recipents: Array<T>,
+  contentProducer: (recipient: T) => string,
   reportMessage: string,
   force: boolean = process.env.NODE_ENV == 'production'
-) => {
+) {
   const rest = createDiscordRestClient();
   const result: Array<Array<string>> = [
     ['宛先', '送信結果', '送信内容', 'エラー'],
@@ -101,4 +103,4 @@ export const sendDirectMessagesIfPossible = async (
       },
     ],
   });
-};
+}
