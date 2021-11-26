@@ -3,8 +3,10 @@ import { LinearProgress } from '@mui/material';
 import { Box } from '@mui/system';
 import {
   DataGrid,
+  GridActionsCellItem,
   GridColDef,
   GridRenderCellParams,
+  GridRowParams,
   GridRowsProp,
   GridToolbar,
   GridValueFormatterParams,
@@ -16,7 +18,8 @@ import { AdminLayout } from '../../../components/admin_filter';
 import { Circles, getCircleName, nextMonth } from '../../../model';
 import { Circle, MonthCircle, useAdminMembersQuery } from '../../../apollo';
 import { prisma } from '../../../database';
-import Link from '../../../components/link';
+import Link, { NextLinkComposed } from '../../../components/link';
+import * as Icons from '@mui/icons-material';
 
 export interface Props {
   monthCircleNames: Array<string>;
@@ -90,24 +93,25 @@ const MemberList: NextPage<Props> = ({ monthCircleNames }) => {
           return <Link href={href}>{params.formattedValue}</Link>;
         },
       },
-      // {
-      //   field: 'actions',
-      //   type: 'actions',
-      //   getActions: (params: GridRowParams) => {
-      //     const actions = [];
-      //     const pathname = params.row.pathname;
-      //     console.log(params.row);
-      //     return [
-      //       <GridActionsCellItem
-      //         key="members_pathname_url"
-      //         component={NextLinkComposed}
-      //         to={`/members/path/${pathname}`}
-      //         label="基本情報登録ページを開く"
-      //         showInMenu
-      //       />,
-      //     ];
-      //   },
-      // },
+      {
+        field: 'actions',
+        type: 'actions',
+        headerName: 'Action',
+        getActions: (params: GridRowParams) => {
+          const actions = [];
+          const pathname = params.row.pathname;
+          console.log(params.row);
+          return [
+            <GridActionsCellItem
+              key="members_pathname_url"
+              component={NextLinkComposed}
+              to={`/members/path/${pathname}`}
+              label="基本情報登録ページを開く"
+              icon={<Icons.Edit />}
+            />,
+          ];
+        },
+      },
     ],
     [monthCircleNames]
   );

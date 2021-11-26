@@ -1,0 +1,5 @@
+query MemberByPathname($pathname: String!) {
+  member(pathname: $pathname) {
+    ...FullMember
+  }
+}

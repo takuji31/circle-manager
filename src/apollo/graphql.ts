@@ -99,10 +99,16 @@ export type MonthSurvey = {
 export type Mutation = {
   __typename?: 'Mutation';
   createNextMonthSurvey?: Maybe<CreateNextMonthSurveyPayload>;
+  updateMember: Member;
   updateMemberMonthCircle?: Maybe<UpdateMemberMonthCirclePayload>;
   updateMembers: Array<Member>;
   updateMonthCircle?: Maybe<UpdateMemberMonthCirclePayload>;
   updateSignUp: SignUp;
+};
+
+
+export type MutationUpdateMemberArgs = {
+  input: UpdateMemberMutationInput;
 };
 
 
@@ -140,7 +146,8 @@ export type Query = {
 
 
 export type QueryMemberArgs = {
-  id: Scalars['String'];
+  id?: Maybe<Scalars['String']>;
+  pathname?: Maybe<Scalars['String']>;
 };
 
 
@@ -177,6 +184,11 @@ export type UpdateMemberMonthCirclePayload = {
   monthCircle: MonthCircle;
 };
 
+export type UpdateMemberMutationInput = {
+  id: Scalars['String'];
+  trainerId?: Maybe<Scalars['String']>;
+};
+
 export type UpdateMonthCircleMutationInput = {
   id: Scalars['String'];
   invited?: Maybe<Scalars['Boolean']>;
@@ -189,6 +201,8 @@ export type ListedCircleFragment = { __typename?: 'Circle', id: string, name: st
 export type MemberMonthCircleFragment = { __typename?: 'MonthCircle', id: string, year: string, month: string, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined };
 
 export type ListedMemberFragment = { __typename?: 'Member', id: string, name: string, trainerId?: string | null | undefined };
+
+export type FullMemberFragment = { __typename?: 'Member', id: string, pathname: string, name: string, trainerId?: string | null | undefined, circleRole: CircleRole, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined };
 
 export type MonthAndSurveyFragment = { __typename?: 'Month', year: string, month: string, survey?: { __typename?: 'MonthSurvey', id: string, year: string, month: string, expiredAt: any } | null | undefined };
 
@@ -210,6 +224,13 @@ export type UpdateMemberMonthCircleMutationVariables = Exact<{
 
 
 export type UpdateMemberMonthCircleMutation = { __typename?: 'Mutation', updateMemberMonthCircle?: { __typename?: 'UpdateMemberMonthCirclePayload', monthCircle: { __typename?: 'MonthCircle', id: string, year: string, month: string, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined } } | null | undefined };
+
+export type UpdateMemberMutationVariables = Exact<{
+  input: UpdateMemberMutationInput;
+}>;
+
+
+export type UpdateMemberMutation = { __typename?: 'Mutation', updateMember: { __typename?: 'Member', id: string, pathname: string, name: string, trainerId?: string | null | undefined, circleRole: CircleRole, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined } };
 
 export type UpdateMembersMutationVariables = Exact<{ [key: string]: never; }>;
 
@@ -257,6 +278,13 @@ export type MemberMonthCirclesQueryVariables = Exact<{
 
 export type MemberMonthCirclesQuery = { __typename?: 'Query', member?: { __typename?: 'Member', thisMonthCircle?: { __typename?: 'MonthCircle', id: string, year: string, month: string, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined } | null | undefined, nextMonthCircle?: { __typename?: 'MonthCircle', id: string, year: string, month: string, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined } | null | undefined } | null | undefined, circles: Array<{ __typename?: 'Circle', id: string, name: string }> };
 
+export type MemberByPathnameQueryVariables = Exact<{
+  pathname: Scalars['String'];
+}>;
+
+
+export type MemberByPathnameQuery = { __typename?: 'Query', member?: { __typename?: 'Member', id: string, pathname: string, name: string, trainerId?: string | null | undefined, circleRole: CircleRole, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined } | null | undefined };
+
 export type MonthCircleQueryVariables = Exact<{
   monthCircleId: Scalars['String'];
 }>;
@@ -264,6 +292,19 @@ export type MonthCircleQueryVariables = Exact<{
 
 export type MonthCircleQuery = { __typename?: 'Query', monthCircle?: { __typename?: 'MonthCircle', id: string, year: string, month: string, member: { __typename?: 'Member', id: string, name: string }, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined } | null | undefined, circles: Array<{ __typename?: 'Circle', id: string, name: string }> };
 
+export const FullMemberFragmentDoc = gql`
+    fragment FullMember on Member {
+  id
+  pathname
+  name
+  trainerId
+  circle {
+    id
+    name
+  }
+  circleRole
+}
+    `;
 export const MonthAndSurveyFragmentDoc = gql`
     fragment MonthAndSurvey on Month {
   year
@@ -414,6 +455,39 @@ export function useUpdateMemberMonthCircleMutation(baseOptions?: Apollo.Mutation
 export type UpdateMemberMonthCircleMutationHookResult = ReturnType<typeof useUpdateMemberMonthCircleMutation>;
 export type UpdateMemberMonthCircleMutationResult = Apollo.MutationResult<UpdateMemberMonthCircleMutation>;
 export type UpdateMemberMonthCircleMutationOptions = Apollo.BaseMutationOptions<UpdateMemberMonthCircleMutation, UpdateMemberMonthCircleMutationVariables>;
+export const UpdateMemberDocument = gql`
+    mutation UpdateMember($input: UpdateMemberMutationInput!) {
+  updateMember(input: $input) {
+    ...FullMember
+  }
+}
+    ${FullMemberFragmentDoc}`;
+export type UpdateMemberMutationFn = Apollo.MutationFunction<UpdateMemberMutation, UpdateMemberMutationVariables>;
+
+/**
+ * __useUpdateMemberMutation__
+ *
+ * To run a mutation, you first call `useUpdateMemberMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateMemberMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateMemberMutation, { data, loading, error }] = useUpdateMemberMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useUpdateMemberMutation(baseOptions?: Apollo.MutationHookOptions<UpdateMemberMutation, UpdateMemberMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateMemberMutation, UpdateMemberMutationVariables>(UpdateMemberDocument, options);
+      }
+export type UpdateMemberMutationHookResult = ReturnType<typeof useUpdateMemberMutation>;
+export type UpdateMemberMutationResult = Apollo.MutationResult<UpdateMemberMutation>;
+export type UpdateMemberMutationOptions = Apollo.BaseMutationOptions<UpdateMemberMutation, UpdateMemberMutationVariables>;
 export const UpdateMembersDocument = gql`
     mutation UpdateMembers {
   updateMembers {
@@ -748,6 +822,41 @@ export function useMemberMonthCirclesLazyQuery(baseOptions?: Apollo.LazyQueryHoo
 export type MemberMonthCirclesQueryHookResult = ReturnType<typeof useMemberMonthCirclesQuery>;
 export type MemberMonthCirclesLazyQueryHookResult = ReturnType<typeof useMemberMonthCirclesLazyQuery>;
 export type MemberMonthCirclesQueryResult = Apollo.QueryResult<MemberMonthCirclesQuery, MemberMonthCirclesQueryVariables>;
+export const MemberByPathnameDocument = gql`
+    query MemberByPathname($pathname: String!) {
+  member(pathname: $pathname) {
+    ...FullMember
+  }
+}
+    ${FullMemberFragmentDoc}`;
+
+/**
+ * __useMemberByPathnameQuery__
+ *
+ * To run a query within a React component, call `useMemberByPathnameQuery` and pass it any options that fit your needs.
+ * When your component renders, `useMemberByPathnameQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useMemberByPathnameQuery({
+ *   variables: {
+ *      pathname: // value for 'pathname'
+ *   },
+ * });
+ */
+export function useMemberByPathnameQuery(baseOptions: Apollo.QueryHookOptions<MemberByPathnameQuery, MemberByPathnameQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<MemberByPathnameQuery, MemberByPathnameQueryVariables>(MemberByPathnameDocument, options);
+      }
+export function useMemberByPathnameLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MemberByPathnameQuery, MemberByPathnameQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<MemberByPathnameQuery, MemberByPathnameQueryVariables>(MemberByPathnameDocument, options);
+        }
+export type MemberByPathnameQueryHookResult = ReturnType<typeof useMemberByPathnameQuery>;
+export type MemberByPathnameLazyQueryHookResult = ReturnType<typeof useMemberByPathnameLazyQuery>;
+export type MemberByPathnameQueryResult = Apollo.QueryResult<MemberByPathnameQuery, MemberByPathnameQueryVariables>;
 export const MonthCircleDocument = gql`
     query MonthCircle($monthCircleId: String!) {
   monthCircle(monthCircleId: $monthCircleId) {
@@ -845,9 +954,10 @@ export type MonthSurveyFieldPolicy = {
 	noAnswerMembers?: FieldPolicy<any> | FieldReadFunction<any>,
 	year?: FieldPolicy<any> | FieldReadFunction<any>
 };
-export type MutationKeySpecifier = ('createNextMonthSurvey' | 'updateMemberMonthCircle' | 'updateMembers' | 'updateMonthCircle' | 'updateSignUp' | MutationKeySpecifier)[];
+export type MutationKeySpecifier = ('createNextMonthSurvey' | 'updateMember' | 'updateMemberMonthCircle' | 'updateMembers' | 'updateMonthCircle' | 'updateSignUp' | MutationKeySpecifier)[];
 export type MutationFieldPolicy = {
 	createNextMonthSurvey?: FieldPolicy<any> | FieldReadFunction<any>,
+	updateMember?: FieldPolicy<any> | FieldReadFunction<any>,
 	updateMemberMonthCircle?: FieldPolicy<any> | FieldReadFunction<any>,
 	updateMembers?: FieldPolicy<any> | FieldReadFunction<any>,
 	updateMonthCircle?: FieldPolicy<any> | FieldReadFunction<any>,

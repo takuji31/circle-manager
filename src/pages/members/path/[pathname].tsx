@@ -2,78 +2,123 @@ import styled from '@emotion/styled';
 import {
   Box,
   Button,
+  Checkbox,
   Container,
+  FormControl,
+  FormControlLabel,
+  Grid,
   Stack,
   TextField,
   Typography,
 } from '@mui/material';
-import { GetStaticPaths, GetStaticProps } from 'next';
+import { GetServerSideProps, GetStaticPaths, GetStaticProps } from 'next';
 import Layout from '../../../components/layout';
 import { prisma } from '../../../database';
 import React, { useState } from 'react';
+import {
+  PageMemberByPathnameComp,
+  ssrMemberByPathname,
+} from '../../../apollo/page';
+import Link from '../../../components/link';
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
+import { useUpdateMemberMutation } from '../../../apollo';
+import { LoadingButton } from '@mui/lab';
 
-/* eslint-disable-next-line */
-export interface PathnameProps {
-  memberId: string;
-  name: string;
-}
+type MemberFormData = {
+  trainerId: string | null;
+};
 
-export function Pathname({ memberId, name }: PathnameProps) {
-  const [trainerId, setTrainerId] = useState('');
-  const [changed, setChanged] = useState(false);
+export const Pathname: PageMemberByPathnameComp = ({ data, error }) => {
+  const member = data?.member;
+  const [mutation, { loading: isUpdating }] = useUpdateMemberMutation();
+  const {
+    register,
+    control,
+    setValue,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<MemberFormData>();
+  if (error) {
+    return <p>{error.message}</p>;
+  } else if (!member) {
+    return <p></p>;
+  }
+
+  const formHandler: SubmitHandler<MemberFormData> = (data) => {
+    mutation({
+      variables: {
+        input: {
+          id: member.id,
+          ...data,
+        },
+      },
+    });
+  };
+
   return (
-    <Layout title={`${name} さんの基本情報`}>
+    <Layout title={`${member.name} さんの基本情報`}>
       <Container maxWidth="md">
         <Stack p={2} sx={{ maxWidth: '600pt' }}>
-          <Typography variant="body1">
-            こちらの情報はサークル運営のために必要です。入力にご協力お願いします。
-          </Typography>
-          <TextField
-            label="トレーナーID"
-            helperText="月初の異動を迅速に行うために必要です。ゲームのプロフィール画面から「IDコピー」でコピーした値を貼り付けてください。"
-            value={trainerId}
-            onChange={(e) => {
-              setTrainerId(e.target.value);
-              setChanged(true);
-            }}
-            variant="standard"
-          />
+          <FormControl>
+            <Typography variant="body1">
+              こちらの情報はサークル運営のために必要です。入力にご協力お願いします。
+            </Typography>
+            <Box
+              component="form"
+              noValidate
+              onSubmit={handleSubmit(formHandler)}
+              sx={{ mt: 3 }}
+            >
+              <Grid container spacing={2}>
+                <Grid item xs={12}>
+                  <Controller
+                    name="trainerId"
+                    control={control}
+                    defaultValue={member.trainerId ?? null}
+                    render={({ field }) => {
+                      return (
+                        <TextField
+                          label="トレーナーID"
+                          helperText="月初の異動を迅速に行うために必要です。ゲームのプロフィール画面から「IDコピー」でコピーした値を貼り付けてください。"
+                          {...field}
+                          disabled={isUpdating}
+                          variant="standard"
+                        />
+                      );
+                    }}
+                  />
+                </Grid>
+                <Grid container item xs={12} justifyContent="flex-end">
+                  <Grid item>
+                    <LoadingButton
+                      loading={isUpdating}
+                      type="submit"
+                      variant="contained"
+                    >
+                      保存
+                    </LoadingButton>
+                  </Grid>
+                </Grid>
+              </Grid>
+            </Box>
+          </FormControl>
         </Stack>
       </Container>
     </Layout>
   );
-}
+};
 
-export const getStaticProps: GetStaticProps<PathnameProps> = async (req) => {
+export const getServerSideProps: GetServerSideProps = (req) => {
   const pathname = req.params?.pathname as string;
-  const member = await prisma.member.findUnique({
-    where: {
-      pathname: pathname,
-    },
+  return ssrMemberByPathname.getServerPage({
+    variables: { pathname },
   });
-  if (!member) {
-    return {
-      notFound: true,
-    };
-  }
+};
+
+export default ssrMemberByPathname.withPage((arg) => {
   return {
-    props: {
-      memberId: member.id,
-      name: member.name,
+    variables: {
+      pathname: arg.query.pathname as string,
     },
   };
-};
-
-export const getStaticPaths: GetStaticPaths = async () => {
-  const members = await prisma.member.findMany({});
-  return {
-    paths: members.map((member) => ({
-      params: {
-        pathname: member.pathname,
-      },
-    })),
-    fallback: 'blocking',
-  };
-};
-
-export default Pathname;
+})(Pathname);

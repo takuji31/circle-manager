@@ -12,6 +12,7 @@ import { getApolloClient , Context} from '../apollo';
 
 
 
+
 export async function getServerPageAdminMembers
     (options: Omit<Apollo.QueryOptions<Types.AdminMembersQueryVariables>, 'query'>, ctx?: Context ){
         const apolloClient = getApolloClient(ctx);
@@ -151,6 +152,41 @@ export const ssrMemberMonthCircles = {
       getServerPage: getServerPageMemberMonthCircles,
       withPage: withPageMemberMonthCircles,
       usePage: useMemberMonthCircles,
+    }
+export async function getServerPageMemberByPathname
+    (options: Omit<Apollo.QueryOptions<Types.MemberByPathnameQueryVariables>, 'query'>, ctx?: Context ){
+        const apolloClient = getApolloClient(ctx);
+        
+        const data = await apolloClient.query<Types.MemberByPathnameQuery>({ ...options, query: Operations.MemberByPathnameDocument });
+        
+        const apolloState = apolloClient.cache.extract();
+
+        return {
+            props: {
+                apolloState: apolloState,
+                data: data?.data,
+                error: data?.error ?? data?.errors ?? null,
+            },
+        };
+      }
+export const useMemberByPathname = (
+  optionsFunc?: (router: NextRouter)=> QueryHookOptions<Types.MemberByPathnameQuery, Types.MemberByPathnameQueryVariables>) => {
+  const router = useRouter();
+  const options = optionsFunc ? optionsFunc(router) : {};
+  return useQuery(Operations.MemberByPathnameDocument, options);
+};
+export type PageMemberByPathnameComp = React.FC<{data?: Types.MemberByPathnameQuery, error?: Apollo.ApolloError}>;
+export const withPageMemberByPathname = (optionsFunc?: (router: NextRouter)=> QueryHookOptions<Types.MemberByPathnameQuery, Types.MemberByPathnameQueryVariables>) => (WrappedComponent:PageMemberByPathnameComp) : NextPage  => (props) => {
+                const router = useRouter()
+                const options = optionsFunc ? optionsFunc(router) : {};
+                const {data, error } = useQuery(Operations.MemberByPathnameDocument, options)    
+                return <WrappedComponent {...props} data={data} error={error} /> ;
+                   
+            }; 
+export const ssrMemberByPathname = {
+      getServerPage: getServerPageMemberByPathname,
+      withPage: withPageMemberByPathname,
+      usePage: useMemberByPathname,
     }
 export async function getServerPageMonthCircle
     (options: Omit<Apollo.QueryOptions<Types.MonthCircleQueryVariables>, 'query'>, ctx?: Context ){

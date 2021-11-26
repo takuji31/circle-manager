@@ -89,6 +89,7 @@ type MonthSurvey {
 
 type Mutation {
   createNextMonthSurvey: CreateNextMonthSurveyPayload
+  updateMember(input: UpdateMemberMutationInput!): Member!
   updateMemberMonthCircle(circleId: String!, memberId: String!, month: String!, year: String!): UpdateMemberMonthCirclePayload
   updateMembers: [Member!]!
   updateMonthCircle(data: UpdateMonthCircleMutationInput!): UpdateMemberMonthCirclePayload
@@ -97,7 +98,7 @@ type Mutation {
 
 type Query {
   circles: [Circle!]!
-  member(id: String!): Member
+  member(id: String, pathname: String): Member
   members: [Member!]!
   monthCircle(monthCircleId: String!): MonthCircle
   monthSurvey(month: String!, year: String!): MonthSurvey
@@ -126,6 +127,11 @@ type SiteMetadata {
 
 type UpdateMemberMonthCirclePayload {
   monthCircle: MonthCircle!
+}
+
+input UpdateMemberMutationInput {
+  id: String!
+  trainerId: String
 }
 
 input UpdateMonthCircleMutationInput {

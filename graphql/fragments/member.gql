@@ -13,3 +13,15 @@ fragment ListedMember on Member {
   name
   trainerId
 }
+
+fragment FullMember on Member {
+  id
+  pathname
+  name
+  trainerId
+  circle {
+    id
+    name
+  }
+  circleRole
+}

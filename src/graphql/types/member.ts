@@ -2,7 +2,9 @@ import { prisma } from './../../database/prisma';
 import { nextMonth, thisMonth, Guild } from '../../model';
 import * as Nexus from 'nexus-prisma';
 import {
+  arg,
   enumType,
+  inputObjectType,
   list,
   mutationField,
   nonNull,
@@ -14,6 +16,7 @@ import { MonthCircle } from '.';
 import { createDiscordRestClient } from '../../discord';
 import { RESTGetAPIGuildMembersResult, Routes } from 'discord-api-types/v9';
 import { CircleRole as PrismaCircleRole } from '@prisma/client';
+import { resolve } from 'path/posix';
 export const Member = objectType({
   name: Nexus.Member.$name,
   description: Nexus.Member.$description,
@@ -61,14 +64,25 @@ export const CircleRole = enumType(Nexus.CircleRole);
 export const MemberField = queryField('member', {
   type: Member,
   args: {
-    id: nonNull(stringArg()),
+    id: stringArg(),
+    pathname: stringArg(),
   },
   resolve(_, args, ctx) {
-    return ctx.prisma.member.findUnique({
-      where: {
-        id: args.id,
-      },
-    });
+    if (args.id) {
+      return ctx.prisma.member.findUnique({
+        where: {
+          id: args.id,
+        },
+      });
+    } else if (args.pathname) {
+      return ctx.prisma.member.findUnique({
+        where: {
+          pathname: args.pathname,
+        },
+      });
+    } else {
+      throw new Error('id or pathname required');
+    }
   },
 });
 
@@ -169,6 +183,35 @@ export const UpdateMembers = mutationField('updateMembers', {
           joinedAt: 'asc',
         },
       ],
+    });
+  },
+});
+
+export const UpdateMemberMutationInput = inputObjectType({
+  name: 'UpdateMemberMutationInput',
+  definition(t) {
+    t.nonNull.string('id');
+    t.string('trainerId', { default: undefined });
+  },
+});
+export const UpdateMember = mutationField('updateMember', {
+  type: nonNull(Member),
+  args: {
+    input: nonNull(UpdateMemberMutationInput),
+  },
+  async resolve(parent, { input }, { prisma, user }) {
+    const { id } = input;
+    if (!user?.isAdmin || id != user.id) {
+      throw new Error('Cannot modify other member.');
+    }
+    const member = await prisma.member.findUnique({ where: { id } });
+    if (!member) {
+      throw new Error(`Member id ${id} not found.`);
+    }
+
+    return await prisma.member.update({
+      where: { id },
+      data: input,
     });
   },
 });
