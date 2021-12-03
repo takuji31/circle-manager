@@ -23,10 +23,7 @@ export default NextAuth({
   ],
   secret: process.env.SECRET,
   session: {
-    jwt: true,
-  },
-  jwt: {
-    signingKey: process.env.NEXTAUTH_SIGNING_KEY,
+    strategy: 'jwt',
   },
   debug: true,
   callbacks: {
