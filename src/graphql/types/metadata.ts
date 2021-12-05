@@ -1,6 +1,5 @@
 import { Circles } from './../../model/circle';
-import { objectType, queryType, nonNull, queryField } from 'nexus';
-import exp from 'constants';
+import { objectType } from 'nexus';
 export const SiteMetadata = objectType({
   name: 'SiteMetadata',
   definition(t) {
@@ -28,12 +27,5 @@ export const SiteMetadata = objectType({
         });
       },
     });
-  },
-});
-
-export const SiteMetadataQuery = queryField('siteMetadata', {
-  type: nonNull(SiteMetadata),
-  resolve() {
-    return {};
   },
 });

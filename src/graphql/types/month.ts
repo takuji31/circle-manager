@@ -1,7 +1,7 @@
 import { Context } from './../context';
-import { nextMonth, thisMonth } from '../../model';
-import { objectType, queryField, nonNull } from 'nexus';
+import { nonNull, objectType } from 'nexus';
 import { MonthSurvey } from './month_survey';
+
 export const Month = objectType({
   name: 'Month',
   definition(t) {
@@ -27,16 +27,11 @@ export const Month = objectType({
   },
 });
 
-export const NextMonthQuery = queryField('nextMonth', {
-  type: nonNull(Month),
-  resolve(_parent, _args, _ctx) {
-    return { ...nextMonth() };
-  },
-});
-
-export const ThisMonthQuery = queryField('thisMonth', {
-  type: nonNull(Month),
-  resolve(_parent, _args, _ctx) {
-    return { ...thisMonth() };
+export const CreateNextMonthSurveyPayload = objectType({
+  name: 'CreateNextMonthSurveyPayload',
+  definition(t) {
+    t.field('nextMonth', {
+      type: nonNull(Month),
+    });
   },
 });
