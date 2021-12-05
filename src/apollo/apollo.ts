@@ -3,30 +3,27 @@ import { useMemo } from 'react';
 import { ApolloClient, InMemoryCache } from '@apollo/client';
 import { NormalizedCacheObject } from '@apollo/client/cache/inmemory/types';
 import { SchemaLink } from '@apollo/client/link/schema';
+import { HttpLink } from '@apollo/client/link/http';
 
 interface PageProps {
   props?: Record<string, any>;
 }
 
 let apolloClient: ApolloClient<NormalizedCacheObject> | null = null;
+const isSSR = typeof window === 'undefined';
 
 function createIsomorphLink() {
-  if (typeof window === 'undefined') {
-    const { schema } = require('../graphql');
-    const { createContext } = require('../graphql/context');
-    return new SchemaLink({ schema, context: createContext });
-  } else {
-    const { HttpLink } = require('@apollo/client/link/http');
-    return new HttpLink({
-      uri: '/api/graphql',
-      credentials: 'same-origin',
-    });
-  }
+  return new HttpLink({
+    uri:
+      (isSSR ? `http://localhost:${process.env.PORT ?? 3000}` : '') +
+      '/api/graphql',
+    credentials: 'same-origin',
+  });
 }
 
 function createApolloClient() {
   return new ApolloClient({
-    ssrMode: typeof window === 'undefined',
+    ssrMode: isSSR,
     link: createIsomorphLink(),
     cache: new InMemoryCache({
       typePolicies: {
