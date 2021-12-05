@@ -1,32 +1,25 @@
 import { LoadingButton } from '@mui/lab';
 import {
   Box,
-  Button,
-  Container,
-  FormControl,
   Grid,
-  Paper,
   Stack,
-  Step,
-  StepLabel,
-  Stepper,
   TextField,
   ToggleButton,
   ToggleButtonGroup,
   Typography,
 } from '@mui/material';
-import { GetServerSideProps, NextPage } from 'next';
+import { GetServerSideProps } from 'next';
 import React from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import Layout from '../../../../components/layout';
-import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { setLocale } from 'yup';
 import * as ja from 'yup-locale-ja';
-import CircleSelector from '../../../../components/circle_selector';
 import { getCircleName } from '../../../../model';
 import { PageSetupComp, ssrSetup } from '../../../../apollo/page';
 import { useUpdateSetupMutation } from '../../../../apollo';
+
+const { yupResolver } = require('@hookform/resolvers/yup/dist/yup.umd');
 
 setLocale(ja.suggestive);
 
