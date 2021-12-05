@@ -46,7 +46,7 @@ export default function MemberMonthCircle({
               {circles.map((circle) => (
                 <ToggleButton
                   value={circle.id}
-                  key={`month_circle_toggle_${circle.id}`}
+                  key={circle.id}
                   onClick={() => {
                     mutation({
                       variables: {

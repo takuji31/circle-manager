@@ -21,6 +21,12 @@ type Circle {
   selectableInSurvey: Boolean!
 }
 
+enum CircleFilter {
+  All
+  CircleSelect
+  MonthSurvey
+}
+
 enum CircleRole {
   Leader
   Member
@@ -53,6 +59,8 @@ type Member {
   name: String!
   nextMonthCircle: MonthCircle
   pathname: String!
+  setupCompleted: Boolean!
+  signUp: SignUp
   thisMonthCircle: MonthCircle
   trainerId: String
 }
@@ -93,11 +101,11 @@ type Mutation {
   updateMemberMonthCircle(circleId: String!, memberId: String!, month: String!, year: String!): UpdateMemberMonthCirclePayload
   updateMembers: [Member!]!
   updateMonthCircle(data: UpdateMonthCircleMutationInput!): UpdateMemberMonthCirclePayload
-  updateSignUp(invited: Boolean, joined: Boolean, memberId: String!): SignUp!
+  updateSignUp(input: UpdateSignUpMutationInput!): SignUp!
 }
 
 type Query {
-  circles: [Circle!]!
+  circles(filter: CircleFilter = All): [Circle!]!
   member(id: String, pathname: String): Member
   members: [Member!]!
   monthCircle(monthCircleId: String!): MonthCircle
@@ -131,7 +139,8 @@ type UpdateMemberMonthCirclePayload {
 
 input UpdateMemberMutationInput {
   id: String!
-  trainerId: String
+  name: String = null
+  trainerId: String = null
 }
 
 input UpdateMonthCircleMutationInput {
@@ -139,4 +148,11 @@ input UpdateMonthCircleMutationInput {
   invited: Boolean = null
   joined: Boolean = null
   kicked: Boolean = null
+}
+
+input UpdateSignUpMutationInput {
+  circleId: String = null
+  invited: Boolean = null
+  joined: Boolean = null
+  memberId: String!
 }

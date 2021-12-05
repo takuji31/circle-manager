@@ -1,0 +1,18 @@
+query Setup($pathname: String!) {
+  member(pathname: $pathname) {
+    id
+    name
+    trainerId
+    signUp {
+      id
+      circle {
+        ...ListedCircle
+      }
+      invited
+      joined
+    }
+  }
+  circles(filter: CircleSelect) {
+    ...ListedCircle
+  }
+}

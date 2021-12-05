@@ -1,0 +1,13 @@
+mutation UpdateSetup(
+  $memberId: String!
+  $circleId: String!
+  $trainerId: String!
+  $name: String!
+) {
+  updateSignUp(input: { memberId: $memberId, circleId: $circleId }) {
+    ...ListedSignUp
+  }
+  updateMember(input: { id: $memberId, trainerId: $trainerId, name: $name }) {
+    ...FullMember
+  }
+}

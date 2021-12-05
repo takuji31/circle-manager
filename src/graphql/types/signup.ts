@@ -1,3 +1,4 @@
+import { Circles } from './../../model/circle';
 import { Routes } from 'discord-api-types/v9';
 import {
   objectType,
@@ -7,6 +8,7 @@ import {
   mutationField,
   stringArg,
   booleanArg,
+  inputObjectType,
 } from 'nexus';
 import { SignUp as T } from 'nexus-prisma';
 import { createDiscordRestClient } from '../../discord';
@@ -33,32 +35,37 @@ export const SignUps = queryField('signUps', {
   },
 });
 
+export const UpdateSignUpMutationInput = inputObjectType({
+  name: 'UpdateSignUpMutationInput',
+  definition(t) {
+    t.nonNull.string('memberId');
+    t.string('circleId', { default: null });
+    t.boolean('invited', { default: null });
+    t.boolean('joined', { default: null });
+  },
+});
+
 export const UpdateSignUpMutation = mutationField('updateSignUp', {
   type: nonNull(SignUp),
   args: {
-    memberId: nonNull(stringArg()),
-    invited: booleanArg(),
-    joined: booleanArg(),
+    input: nonNull(UpdateSignUpMutationInput.asArg()),
   },
-  async resolve(_, { memberId, invited, joined }, ctx) {
+  async resolve(
+    _,
+    { input: { memberId, circleId: circleIdOrNull, invited, joined } },
+    ctx
+  ) {
     const signUp = await ctx.prisma.signUp.findUnique({
       where: { id: memberId },
     });
-    if (!signUp) {
+
+    if (!signUp && !circleIdOrNull) {
       throw new Error('Not found');
     }
 
-    const data: { invited?: boolean; joined?: boolean } = {};
+    const circleId = circleIdOrNull ?? signUp?.circleId;
 
-    if (invited != null) {
-      data.invited = invited;
-    }
-    if (joined != null) {
-      data.joined = joined;
-    }
-
-    const circleId = signUp.circleId;
-    if (joined) {
+    if (joined && circleId) {
       try {
         if (process.env.NODE_ENV != 'production') {
           throw new Error('Update role ignored in develop');
@@ -80,9 +87,19 @@ export const UpdateSignUpMutation = mutationField('updateSignUp', {
       });
     }
 
-    return await ctx.prisma.signUp.update({
+    const data = {
+      invited: invited ?? undefined,
+      joined: joined ?? undefined,
+    };
+
+    return await ctx.prisma.signUp.upsert({
       where: { id: memberId },
-      data: data,
+      create: {
+        id: memberId,
+        circleId: circleId ?? Circles.specialIds.noAnswer,
+        ...data,
+      },
+      update: data,
     });
   },
 });

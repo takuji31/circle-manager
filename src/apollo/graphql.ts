@@ -39,6 +39,12 @@ export type Circle = {
   selectableInSurvey: Scalars['Boolean'];
 };
 
+export enum CircleFilter {
+  All = 'All',
+  CircleSelect = 'CircleSelect',
+  MonthSurvey = 'MonthSurvey'
+}
+
 export enum CircleRole {
   Leader = 'Leader',
   Member = 'Member',
@@ -60,6 +66,8 @@ export type Member = {
   name: Scalars['String'];
   nextMonthCircle?: Maybe<MonthCircle>;
   pathname: Scalars['String'];
+  setupCompleted: Scalars['Boolean'];
+  signUp?: Maybe<SignUp>;
   thisMonthCircle?: Maybe<MonthCircle>;
   trainerId?: Maybe<Scalars['String']>;
 };
@@ -126,9 +134,7 @@ export type MutationUpdateMonthCircleArgs = {
 
 
 export type MutationUpdateSignUpArgs = {
-  invited?: Maybe<Scalars['Boolean']>;
-  joined?: Maybe<Scalars['Boolean']>;
-  memberId: Scalars['String'];
+  input: UpdateSignUpMutationInput;
 };
 
 export type Query = {
@@ -142,6 +148,11 @@ export type Query = {
   signUps: Array<SignUp>;
   siteMetadata: SiteMetadata;
   thisMonth: Month;
+};
+
+
+export type QueryCirclesArgs = {
+  filter?: Maybe<CircleFilter>;
 };
 
 
@@ -186,6 +197,7 @@ export type UpdateMemberMonthCirclePayload = {
 
 export type UpdateMemberMutationInput = {
   id: Scalars['String'];
+  name?: Maybe<Scalars['String']>;
   trainerId?: Maybe<Scalars['String']>;
 };
 
@@ -194,6 +206,13 @@ export type UpdateMonthCircleMutationInput = {
   invited?: Maybe<Scalars['Boolean']>;
   joined?: Maybe<Scalars['Boolean']>;
   kicked?: Maybe<Scalars['Boolean']>;
+};
+
+export type UpdateSignUpMutationInput = {
+  circleId?: Maybe<Scalars['String']>;
+  invited?: Maybe<Scalars['Boolean']>;
+  joined?: Maybe<Scalars['Boolean']>;
+  memberId: Scalars['String'];
 };
 
 export type ListedCircleFragment = { __typename?: 'Circle', id: string, name: string };
@@ -244,6 +263,15 @@ export type UpdateMonthCircleMutationVariables = Exact<{
 
 export type UpdateMonthCircleMutation = { __typename?: 'Mutation', updateMonthCircle?: { __typename?: 'UpdateMemberMonthCirclePayload', monthCircle: { __typename?: 'MonthCircle', kicked: boolean, invited: boolean, joined: boolean, id: string, year: string, month: string, currentCircle: { __typename?: 'Circle', id: string, name: string }, member: { __typename?: 'Member', id: string, name: string, trainerId?: string | null | undefined, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined }, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined } } | null | undefined };
 
+export type UpdateSetupMutationVariables = Exact<{
+  memberId: Scalars['String'];
+  circleId: Scalars['String'];
+  trainerId: Scalars['String'];
+}>;
+
+
+export type UpdateSetupMutation = { __typename?: 'Mutation', updateSignUp: { __typename?: 'SignUp', id: string, invited: boolean, joined: boolean, member: { __typename?: 'Member', id: string, name: string, trainerId?: string | null | undefined }, circle: { __typename?: 'Circle', id: string, name: string } }, updateMember: { __typename?: 'Member', id: string, pathname: string, name: string, trainerId?: string | null | undefined, circleRole: CircleRole, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined } };
+
 export type UpdateSignUpMutationVariables = Exact<{
   memberId: Scalars['String'];
   invited?: Maybe<Scalars['Boolean']>;
@@ -291,6 +319,13 @@ export type MonthCircleQueryVariables = Exact<{
 
 
 export type MonthCircleQuery = { __typename?: 'Query', monthCircle?: { __typename?: 'MonthCircle', id: string, year: string, month: string, member: { __typename?: 'Member', id: string, name: string }, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined } | null | undefined, circles: Array<{ __typename?: 'Circle', id: string, name: string }> };
+
+export type SetupQueryVariables = Exact<{
+  pathname: Scalars['String'];
+}>;
+
+
+export type SetupQuery = { __typename?: 'Query', member?: { __typename?: 'Member', id: string, name: string, trainerId?: string | null | undefined, signUp?: { __typename?: 'SignUp', id: string, invited: boolean, joined: boolean, circle: { __typename?: 'Circle', id: string, name: string } } | null | undefined } | null | undefined, circles: Array<{ __typename?: 'Circle', id: string, name: string }> };
 
 export const FullMemberFragmentDoc = gql`
     fragment FullMember on Member {
@@ -582,9 +617,48 @@ export function useUpdateMonthCircleMutation(baseOptions?: Apollo.MutationHookOp
 export type UpdateMonthCircleMutationHookResult = ReturnType<typeof useUpdateMonthCircleMutation>;
 export type UpdateMonthCircleMutationResult = Apollo.MutationResult<UpdateMonthCircleMutation>;
 export type UpdateMonthCircleMutationOptions = Apollo.BaseMutationOptions<UpdateMonthCircleMutation, UpdateMonthCircleMutationVariables>;
+export const UpdateSetupDocument = gql`
+    mutation UpdateSetup($memberId: String!, $circleId: String!, $trainerId: String!) {
+  updateSignUp(input: {memberId: $memberId, circleId: $circleId}) {
+    ...ListedSignUp
+  }
+  updateMember(input: {id: $memberId, trainerId: $trainerId}) {
+    ...FullMember
+  }
+}
+    ${ListedSignUpFragmentDoc}
+${FullMemberFragmentDoc}`;
+export type UpdateSetupMutationFn = Apollo.MutationFunction<UpdateSetupMutation, UpdateSetupMutationVariables>;
+
+/**
+ * __useUpdateSetupMutation__
+ *
+ * To run a mutation, you first call `useUpdateSetupMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateSetupMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateSetupMutation, { data, loading, error }] = useUpdateSetupMutation({
+ *   variables: {
+ *      memberId: // value for 'memberId'
+ *      circleId: // value for 'circleId'
+ *      trainerId: // value for 'trainerId'
+ *   },
+ * });
+ */
+export function useUpdateSetupMutation(baseOptions?: Apollo.MutationHookOptions<UpdateSetupMutation, UpdateSetupMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateSetupMutation, UpdateSetupMutationVariables>(UpdateSetupDocument, options);
+      }
+export type UpdateSetupMutationHookResult = ReturnType<typeof useUpdateSetupMutation>;
+export type UpdateSetupMutationResult = Apollo.MutationResult<UpdateSetupMutation>;
+export type UpdateSetupMutationOptions = Apollo.BaseMutationOptions<UpdateSetupMutation, UpdateSetupMutationVariables>;
 export const UpdateSignUpDocument = gql`
     mutation UpdateSignUp($memberId: String!, $invited: Boolean, $joined: Boolean) {
-  updateSignUp(memberId: $memberId, invited: $invited, joined: $joined) {
+  updateSignUp(input: {memberId: $memberId, invited: $invited, joined: $joined}) {
     ...ListedSignUp
   }
 }
@@ -900,6 +974,54 @@ export function useMonthCircleLazyQuery(baseOptions?: Apollo.LazyQueryHookOption
 export type MonthCircleQueryHookResult = ReturnType<typeof useMonthCircleQuery>;
 export type MonthCircleLazyQueryHookResult = ReturnType<typeof useMonthCircleLazyQuery>;
 export type MonthCircleQueryResult = Apollo.QueryResult<MonthCircleQuery, MonthCircleQueryVariables>;
+export const SetupDocument = gql`
+    query Setup($pathname: String!) {
+  member(pathname: $pathname) {
+    id
+    name
+    trainerId
+    signUp {
+      id
+      circle {
+        ...ListedCircle
+      }
+      invited
+      joined
+    }
+  }
+  circles(filter: CircleSelect) {
+    ...ListedCircle
+  }
+}
+    ${ListedCircleFragmentDoc}`;
+
+/**
+ * __useSetupQuery__
+ *
+ * To run a query within a React component, call `useSetupQuery` and pass it any options that fit your needs.
+ * When your component renders, `useSetupQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useSetupQuery({
+ *   variables: {
+ *      pathname: // value for 'pathname'
+ *   },
+ * });
+ */
+export function useSetupQuery(baseOptions: Apollo.QueryHookOptions<SetupQuery, SetupQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<SetupQuery, SetupQueryVariables>(SetupDocument, options);
+      }
+export function useSetupLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<SetupQuery, SetupQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<SetupQuery, SetupQueryVariables>(SetupDocument, options);
+        }
+export type SetupQueryHookResult = ReturnType<typeof useSetupQuery>;
+export type SetupLazyQueryHookResult = ReturnType<typeof useSetupLazyQuery>;
+export type SetupQueryResult = Apollo.QueryResult<SetupQuery, SetupQueryVariables>;
 export type CircleKeySpecifier = ('id' | 'members' | 'name' | 'order' | 'selectableByAdmin' | 'selectableByUser' | 'selectableInSurvey' | CircleKeySpecifier)[];
 export type CircleFieldPolicy = {
 	id?: FieldPolicy<any> | FieldReadFunction<any>,
@@ -914,7 +1036,7 @@ export type CreateNextMonthSurveyPayloadKeySpecifier = ('nextMonth' | CreateNext
 export type CreateNextMonthSurveyPayloadFieldPolicy = {
 	nextMonth?: FieldPolicy<any> | FieldReadFunction<any>
 };
-export type MemberKeySpecifier = ('circle' | 'circleRole' | 'id' | 'joinedAt' | 'leavedAt' | 'name' | 'nextMonthCircle' | 'pathname' | 'thisMonthCircle' | 'trainerId' | MemberKeySpecifier)[];
+export type MemberKeySpecifier = ('circle' | 'circleRole' | 'id' | 'joinedAt' | 'leavedAt' | 'name' | 'nextMonthCircle' | 'pathname' | 'setupCompleted' | 'signUp' | 'thisMonthCircle' | 'trainerId' | MemberKeySpecifier)[];
 export type MemberFieldPolicy = {
 	circle?: FieldPolicy<any> | FieldReadFunction<any>,
 	circleRole?: FieldPolicy<any> | FieldReadFunction<any>,
@@ -924,6 +1046,8 @@ export type MemberFieldPolicy = {
 	name?: FieldPolicy<any> | FieldReadFunction<any>,
 	nextMonthCircle?: FieldPolicy<any> | FieldReadFunction<any>,
 	pathname?: FieldPolicy<any> | FieldReadFunction<any>,
+	setupCompleted?: FieldPolicy<any> | FieldReadFunction<any>,
+	signUp?: FieldPolicy<any> | FieldReadFunction<any>,
 	thisMonthCircle?: FieldPolicy<any> | FieldReadFunction<any>,
 	trainerId?: FieldPolicy<any> | FieldReadFunction<any>
 };

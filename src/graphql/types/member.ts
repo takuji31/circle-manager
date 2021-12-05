@@ -1,3 +1,4 @@
+import { PrismaPromise } from '.prisma/client';
 import { prisma } from './../../database/prisma';
 import { nextMonth, thisMonth, Guild } from '../../model';
 import * as Nexus from 'nexus-prisma';
@@ -12,7 +13,7 @@ import {
   queryField,
   stringArg,
 } from 'nexus';
-import { MonthCircle } from '.';
+import { MonthCircle, SignUp } from '.';
 import { createDiscordRestClient } from '../../discord';
 import { RESTGetAPIGuildMembersResult, Routes } from 'discord-api-types/v9';
 import { CircleRole as PrismaCircleRole } from '@prisma/client';
@@ -27,6 +28,7 @@ export const Member = objectType({
     t.field(m.circleRole);
     t.field(m.name);
     t.field(m.trainerId);
+    t.field(m.setupCompleted);
     t.field(m.joinedAt);
     t.field(m.leavedAt);
     t.field(m.circle);
@@ -52,6 +54,16 @@ export const Member = objectType({
               ...nextMonth(),
               memberId: parent.id,
             },
+          },
+        });
+      },
+    });
+    t.field('signUp', {
+      type: SignUp,
+      resolve(parent, _, ctx) {
+        return ctx.prisma.signUp.findUnique({
+          where: {
+            id: parent.id,
           },
         });
       },
@@ -191,7 +203,8 @@ export const UpdateMemberMutationInput = inputObjectType({
   name: 'UpdateMemberMutationInput',
   definition(t) {
     t.nonNull.string('id');
-    t.string('trainerId', { default: undefined });
+    t.string('trainerId', { default: null });
+    t.string('name', { default: null });
   },
 });
 export const UpdateMember = mutationField('updateMember', {
@@ -199,8 +212,7 @@ export const UpdateMember = mutationField('updateMember', {
   args: {
     input: nonNull(UpdateMemberMutationInput),
   },
-  async resolve(parent, { input }, { prisma, user }) {
-    const { id } = input;
+  async resolve(_, { input: { id, name, trainerId } }, { prisma, user }) {
     if (!user?.isAdmin && id != user?.id) {
       throw new Error('Cannot modify other member.');
     }
@@ -209,9 +221,15 @@ export const UpdateMember = mutationField('updateMember', {
       throw new Error(`Member id ${id} not found.`);
     }
 
+    const transactions: Array<PrismaPromise<any>> = [];
+
     return await prisma.member.update({
       where: { id },
-      data: input,
+      data: {
+        id,
+        name: name ?? undefined,
+        trainerId: trainerId ?? undefined,
+      },
     });
   },
 });

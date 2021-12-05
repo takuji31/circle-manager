@@ -13,6 +13,7 @@ import { getApolloClient , Context} from '../apollo';
 
 
 
+
 export async function getServerPageAdminMembers
     (options: Omit<Apollo.QueryOptions<Types.AdminMembersQueryVariables>, 'query'>, ctx?: Context ){
         const apolloClient = getApolloClient(ctx);
@@ -222,4 +223,39 @@ export const ssrMonthCircle = {
       getServerPage: getServerPageMonthCircle,
       withPage: withPageMonthCircle,
       usePage: useMonthCircle,
+    }
+export async function getServerPageSetup
+    (options: Omit<Apollo.QueryOptions<Types.SetupQueryVariables>, 'query'>, ctx?: Context ){
+        const apolloClient = getApolloClient(ctx);
+        
+        const data = await apolloClient.query<Types.SetupQuery>({ ...options, query: Operations.SetupDocument });
+        
+        const apolloState = apolloClient.cache.extract();
+
+        return {
+            props: {
+                apolloState: apolloState,
+                data: data?.data,
+                error: data?.error ?? data?.errors ?? null,
+            },
+        };
+      }
+export const useSetup = (
+  optionsFunc?: (router: NextRouter)=> QueryHookOptions<Types.SetupQuery, Types.SetupQueryVariables>) => {
+  const router = useRouter();
+  const options = optionsFunc ? optionsFunc(router) : {};
+  return useQuery(Operations.SetupDocument, options);
+};
+export type PageSetupComp = React.FC<{data?: Types.SetupQuery, error?: Apollo.ApolloError}>;
+export const withPageSetup = (optionsFunc?: (router: NextRouter)=> QueryHookOptions<Types.SetupQuery, Types.SetupQueryVariables>) => (WrappedComponent:PageSetupComp) : NextPage  => (props) => {
+                const router = useRouter()
+                const options = optionsFunc ? optionsFunc(router) : {};
+                const {data, error } = useQuery(Operations.SetupDocument, options)    
+                return <WrappedComponent {...props} data={data} error={error} /> ;
+                   
+            }; 
+export const ssrSetup = {
+      getServerPage: getServerPageSetup,
+      withPage: withPageSetup,
+      usePage: useSetup,
     }
