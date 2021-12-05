@@ -198,6 +198,7 @@ export type UpdateMemberMonthCirclePayload = {
 export type UpdateMemberMutationInput = {
   id: Scalars['String'];
   name?: Maybe<Scalars['String']>;
+  setupCompleted?: Maybe<Scalars['Boolean']>;
   trainerId?: Maybe<Scalars['String']>;
 };
 
@@ -221,7 +222,7 @@ export type MemberMonthCircleFragment = { __typename?: 'MonthCircle', id: string
 
 export type ListedMemberFragment = { __typename?: 'Member', id: string, name: string, trainerId?: string | null | undefined };
 
-export type FullMemberFragment = { __typename?: 'Member', id: string, pathname: string, name: string, trainerId?: string | null | undefined, circleRole: CircleRole, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined };
+export type FullMemberFragment = { __typename?: 'Member', id: string, pathname: string, name: string, trainerId?: string | null | undefined, setupCompleted: boolean, circleRole: CircleRole, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined };
 
 export type MonthAndSurveyFragment = { __typename?: 'Month', year: string, month: string, survey?: { __typename?: 'MonthSurvey', id: string, year: string, month: string, expiredAt: any } | null | undefined };
 
@@ -249,7 +250,7 @@ export type UpdateMemberMutationVariables = Exact<{
 }>;
 
 
-export type UpdateMemberMutation = { __typename?: 'Mutation', updateMember: { __typename?: 'Member', id: string, pathname: string, name: string, trainerId?: string | null | undefined, circleRole: CircleRole, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined } };
+export type UpdateMemberMutation = { __typename?: 'Mutation', updateMember: { __typename?: 'Member', id: string, pathname: string, name: string, trainerId?: string | null | undefined, setupCompleted: boolean, circleRole: CircleRole, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined } };
 
 export type UpdateMembersMutationVariables = Exact<{ [key: string]: never; }>;
 
@@ -267,10 +268,11 @@ export type UpdateSetupMutationVariables = Exact<{
   memberId: Scalars['String'];
   circleId: Scalars['String'];
   trainerId: Scalars['String'];
+  name: Scalars['String'];
 }>;
 
 
-export type UpdateSetupMutation = { __typename?: 'Mutation', updateSignUp: { __typename?: 'SignUp', id: string, invited: boolean, joined: boolean, member: { __typename?: 'Member', id: string, name: string, trainerId?: string | null | undefined }, circle: { __typename?: 'Circle', id: string, name: string } }, updateMember: { __typename?: 'Member', id: string, pathname: string, name: string, trainerId?: string | null | undefined, circleRole: CircleRole, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined } };
+export type UpdateSetupMutation = { __typename?: 'Mutation', updateSignUp: { __typename?: 'SignUp', id: string, invited: boolean, joined: boolean, member: { __typename?: 'Member', id: string, name: string, trainerId?: string | null | undefined }, circle: { __typename?: 'Circle', id: string, name: string } }, updateMember: { __typename?: 'Member', id: string, pathname: string, name: string, trainerId?: string | null | undefined, setupCompleted: boolean, circleRole: CircleRole, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined } };
 
 export type UpdateSignUpMutationVariables = Exact<{
   memberId: Scalars['String'];
@@ -311,7 +313,7 @@ export type MemberByPathnameQueryVariables = Exact<{
 }>;
 
 
-export type MemberByPathnameQuery = { __typename?: 'Query', member?: { __typename?: 'Member', id: string, pathname: string, name: string, trainerId?: string | null | undefined, circleRole: CircleRole, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined } | null | undefined };
+export type MemberByPathnameQuery = { __typename?: 'Query', member?: { __typename?: 'Member', id: string, pathname: string, name: string, trainerId?: string | null | undefined, setupCompleted: boolean, circleRole: CircleRole, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined } | null | undefined };
 
 export type MonthCircleQueryVariables = Exact<{
   monthCircleId: Scalars['String'];
@@ -325,7 +327,7 @@ export type SetupQueryVariables = Exact<{
 }>;
 
 
-export type SetupQuery = { __typename?: 'Query', member?: { __typename?: 'Member', id: string, name: string, trainerId?: string | null | undefined, signUp?: { __typename?: 'SignUp', id: string, invited: boolean, joined: boolean, circle: { __typename?: 'Circle', id: string, name: string } } | null | undefined } | null | undefined, circles: Array<{ __typename?: 'Circle', id: string, name: string }> };
+export type SetupQuery = { __typename?: 'Query', member?: { __typename?: 'Member', id: string, pathname: string, name: string, trainerId?: string | null | undefined, setupCompleted: boolean, circleRole: CircleRole, signUp?: { __typename?: 'SignUp', id: string, invited: boolean, joined: boolean, circle: { __typename?: 'Circle', id: string, name: string } } | null | undefined, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined } | null | undefined, circles: Array<{ __typename?: 'Circle', id: string, name: string }> };
 
 export const FullMemberFragmentDoc = gql`
     fragment FullMember on Member {
@@ -333,6 +335,7 @@ export const FullMemberFragmentDoc = gql`
   pathname
   name
   trainerId
+  setupCompleted
   circle {
     id
     name
@@ -618,11 +621,13 @@ export type UpdateMonthCircleMutationHookResult = ReturnType<typeof useUpdateMon
 export type UpdateMonthCircleMutationResult = Apollo.MutationResult<UpdateMonthCircleMutation>;
 export type UpdateMonthCircleMutationOptions = Apollo.BaseMutationOptions<UpdateMonthCircleMutation, UpdateMonthCircleMutationVariables>;
 export const UpdateSetupDocument = gql`
-    mutation UpdateSetup($memberId: String!, $circleId: String!, $trainerId: String!) {
+    mutation UpdateSetup($memberId: String!, $circleId: String!, $trainerId: String!, $name: String!) {
   updateSignUp(input: {memberId: $memberId, circleId: $circleId}) {
     ...ListedSignUp
   }
-  updateMember(input: {id: $memberId, trainerId: $trainerId}) {
+  updateMember(
+    input: {id: $memberId, trainerId: $trainerId, name: $name, setupCompleted: true}
+  ) {
     ...FullMember
   }
 }
@@ -646,6 +651,7 @@ export type UpdateSetupMutationFn = Apollo.MutationFunction<UpdateSetupMutation,
  *      memberId: // value for 'memberId'
  *      circleId: // value for 'circleId'
  *      trainerId: // value for 'trainerId'
+ *      name: // value for 'name'
  *   },
  * });
  */
@@ -977,9 +983,7 @@ export type MonthCircleQueryResult = Apollo.QueryResult<MonthCircleQuery, MonthC
 export const SetupDocument = gql`
     query Setup($pathname: String!) {
   member(pathname: $pathname) {
-    id
-    name
-    trainerId
+    ...FullMember
     signUp {
       id
       circle {
@@ -993,7 +997,8 @@ export const SetupDocument = gql`
     ...ListedCircle
   }
 }
-    ${ListedCircleFragmentDoc}`;
+    ${FullMemberFragmentDoc}
+${ListedCircleFragmentDoc}`;
 
 /**
  * __useSetupQuery__

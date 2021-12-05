@@ -7,7 +7,14 @@ mutation UpdateSetup(
   updateSignUp(input: { memberId: $memberId, circleId: $circleId }) {
     ...ListedSignUp
   }
-  updateMember(input: { id: $memberId, trainerId: $trainerId, name: $name }) {
+  updateMember(
+    input: {
+      id: $memberId
+      trainerId: $trainerId
+      name: $name
+      setupCompleted: true
+    }
+  ) {
     ...FullMember
   }
 }

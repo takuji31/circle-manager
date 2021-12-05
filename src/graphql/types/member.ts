@@ -205,6 +205,7 @@ export const UpdateMemberMutationInput = inputObjectType({
     t.nonNull.string('id');
     t.string('trainerId', { default: null });
     t.string('name', { default: null });
+    t.boolean('setupCompleted', { default: null });
   },
 });
 export const UpdateMember = mutationField('updateMember', {
@@ -212,7 +213,11 @@ export const UpdateMember = mutationField('updateMember', {
   args: {
     input: nonNull(UpdateMemberMutationInput),
   },
-  async resolve(_, { input: { id, name, trainerId } }, { prisma, user }) {
+  async resolve(
+    _,
+    { input: { id, name, trainerId, setupCompleted } },
+    { prisma, user }
+  ) {
     if (!user?.isAdmin && id != user?.id) {
       throw new Error('Cannot modify other member.');
     }
@@ -229,6 +234,7 @@ export const UpdateMember = mutationField('updateMember', {
         id,
         name: name ?? undefined,
         trainerId: trainerId ?? undefined,
+        setupCompleted: setupCompleted ?? undefined,
       },
     });
   },

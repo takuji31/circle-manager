@@ -1,8 +1,6 @@
 query Setup($pathname: String!) {
   member(pathname: $pathname) {
-    id
-    name
-    trainerId
+    ...FullMember
     signUp {
       id
       circle {

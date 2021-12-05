@@ -19,6 +19,7 @@ fragment FullMember on Member {
   pathname
   name
   trainerId
+  setupCompleted
   circle {
     id
     name

@@ -83,115 +83,122 @@ const Setup: PageSetupComp = ({ data, error }) => {
   return (
     <Layout title="初期設定">
       <Stack p={2} sx={{ maxWidth: '600pt' }}>
-        <FormControl>
+        {member.setupCompleted && (
           <Typography variant="body1">
-            ウマ娘愛好会グループへようこそ。こちらでサークル加入に必要な情報を入力していただきます。
-            <br />
-            不明な点はDiscordの #サポート で気軽にお問い合わせください。
+            初期設定が完了しました。この画面を閉じてDiscordに戻って引き続きお楽しみください！
           </Typography>
-          <Box
-            component="form"
-            onSubmit={handleSubmit(formHandler, (e) => {
-              console.log(e);
-            })}
-            sx={{ mt: 3 }}
-          >
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <Controller
-                  name="circleId"
-                  control={control}
-                  defaultValue={member.signUp?.circle.id}
-                  render={({ field, fieldState }) => {
-                    return (
-                      <Stack spacing={2}>
-                        <Typography variant="body1">
-                          加入予定のサークル
-                        </Typography>
-                        <ToggleButtonGroup value={field.value}>
-                          {circles.map((circle) => (
-                            <ToggleButton
-                              value={circle.id}
-                              key={circle.id}
-                              onClick={() => {
-                                setValue('circleId', circle.id);
-                              }}
-                            >
-                              {getCircleName(circle)}
-                            </ToggleButton>
-                          ))}
-                        </ToggleButtonGroup>
-                        {fieldState.error && (
-                          <Typography variant="caption" color="error">
-                            {fieldState.error.message}
+        )}
+        {!member.setupCompleted && (
+          <>
+            <Typography variant="body1">
+              ウマ娘愛好会グループへようこそ。こちらでサークル加入に必要な情報を入力していただきます。
+              <br />
+              不明な点はDiscordの #サポート で気軽にお問い合わせください。
+            </Typography>
+            <Box
+              component="form"
+              onSubmit={handleSubmit(formHandler, (e) => {
+                console.log(e);
+              })}
+              sx={{ mt: 3 }}
+            >
+              <Grid container spacing={2}>
+                <Grid item xs={12}>
+                  <Controller
+                    name="circleId"
+                    control={control}
+                    defaultValue={member.signUp?.circle.id}
+                    render={({ field, fieldState }) => {
+                      return (
+                        <Stack spacing={2}>
+                          <Typography variant="body1">
+                            加入予定のサークル
                           </Typography>
-                        )}
-                      </Stack>
-                    );
-                  }}
-                  rules={{ required: true }}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <Controller
-                  name="name"
-                  control={control}
-                  defaultValue={member.name}
-                  render={({ field }) => {
-                    return (
-                      <TextField
-                        label="トレーナー名"
-                        helperText={
-                          errors.name?.message ??
-                          '円滑な運営のためにサーバーニックネームをトレーナー名に変更します。Discordのユーザー名には影響はありません。'
-                        }
-                        {...field}
-                        error={!!errors.name?.message}
-                        variant="standard"
-                        sx={{ width: '100%' }}
-                      />
-                    );
-                  }}
-                  rules={{ required: true }}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <Controller
-                  name="trainerId"
-                  control={control}
-                  defaultValue={member.trainerId ?? ''}
-                  render={({ field }) => {
-                    return (
-                      <TextField
-                        label="トレーナーID"
-                        helperText={
-                          errors.trainerId?.message ??
-                          '加入手続きや姉妹サークルへの移籍を行うために必要です。ゲームのプロフィール画面から「IDコピー」でコピーした値を貼り付けてください。'
-                        }
-                        {...field}
-                        error={!!errors.trainerId?.message}
-                        variant="standard"
-                        sx={{ width: '100%' }}
-                      />
-                    );
-                  }}
-                  rules={{ required: true }}
-                />
-              </Grid>
-              <Grid container item xs={12} justifyContent="flex-end">
-                <Grid item>
-                  <LoadingButton
-                    loading={loading}
-                    type="submit"
-                    variant="contained"
-                  >
-                    完了
-                  </LoadingButton>
+                          <ToggleButtonGroup value={field.value}>
+                            {circles.map((circle) => (
+                              <ToggleButton
+                                value={circle.id}
+                                key={circle.id}
+                                onClick={() => {
+                                  setValue('circleId', circle.id);
+                                }}
+                              >
+                                {getCircleName(circle)}
+                              </ToggleButton>
+                            ))}
+                          </ToggleButtonGroup>
+                          {fieldState.error && (
+                            <Typography variant="caption" color="error">
+                              {fieldState.error.message}
+                            </Typography>
+                          )}
+                        </Stack>
+                      );
+                    }}
+                    rules={{ required: true }}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <Controller
+                    name="name"
+                    control={control}
+                    defaultValue={member.name}
+                    render={({ field }) => {
+                      return (
+                        <TextField
+                          label="トレーナー名"
+                          helperText={
+                            errors.name?.message ??
+                            '円滑な運営のためにサーバーニックネームをトレーナー名に変更します。Discordのユーザー名には影響はありません。'
+                          }
+                          {...field}
+                          error={!!errors.name?.message}
+                          variant="standard"
+                          sx={{ width: '100%' }}
+                        />
+                      );
+                    }}
+                    rules={{ required: true }}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <Controller
+                    name="trainerId"
+                    control={control}
+                    defaultValue={member.trainerId ?? ''}
+                    render={({ field }) => {
+                      return (
+                        <TextField
+                          label="トレーナーID"
+                          helperText={
+                            errors.trainerId?.message ??
+                            '加入手続きや姉妹サークルへの移籍を行うために必要です。ゲームのプロフィール画面から「IDコピー」でコピーした値を貼り付けてください。'
+                          }
+                          {...field}
+                          error={!!errors.trainerId?.message}
+                          variant="standard"
+                          sx={{ width: '100%' }}
+                        />
+                      );
+                    }}
+                    rules={{ required: true }}
+                  />
+                </Grid>
+                <Grid container item xs={12} justifyContent="flex-end">
+                  <Grid item>
+                    <LoadingButton
+                      loading={loading}
+                      type="submit"
+                      variant="contained"
+                    >
+                      完了
+                    </LoadingButton>
+                  </Grid>
                 </Grid>
               </Grid>
-            </Grid>
-          </Box>
-        </FormControl>
+            </Box>
+          </>
+        )}
       </Stack>
     </Layout>
   );

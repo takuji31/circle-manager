@@ -140,6 +140,7 @@ type UpdateMemberMonthCirclePayload {
 input UpdateMemberMutationInput {
   id: String!
   name: String = null
+  setupCompleted: Boolean = null
   trainerId: String = null
 }
 
