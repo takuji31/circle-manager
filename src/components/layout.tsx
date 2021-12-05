@@ -1,32 +1,30 @@
-import React from "react";
-import Box from "@mui/material/Box";
-import { AppBar, IconButton, Toolbar, Typography } from "@mui/material";
-import LoginButton from "./login_button";
-import Head from "next/head";
-import { AdminMenu } from "./admin_menu";
-import * as Icons from "@mui/icons-material";
-import { NextLinkComposed } from "./link";
-import { useRouter } from "next/router";
+import React from 'react';
+import Box from '@mui/material/Box';
+import { AppBar, IconButton, Toolbar, Typography } from '@mui/material';
+import LoginButton from './login_button';
+import Head from 'next/head';
+import { AdminMenu } from './admin_menu';
+import * as Icons from '@mui/icons-material';
+import { NextLinkComposed } from './link';
+import { useRouter } from 'next/router';
 
 type LayoutProps = {
   children: React.ReactNode;
   title?: string;
 };
 
-const Layout = ({ children, title = "シン・ウマ娘愛好会" }: LayoutProps) => {
+const Layout = ({ children, title = 'ウマ娘愛好会' }: LayoutProps) => {
   const router = useRouter();
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Head>
         <title>
-          {title == "シン・ウマ娘愛好会"
-            ? title
-            : title + " - シン・ウマ娘愛好会"}
+          {title == 'ウマ娘愛好会' ? title : title + ' - ウマ娘愛好会'}
         </title>
       </Head>
       <AppBar position="static">
         <Toolbar>
-          {router.asPath != "/" && (
+          {router.asPath != '/' && (
             <IconButton
               size="large"
               edge="start"

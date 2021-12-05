@@ -41,7 +41,7 @@ export default function MyApp({
       <ApolloProvider client={apolloClient}>
         <CacheProvider value={emotionCache}>
           <Head>
-            <title>My page</title>
+            <title>ウマ娘愛好会グループ</title>
             <meta
               name="viewport"
               content="initial-scale=1, width=device-width"
