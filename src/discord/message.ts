@@ -40,6 +40,64 @@ class DMSendResult {
   }
 }
 
+export async function sendDirectMessageIfPossible<
+  T extends DirectMessageRecipient = DirectMessageRecipient
+>(
+  recipent: T,
+  content: string,
+  force: boolean = process.env.NODE_ENV == 'production'
+) {
+  const rest = createDiscordRestClient();
+  try {
+    let channelId = recipent.messageChannelId;
+    if (!channelId) {
+      const messsageChannel = (await rest.post(Routes.userChannels(), {
+        body: {
+          recipient_id: recipent.id,
+        },
+      })) as RESTPostAPICurrentUserCreateDMChannelResult;
+      await prisma.member.update({
+        where: { id: recipent.id },
+        data: { messageChannelId: messsageChannel.id },
+      });
+      channelId = messsageChannel.id;
+    }
+    if (force) {
+      const body: RESTPostAPIChannelMessageJSONBody = {
+        content,
+      };
+      await rest.post(Routes.channelMessages(channelId), {
+        body: body,
+      });
+    } else {
+      const body: RESTPostAPIChannelMessageJSONBody = {
+        content:
+          '`' +
+          recipent.name +
+          '`' +
+          'さんへのDM送信(テストのため実際には送信されません)。内容\n```\n' +
+          content +
+          '\n```',
+      };
+      await rest.post(Routes.channelMessages(Guild.channelIds.admin), {
+        body: body,
+      });
+    }
+  } catch (e) {
+    console.log(e);
+    const body: RESTPostAPIChannelMessageJSONBody = {
+      content:
+        recipent.name +
+        'さんへのDM送信に失敗しました。エラー内容\n```\n' +
+        e +
+        '\n```',
+    };
+    await rest.post(Routes.channelMessages(Guild.channelIds.admin), {
+      body: body,
+    });
+  }
+}
+
 export async function sendDirectMessagesIfPossible<
   T extends DirectMessageRecipient = DirectMessageRecipient
 >(

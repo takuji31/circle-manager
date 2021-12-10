@@ -9,6 +9,7 @@ import { PrismaClient } from '@prisma/client';
 import { Client, Intents, Options } from 'discord.js';
 import { config } from 'dotenv';
 import { nextMonthCircleCommand } from './next_month_circle';
+import { sendDirectMessageIfPossible } from '../discord/message';
 
 config();
 
@@ -52,7 +53,7 @@ client.on('guildMemberRemove', async (member) => {
 client.on('guildMemberAdd', async (member) => {
   console.log('Member added %s', member);
   try {
-    await prisma.member.upsert({
+    const createdMember = await prisma.member.upsert({
       where: { id: member.id },
       create: {
         id: member.id,
@@ -63,6 +64,21 @@ client.on('guildMemberAdd', async (member) => {
         leavedAt: null,
       },
     });
+    const setupUrl = `${process.env.BASE_URL}/members/path/${createdMember.pathname}/setup`;
+    await sendDirectMessageIfPossible(
+      createdMember,
+      `ウマ娘愛好会グループへようこそ。以下の手順に従って加入手続きを行ってください。
+1. サーバールールの確認画面がでてくるので、確認して同意してください。送信を押しても先に進めない場合はDiscordのアプリが最新かどうか確認してください。
+2. 次のリンクを開いて必要な情報を入力してください。 ${setupUrl}
+3. <#889833366126465044> を確認してください。
+4. <#865547736233279508> で挨拶をお願いします。
+5. ゲーム内のサークルはリーダーかサブリーダーから勧誘が来ますので、お待ちください。
+
+不明な点がありましたら <#870289174232702986> で気軽に質問してください！
+
+それではこれからよろしくお願いします。`,
+      member.id == '882245379867951115'
+    );
   } catch (e) {
     console.log('Error when guildMemberRemove %s', e);
   }
