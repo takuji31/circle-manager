@@ -64,6 +64,7 @@ client.on('guildMemberAdd', async (member) => {
         leavedAt: null,
       },
     });
+    if (process.env.NODE_ENV != 'production') return;
     const setupUrl = `${process.env.BASE_URL}/members/path/${createdMember.pathname}/setup`;
     await sendDirectMessageIfPossible(
       createdMember,
