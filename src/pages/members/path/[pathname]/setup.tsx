@@ -18,8 +18,7 @@ import * as ja from 'yup-locale-ja';
 import { getCircleName } from '../../../../model';
 import { PageSetupComp, ssrSetup } from '../../../../apollo/page';
 import { useUpdateSetupMutation } from '../../../../apollo';
-
-const { yupResolver } = require('@hookform/resolvers/yup/dist/yup.umd');
+import { yupResolver } from '@hookform/resolvers/yup';
 
 setLocale(ja.suggestive);
 
