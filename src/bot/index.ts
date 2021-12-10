@@ -76,8 +76,7 @@ client.on('guildMemberAdd', async (member) => {
 
 不明な点がありましたら <#870289174232702986> で気軽に質問してください！
 
-それではこれからよろしくお願いします。`,
-      member.id == '882245379867951115'
+それではこれからよろしくお願いします。`
     );
   } catch (e) {
     console.log('Error when guildMemberRemove %s', e);
