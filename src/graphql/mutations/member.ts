@@ -2,7 +2,12 @@ import { prisma } from './../../database/prisma';
 import { Guild } from '../../model';
 import { list, mutationField, nonNull } from 'nexus';
 import { createDiscordRestClient } from '../../discord';
-import { RESTGetAPIGuildMembersResult, Routes } from 'discord-api-types/v9';
+import {
+  RESTGetAPIGuildMembersResult,
+  Routes,
+  RESTPatchAPIGuildMemberJSONBody,
+  RESTPatchAPIGuildMemberResult,
+} from 'discord-api-types/v9';
 import { CircleRole as PrismaCircleRole, PrismaPromise } from '@prisma/client';
 import { Member, UpdateMemberMutationInput } from '../types';
 
@@ -99,6 +104,16 @@ export const UpdateMember = mutationField('updateMember', {
     const member = await prisma.member.findUnique({ where: { id } });
     if (!member) {
       throw new Error(`Member id ${id} not found.`);
+    }
+
+    if (name && member.name != name) {
+      const rest = createDiscordRestClient();
+      const body: RESTPatchAPIGuildMemberJSONBody = {
+        nick: name,
+      };
+      await rest.patch(Routes.guildMember(Guild.id, member.id), {
+        body,
+      });
     }
 
     return await prisma.member.update({
