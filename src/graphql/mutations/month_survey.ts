@@ -62,10 +62,7 @@ export const CreateNextMonthSurveyMutation = mutationField(
         orderBy: { order: 'asc' },
       });
       circles.forEach((circle) => {
-        embed.addField(
-          `${getCircleName(circle)} 希望の場合`,
-          `${circle.emoji}`
-        );
+        embed.addField(`${getCircleName(circle)}`, `${circle.emoji}`, true);
       });
 
       embed.addField('未回答の場合', '***除名となります。***');
