@@ -5,9 +5,16 @@ import {
   Button,
   Checkbox,
   CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   Grid,
   TableRow,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
 import Layout from '../components/layout';
 import useUser from '../hooks/user';
@@ -149,6 +156,22 @@ const AdminTopContent = () => {
       });
     }
   }, [data?.nextMonth?.survey?.expiredAt]);
+
+  const [open, setOpen] = React.useState(false);
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    mutation()
+      .then(() => {})
+      .finally(() => {
+        setOpen(false);
+      });
+  };
   return (
     <Grid container spacing={2}>
       <Grid item xs={12}>
@@ -202,7 +225,36 @@ const AdminTopContent = () => {
               {!nextMonth.survey && (
                 <>
                   <Typography variant="body1">まだ開始していません</Typography>
-                  <Button onClick={() => mutation().then()}>開始する</Button>
+                  <Button onClick={() => handleClickOpen()}>開始する</Button>
+                  <Dialog
+                    fullScreen={fullScreen}
+                    open={open}
+                    onClose={handleClose}
+                    aria-labelledby="responsive-dialog-title"
+                  >
+                    <DialogTitle id="responsive-dialog-title">確認</DialogTitle>
+                    <DialogContent>
+                      <DialogContentText>
+                        在籍希望アンケートを開始しますか？
+                      </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                      <Button
+                        disabled={creating}
+                        autoFocus
+                        onClick={() => setOpen(false)}
+                      >
+                        やめる
+                      </Button>
+                      <Button
+                        disabled={creating}
+                        onClick={handleClose}
+                        autoFocus
+                      >
+                        開始する
+                      </Button>
+                    </DialogActions>
+                  </Dialog>
                 </>
               )}
               {nextMonth.survey && (
