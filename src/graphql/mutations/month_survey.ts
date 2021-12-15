@@ -104,13 +104,15 @@ export const CreateNextMonthSurveyMutation = mutationField(
       });
 
       await prisma.monthCircle.createMany({
-        data: members.map(({ id, circleId }) => ({
-          memberId: id,
-          currentCircleId: circleId!!,
-          year,
-          month,
-          circleId: Circles.specialIds.noAnswer,
-        })),
+        data: members.map(
+          ({ id, circleId }: { id: string; circleId: string | null }) => ({
+            memberId: id,
+            currentCircleId: circleId!!,
+            year,
+            month,
+            circleId: Circles.specialIds.noAnswer,
+          })
+        ),
         skipDuplicates: true,
       });
 
