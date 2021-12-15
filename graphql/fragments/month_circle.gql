@@ -1,0 +1,21 @@
+fragment MemberMonthCircle on MonthCircle {
+  id
+  year
+  month
+  circle {
+    ...ListedCircle
+  }
+}
+
+fragment FullMonthCircle on MonthCircle {
+  ...MemberMonthCircle
+  currentCircle {
+    ...ListedCircle
+  }
+  member {
+    ...ListedMember
+  }
+  kicked
+  invited
+  joined
+}

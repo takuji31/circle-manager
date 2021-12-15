@@ -42,13 +42,6 @@ export const MonthCircleList: PageMonthSurveyComp = ({ data, error }) => {
     return <p></p>;
   }
 
-  const movingAnswers = monthSurvey.answers.filter((answer) => {
-    return (
-      answer.circle &&
-      answer.currentCircle &&
-      answer.circle.id != answer.currentCircle.id
-    );
-  });
   return (
     <AdminLayout title={`${monthSurvey.year}年${monthSurvey.month}月の移籍表`}>
       <Stack p={2} spacing={4}>
@@ -64,51 +57,46 @@ export const MonthCircleList: PageMonthSurveyComp = ({ data, error }) => {
             <TableCell>加入済み</TableCell>
           </TableHead>
           <TableBody>
-            {movingAnswers
-              .filter(
-                (monthCicle) =>
-                  monthCicle.circle && !isLeaveCircle(monthCicle.circle)
-              )
-              .map((monthCircle) => {
-                return (
-                  <TableRow key={`answered_${monthCircle.id}`}>
-                    <TableCell>{monthCircle.member.name}</TableCell>
-                    <TableCell>{monthCircle.currentCircle.name}</TableCell>
-                    <TableCell>{monthCircle.circle?.name}</TableCell>
-                    <TableCell>{monthCircle.member.trainerId}</TableCell>
-                    <TableCell>
-                      <MonthCircleStateCheckbox
-                        checked={monthCircle.kicked}
-                        disabled={monthCircle.kicked && monthCircle.invited}
-                        variablesBuilder={(kicked) => ({
-                          id: monthCircle.id,
-                          kicked,
-                        })}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <MonthCircleStateCheckbox
-                        checked={monthCircle.invited}
-                        disabled={!monthCircle.kicked || monthCircle.joined}
-                        variablesBuilder={(invited) => ({
-                          id: monthCircle.id,
-                          invited,
-                        })}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <MonthCircleStateCheckbox
-                        checked={monthCircle.joined}
-                        disabled={!monthCircle.kicked || !monthCircle.invited}
-                        variablesBuilder={(joined) => ({
-                          id: monthCircle.id,
-                          joined,
-                        })}
-                      />
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
+            {monthSurvey.move.map((monthCircle) => {
+              return (
+                <TableRow key={`answered_${monthCircle.id}`}>
+                  <TableCell>{monthCircle.member.name}</TableCell>
+                  <TableCell>{monthCircle.currentCircle.name}</TableCell>
+                  <TableCell>{monthCircle.circle?.name}</TableCell>
+                  <TableCell>{monthCircle.member.trainerId}</TableCell>
+                  <TableCell>
+                    <MonthCircleStateCheckbox
+                      checked={monthCircle.kicked}
+                      disabled={monthCircle.kicked && monthCircle.invited}
+                      variablesBuilder={(kicked) => ({
+                        id: monthCircle.id,
+                        kicked,
+                      })}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <MonthCircleStateCheckbox
+                      checked={monthCircle.invited}
+                      disabled={!monthCircle.kicked || monthCircle.joined}
+                      variablesBuilder={(invited) => ({
+                        id: monthCircle.id,
+                        invited,
+                      })}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <MonthCircleStateCheckbox
+                      checked={monthCircle.joined}
+                      disabled={!monthCircle.kicked || !monthCircle.invited}
+                      variablesBuilder={(joined) => ({
+                        id: monthCircle.id,
+                        joined,
+                      })}
+                    />
+                  </TableCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
         </TableContainer>
         <Typography variant="h6">脱退予定者</Typography>
@@ -120,68 +108,44 @@ export const MonthCircleList: PageMonthSurveyComp = ({ data, error }) => {
             <TableCell>Discord残留</TableCell>
           </TableHead>
           <TableBody>
-            {movingAnswers
-              .filter(
-                (monthCicle) =>
-                  monthCicle.circle && isLeaveCircle(monthCicle.circle)
-              )
-              .map((monthCircle) => {
-                return (
-                  <TableRow key={`leave_${monthCircle.id}`}>
-                    <TableCell>{monthCircle.member.name}</TableCell>
-                    <TableCell>{monthCircle.currentCircle.name}</TableCell>
-                    <TableCell>
-                      <MonthCircleStateCheckbox
-                        checked={monthCircle.kicked}
-                        disabled={monthCircle.kicked && monthCircle.invited}
-                        variablesBuilder={(kicked) => ({
-                          id: monthCircle.id,
-                          kicked,
-                        })}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Checkbox
-                        checked={
-                          monthCircle.circle?.id == Circles.specialIds.ob
-                        }
-                        disabled={true}
-                      />
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
+            {monthSurvey.leave.map((monthCircle) => {
+              return (
+                <TableRow key={`leave_${monthCircle.id}`}>
+                  <TableCell>{monthCircle.member.name}</TableCell>
+                  <TableCell>{monthCircle.currentCircle.name}</TableCell>
+                  <TableCell>
+                    <MonthCircleStateCheckbox
+                      checked={monthCircle.kicked}
+                      disabled={monthCircle.kicked && monthCircle.invited}
+                      variablesBuilder={(kicked) => ({
+                        id: monthCircle.id,
+                        kicked,
+                      })}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Checkbox
+                      checked={monthCircle.circle?.id == Circles.specialIds.ob}
+                      disabled={true}
+                    />
+                  </TableCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
         </TableContainer>
         <Typography variant="h6">除名者(未回答含む)</Typography>
-        <Typography variant="body1">
-          Discordからkickするとリストから消えます。先にサークルから除名してください
-        </Typography>
         <TableContainer>
           <TableHead>
             <TableCell>名前</TableCell>
             <TableCell>現サークル</TableCell>
           </TableHead>
           <TableBody>
-            {movingAnswers
-              .filter(
-                (monthCicle) =>
-                  !monthCicle.circle ||
-                  monthCicle.circle.id == Circles.specialIds.kick
-              )
-              .map((monthCircle) => {
-                return (
-                  <TableRow key={`no_answer_${monthCircle.id}`}>
-                    <TableCell>{monthCircle.member.name}</TableCell>
-                    <TableCell>{monthCircle.currentCircle.name}</TableCell>
-                  </TableRow>
-                );
-              })}
-            {monthSurvey.noAnswerMembers.map((member) => {
+            {monthSurvey.kick.map((monthCircle) => {
               return (
-                <TableRow key={`no_answer_${member.id}`}>
-                  <TableCell>{member.name}</TableCell>
-                  <TableCell>{member.circle?.name}</TableCell>
+                <TableRow key={`no_answer_${monthCircle.id}`}>
+                  <TableCell>{monthCircle.member.name}</TableCell>
+                  <TableCell>{monthCircle.currentCircle.name}</TableCell>
                 </TableRow>
               );
             })}

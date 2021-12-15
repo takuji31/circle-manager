@@ -85,12 +85,16 @@ const MemberList: NextPage<Props> = ({ monthCircleNames }) => {
         },
         renderCell: (params: GridRenderCellParams) => {
           const value = params.value as MonthCircle;
-          const memberId = params.row.id;
-          const { year, month } = nextMonth();
-          const href = value
-            ? `/month_circles/${value.id}`
-            : `/members/${memberId}/month_circles/${year}/${month}`;
-          return <Link href={href}>{params.formattedValue}</Link>;
+
+          if (!value) {
+            return params.formattedValue;
+          }
+
+          return (
+            <Link href={`/month_circles/${value.id}`}>
+              {params.formattedValue}
+            </Link>
+          );
         },
       },
       {
@@ -105,7 +109,7 @@ const MemberList: NextPage<Props> = ({ monthCircleNames }) => {
             <GridActionsCellItem
               key="members_pathname_url"
               component={NextLinkComposed}
-              to={`/members/path/${pathname}`}
+              to={`/members/${pathname}`}
               label="基本情報登録ページを開く"
               icon={<Icons.Edit />}
             />,

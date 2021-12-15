@@ -19,26 +19,22 @@ export const Member = objectType({
     t.field(m.circle);
     t.field('thisMonthCircle', {
       type: MonthCircle,
-      async resolve(parent, _, ctx) {
-        return await ctx.prisma.monthCircle.findUnique({
+      resolve(parent, _, ctx) {
+        return ctx.prisma.monthCircle.findFirst({
           where: {
-            year_month_memberId: {
-              ...thisMonth(),
-              memberId: parent.id,
-            },
+            ...thisMonth(),
+            memberId: parent.id,
           },
         });
       },
     });
     t.field('nextMonthCircle', {
       type: MonthCircle,
-      async resolve(parent, _, ctx) {
-        return ctx.prisma.monthCircle.findUnique({
+      resolve(parent, _, ctx) {
+        return ctx.prisma.monthCircle.findFirst({
           where: {
-            year_month_memberId: {
-              ...nextMonth(),
-              memberId: parent.id,
-            },
+            ...nextMonth(),
+            memberId: parent.id,
           },
         });
       },

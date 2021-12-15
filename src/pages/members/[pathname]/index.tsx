@@ -1,25 +1,19 @@
-import styled from '@emotion/styled';
 import {
   Box,
-  Button,
-  Checkbox,
   Container,
   FormControl,
-  FormControlLabel,
   Grid,
   Stack,
   TextField,
   Typography,
 } from '@mui/material';
-import { GetServerSideProps, GetStaticPaths, GetStaticProps } from 'next';
+import { GetServerSideProps } from 'next';
 import Layout from '../../../components/layout';
-import { prisma } from '../../../database';
-import React, { useState } from 'react';
+import React from 'react';
 import {
   PageMemberByPathnameComp,
   ssrMemberByPathname,
 } from '../../../apollo/page';
-import Link from '../../../components/link';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { useUpdateMemberMutation } from '../../../apollo';
 import { LoadingButton } from '@mui/lab';

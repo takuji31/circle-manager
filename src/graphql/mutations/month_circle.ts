@@ -70,7 +70,7 @@ export const UpdateMemberMonthCircleMutation = mutationField(
 export const UpdateMonthCircleMutation = mutationField('updateMonthCircle', {
   type: UpdateMemberMonthCirclePayload,
   args: { data: nonNull(UpdateMonthCircleMutationInput.asArg()) },
-  async resolve(parent, { data: { id, kicked, invited, joined } }, { prisma }) {
+  async resolve(_, { data: { id, kicked, invited, joined } }, { prisma }) {
     if (kicked != null) {
       await prisma.monthCircle.update({
         where: { id },

@@ -12,13 +12,13 @@ import {
 import { GetServerSideProps } from 'next';
 import React from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import Layout from '../../../../components/layout';
+import Layout from '../../../components/layout';
 import * as yup from 'yup';
 import { setLocale } from 'yup';
 import * as ja from 'yup-locale-ja';
-import { getCircleName } from '../../../../model';
-import { PageSetupComp, ssrSetup } from '../../../../apollo/page';
-import { useUpdateSetupMutation } from '../../../../apollo';
+import { getCircleName } from '../../../model';
+import { PageSetupComp, ssrSetup } from '../../../apollo/page';
+import { useUpdateSetupMutation } from '../../../apollo';
 import { yupResolver } from '@hookform/resolvers/yup';
 
 setLocale(ja.suggestive);

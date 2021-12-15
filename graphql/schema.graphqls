@@ -90,7 +90,10 @@ type MonthSurvey {
 
   """アンケートのメッセージID"""
   id: ID!
+  kick: [MonthCircle!]!
+  leave: [MonthCircle!]!
   month: String!
+  move: [MonthCircle!]!
   noAnswerMembers: [Member!]!
   year: String!
 }

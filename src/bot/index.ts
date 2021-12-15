@@ -65,7 +65,7 @@ client.on('guildMemberAdd', async (member) => {
       },
     });
     if (process.env.NODE_ENV != 'production') return;
-    const setupUrl = `${process.env.BASE_URL}/members/path/${createdMember.pathname}/setup`;
+    const setupUrl = `${process.env.BASE_URL}/members/${createdMember.pathname}/setup`;
     await sendDirectMessageIfPossible(
       createdMember,
       `ウマ娘愛好会グループへようこそ。以下の手順に従って加入手続きを行ってください。

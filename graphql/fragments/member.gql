@@ -1,13 +1,3 @@
-fragment MemberMonthCircle on MonthCircle {
-  id
-  year
-  month
-  circle {
-    id
-    name
-  }
-}
-
 fragment ListedMember on Member {
   id
   name

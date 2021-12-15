@@ -1,4 +1,4 @@
-import { getCircleName } from './../../model/circle';
+import { getCircleName, Circles } from './../../model/circle';
 import { Guild } from './../../model/guild';
 import { Circle } from '@prisma/client';
 import { Temporal } from 'proposal-temporal';
@@ -17,7 +17,7 @@ export const CreateNextMonthSurveyMutation = mutationField(
   'createNextMonthSurvey',
   {
     type: CreateNextMonthSurveyPayload,
-    async resolve(parent, args, { prisma, user }) {
+    async resolve(_, __, { prisma, user }) {
       if (!user?.isAdmin) {
         throw new Error('Cannot crate month survey.');
       }
@@ -93,6 +93,25 @@ export const CreateNextMonthSurveyMutation = mutationField(
           month,
           expiredAt: new Date(expiredAt.epochMilliseconds),
         },
+      });
+
+      const members = await prisma.member.findMany({
+        where: {
+          circle: {
+            selectableByUser: true,
+          },
+        },
+      });
+
+      await prisma.monthCircle.createMany({
+        data: members.map(({ id, circleId }) => ({
+          memberId: id,
+          currentCircleId: circleId!!,
+          year,
+          month,
+          circleId: Circles.specialIds.noAnswer,
+        })),
+        skipDuplicates: true,
       });
 
       const emojiNames = [...circles.map((circle) => circle.emoji)];

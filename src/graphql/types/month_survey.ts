@@ -12,6 +12,79 @@ export const MonthSurvey = objectType({
     t.field(_MonthSurvey.year);
     t.field(_MonthSurvey.month);
     t.field(_MonthSurvey.expiredAt);
+
+    t.field('move', {
+      type: nonNull(list(nonNull(MonthCircle))),
+      async resolve(parent, _, { prisma }) {
+        const monthCircles = await prisma.monthCircle.findMany({
+          where: {
+            year: parent.year,
+            month: parent.month,
+            circleId: {
+              not: {
+                in: [
+                  Circles.specialIds.noAnswer,
+                  Circles.specialIds.leave,
+                  Circles.specialIds.kick,
+                  Circles.specialIds.notJoined,
+                  Circles.specialIds.ob,
+                ],
+              },
+            },
+          },
+          orderBy: {
+            currentCircle: {
+              order: 'asc',
+            },
+          },
+        });
+
+        return monthCircles.filter(
+          (monthCircle) => monthCircle.circleId != monthCircle.currentCircleId
+        );
+      },
+    });
+
+    t.field('leave', {
+      type: nonNull(list(nonNull(MonthCircle))),
+      async resolve(parent, _, { prisma }) {
+        return prisma.monthCircle.findMany({
+          where: {
+            year: parent.year,
+            month: parent.month,
+            circleId: {
+              in: [Circles.specialIds.leave, Circles.specialIds.ob],
+            },
+          },
+          orderBy: {
+            currentCircle: {
+              order: 'asc',
+            },
+          },
+        });
+      },
+    });
+
+    t.field('kick', {
+      type: nonNull(list(nonNull(MonthCircle))),
+      async resolve(parent, _, { prisma }) {
+        return prisma.monthCircle.findMany({
+          where: {
+            year: parent.year,
+            month: parent.month,
+            circleId: {
+              in: [Circles.specialIds.kick, Circles.specialIds.noAnswer],
+            },
+          },
+          orderBy: {
+            currentCircle: {
+              order: 'asc',
+            },
+          },
+        });
+      },
+    });
+
     t.field('answers', {
       type: nonNull(list(nonNull(MonthCircle))),
       resolve(parent, _, { prisma }) {
@@ -41,27 +114,13 @@ export const MonthSurvey = objectType({
                 },
               },
               {
-                OR: [
-                  {
-                    monthCircles: {
-                      none: {
-                        year: parent.year,
-                        month: parent.month,
-                      },
-                    },
+                monthCircles: {
+                  some: {
+                    year: parent.year,
+                    month: parent.month,
+                    circleId: Circles.specialIds.noAnswer,
                   },
-                  {
-                    monthCircles: {
-                      none: {
-                        year: parent.year,
-                        month: parent.month,
-                        circleId: {
-                          not: Circles.specialIds.noAnswer,
-                        },
-                      },
-                    },
-                  },
-                ],
+                },
               },
             ],
           },
