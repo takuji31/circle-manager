@@ -85,7 +85,7 @@ async function main() {
       selectableInSurvey: false,
     },
   ];
-  dataList.forEach(async (data) => {
+  for (const data of dataList) {
     await prisma.circle.upsert({
       where: {
         id: data.id,
@@ -93,7 +93,7 @@ async function main() {
       create: data,
       update: data,
     });
-  });
+  }
 }
 
 main()

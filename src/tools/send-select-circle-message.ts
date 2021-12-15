@@ -41,13 +41,14 @@ const rest = createDiscordRestClient();
     )) as RESTPostAPIChannelMessageResult;
 
     const emojiNames = circles.map((circle) => circle.emoji);
-    emojiNames.forEach(async (emoji) => {
+
+    for (const emoji of emojiNames) {
       if (emoji) {
         await rest.put(
           Routes.channelMessageOwnReaction(channelId, messageId, `${emoji}`)
         );
       }
-    });
+    }
 
     console.log('MessageID: %s', messageId);
   } catch (error) {

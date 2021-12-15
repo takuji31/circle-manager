@@ -106,13 +106,14 @@ export const UpdateMonthCircleMutation = mutationField('updateMonthCircle', {
         }
         const rest = createDiscordRestClient();
         const roleIds = Guild.roleIds.circleIds;
-        roleIds
-          .filter((id) => id != monthCircle.circleId)
-          .forEach(async (id) => {
-            await rest.delete(
-              Routes.guildMemberRole(Guild.id, monthCircle.memberId, id)
-            );
-          });
+        const removingIds = roleIds.filter((id) => id != monthCircle.circleId);
+
+        for (const id of removingIds) {
+          await rest.delete(
+            Routes.guildMemberRole(Guild.id, monthCircle.memberId, id)
+          );
+        }
+
         await rest.put(
           Routes.guildMemberRole(Guild.id, monthCircle.memberId, circleId)
         );

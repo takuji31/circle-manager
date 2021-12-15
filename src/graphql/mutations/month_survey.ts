@@ -117,13 +117,14 @@ export const CreateNextMonthSurveyMutation = mutationField(
       });
 
       const emojiNames = [...circles.map((circle) => circle.emoji)];
-      emojiNames.forEach(async (emoji) => {
+
+      for (const emoji of emojiNames) {
         if (emoji) {
           await rest.put(
             Routes.channelMessageOwnReaction(channelId, messageId, `${emoji}`)
           );
         }
-      });
+      }
 
       return {
         nextMonth: {

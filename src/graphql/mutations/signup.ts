@@ -32,11 +32,12 @@ export const UpdateSignUpMutation = mutationField('updateSignUp', {
         }
         const rest = createDiscordRestClient();
         const roleIds = Guild.roleIds.circleIds;
-        roleIds
-          .filter((id) => id != circleId)
-          .forEach(async (id) => {
-            await rest.delete(Routes.guildMemberRole(Guild.id, memberId, id));
-          });
+        const removingIds = roleIds.filter((id) => id != circleId);
+
+        for (const id of removingIds) {
+          await rest.delete(Routes.guildMemberRole(Guild.id, memberId, id));
+        }
+
         await rest.put(Routes.guildMemberRole(Guild.id, memberId, circleId));
       } catch (e) {
         console.log(e);
