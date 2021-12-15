@@ -72,7 +72,7 @@ type Month {
 }
 
 type MonthCircle {
-  circle: Circle
+  circle: Circle!
   currentCircle: Circle!
   id: ID!
   invited: Boolean!
