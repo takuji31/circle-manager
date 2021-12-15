@@ -2,6 +2,7 @@ import { MonthCircle } from './month_circle';
 import { Member } from './member';
 import { Circles } from '../../model';
 import { MonthSurvey as _MonthSurvey } from 'nexus-prisma';
+import { MonthCircle as _MonthCircle } from '@prisma/client';
 import { nonNull, objectType, list } from 'nexus';
 
 export const MonthSurvey = objectType({
@@ -40,7 +41,8 @@ export const MonthSurvey = objectType({
         });
 
         return monthCircles.filter(
-          (monthCircle) => monthCircle.circleId != monthCircle.currentCircleId
+          (monthCircle: _MonthCircle) =>
+            monthCircle.circleId != monthCircle.currentCircleId
         );
       },
     });
