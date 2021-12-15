@@ -96,8 +96,9 @@ export const monthSurveyReaction: ReactionHandler = async (
       `${year}年${month}月の在籍希望アンケートを「${circle.name}」への移籍で受け付けました。トレーナーID入力済みですので、追加の手続きは必要ありません。月初にサークル勧誘と除名が行われますので、除名され次第希望のサークルからの勧誘を承諾して異動をお願いします。`
     );
   } else {
+    const url = `${process.env.BASE_URL}/members/${member.pathname}/edit`;
     await user.send(
-      `${year}年${month}月の在籍希望アンケートを「${circle.name}」への移籍で受け付けました。移籍にはトレーナーIDの入力が必要です。ゲームのプロフィール画面の「IDコピー」を押してDiscordのサーバー上で \`/register-trainer-id\` と入力してトレーナーIDを登録してください。`
+      `${year}年${month}月の在籍希望アンケートを「${circle.name}」への移籍で受け付けました。移籍にはトレーナーIDの入力が必要です。以下のURLでトレーナーIDを登録してください。\n${url}`
     );
   }
 };

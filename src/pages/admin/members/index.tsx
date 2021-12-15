@@ -109,8 +109,8 @@ const MemberList: NextPage<Props> = ({ monthCircleNames }) => {
             <GridActionsCellItem
               key="members_pathname_url"
               component={NextLinkComposed}
-              to={`/members/${pathname}`}
-              label="基本情報登録ページを開く"
+              to={`/members/${pathname}/edit`}
+              label="編集"
               icon={<Icons.Edit />}
             />,
           ];
