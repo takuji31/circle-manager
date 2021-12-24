@@ -31,7 +31,7 @@ export const UpdateMembers = mutationField('updateMembers', {
     const members = (await rest.get(
       `${Routes.guildMembers(Guild.id)}?limit=1000`
     )) as RESTGetAPIGuildMembersResult;
-    ctx.prisma.$transaction([
+    await ctx.prisma.$transaction([
       prisma.member.updateMany({
         where: {
           circleId: {
@@ -72,6 +72,15 @@ export const UpdateMembers = mutationField('updateMembers', {
           });
         }),
     ]);
+
+    await ctx.prisma.member.updateMany({
+      where: {
+        leavedAt: { not: null },
+      },
+      data: {
+        circleId: null,
+      },
+    });
 
     return ctx.prisma.member.findMany({
       orderBy: [
