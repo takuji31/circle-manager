@@ -1,23 +1,16 @@
 import { Guild } from './../model/guild';
-import { Circles } from './../model/circle';
-import { ReactionHandler } from './types';
+import { Circles, getCircleName } from './../model/circle';
+import { ReactionHandler, ReactionHandlerWithData } from './types';
 import { Temporal } from 'proposal-temporal';
 import { prisma } from '../database';
+import { MonthSurvey } from '@prisma/client';
 
-export const monthSurveyReaction: ReactionHandler = async (
+export const monthSurveyReaction: ReactionHandlerWithData<MonthSurvey> = async (
   reaction,
   user,
-  emoji
+  emoji,
+  data
 ) => {
-  const survey = await prisma.monthSurvey.findUnique({
-    where: {
-      id: reaction.message.id,
-    },
-  });
-  if (!survey) {
-    return;
-  }
-
   await reaction.users.remove(user.id);
 
   const member = await prisma.member.findUnique({
@@ -31,12 +24,12 @@ export const monthSurveyReaction: ReactionHandler = async (
     return;
   }
 
-  if (survey.expiredAt.getTime() <= Temporal.now.instant().epochMilliseconds) {
+  if (data.expiredAt.getTime() <= Temporal.now.instant().epochMilliseconds) {
     await user.send('在籍希望アンケートの期限が過ぎています。');
     return;
   }
 
-  const { year, month } = survey;
+  const { year, month } = data;
   const { id: memberId, circleId, circle: currentCircle } = member;
 
   if (!circleId) {
@@ -99,6 +92,60 @@ export const monthSurveyReaction: ReactionHandler = async (
     const url = `${process.env.BASE_URL}/members/${member.pathname}/edit`;
     await user.send(
       `${year}年${month}月の在籍希望アンケートを「${circle.name}」への移籍で受け付けました。移籍にはトレーナーIDの入力が必要です。以下のURLでトレーナーIDを登録してください。\n${url}`
+    );
+  }
+};
+
+export const monthSurveyShowReaction: ReactionHandlerWithData<
+  MonthSurvey
+> = async (reaction, user, _, data) => {
+  await reaction.users.remove(user.id);
+
+  const member = await prisma.member.findUnique({
+    where: { id: user.id },
+    include: {
+      circle: true,
+    },
+  });
+
+  if (!member) {
+    return;
+  }
+
+  const { year, month } = data;
+  const monthCircle = await prisma.monthCircle.findUnique({
+    where: {
+      year_month_memberId: {
+        year,
+        month,
+        memberId: user.id,
+      },
+    },
+    include: {
+      circle: true,
+    },
+  });
+
+  if (!monthCircle) {
+    await user.send('この在籍希望アンケートは対象ではないため回答不要です。');
+    return;
+  }
+
+  if (monthCircle.circleId == Circles.specialIds.noAnswer) {
+    await user.send(
+      `あなたの${year}年${month}月の在籍希望は未回答です。回答がない場合は除名となりますのでご注意ください。`
+    );
+    return;
+  } else if (monthCircle.circleId == Circles.specialIds.kick) {
+    await user.send(
+      `あなたは${year}年${month}月の除名対象となっています。除名対象になった理由については運営メンバーにお問い合わせください。`
+    );
+    return;
+  } else {
+    await user.send(
+      `あなたの${year}年${month}月の在籍希望は「${getCircleName(
+        monthCircle.circle
+      )}」です。変更がある場合は期限内に再度希望内容の絵文字でリアクションしてください。`
     );
   }
 };

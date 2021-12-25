@@ -2,7 +2,7 @@ import { trainerIdCommand } from './member/trainer_id';
 import { updateMemberNicknameEvent } from './member/update_member_nickname';
 import { registerNextMonthCircleCommand } from './register_next_month_circle';
 import { selectCircleReaction } from './select_circle';
-import { monthSurveyReaction } from './month_survey';
+import { monthSurveyReaction, monthSurveyShowReaction } from './month_survey';
 import { Guild } from './../model/guild';
 import { registerTrainerIdCommand } from './register_trainer_id';
 import { PrismaClient } from '@prisma/client';
@@ -124,8 +124,18 @@ client.on('messageReactionAdd', async (reaction, user) => {
 
     if (reaction.message.id == Guild.messageIds.circleSelect) {
       selectCircleReaction(reaction, user, emoji);
-    } else {
-      monthSurveyReaction(reaction, user, emoji);
+      return;
+    }
+
+    const survey = await prisma.monthSurvey.findUnique({
+      where: {
+        id: reaction.message.id,
+      },
+    });
+    if (survey && emoji == '👀') {
+      monthSurveyShowReaction(reaction, user, emoji, survey);
+    } else if (survey) {
+      monthSurveyReaction(reaction, user, emoji, survey);
     }
   } catch (e) {
     console.log('Error when messageReactionAdd %s', e);

@@ -72,9 +72,7 @@ export const CreateNextMonthSurveyMutation = mutationField(
       embed.addField('未回答の場合', '***除名となります。***');
       embed.addField(
         '回答状態の確認方法',
-        `任意のチャンネル(例: <#${
-          Guild.channelIds.commandExecutor
-        }>)で ${'`/next-month-circle`'} と送信すると確認できます。`
+        `このメッセージに:eyes:でリアクション`
       );
 
       const { id: messageId, channel_id: channelId } = (await rest.post(
@@ -120,7 +118,7 @@ export const CreateNextMonthSurveyMutation = mutationField(
         skipDuplicates: true,
       });
 
-      const emojiNames = [...circles.map((circle) => circle.emoji)];
+      const emojiNames = [...circles.map((circle) => circle.emoji), '👀'];
 
       for (const emoji of emojiNames) {
         if (emoji) {
