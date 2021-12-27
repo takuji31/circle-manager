@@ -19,8 +19,8 @@ export const UpdateMemberMonthCircleMutation = mutationField(
       month: nonNull(stringArg()),
       circleId: nonNull(stringArg()),
     },
-    async resolve(parent, { year, month, memberId, circleId }, ctx) {
-      if (ctx.user?.id != memberId && !ctx?.user?.isAdmin) {
+    async resolve(_, { year, month, memberId, circleId }, { user, prisma }) {
+      if (user?.id != memberId && !user?.isAdmin) {
         throw new Error("Cannot update this user's month circle.");
       }
       const member = await prisma.member.findUnique({
@@ -32,33 +32,53 @@ export const UpdateMemberMonthCircleMutation = mutationField(
       }
 
       const { circleId: currentCircleId } = member;
-      if (!currentCircleId) {
-        throw new Error('This member was leaved');
-      }
+      let monthCircle = await prisma.monthCircle.findUnique({
+        where: { year_month_memberId: { memberId, year, month } },
+      });
 
-      const monthCircle = await ctx.prisma.monthCircle.upsert({
-        where: {
-          year_month_memberId: {
+      if (currentCircleId) {
+        monthCircle = await prisma.monthCircle.upsert({
+          where: {
+            year_month_memberId: {
+              year,
+              month,
+              memberId,
+            },
+          },
+          create: {
             year,
             month,
             memberId,
+            circleId,
+            currentCircleId,
           },
-        },
-        create: {
-          year,
-          month,
-          memberId,
-          circleId,
-          currentCircleId,
-        },
-        update: {
-          year,
-          month,
-          memberId,
-          circleId,
-          currentCircleId,
-        },
-      });
+          update: {
+            year,
+            month,
+            memberId,
+            circleId,
+            currentCircleId,
+          },
+        });
+      } else if (user.isAdmin) {
+        monthCircle = await prisma.monthCircle.update({
+          where: {
+            year_month_memberId: {
+              year,
+              month,
+              memberId,
+            },
+          },
+          data: {
+            year,
+            month,
+            memberId,
+            circleId,
+          },
+        });
+      } else {
+        throw new Error('This member was leaved');
+      }
 
       return {
         monthCircle,
