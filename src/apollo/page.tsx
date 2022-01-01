@@ -14,6 +14,41 @@ import { getApolloClient , Context} from '../apollo';
 
 
 
+export async function getServerPageAdminCircles
+    (options: Omit<Apollo.QueryOptions<Types.AdminCirclesQueryVariables>, 'query'>, ctx?: Context ){
+        const apolloClient = getApolloClient(ctx);
+        
+        const data = await apolloClient.query<Types.AdminCirclesQuery>({ ...options, query: Operations.AdminCirclesDocument });
+        
+        const apolloState = apolloClient.cache.extract();
+
+        return {
+            props: {
+                apolloState: apolloState,
+                data: data?.data,
+                error: data?.error ?? data?.errors ?? null,
+            },
+        };
+      }
+export const useAdminCircles = (
+  optionsFunc?: (router: NextRouter)=> QueryHookOptions<Types.AdminCirclesQuery, Types.AdminCirclesQueryVariables>) => {
+  const router = useRouter();
+  const options = optionsFunc ? optionsFunc(router) : {};
+  return useQuery(Operations.AdminCirclesDocument, options);
+};
+export type PageAdminCirclesComp = React.FC<{data?: Types.AdminCirclesQuery, error?: Apollo.ApolloError}>;
+export const withPageAdminCircles = (optionsFunc?: (router: NextRouter)=> QueryHookOptions<Types.AdminCirclesQuery, Types.AdminCirclesQueryVariables>) => (WrappedComponent:PageAdminCirclesComp) : NextPage  => (props) => {
+                const router = useRouter()
+                const options = optionsFunc ? optionsFunc(router) : {};
+                const {data, error } = useQuery(Operations.AdminCirclesDocument, options)    
+                return <WrappedComponent {...props} data={data} error={error} /> ;
+                   
+            }; 
+export const ssrAdminCircles = {
+      getServerPage: getServerPageAdminCircles,
+      withPage: withPageAdminCircles,
+      usePage: useAdminCircles,
+    }
 export async function getServerPageAdminMembers
     (options: Omit<Apollo.QueryOptions<Types.AdminMembersQueryVariables>, 'query'>, ctx?: Context ){
         const apolloClient = getApolloClient(ctx);

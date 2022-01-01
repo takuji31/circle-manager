@@ -288,6 +288,11 @@ export type UpdateSignUpMutationVariables = Exact<{
 
 export type UpdateSignUpMutation = { __typename?: 'Mutation', updateSignUp: { __typename?: 'SignUp', id: string, invited: boolean, joined: boolean, member: { __typename?: 'Member', id: string, name: string, trainerId?: string | null | undefined }, circle: { __typename?: 'Circle', id: string, name: string } } };
 
+export type AdminCirclesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type AdminCirclesQuery = { __typename?: 'Query', circles: Array<{ __typename?: 'Circle', id: string, name: string }> };
+
 export type AdminMembersQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -717,6 +722,40 @@ export function useUpdateSignUpMutation(baseOptions?: Apollo.MutationHookOptions
 export type UpdateSignUpMutationHookResult = ReturnType<typeof useUpdateSignUpMutation>;
 export type UpdateSignUpMutationResult = Apollo.MutationResult<UpdateSignUpMutation>;
 export type UpdateSignUpMutationOptions = Apollo.BaseMutationOptions<UpdateSignUpMutation, UpdateSignUpMutationVariables>;
+export const AdminCirclesDocument = gql`
+    query AdminCircles {
+  circles(filter: CircleSelect) {
+    ...ListedCircle
+  }
+}
+    ${ListedCircleFragmentDoc}`;
+
+/**
+ * __useAdminCirclesQuery__
+ *
+ * To run a query within a React component, call `useAdminCirclesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useAdminCirclesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useAdminCirclesQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useAdminCirclesQuery(baseOptions?: Apollo.QueryHookOptions<AdminCirclesQuery, AdminCirclesQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<AdminCirclesQuery, AdminCirclesQueryVariables>(AdminCirclesDocument, options);
+      }
+export function useAdminCirclesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<AdminCirclesQuery, AdminCirclesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<AdminCirclesQuery, AdminCirclesQueryVariables>(AdminCirclesDocument, options);
+        }
+export type AdminCirclesQueryHookResult = ReturnType<typeof useAdminCirclesQuery>;
+export type AdminCirclesLazyQueryHookResult = ReturnType<typeof useAdminCirclesLazyQuery>;
+export type AdminCirclesQueryResult = Apollo.QueryResult<AdminCirclesQuery, AdminCirclesQueryVariables>;
 export const AdminMembersDocument = gql`
     query AdminMembers {
   members {
