@@ -1,6 +1,5 @@
 const Channels = {
   all: '839400642664595508', // 全体連絡用
-  circleSelect: '889836038221099038', // サークル選択
   botNotification: '897467813428617227', // bot通知用
   botTest: '879703761562529832', // bot実験用
 };
@@ -23,7 +22,6 @@ export const Guild = {
   channelIds: {
     all: isProduction ? Channels.all : Channels.botTest,
     admin: isProduction ? Channels.botNotification : Channels.botTest,
-    circleSelect: isProduction ? Channels.circleSelect : Channels.botTest,
     commandExecutor: '908319798700703794',
   },
   messageIds: {

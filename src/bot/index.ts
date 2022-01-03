@@ -2,15 +2,12 @@ import { sendSetupMessage } from './../discord/member/setup_message';
 import { trainerIdCommand } from './member/trainer_id';
 import { updateMemberNicknameEvent } from './member/update_member_nickname';
 import { registerNextMonthCircleCommand } from './register_next_month_circle';
-import { selectCircleReaction } from './select_circle';
 import { monthSurveyReaction, monthSurveyShowReaction } from './month_survey';
-import { Guild } from './../model/guild';
 import { registerTrainerIdCommand } from './register_trainer_id';
 import { PrismaClient } from '@prisma/client';
 import { Client, Intents, Options } from 'discord.js';
 import { config } from 'dotenv';
 import { nextMonthCircleCommand } from './next_month_circle';
-import { sendDirectMessageIfPossible } from '../discord/message';
 
 config();
 
@@ -107,11 +104,6 @@ client.on('messageReactionAdd', async (reaction, user) => {
     }
     const emoji = reaction.emoji.name;
     if (!emoji) {
-      return;
-    }
-
-    if (reaction.message.id == Guild.messageIds.circleSelect) {
-      selectCircleReaction(reaction, user, emoji);
       return;
     }
 

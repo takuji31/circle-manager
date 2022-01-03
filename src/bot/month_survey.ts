@@ -39,7 +39,7 @@ export const monthSurveyReaction: ReactionHandlerWithData<MonthSurvey> = async (
 
   if (currentCircle?.id == Circles.specialIds.notJoined) {
     await user.send(
-      'サークルに未加入です。先に<#889836038221099038>をしてください。加入申請が承認されると回答できるようになります。'
+      'サークルに未加入です。先に初期設定を完了してください。加入申請が承認されると回答できるようになります。'
     );
     return;
   }
