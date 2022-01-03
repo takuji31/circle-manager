@@ -1,3 +1,4 @@
+import { prisma } from './../database/prisma';
 import { Temporal } from 'proposal-temporal';
 import { Guild } from './../model/guild';
 import { Routes } from 'discord-api-types/v9';
@@ -24,8 +25,8 @@ export interface UmastagramMember {
 export interface UmastagramCircle {
   total: string;
   avg: string;
-  predicatedTotal: string;
-  predicatedAvg: string;
+  predictedTotal: string;
+  predictedAvg: string;
 }
 
 export const crawlUmastagram: (
@@ -37,127 +38,226 @@ export const crawlUmastagram: (
     .zonedDateTime(Temporal.Calendar.from('iso8601'), 'Asia/Tokyo')
     .subtract(Temporal.Duration.from({ days: 1 }))
     .toPlainDate();
-  // await rest.post(Routes.channelMessages(Guild.channelIds.admin), {
-  //   body: {
-  //     content: `${cirle.name}の ${yesterday.month}月${yesterday.day}日のファン数を取得しています...`,
-  //   },
-  // });
+  const [year, month, day] = [
+    yesterday.year.toString(),
+    yesterday.month.toString(),
+    yesterday.day.toString(),
+  ];
 
-  const browser = await puppeteer.launch({
-    headless: process.env.NODE_ENV == 'production',
-  });
+  try {
+    // await rest.post(Routes.channelMessages(Guild.channelIds.admin), {
+    //   body: {
+    //     content: `${cirle.name}の ${yesterday.month}月${yesterday.day}日のファン数を取得しています...`,
+    //   },
+    // });
 
-  const page = await browser.newPage();
-  // page.on('console', (msg) => console.log('PAGE LOG:', msg.text()));
+    const browser = await puppeteer.launch({
+      headless: process.env.NODE_ENV == 'production',
+    });
 
-  page.setViewport({ width: 1280, height: 960 });
+    const page = await browser.newPage();
+    // page.on('console', (msg) => console.log('PAGE LOG:', msg.text()));
 
-  await page.goto(url, {
-    waitUntil: 'networkidle2',
-  });
+    page.setViewport({ width: 1280, height: 960 });
 
-  await selectTab(page, '実測');
+    await page.goto(url, {
+      waitUntil: 'networkidle2',
+    });
 
-  const memberGradeTables = await extractTableCells(
-    page,
-    'div.circle-member-grades table tbody tr'
-  );
+    await selectTab(page, '実測');
 
-  const memberGrades: Array<GradeTabRow> = memberGradeTables.map((row) => {
-    const [name, avg, total] = row;
+    const memberGradeTables = await extractTableCells(
+      page,
+      'div.circle-member-grades table tbody tr'
+    );
 
-    if (name == null || avg == null || total == null) {
-      throw new Error(`Invalid cell ${row}`);
-    }
+    const memberGrades: Array<GradeTabRow> = memberGradeTables.map((row) => {
+      const [name, avg, total] = row;
 
-    return {
-      name,
-      avg,
-      total,
-    };
-  });
-
-  await selectTab(page, '予測');
-  const memberPredicatedTables = await extractTableCells(
-    page,
-    'div.circle-member-predict-grades table tbody tr'
-  );
-
-  const memberPredicts: Array<PredictedTabRow> = memberPredicatedTables.map(
-    (row) => {
-      const [name, _, __, predicted] = row;
-
-      if (name == null || predicted == null) {
+      if (name == null || avg == null || total == null) {
         throw new Error(`Invalid cell ${row}`);
       }
 
       return {
         name,
-        predicted,
+        avg,
+        total,
       };
-    }
-  );
+    });
 
-  await selectTab(page, '目標');
-  const memberGoalTables = await extractTableCells(
-    page,
-    'div.circle-member-predict-quota table tbody tr'
-  );
+    await selectTab(page, '予測');
+    const memberPredicatedTables = await extractTableCells(
+      page,
+      'div.circle-member-predict-grades table tbody tr'
+    );
 
-  const memberGoals: Array<GoalTabRow> = memberGoalTables.map((row) => {
-    const [name, _, __, completeDay] = row;
+    const memberPredicts: Array<PredictedTabRow> = memberPredicatedTables.map(
+      (row) => {
+        const [name, _, __, predicted] = row;
 
-    if (name == null || completeDay == null) {
-      throw new Error(`Invalid cell ${row}`);
-    }
+        if (name == null || predicted == null) {
+          throw new Error(`Invalid cell ${row}`);
+        }
 
-    return {
-      name,
-      completeDay,
+        return {
+          name,
+          predicted,
+        };
+      }
+    );
+
+    await selectTab(page, '目標');
+    const memberGoalTables = await extractTableCells(
+      page,
+      'div.circle-member-predict-quota table tbody tr'
+    );
+
+    const memberGoals: Array<GoalTabRow> = memberGoalTables.map((row) => {
+      const [name, _, __, completeDay] = row;
+
+      if (name == null || completeDay == null) {
+        throw new Error(`Invalid cell ${row}`);
+      }
+
+      return {
+        name,
+        completeDay,
+      };
+    });
+
+    const members: Array<UmastagramMember> = memberGrades.map(
+      (grade, index) => {
+        const predict = memberPredicts[index];
+        const goal = memberGoals[index];
+        return {
+          ...grade,
+          ...predict,
+          ...goal,
+        };
+      }
+    );
+
+    await selectTab(page, 'サークル');
+
+    const circleTable = await extractTableCells(
+      page,
+      'div.circle-aggregate table tr'
+    );
+
+    const circleCells: Array<string> = circleTable.map((row) => {
+      const [value] = row;
+
+      if (value == null) {
+        throw new Error(`Invalid cell ${row}`);
+      }
+
+      return value;
+    });
+
+    // const data = await page.screenshot({
+    //   path: 'screenshot.png',
+    //   encoding: 'binary',
+    //   type: 'png',
+    //   fullPage: true,
+    // });
+
+    // await rest.post(Routes.channelMessages(Guild.channelIds.admin), {
+    //   body: {
+    //     content: `${circle.name}の ${yesterday.month}月${yesterday.day}日のファン数を取得しました。`,
+    //   },
+    //   attachments: [
+    //     {
+    //       fileName: 'result.json',
+    //       rawBuffer: Buffer.from(JSON.stringify(members, null, 2), 'utf-8'),
+    //     },
+    //   ],
+    // });
+
+    await browser.close();
+
+    const circleResult = {
+      total: circleCells[0],
+      avg: circleCells[1],
+      predictedTotal: circleCells[2],
+      predictedAvg: circleCells[3],
     };
-  });
-
-  const members: Array<UmastagramMember> = memberGrades.map((grade, index) => {
-    const { name } = grade;
-    const predict = memberPredicts[index];
-    const goal = memberGoals[index];
-    return {
-      ...grade,
-      ...predict,
-      ...goal,
+    const result = {
+      members: members,
+      circle: circleResult,
     };
-  });
 
-  // const data = await page.screenshot({
-  //   path: 'screenshot.png',
-  //   encoding: 'binary',
-  //   type: 'png',
-  //   fullPage: true,
-  // });
+    const circleId = circle.id;
 
-  // await rest.post(Routes.channelMessages(Guild.channelIds.admin), {
-  //   body: {
-  //     content: `${circle.name}の ${yesterday.month}月${yesterday.day}日のファン数を取得しました。`,
-  //   },
-  //   attachments: [
-  //     {
-  //       fileName: 'result.json',
-  //       rawBuffer: Buffer.from(JSON.stringify(members, null, 2), 'utf-8'),
-  //     },
-  //   ],
-  // });
+    const dbMembers = await prisma.member.findMany({
+      where: {
+        circleId,
+        name: {
+          in: [...members.map((member) => member.name)],
+        },
+      },
+    });
 
-  await browser.close();
+    const circleFanCountData = {
+      circleId,
+      year,
+      month,
+      day,
+      total: BigInt(circleResult.total.replaceAll(',', '')),
+      avg: BigInt(circleResult.avg.replaceAll(',', '')),
+      predicted: BigInt(circleResult.predictedAvg.replaceAll(',', '')),
+      predictedAvg: BigInt(circleResult.predictedTotal.replaceAll(',', '')),
+    };
+    await prisma.$transaction([
+      prisma.memberFanCount.deleteMany({
+        where: { circleId, year, month, day },
+      }),
+      prisma.memberFanCount.createMany({
+        data: [
+          ...members.map((member) => {
+            const dbMember = dbMembers.find((m) => m.name == member.name);
+            const memberId = dbMember?.id ?? null;
+            return {
+              circleId,
+              year,
+              month,
+              day,
+              name: member.name,
+              memberId,
+              total: BigInt(member.total.replaceAll(',', '')),
+              avg: BigInt(member.avg.replaceAll(',', '')),
+              predicted: BigInt(member.predicted.replaceAll(',', '')),
+            };
+          }),
+        ],
+        skipDuplicates: false,
+      }),
+      prisma.circleFanCount.upsert({
+        where: {
+          circleId_year_month_day: {
+            circleId,
+            year,
+            month,
+            day,
+          },
+        },
+        create: circleFanCountData,
+        update: circleFanCountData,
+      }),
+    ]);
 
-  return {
-    members: members,
-    circle: {
-      total: '0',
-      avg: '0',
-      predicatedAvg: '0',
-      predicatedTotal: '0',
-    },
-  };
+    return result;
+  } catch (e) {
+    await rest.post(Routes.channelMessages(Guild.channelIds.admin), {
+      body: {
+        content:
+          `${circle.name}の ${yesterday.month}月${yesterday.day}日のファン数を取得できませんでした。\n` +
+          '```\n' +
+          `${e}\n` +
+          '```',
+      },
+    });
+    throw e;
+  }
 };
 
 const extractTableCells: (
@@ -186,7 +286,7 @@ const selectTab = async (page: Page, tabName: string) => {
   }
 
   await tab.click({ delay: 100 });
-  await page.waitForTimeout(1000);
+  await page.waitForTimeout(2000);
 };
 
 const findTab = async (page: Page, tabName: string) => {
