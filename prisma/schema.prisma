@@ -27,7 +27,7 @@ model Circle {
   currentMonthCircles MonthCircle[]    @relation("currentCircle")
   signUps             SignUp[]
   fanCounts           MemberFanCount[]
-  circleFanCounts CircleFanCount[]
+  circleFanCounts     CircleFanCount[]
 
   @@index([order])
   @@index([selectableByAdmin, order])
@@ -138,8 +138,8 @@ model CircleFanCount {
   predicted    BigInt
   predictedAvg BigInt
 
-  @@index([year, month, day])
   @@unique([circleId, year, month, day])
+  @@index([year, month, day])
 }
 
 // for NextAuth
