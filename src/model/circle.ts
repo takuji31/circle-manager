@@ -62,7 +62,6 @@ export const CircleId = {
   ha: '870950796479594556', // 破
   jo: '863398725920227339', // 序
 } as const;
-
 export type CircleId = typeof CircleId[keyof typeof CircleId];
 
 interface ICircle {
