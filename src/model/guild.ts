@@ -1,10 +1,12 @@
+import { CircleId } from './circle';
+
+const isProduction = process.env.NODE_ENV == 'production';
+
 const Channels = {
   all: '839400642664595508', // 全体連絡用
   botNotification: '897467813428617227', // bot通知用
   botTest: '879703761562529832', // bot実験用
-};
-
-const isProduction = process.env.NODE_ENV == 'production';
+} as const;
 
 export const Guild = {
   id: '839400642664595506',
@@ -12,10 +14,10 @@ export const Guild = {
     leader: '894446042991452170',
     subLeader: '894446097232191488',
     circleIds: [
-      '908304060640276520', // 西京ファーム
-      '863398236474834944', // シン
-      '870950796479594556', // 破
-      '863398725920227339', // 序
+      CircleId.saikyo,
+      CircleId.shin,
+      CircleId.ha,
+      CircleId.jo,
       '902440950176034816', // 未加入
     ],
   },
@@ -24,7 +26,4 @@ export const Guild = {
     admin: isProduction ? Channels.botNotification : Channels.botTest,
     commandExecutor: '908319798700703794',
   },
-  messageIds: {
-    circleSelect: isProduction ? '908362316339359774' : '908316632995209256',
-  },
-};
+} as const;

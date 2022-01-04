@@ -15,19 +15,17 @@ generator nexusPrisma {
 }
 
 model Circle {
-  id                  String           @id @db.VarChar(255)
+  id                  String        @id @db.VarChar(255)
   name                String
   emoji               String?
-  order               Int              @default(0)
-  selectableByUser    Boolean          @default(true)
-  selectableByAdmin   Boolean          @default(true)
-  selectableInSurvey  Boolean          @default(true)
+  order               Int           @default(0)
+  selectableByUser    Boolean       @default(true)
+  selectableByAdmin   Boolean       @default(true)
+  selectableInSurvey  Boolean       @default(true)
   members             Member[]
   monthCircles        MonthCircle[]
-  currentMonthCircles MonthCircle[]    @relation("currentCircle")
+  currentMonthCircles MonthCircle[] @relation("currentCircle")
   signUps             SignUp[]
-  fanCounts           MemberFanCount[]
-  circleFanCounts     CircleFanCount[]
 
   @@index([order])
   @@index([selectableByAdmin, order])
@@ -43,10 +41,12 @@ model Member {
   trainerId        String?          @db.VarChar(255)
   messageChannelId String?          @db.VarChar(255)
   setupCompleted   Boolean          @default(false)
+  status           MemberStatus     @default(Joined)
   joinedAt         DateTime
   leavedAt         DateTime?
   circleId         String?          @db.VarChar(255)
   circle           Circle?          @relation(fields: [circleId], references: [id])
+  circleKey        CircleKey?       @default(dbgenerated("NULL"))
   monthCircles     MonthCircle[]
   signUp           SignUp?
   fanCounts        MemberFanCount[]
@@ -95,50 +95,49 @@ model MonthSurvey {
 
 /// 加入申請
 model SignUp {
-  id        String   @id @db.VarChar(255) /// DiscordのユーザーID
-  member    Member   @relation(fields: [id], references: [id])
-  circleId  String   @db.VarChar(255)
-  circle    Circle   @relation(fields: [circleId], references: [id])
-  invited   Boolean  @default(false)
-  joined    Boolean  @default(false)
-  createdAt DateTime @default(now())
+  id        String     @id @db.VarChar(255) /// DiscordのユーザーID
+  member    Member     @relation(fields: [id], references: [id])
+  circleId  String     @db.VarChar(255)
+  circle    Circle     @relation(fields: [circleId], references: [id])
+  circleKey CircleKey? @default(dbgenerated("NULL"))
+  invited   Boolean    @default(false)
+  joined    Boolean    @default(false)
+  createdAt DateTime   @default(now())
 
   @@index([joined])
 }
 
 /// Umastagramから取得した各メンバーのファン数
 model MemberFanCount {
-  id        String  @id @default(cuid()) @db.VarChar(255)
-  year      String  @db.Char(4)
-  month     String  @db.Char(2)
-  day       String  @db.Char(2)
-  circleId  String  @db.VarChar(255)
-  circle    Circle  @relation(fields: [circleId], references: [id])
-  name      String  @db.VarChar(255)
+  id        String    @id @default(cuid()) @db.VarChar(255)
+  year      String    @db.Char(4)
+  month     String    @db.Char(2)
+  day       String    @db.Char(2)
+  circle    CircleKey
+  name      String    @db.VarChar(255)
   total     BigInt
   avg       BigInt
   predicted BigInt
-  memberId  String? @db.VarChar(255)
-  member    Member? @relation(fields: [memberId], references: [id])
+  memberId  String?   @db.VarChar(255)
+  member    Member?   @relation(fields: [memberId], references: [id])
 
-  @@index([year, month, day, circleId])
+  @@index([year, month, day, circle])
   @@index([memberId, year, month, day])
 }
 
 /// Umastagramから取得したサークルごとのファン数
 model CircleFanCount {
-  id           String @id @default(cuid()) @db.VarChar(255)
-  year         String @db.Char(4)
-  month        String @db.Char(2)
-  day          String @db.Char(2)
-  circleId     String @db.VarChar(255)
-  circle       Circle @relation(fields: [circleId], references: [id])
+  id           String    @id @default(cuid()) @db.VarChar(255)
+  year         String    @db.Char(4)
+  month        String    @db.Char(2)
+  day          String    @db.Char(2)
+  circle       CircleKey
   total        BigInt
   avg          BigInt
   predicted    BigInt
   predictedAvg BigInt
 
-  @@unique([circleId, year, month, day])
+  @@unique([circle, year, month, day])
   @@index([year, month, day])
 }
 
@@ -191,3 +190,22 @@ model VerificationToken {
 }
 
 // end for NextAuth
+
+// enum
+
+enum CircleKey {
+  Saikyo
+  Shin
+  Ha
+  Jo
+}
+
+enum MemberStatus {
+  NotJoined
+  Joined
+  Leaved
+  OB
+  Kicked
+}
+
+// end enum

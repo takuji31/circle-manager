@@ -5,6 +5,8 @@ import { Routes } from 'discord-api-types/v9';
 import { createDiscordRestClient } from '../discord';
 import puppeteer, { Page } from 'puppeteer';
 import { type } from 'os';
+import { Circle } from '../model';
+import { CircleKey } from '@prisma/client';
 export interface UmastagramPage {
   members: Array<UmastagramMember>;
   circle: UmastagramCircle;
@@ -31,7 +33,7 @@ export interface UmastagramCircle {
 
 export const crawlUmastagram: (
   url: string,
-  circle: { id: string; name: string }
+  circle: Circle
 ) => Promise<UmastagramPage> = async (url, circle) => {
   const rest = createDiscordRestClient();
   const yesterday = Temporal.now
@@ -187,6 +189,7 @@ export const crawlUmastagram: (
     };
 
     const circleId = circle.id;
+    const circleKey = circle.key;
 
     const dbMembers = await prisma.member.findMany({
       where: {
@@ -198,7 +201,7 @@ export const crawlUmastagram: (
     });
 
     const circleFanCountData = {
-      circleId,
+      circle: circleKey,
       year,
       month,
       day,
@@ -209,7 +212,7 @@ export const crawlUmastagram: (
     };
     await prisma.$transaction([
       prisma.memberFanCount.deleteMany({
-        where: { circleId, year, month, day },
+        where: { circle: circleKey, year, month, day },
       }),
       prisma.memberFanCount.createMany({
         data: [
@@ -217,7 +220,7 @@ export const crawlUmastagram: (
             const dbMember = dbMembers.find((m) => m.name == member.name);
             const memberId = dbMember?.id ?? null;
             return {
-              circleId,
+              circle: circleKey,
               year,
               month,
               day,
@@ -233,8 +236,8 @@ export const crawlUmastagram: (
       }),
       prisma.circleFanCount.upsert({
         where: {
-          circleId_year_month_day: {
-            circleId,
+          circle_year_month_day: {
+            circle: circleKey,
             year,
             month,
             day,
