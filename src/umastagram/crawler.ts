@@ -31,19 +31,18 @@ export interface UmastagramCircle {
   predictedAvg: string;
 }
 
-export const crawlUmastagram: (
+export async function crawlUmastagram(
   url: string,
-  circle: Circle
-) => Promise<UmastagramPage> = async (url, circle) => {
-  const rest = createDiscordRestClient();
-  const yesterday = Temporal.now
-    .zonedDateTime(Temporal.Calendar.from('iso8601'), 'Asia/Tokyo')
+  circle: Circle,
+  date: Temporal.PlainDate = Temporal.now
+    .plainDate('iso8601', 'Asia/Tokyo')
     .subtract(Temporal.Duration.from({ days: 1 }))
-    .toPlainDate();
+): Promise<UmastagramPage> {
+  const rest = createDiscordRestClient();
   const [year, month, day] = [
-    yesterday.year.toString(),
-    yesterday.month.toString(),
-    yesterday.day.toString(),
+    date.year.toString(),
+    date.month.toString(),
+    date.day.toString(),
   ];
 
   try {
@@ -163,18 +162,6 @@ export const crawlUmastagram: (
     //   fullPage: true,
     // });
 
-    // await rest.post(Routes.channelMessages(Guild.channelIds.admin), {
-    //   body: {
-    //     content: `${circle.name}の ${yesterday.month}月${yesterday.day}日のファン数を取得しました。`,
-    //   },
-    //   attachments: [
-    //     {
-    //       fileName: 'result.json',
-    //       rawBuffer: Buffer.from(JSON.stringify(members, null, 2), 'utf-8'),
-    //     },
-    //   ],
-    // });
-
     await browser.close();
 
     const circleResult = {
@@ -248,12 +235,24 @@ export const crawlUmastagram: (
       }),
     ]);
 
+    await rest.post(Routes.channelMessages(Guild.channelIds.admin), {
+      body: {
+        content: `${circle.name}の ${year}年${month}月${day}日のファン数を取得しました。`,
+      },
+      attachments: [
+        {
+          fileName: 'result.json',
+          rawBuffer: Buffer.from(JSON.stringify(members, null, 2), 'utf-8'),
+        },
+      ],
+    });
+
     return result;
   } catch (e) {
     await rest.post(Routes.channelMessages(Guild.channelIds.admin), {
       body: {
         content:
-          `${circle.name}の ${yesterday.month}月${yesterday.day}日のファン数を取得できませんでした。\n` +
+          `${circle.name}の ${year}年${date.month}月${date.day}日のファン数を取得できませんでした。\n` +
           '```\n' +
           `${e}\n` +
           '```',
@@ -261,7 +260,7 @@ export const crawlUmastagram: (
     });
     throw e;
   }
-};
+}
 
 const extractTableCells: (
   page: Page,
