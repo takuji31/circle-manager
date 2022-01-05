@@ -108,7 +108,12 @@ export async function crawlUmastagram(
       }
     );
 
-    await selectTab(page, '目標');
+    try {
+      await selectTab(page, 'ノルマ');
+    } catch (e) {
+      await selectTab(page, '目標');
+    }
+
     const memberGoalTables = await extractTableCells(
       page,
       'div.circle-member-predict-quota table tbody tr'
