@@ -254,7 +254,8 @@ export async function crawlUmastagram(
         content:
           `${circle.name}の ${year}年${date.month}月${date.day}日のファン数を取得できませんでした。\n` +
           '```\n' +
-          `${e}\n` +
+          `${e}`.substring(0, 1800) +
+          `\n` +
           '```',
       },
     });
