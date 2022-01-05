@@ -54,6 +54,7 @@ export async function crawlUmastagram(
 
     const browser = await puppeteer.launch({
       headless: process.env.NODE_ENV == 'production',
+      args: ['--no-sandbox'],
     });
 
     const page = await browser.newPage();
