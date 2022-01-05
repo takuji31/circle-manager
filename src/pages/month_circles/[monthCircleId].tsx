@@ -55,17 +55,8 @@ export const getStaticProps: GetStaticProps<Props> = (ctx) => {
 };
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const monthCirles = await prisma.monthCircle.findMany({
-    where: {
-      OR: [{ ...thisMonth() }, { ...nextMonth() }],
-    },
-  });
   return {
-    paths: monthCirles.map((circle) => ({
-      params: {
-        monthCircleId: circle.id,
-      },
-    })),
+    paths: [],
     fallback: 'blocking',
   };
 };
