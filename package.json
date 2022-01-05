@@ -32,6 +32,9 @@
   "prisma": {
     "seed": "yarn run ts-node src/database/seed.ts"
   },
+  "cacheDirectories": [
+    ".next/cache"
+  ],
   "private": true,
   "dependencies": {
     "@apollo/client": "^3.4.16",
