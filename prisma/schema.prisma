@@ -61,6 +61,7 @@ model Member {
 enum CircleRole {
   Leader
   SubLeader
+  Member
 }
 
 model MonthCircle {
