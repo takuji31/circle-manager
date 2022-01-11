@@ -51,6 +51,7 @@ model Member {
   signUp           SignUp?
   fanCounts        MemberFanCount[]
 
+  MonthSurveyAnswer MonthSurveyAnswer[]
   @@unique([pathname])
   @@index([leavedAt])
   @@index([joinedAt])
@@ -60,7 +61,6 @@ model Member {
 enum CircleRole {
   Leader
   SubLeader
-  Member
 }
 
 model MonthCircle {
@@ -91,6 +91,28 @@ model MonthSurvey {
   expiredAt DateTime
 
   @@unique([year, month])
+}
+
+model MonthSurveyAnswer {
+  id        String                  @id @default(uuid()) @db.VarChar(255)
+  year      String                  @db.Char(4)
+  month     String                  @db.Char(2)
+  memberId  String                  @db.VarChar(255)
+  member    Member                  @relation(fields: [memberId], references: [id])
+  circleKey CircleKey
+  value     MonthSurveyAnswerValue? @default(None)
+
+  @@unique([year, month, memberId])
+  @@index([memberId])
+  @@index([value, memberId])
+}
+
+enum MonthSurveyAnswerValue {
+  None
+  Saikyo
+  Umamusume
+  Leave
+  Ob
 }
 
 /// 加入申請
