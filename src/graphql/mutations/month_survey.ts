@@ -1,6 +1,6 @@
 import { getCircleName, Circles } from './../../model/circle';
 import { Guild } from './../../model/guild';
-import { Circle } from '@prisma/client';
+import { Circle, Member, MemberStatus } from '@prisma/client';
 import { Temporal } from 'proposal-temporal';
 import { createDiscordRestClient } from '../../discord';
 import { nextMonth } from '../../model';
@@ -12,6 +12,7 @@ import {
   Routes,
 } from 'discord-api-types/v9';
 import { CreateNextMonthSurveyPayload } from '../types';
+import { Emoji, MonthSurveyEmoji } from '../../model/emoji';
 
 export const CreateNextMonthSurveyMutation = mutationField(
   'createNextMonthSurvey',
@@ -28,7 +29,7 @@ export const CreateNextMonthSurveyMutation = mutationField(
         month: parseInt(month),
         day: 1,
       })
-        .subtract(Temporal.Duration.from({ days: 4 }))
+        .subtract(Temporal.Duration.from({ days: 6 }))
         .toZonedDateTime({
           timeZone: 'Asia/Tokyo',
           plainTime: Temporal.PlainTime.from({ hour: 0, minute: 0, second: 0 }),
@@ -47,7 +48,11 @@ export const CreateNextMonthSurveyMutation = mutationField(
         )
         .addField(
           '対象者',
-          'このメッセージが送信された時点でサークルに所属しているメンバー全員、及び送信後に加入したが来月姉妹サークルへ移籍予定のメンバー'
+          'このメッセージが送信された時点でサークルに所属しているメンバー/来月復帰予定のOB'
+        )
+        .addField(
+          '対象外の方',
+          'このメッセージが送信された時点で加入申請中のメンバー/来月復帰予定のないOB'
         )
         .addField(
           '期限',
@@ -61,13 +66,10 @@ export const CreateNextMonthSurveyMutation = mutationField(
         )
         .addField('回答方法', 'このメッセージにリアクション');
 
-      const circles: Array<Circle> = await prisma.circle.findMany({
-        where: { selectableInSurvey: true },
-        orderBy: { order: 'asc' },
-      });
-      circles.forEach((circle) => {
-        embed.addField(`${getCircleName(circle)}`, `${circle.emoji}`, true);
-      });
+      embed.addField('西京ファーム', Emoji.a, true);
+      embed.addField('ウマ娘愛好会(ランキング制)', Emoji.b, true);
+      embed.addField('脱退', Emoji.c, true);
+      embed.addField('脱退(Discord残留)', Emoji.d, true);
 
       embed.addField('未回答の場合', '***除名となります。***');
       embed.addField(
@@ -99,33 +101,29 @@ export const CreateNextMonthSurveyMutation = mutationField(
 
       const members = await prisma.member.findMany({
         where: {
-          circle: {
-            selectableByUser: true,
+          circleKey: {
+            not: null,
           },
+          status: MemberStatus.Joined,
         },
       });
 
-      await prisma.monthCircle.createMany({
-        data: members.map(
-          ({ id, circleId }: { id: string; circleId: string | null }) => ({
-            memberId: id,
-            currentCircleId: circleId!!,
-            year,
-            month,
-            circleId: Circles.specialIds.noAnswer,
-          })
-        ),
+      await prisma.monthSurveyAnswer.createMany({
+        data: members.map(({ id, circleKey }: Member) => ({
+          memberId: id,
+          circleKey: circleKey!!,
+          year,
+          month,
+        })),
         skipDuplicates: true,
       });
 
-      const emojiNames = [...circles.map((circle) => circle.emoji), '👀'];
+      const emojiNames = Object.values(MonthSurveyEmoji);
 
       for (const emoji of emojiNames) {
-        if (emoji) {
-          await rest.put(
-            Routes.channelMessageOwnReaction(channelId, messageId, `${emoji}`)
-          );
-        }
+        await rest.put(
+          Routes.channelMessageOwnReaction(channelId, messageId, emoji)
+        );
       }
 
       return {

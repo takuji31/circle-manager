@@ -1,9 +1,14 @@
-import { Guild } from './../model/guild';
 import { Circles, getCircleName } from './../model/circle';
-import { ReactionHandler, ReactionHandlerWithData } from './types';
+import { ReactionHandlerWithData } from './types';
 import { Temporal } from 'proposal-temporal';
 import { prisma } from '../database';
-import { MonthSurvey } from '@prisma/client';
+import {
+  CircleKey,
+  MemberStatus,
+  MonthSurvey,
+  MonthSurveyAnswerValue,
+} from '@prisma/client';
+import { isValidMonthSurveyEmoji, MonthSurveyEmoji } from '../model/emoji';
 
 export const monthSurveyReaction: ReactionHandlerWithData<MonthSurvey> = async (
   reaction,
@@ -30,29 +35,39 @@ export const monthSurveyReaction: ReactionHandlerWithData<MonthSurvey> = async (
   }
 
   const { year, month } = data;
-  const { id: memberId, circleId, circle: currentCircle } = member;
+  const { id: memberId, circleKey, status, circle: currentCircle } = member;
 
-  if (!circleId) {
+  if (!circleKey) {
     await user.send('サークルに所属していません。');
     return;
   }
 
-  if (currentCircle?.id == Circles.specialIds.notJoined) {
+  if (status == MemberStatus.NotJoined) {
     await user.send(
       'サークルに未加入です。先に初期設定を完了してください。加入申請が承認されると回答できるようになります。'
     );
     return;
   }
 
-  const circle = await prisma.circle.findFirst({ where: { emoji } });
-  if (!circle) {
+  if (!isValidMonthSurveyEmoji(emoji)) {
     await user.send(
       '不明な絵文字です、在籍希望アンケートには決められた絵文字でリアクションしてください。'
     );
     return;
   }
 
-  await prisma.monthCircle.upsert({
+  const value: MonthSurveyAnswerValue =
+    emoji == MonthSurveyEmoji.saikyo
+      ? MonthSurveyAnswerValue.Saikyo
+      : emoji == MonthSurveyEmoji.umamusume
+      ? MonthSurveyAnswerValue.Umamusume
+      : emoji == MonthSurveyEmoji.leave
+      ? MonthSurveyAnswerValue.Leave
+      : emoji == MonthSurveyEmoji.ob
+      ? MonthSurveyAnswerValue.Ob
+      : MonthSurveyAnswerValue.None;
+
+  await prisma.monthSurveyAnswer.upsert({
     where: {
       year_month_memberId: { year, month, memberId },
     },
@@ -60,38 +75,41 @@ export const monthSurveyReaction: ReactionHandlerWithData<MonthSurvey> = async (
       year,
       month,
       memberId,
-      circleId: circle.id,
-      currentCircleId: circleId,
+      circleKey,
+      value,
     },
     update: {
       year,
       month,
       memberId,
-      circleId: circle.id,
-      currentCircleId: circleId,
+      circleKey,
+      value,
     },
   });
 
-  if (circle.id == Circles.specialIds.leave) {
+  const url = `${process.env.BASE_URL}/members/${member.pathname}/edit`;
+  if (value == MonthSurveyAnswerValue.Leave) {
     await user.send(
-      `${year}年${month}月の在籍希望アンケートを「脱退予定」で受け付けました。大変残念ですが、新天地での活躍をお祈りします。当サークルに在籍していただきありがとうございました :person_bowing:`
+      `${year}年${month}月の在籍希望アンケートを「脱退」で受け付けました。大変残念ですが、新天地での活躍をお祈りします。当サークルに在籍していただきありがとうございました :person_bowing:`
     );
-  } else if (circle.id == Circles.specialIds.ob) {
+  } else if (value == MonthSurveyAnswerValue.Ob) {
     await user.send(
-      `${year}年${month}月の在籍希望アンケートを「脱退予定」で受け付けました。Discord残留とのことですので、引き続きよろしくお願いします。`
+      `${year}年${month}月の在籍希望アンケートを「脱退」で受け付けました。Discord残留とのことですので、引き続きよろしくお願いします。`
     );
-  } else if (circle.id == member.circle?.id) {
+  } else if (
+    value == MonthSurveyAnswerValue.Saikyo &&
+    circleKey == CircleKey.Saikyo
+  ) {
     await user.send(
-      `${year}年${month}月の在籍希望アンケートを受け付けました。引き続き「${circle.name}」に所属とのことで手続きは以上となります。引き続きよろしくお願いします。`
+      `${year}年${month}月の在籍希望アンケートを受け付けました。引き続き「西京ファーム」に所属とのことで手続きは以上となります。引き続きよろしくお願いします。`
     );
-  } else if (member.trainerId) {
+  } else if (value == MonthSurveyAnswerValue.Saikyo) {
     await user.send(
-      `${year}年${month}月の在籍希望アンケートを「${circle.name}」への移籍で受け付けました。トレーナーID入力済みですので、追加の手続きは必要ありません。月初にサークル勧誘と除名が行われますので、除名され次第希望のサークルからの勧誘を承諾して異動をお願いします。`
+      `${year}年${month}月の在籍希望アンケートを「西京ファーム」で受け付けました。トレーナーIDの登録がまだの方は以下のリンクからトレーナーIDの登録をお願いします。\n${url}`
     );
-  } else {
-    const url = `${process.env.BASE_URL}/members/${member.pathname}/edit`;
+  } else if (value == MonthSurveyAnswerValue.Umamusume) {
     await user.send(
-      `${year}年${month}月の在籍希望アンケートを「${circle.name}」への移籍で受け付けました。移籍にはトレーナーIDの入力が必要です。以下のURLでトレーナーIDを登録してください。\n${url}`
+      `${year}年${month}月の在籍希望アンケートを「ウマ娘愛好会」で受け付けました。入れ替えの対象になった場合トレーナーIDが必要ですので、登録がまだの方は以下のリンクから今すぐトレーナーIDの登録をお願いします。\n${url}`
     );
   }
 };
@@ -103,9 +121,6 @@ export const monthSurveyShowReaction: ReactionHandlerWithData<
 
   const member = await prisma.member.findUnique({
     where: { id: user.id },
-    include: {
-      circle: true,
-    },
   });
 
   if (!member) {
@@ -113,7 +128,7 @@ export const monthSurveyShowReaction: ReactionHandlerWithData<
   }
 
   const { year, month } = data;
-  const monthCircle = await prisma.monthCircle.findUnique({
+  const answer = await prisma.monthSurveyAnswer.findUnique({
     where: {
       year_month_memberId: {
         year,
@@ -121,31 +136,31 @@ export const monthSurveyShowReaction: ReactionHandlerWithData<
         memberId: user.id,
       },
     },
-    include: {
-      circle: true,
-    },
   });
 
-  if (!monthCircle) {
+  if (!answer) {
     await user.send('この在籍希望アンケートは対象ではないため回答不要です。');
     return;
   }
-
-  if (monthCircle.circleId == Circles.specialIds.noAnswer) {
+  const value = answer.value;
+  if (value == MonthSurveyAnswerValue.None) {
     await user.send(
       `あなたの${year}年${month}月の在籍希望は未回答です。回答がない場合は除名となりますのでご注意ください。`
     );
     return;
-  } else if (monthCircle.circleId == Circles.specialIds.kick) {
-    await user.send(
-      `あなたは${year}年${month}月の除名対象となっています。除名対象になった理由については運営メンバーにお問い合わせください。`
-    );
-    return;
   } else {
     await user.send(
-      `あなたの${year}年${month}月の在籍希望は「${getCircleName(
-        monthCircle.circle
-      )}」です。変更がある場合は期限内に再度希望内容の絵文字でリアクションしてください。`
+      `あなたの${year}年${month}月の在籍希望は「${
+        value == 'Saikyo'
+          ? '西京ファーム'
+          : value == 'Umamusume'
+          ? 'ウマ娘愛好会'
+          : value == 'Leave'
+          ? '脱退'
+          : value == 'Ob'
+          ? '脱退(Discord残留)'
+          : ''
+      }」です。変更がある場合は期限内に再度希望内容の絵文字でリアクションしてください。`
     );
   }
 };

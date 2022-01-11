@@ -8,6 +8,7 @@ import { PrismaClient } from '@prisma/client';
 import { Client, Intents, Options } from 'discord.js';
 import { config } from 'dotenv';
 import { nextMonthCircleCommand } from './next_month_circle';
+import { Emoji } from '../model/emoji';
 
 config();
 
@@ -112,7 +113,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
         id: reaction.message.id,
       },
     });
-    if (survey && emoji == '👀') {
+    if (survey && emoji == Emoji.eyes) {
       monthSurveyShowReaction(reaction, user, emoji, survey);
     } else if (survey) {
       monthSurveyReaction(reaction, user, emoji, survey);
