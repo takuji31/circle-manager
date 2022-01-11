@@ -1,14 +1,13 @@
 import { prisma } from './../../database/prisma';
-import { Guild } from '../../model';
+import { Circle, Circles, Guild } from '../../model';
 import { list, mutationField, nonNull } from 'nexus';
 import { createDiscordRestClient } from '../../discord';
 import {
   RESTGetAPIGuildMembersResult,
   Routes,
   RESTPatchAPIGuildMemberJSONBody,
-  RESTPatchAPIGuildMemberResult,
 } from 'discord-api-types/v9';
-import { CircleRole as PrismaCircleRole, PrismaPromise } from '@prisma/client';
+import { CircleRole as PrismaCircleRole, MemberStatus } from '@prisma/client';
 import { Member, UpdateMemberMutationInput } from '../types';
 
 export const UpdateMembers = mutationField('updateMembers', {
@@ -18,59 +17,73 @@ export const UpdateMembers = mutationField('updateMembers', {
       throw new Error('updateMembers not supported');
     }
     const rest = createDiscordRestClient();
-    const circles = await ctx.prisma.circle.findMany({
-      select: {
-        id: true,
-      },
-      orderBy: {
-        id: 'asc',
-      },
-    });
-    const circleIds = circles.map((circle: { id: string }) => circle.id);
+    const circleIds = Object.values(Circle).map(
+      (circle) => circle.id as string
+    );
 
-    const members = (await rest.get(
-      `${Routes.guildMembers(Guild.id)}?limit=1000`
-    )) as RESTGetAPIGuildMembersResult;
+    const members = (
+      (await rest.get(
+        `${Routes.guildMembers(Guild.id)}?limit=1000`
+      )) as RESTGetAPIGuildMembersResult
+    ).filter((member) => !member.user?.bot && member.user);
     await ctx.prisma.$transaction([
       prisma.member.updateMany({
         where: {
-          circleId: {
-            not: null,
+          id: {
+            notIn: [...members.map((member) => member.user?.id!)],
           },
+          status: MemberStatus.Joined,
         },
-        data: { circleId: null },
+        data: {
+          status: MemberStatus.Leaved,
+          circleKey: null,
+          circleId: null,
+        },
       }),
-      ...members
-        .filter((member) => !member.user?.bot && member.user)
-        .map((member) => {
-          const user = member.user!;
-          const circleIdOrNull = member.roles.filter(
-            (role) => circleIds.indexOf(role) != -1
-          )[0];
-          const circleRole = member.roles.includes(Guild.roleIds.leader)
-            ? PrismaCircleRole.Leader
-            : member.roles.includes(Guild.roleIds.subLeader)
-            ? PrismaCircleRole.SubLeader
-            : PrismaCircleRole.Member;
-          return ctx.prisma.member.upsert({
-            where: {
-              id: user.id,
-            },
-            create: {
-              id: user.id,
-              name: member.nick ?? user.username,
-              circleId: circleIdOrNull,
-              circleRole: circleRole,
-              joinedAt: member.joined_at,
-            },
-            update: {
-              name: member.nick ?? user.username,
-              circleId: circleIdOrNull,
-              circleRole: circleRole,
-              joinedAt: member.joined_at,
-            },
-          });
-        }),
+      ...members.map((member) => {
+        const user = member.user!;
+        const circleIdOrNull = member.roles.filter(
+          (role) => circleIds.indexOf(role) != -1
+        )[0];
+        const isOb = member.roles.includes(Guild.roleIds.ob);
+        const isNotJoined = member.roles.includes(Guild.roleIds.notJoined);
+        const circle =
+          !isOb && !isNotJoined && circleIdOrNull
+            ? Circles.findByRawId(circleIdOrNull)
+            : null;
+        const status = isOb
+          ? MemberStatus.OB
+          : isNotJoined
+          ? MemberStatus.NotJoined
+          : circle != null
+          ? MemberStatus.Joined
+          : MemberStatus.NotJoined;
+        const circleRole = member.roles.includes(Guild.roleIds.leader)
+          ? PrismaCircleRole.Leader
+          : member.roles.includes(Guild.roleIds.subLeader)
+          ? PrismaCircleRole.SubLeader
+          : PrismaCircleRole.Member;
+        return ctx.prisma.member.upsert({
+          where: {
+            id: user.id,
+          },
+          create: {
+            id: user.id,
+            name: member.nick ?? user.username,
+            circleKey: circle?.key ?? null,
+            circleRole: circleRole,
+            joinedAt: member.joined_at,
+            status,
+          },
+          update: {
+            name: member.nick ?? user.username,
+            circleKey: circle?.key ?? null,
+            circleRole: circleRole,
+            joinedAt: member.joined_at,
+            status,
+          },
+        });
+      }),
     ]);
 
     await ctx.prisma.member.updateMany({
@@ -79,15 +92,14 @@ export const UpdateMembers = mutationField('updateMembers', {
       },
       data: {
         circleId: null,
+        circleKey: null,
       },
     });
 
     return ctx.prisma.member.findMany({
       orderBy: [
         {
-          circle: {
-            order: 'asc',
-          },
+          circleKey: 'asc',
         },
         {
           circleRole: 'asc',

@@ -20,6 +20,8 @@ export const Guild = {
       CircleId.jo,
       '902440950176034816', // 未加入
     ],
+    ob: '889835308189900810',
+    notJoined: '902440950176034816',
   },
   channelIds: {
     all: isProduction ? Channels.all : Channels.botTest,
