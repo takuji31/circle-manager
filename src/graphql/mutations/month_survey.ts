@@ -118,7 +118,13 @@ export const CreateNextMonthSurveyMutation = mutationField(
         skipDuplicates: true,
       });
 
-      const emojiNames = [...Object.values(MonthSurveyEmoji), Emoji.eyes];
+      const emojiNames = [
+        MonthSurveyEmoji.saikyo,
+        MonthSurveyEmoji.umamusume,
+        MonthSurveyEmoji.leave,
+        MonthSurveyEmoji.ob,
+        Emoji.eyes,
+      ];
 
       for (const emoji of emojiNames) {
         await rest.put(
