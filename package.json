@@ -26,6 +26,7 @@
     "send-select-circle-message": "yarn run ts-node src/tools/send-select-circle-message",
     "cron:month-survey-reminder": "curl https://cronitor.link/p/2028ed5e5f8544a5adfc7de3d7dd2455/month-survey-reminder?state=run ; yarn run ts-node src/cron/month-survey-reminder && curl https://cronitor.link/p/2028ed5e5f8544a5adfc7de3d7dd2455/month-survey-reminder?state=complete || curl https://cronitor.link/p/2028ed5e5f8544a5adfc7de3d7dd2455/month-survey-reminder?state=fail",
     "cron:month-circle-notifier": "curl https://cronitor.link/p/2028ed5e5f8544a5adfc7de3d7dd2455/month-circle-notifier?state=run ; yarn run ts-node src/cron/month-circle-notifier && curl https://cronitor.link/p/2028ed5e5f8544a5adfc7de3d7dd2455/month-circle-notifier?state=complete || curl https://cronitor.link/p/2028ed5e5f8544a5adfc7de3d7dd2455/month-circle-notifier?state=fail",
+    "cron:start-month-survey": "curl https://cronitor.link/p/2028ed5e5f8544a5adfc7de3d7dd2455/start-month-survey?state=run ; yarn run ts-node src/cron/start-month-survey && curl https://cronitor.link/p/2028ed5e5f8544a5adfc7de3d7dd2455/start-month-survey?state=complete || curl https://cronitor.link/p/2028ed5e5f8544a5adfc7de3d7dd2455/start-month-survey?state=fail",
     "ts-node": "ts-node --compiler-options {\\\"module\\\":\\\"commonjs\\\"} ",
     "ts-node-dev": "ts-node-dev --compiler-options {\\\"module\\\":\\\"commonjs\\\"} "
   },
