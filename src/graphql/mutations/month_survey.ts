@@ -29,7 +29,7 @@ export const CreateNextMonthSurveyMutation = mutationField(
         month: parseInt(month),
         day: 1,
       })
-        .subtract(Temporal.Duration.from({ days: 6 }))
+        .subtract(Temporal.Duration.from({ days: 12 }))
         .toZonedDateTime({
           timeZone: 'Asia/Tokyo',
           plainTime: Temporal.PlainTime.from({ hour: 0, minute: 0, second: 0 }),
@@ -118,7 +118,7 @@ export const CreateNextMonthSurveyMutation = mutationField(
         skipDuplicates: true,
       });
 
-      const emojiNames = Object.values(MonthSurveyEmoji);
+      const emojiNames = [...Object.values(MonthSurveyEmoji), Emoji.eyes];
 
       for (const emoji of emojiNames) {
         await rest.put(
