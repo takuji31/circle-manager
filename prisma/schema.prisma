@@ -133,9 +133,7 @@ model SignUp {
 /// Umastagramから取得した各メンバーのファン数
 model MemberFanCount {
   id        String    @id @default(cuid()) @db.VarChar(255)
-  year      String    @db.Char(4)
-  month     String    @db.Char(2)
-  day       String    @db.Char(2)
+  date      DateTime  @db.Date
   circle    CircleKey
   name      String    @db.VarChar(255)
   total     BigInt
@@ -144,24 +142,22 @@ model MemberFanCount {
   memberId  String?   @db.VarChar(255)
   member    Member?   @relation(fields: [memberId], references: [id])
 
-  @@index([year, month, day, circle])
-  @@index([memberId, year, month, day])
+  @@index([date, circle])
+  @@index([memberId, date])
 }
 
 /// Umastagramから取得したサークルごとのファン数
 model CircleFanCount {
   id           String    @id @default(cuid()) @db.VarChar(255)
-  year         String    @db.Char(4)
-  month        String    @db.Char(2)
-  day          String    @db.Char(2)
+  date         DateTime  @db.Date
   circle       CircleKey
   total        BigInt
   avg          BigInt
   predicted    BigInt
   predictedAvg BigInt
 
-  @@unique([circle, year, month, day])
-  @@index([year, month, day])
+  @@unique([circle, date])
+  @@index([date])
 }
 
 // for NextAuth

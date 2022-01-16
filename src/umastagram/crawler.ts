@@ -34,16 +34,12 @@ export interface UmastagramCircle {
 export async function crawlUmastagram(
   url: string,
   circle: Circle,
-  date: Temporal.PlainDate = Temporal.now
+  plainDate: Temporal.PlainDate = Temporal.now
     .plainDate('iso8601', 'Asia/Tokyo')
     .subtract(Temporal.Duration.from({ days: 1 }))
 ): Promise<UmastagramPage> {
   const rest = createDiscordRestClient();
-  const [year, month, day] = [
-    date.year.toString(),
-    date.month.toString(),
-    date.day.toString(),
-  ];
+  const date = new Date(plainDate.toString());
 
   try {
     // await rest.post(Routes.channelMessages(Guild.channelIds.admin), {
@@ -181,12 +177,11 @@ export async function crawlUmastagram(
       circle: circleResult,
     };
 
-    const circleId = circle.id;
     const circleKey = circle.key;
 
     const dbMembers = await prisma.member.findMany({
       where: {
-        circleId,
+        circleKey,
         name: {
           in: [...members.map((member) => member.name)],
         },
@@ -195,9 +190,7 @@ export async function crawlUmastagram(
 
     const circleFanCountData = {
       circle: circleKey,
-      year,
-      month,
-      day,
+      date,
       total: BigInt(circleResult.total.replaceAll(',', '')),
       avg: BigInt(circleResult.avg.replaceAll(',', '')),
       predicted: BigInt(circleResult.predictedAvg.replaceAll(',', '')),
@@ -205,7 +198,7 @@ export async function crawlUmastagram(
     };
     await prisma.$transaction([
       prisma.memberFanCount.deleteMany({
-        where: { circle: circleKey, year, month, day },
+        where: { circle: circleKey, date },
       }),
       prisma.memberFanCount.createMany({
         data: [
@@ -214,9 +207,7 @@ export async function crawlUmastagram(
             const memberId = dbMember?.id ?? null;
             return {
               circle: circleKey,
-              year,
-              month,
-              day,
+              date,
               name: member.name,
               memberId,
               total: BigInt(member.total.replaceAll(',', '')),
@@ -229,11 +220,9 @@ export async function crawlUmastagram(
       }),
       prisma.circleFanCount.upsert({
         where: {
-          circle_year_month_day: {
+          circle_date: {
             circle: circleKey,
-            year,
-            month,
-            day,
+            date,
           },
         },
         create: circleFanCountData,
@@ -243,7 +232,9 @@ export async function crawlUmastagram(
 
     await rest.post(Routes.channelMessages(Guild.channelIds.admin), {
       body: {
-        content: `${circle.name}の ${year}年${month}月${day}日のファン数を取得しました。`,
+        content: `${circle.name}の ${plainDate.toLocaleString(
+          'ja-JP'
+        )}のファン数を取得しました。`,
       },
       attachments: [
         {
@@ -258,7 +249,9 @@ export async function crawlUmastagram(
     await rest.post(Routes.channelMessages(Guild.channelIds.admin), {
       body: {
         content:
-          `${circle.name}の ${year}年${date.month}月${date.day}日のファン数を取得できませんでした。\n` +
+          `${circle.name}の ${plainDate.toLocaleString(
+            'ja-JP'
+          )}のファン数を取得できませんでした。\n` +
           '```\n' +
           `${e}`.substring(0, 1800) +
           `\n` +
