@@ -26,7 +26,13 @@ import {
   TableBody,
   TableCell,
 } from '@mui/material';
-import { nextMonth, thisMonth, UserWithSession } from '../model';
+import {
+  Circle,
+  CircleId,
+  nextMonth,
+  thisMonth,
+  UserWithSession,
+} from '../model';
 import MemberMonthCircle from '../components/member_month_circle';
 import {
   useAdminTopQuery,
@@ -39,6 +45,7 @@ import { Temporal } from 'proposal-temporal';
 import Link from '../components/link';
 import { ssrAdminMembers, ssrAdminTop } from '../apollo/page';
 import { LoadingCheckBox } from '../components/loading_checkbox';
+import { MonthSurveyAnswerValue } from '@prisma/client';
 
 const Home: NextPage = (props) => {
   const { user, status } = useUser();
@@ -120,23 +127,28 @@ const AdminTopContent = () => {
     useCreateNextMonthSurveyMutation();
   const thisMonth = data?.thisMonth;
   const nextMonth = data?.nextMonth;
-  const circles = data?.circles;
-  const answers = data?.nextMonth.survey?.answers;
-  const circleIdToMemberCount: { [id: string]: number } = useMemo(() => {
-    if (!circles || !answers) {
-      return {};
+  const answers = data?.nextMonth.survey?.monthSurveyAnswers;
+  const circleIdToMemberCount: Array<{
+    value: MonthSurveyAnswerValue;
+    count: number;
+  }> = useMemo(() => {
+    if (!answers) {
+      return [];
     } else {
-      const data: { [id: string]: number } = {};
-
-      circles.forEach((circle) => {
-        data[circle.id] = answers.filter(
-          (answer) => answer?.circle?.id == circle.id
-        ).length;
-      });
-
-      return data;
+      return [
+        ...[
+          MonthSurveyAnswerValue.Saikyo,
+          MonthSurveyAnswerValue.Umamusume,
+          MonthSurveyAnswerValue.Leave,
+          MonthSurveyAnswerValue.Ob,
+          MonthSurveyAnswerValue.None,
+        ].map((value) => ({
+          value,
+          count: answers.filter((answer) => answer.value == value).length,
+        })),
+      ];
     }
-  }, [circles, answers]);
+  }, [answers]);
   const expiredAtString = useMemo(() => {
     const expiredAt = data?.nextMonth?.survey?.expiredAt as string;
     if (!expiredAt) {
@@ -270,19 +282,29 @@ const AdminTopContent = () => {
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {circles &&
-                        circles.map((circle) => {
-                          return (
-                            <TableRow
-                              key={`month_survey_answer_count_${circle.id}`}
-                            >
-                              <TableCell>{circle.name}</TableCell>
-                              <TableCell>
-                                {circleIdToMemberCount[circle.id] ?? 0} / 30
-                              </TableCell>
-                            </TableRow>
-                          );
-                        })}
+                      {circleIdToMemberCount.map(({ value, count }) => {
+                        return (
+                          <TableRow key={`month_survey_answer_count_${value}`}>
+                            <TableCell>
+                              {value == MonthSurveyAnswerValue.Saikyo
+                                ? '西京ファーム'
+                                : value == MonthSurveyAnswerValue.Umamusume
+                                ? 'ウマ娘愛好会'
+                                : value == MonthSurveyAnswerValue.Leave
+                                ? '脱退'
+                                : value == MonthSurveyAnswerValue.Ob
+                                ? '脱退(Discord残留)'
+                                : '未回答'}
+                            </TableCell>
+                            <TableCell>
+                              {count}{' '}
+                              {value == MonthSurveyAnswerValue.Saikyo && '/ 30'}
+                              {value == MonthSurveyAnswerValue.Umamusume &&
+                                '/ 90'}
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
                       <TableRow>
                         <TableCell>回答済み合計</TableCell>
                         <TableCell>

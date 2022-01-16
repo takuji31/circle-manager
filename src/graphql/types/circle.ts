@@ -2,19 +2,16 @@ import * as Nexus from 'nexus-prisma';
 import { enumType, objectType } from 'nexus';
 
 export const Circle = objectType({
-  name: Nexus.Circle.$name,
-  description: Nexus.Circle.$description,
+  name: 'Circle',
+  description: 'circle',
   definition(t) {
-    const c = Nexus.Circle;
-    t.field(c.id);
-    t.field(c.name);
-    t.field(c.order);
-    t.field(c.selectableByUser);
-    t.field(c.selectableByAdmin);
-    t.field(c.selectableInSurvey);
-    t.field(c.members);
+    t.nonNull.id('id');
+    t.nonNull.field('key', { type: CircleKey });
+    t.nonNull.string('name');
   },
 });
+
+export const CircleKey = enumType(Nexus.CircleKey);
 
 export const CircleFilter = enumType({
   name: 'CircleFilter',

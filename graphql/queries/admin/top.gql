@@ -12,8 +12,4 @@ query AdminTop {
   signUps {
     ...ListedSignUp
   }
-
-  circles {
-    ...ListedCircle
-  }
 }

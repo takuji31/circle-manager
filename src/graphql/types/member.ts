@@ -1,7 +1,9 @@
-import { nextMonth, thisMonth } from '../../model';
+import { Circles, nextMonth, thisMonth } from '../../model';
 import * as Nexus from 'nexus-prisma';
 import { enumType, inputObjectType, objectType } from 'nexus';
-import { MonthCircle, SignUp } from '.';
+import { Circle } from './circle';
+import { MonthCircle } from './month_circle';
+import { SignUp } from './signup';
 
 export const Member = objectType({
   name: Nexus.Member.$name,
@@ -16,7 +18,17 @@ export const Member = objectType({
     t.field(m.setupCompleted);
     t.field(m.joinedAt);
     t.field(m.leavedAt);
-    t.field(m.circle);
+    t.field(m.circleKey);
+    t.field('circle', {
+      type: Circle,
+      resolve({ circleKey }, _, __) {
+        if (!circleKey) {
+          return null;
+        } else {
+          return Circles.findByCircleKey(circleKey);
+        }
+      },
+    });
     t.field('thisMonthCircle', {
       type: MonthCircle,
       resolve(parent, _, ctx) {

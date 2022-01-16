@@ -27,5 +27,12 @@ fragment MonthAndSurveyWithMembers on Month {
       id
       name
     }
+    monthSurveyAnswers {
+      id
+      year
+      month
+      circleKey
+      value
+    }
   }
 }

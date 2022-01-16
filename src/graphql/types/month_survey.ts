@@ -4,6 +4,7 @@ import { Circles } from '../../model';
 import { MonthSurvey as _MonthSurvey } from 'nexus-prisma';
 import { MonthCircle as _MonthCircle } from '@prisma/client';
 import { nonNull, objectType, list } from 'nexus';
+import { MonthSurveyAnswer } from './month_survey_answer';
 
 export const MonthSurvey = objectType({
   name: _MonthSurvey.$name,
@@ -126,6 +127,26 @@ export const MonthSurvey = objectType({
               },
             ],
           },
+        });
+      },
+    });
+
+    t.field('monthSurveyAnswers', {
+      type: nonNull(list(nonNull(MonthSurveyAnswer))),
+      resolve({ year, month }, _, { prisma }) {
+        return prisma.monthSurveyAnswer.findMany({
+          where: {
+            year,
+            month,
+          },
+          orderBy: [
+            {
+              circleKey: 'asc',
+            },
+            {
+              value: 'asc',
+            },
+          ],
         });
       },
     });
