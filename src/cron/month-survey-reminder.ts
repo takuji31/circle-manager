@@ -4,6 +4,7 @@ import { prisma } from './../database/prisma';
 import { config } from 'dotenv';
 import { sendDirectMessagesIfPossible } from '../discord/message';
 import { Temporal } from 'proposal-temporal';
+import { MonthSurveyAnswerValue } from '@prisma/client';
 
 config();
 
@@ -12,27 +13,16 @@ config();
   const month = nextMonth();
   const members = await prisma.member.findMany({
     where: {
-      circle: {
-        is: {
-          selectableByUser: true,
-        },
+      circleKey: {
+        not: null,
       },
       leavedAt: null,
-      OR: [
-        {
-          monthCircles: {
-            none: { ...month },
-          },
+      MonthSurveyAnswer: {
+        some: {
+          ...month,
+          value: MonthSurveyAnswerValue.None,
         },
-        {
-          monthCircles: {
-            some: {
-              ...month,
-              circleId: Circles.specialIds.noAnswer,
-            },
-          },
-        },
-      ],
+      },
     },
   });
   const monthSurvey = await prisma.monthSurvey.findUnique({
