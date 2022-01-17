@@ -21,4 +21,5 @@ export const schema = makeSchema({
     export: 'Context',
     module: join(process.cwd(), 'src', 'graphql', 'context.ts'),
   },
+  shouldExitAfterGenerateArtifacts: process.argv.includes('--nexusTypegen'),
 });
