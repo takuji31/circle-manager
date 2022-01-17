@@ -32,46 +32,48 @@ export const Member = objectType({
     });
     t.field('thisMonthCircle', {
       type: MonthCircle,
-      resolve(parent, _, ctx) {
-        return ctx.prisma.monthCircle.findFirst({
-          where: {
-            ...thisMonth(),
-            memberId: parent.id,
-          },
-        });
+      resolve({ id }, _, ctx) {
+        return ctx.prisma.member
+          .findUnique({ where: { id } })
+          .monthCircles({
+            where: {
+              ...thisMonth(),
+            },
+          })
+          .then((monthCircles) => monthCircles[0]);
       },
     });
     t.field('nextMonthCircle', {
       type: MonthCircle,
-      resolve(parent, _, ctx) {
-        return ctx.prisma.monthCircle.findFirst({
-          where: {
-            ...nextMonth(),
-            memberId: parent.id,
-          },
-        });
+      resolve({ id }, _, ctx) {
+        return ctx.prisma.member
+          .findUnique({ where: { id } })
+          .monthCircles({
+            where: {
+              ...nextMonth(),
+            },
+          })
+          .then((monthCircles) => monthCircles[0]);
       },
     });
     t.field('signUp', {
       type: SignUp,
-      resolve(parent, _, ctx) {
-        return ctx.prisma.signUp.findUnique({
-          where: {
-            id: parent.id,
-          },
-        });
+      resolve({ id }, _, ctx) {
+        return ctx.prisma.member.findUnique({ where: { id } }).signUp();
       },
     });
     t.field('nextMonthSurveyAnswer', {
       type: MonthSurveyAnswer,
       description: '次の月の在籍希望アンケート回答',
       resolve({ id }, _, { prisma }) {
-        return prisma.monthSurveyAnswer.findFirst({
-          where: {
-            ...nextMonth(),
-            memberId: id,
-          },
-        });
+        return prisma.member
+          .findUnique({ where: { id } })
+          .MonthSurveyAnswer({
+            where: {
+              ...nextMonth(),
+            },
+          })
+          .then((values) => values[0]);
       },
     });
   },
