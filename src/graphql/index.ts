@@ -7,14 +7,9 @@ import * as mutations from './mutations';
 
 export const schema = makeSchema({
   types: [types, fields, mutations, NexusPrismaScalars],
+  shouldGenerateArtifacts: process.env.NODE_ENV == 'development',
   outputs: {
-    typegen: join(
-      process.cwd(),
-      'node_modules',
-      '@types',
-      'nexus-typegen',
-      'index.d.ts'
-    ),
+    typegen: join(process.cwd(), 'src', 'graphql', 'generated', 'nexus.ts'),
     schema: join(process.cwd(), 'graphql', 'schema.graphqls'),
   },
   contextType: {

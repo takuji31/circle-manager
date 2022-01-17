@@ -1,5 +1,5 @@
 import { list, nonNull, queryField } from 'nexus';
-import { Circles, Circle as C } from '../../model';
+import { Circle as C } from '../../model';
 import { Circle, CircleFilter } from '../types/';
 
 export const CirclesQueryField = queryField('circles', {
