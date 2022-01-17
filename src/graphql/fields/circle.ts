@@ -1,4 +1,5 @@
 import { list, nonNull, queryField } from 'nexus';
+import { Circles, Circle as C } from '../../model';
 import { Circle, CircleFilter } from '../types/';
 
 export const CirclesQueryField = queryField('circles', {
@@ -7,21 +8,9 @@ export const CirclesQueryField = queryField('circles', {
     filter: CircleFilter.asArg({ default: 'All' }),
   },
   resolve(_, { filter: f }, ctx) {
+    // TODO: fix
     const circleSelect = f == 'CircleSelect';
     const monthSurvey = f == 'MonthSurvey';
-    return ctx.prisma.circle.findMany({
-      where: circleSelect
-        ? {
-            selectableByUser: true,
-          }
-        : monthSurvey
-        ? {
-            selectableInSurvey: true,
-          }
-        : {},
-      orderBy: {
-        order: 'asc',
-      },
-    });
+    return [C.saikyo, C.shin, C.jo, C.ha];
   },
 });
