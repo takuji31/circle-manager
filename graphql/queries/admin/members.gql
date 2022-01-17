@@ -15,5 +15,8 @@ query AdminMembers {
     nextMonthCircle {
       ...MemberMonthCircle
     }
+    nextMonthSurveyAnswer {
+      ...ListedMonthSurveyAnswer
+    }
   }
 }

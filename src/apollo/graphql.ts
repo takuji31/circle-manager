@@ -73,6 +73,8 @@ export type Member = {
   leavedAt?: Maybe<Scalars['DateTime']>;
   name: Scalars['String'];
   nextMonthCircle?: Maybe<MonthCircle>;
+  /** 次の月の在籍希望アンケート回答 */
+  nextMonthSurveyAnswer?: Maybe<MonthSurveyAnswer>;
   pathname: Scalars['String'];
   setupCompleted: Scalars['Boolean'];
   signUp?: Maybe<SignUp>;
@@ -279,6 +281,8 @@ export type MemberMonthCircleFragment = { __typename?: 'MonthCircle', id: string
 
 export type FullMonthCircleFragment = { __typename?: 'MonthCircle', kicked: boolean, invited: boolean, joined: boolean, id: string, year: string, month: string, currentCircle: { __typename?: 'Circle', id: string, name: string }, member: { __typename?: 'Member', id: string, name: string, trainerId?: string | null | undefined }, circle: { __typename?: 'Circle', id: string, name: string } };
 
+export type ListedMonthSurveyAnswerFragment = { __typename?: 'MonthSurveyAnswer', id: string, year: string, month: string, circleKey: CircleKey, value?: MonthSurveyAnswerValue | null | undefined };
+
 export type ListedSignUpFragment = { __typename?: 'SignUp', id: string, invited: boolean, joined: boolean, member: { __typename?: 'Member', id: string, name: string, trainerId?: string | null | undefined }, circle: { __typename?: 'Circle', id: string, name: string } };
 
 export type CreateNextMonthSurveyMutationVariables = Exact<{ [key: string]: never; }>;
@@ -342,7 +346,7 @@ export type AdminCirclesQuery = { __typename?: 'Query', circles: Array<{ __typen
 export type AdminMembersQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type AdminMembersQuery = { __typename?: 'Query', members: Array<{ __typename?: 'Member', id: string, pathname: string, name: string, trainerId?: string | null | undefined, circleRole: CircleRole, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined, thisMonthCircle?: { __typename?: 'MonthCircle', id: string, year: string, month: string, circle: { __typename?: 'Circle', id: string, name: string } } | null | undefined, nextMonthCircle?: { __typename?: 'MonthCircle', id: string, year: string, month: string, circle: { __typename?: 'Circle', id: string, name: string } } | null | undefined }> };
+export type AdminMembersQuery = { __typename?: 'Query', members: Array<{ __typename?: 'Member', id: string, pathname: string, name: string, trainerId?: string | null | undefined, circleRole: CircleRole, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined, thisMonthCircle?: { __typename?: 'MonthCircle', id: string, year: string, month: string, circle: { __typename?: 'Circle', id: string, name: string } } | null | undefined, nextMonthCircle?: { __typename?: 'MonthCircle', id: string, year: string, month: string, circle: { __typename?: 'Circle', id: string, name: string } } | null | undefined, nextMonthSurveyAnswer?: { __typename?: 'MonthSurveyAnswer', id: string, year: string, month: string, circleKey: CircleKey, value?: MonthSurveyAnswerValue | null | undefined } | null | undefined }> };
 
 export type MonthSurveyQueryVariables = Exact<{
   year: Scalars['String'];
@@ -480,6 +484,15 @@ export const FullMonthCircleFragmentDoc = gql`
     ${MemberMonthCircleFragmentDoc}
 ${ListedCircleFragmentDoc}
 ${ListedMemberFragmentDoc}`;
+export const ListedMonthSurveyAnswerFragmentDoc = gql`
+    fragment ListedMonthSurveyAnswer on MonthSurveyAnswer {
+  id
+  year
+  month
+  circleKey
+  value
+}
+    `;
 export const ListedSignUpFragmentDoc = gql`
     fragment ListedSignUp on SignUp {
   id
@@ -827,9 +840,13 @@ export const AdminMembersDocument = gql`
     nextMonthCircle {
       ...MemberMonthCircle
     }
+    nextMonthSurveyAnswer {
+      ...ListedMonthSurveyAnswer
+    }
   }
 }
-    ${MemberMonthCircleFragmentDoc}`;
+    ${MemberMonthCircleFragmentDoc}
+${ListedMonthSurveyAnswerFragmentDoc}`;
 
 /**
  * __useAdminMembersQuery__
@@ -1129,7 +1146,7 @@ export type CreateNextMonthSurveyPayloadKeySpecifier = ('nextMonth' | CreateNext
 export type CreateNextMonthSurveyPayloadFieldPolicy = {
 	nextMonth?: FieldPolicy<any> | FieldReadFunction<any>
 };
-export type MemberKeySpecifier = ('circle' | 'circleKey' | 'circleRole' | 'id' | 'joinedAt' | 'leavedAt' | 'name' | 'nextMonthCircle' | 'pathname' | 'setupCompleted' | 'signUp' | 'thisMonthCircle' | 'trainerId' | MemberKeySpecifier)[];
+export type MemberKeySpecifier = ('circle' | 'circleKey' | 'circleRole' | 'id' | 'joinedAt' | 'leavedAt' | 'name' | 'nextMonthCircle' | 'nextMonthSurveyAnswer' | 'pathname' | 'setupCompleted' | 'signUp' | 'thisMonthCircle' | 'trainerId' | MemberKeySpecifier)[];
 export type MemberFieldPolicy = {
 	circle?: FieldPolicy<any> | FieldReadFunction<any>,
 	circleKey?: FieldPolicy<any> | FieldReadFunction<any>,
@@ -1139,6 +1156,7 @@ export type MemberFieldPolicy = {
 	leavedAt?: FieldPolicy<any> | FieldReadFunction<any>,
 	name?: FieldPolicy<any> | FieldReadFunction<any>,
 	nextMonthCircle?: FieldPolicy<any> | FieldReadFunction<any>,
+	nextMonthSurveyAnswer?: FieldPolicy<any> | FieldReadFunction<any>,
 	pathname?: FieldPolicy<any> | FieldReadFunction<any>,
 	setupCompleted?: FieldPolicy<any> | FieldReadFunction<any>,
 	signUp?: FieldPolicy<any> | FieldReadFunction<any>,

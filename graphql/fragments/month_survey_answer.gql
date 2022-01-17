@@ -1,0 +1,7 @@
+fragment ListedMonthSurveyAnswer on MonthSurveyAnswer {
+  id
+  year
+  month
+  circleKey
+  value
+}

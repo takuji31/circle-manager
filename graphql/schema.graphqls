@@ -66,6 +66,9 @@ type Member {
   leavedAt: DateTime
   name: String!
   nextMonthCircle: MonthCircle
+
+  """次の月の在籍希望アンケート回答"""
+  nextMonthSurveyAnswer: MonthSurveyAnswer
   pathname: String!
   setupCompleted: Boolean!
   signUp: SignUp

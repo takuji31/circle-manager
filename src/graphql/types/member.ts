@@ -4,6 +4,7 @@ import { enumType, inputObjectType, objectType } from 'nexus';
 import { Circle } from './circle';
 import { MonthCircle } from './month_circle';
 import { SignUp } from './signup';
+import { MonthSurveyAnswer } from './month_survey_answer';
 
 export const Member = objectType({
   name: Nexus.Member.$name,
@@ -57,6 +58,20 @@ export const Member = objectType({
         return ctx.prisma.signUp.findUnique({
           where: {
             id: parent.id,
+          },
+        });
+      },
+    });
+    t.field('nextMonthSurveyAnswer', {
+      type: MonthSurveyAnswer,
+      description: '次の月の在籍希望アンケート回答',
+      resolve({ id }, _, { prisma }) {
+        return prisma.monthSurveyAnswer.findUnique({
+          where: {
+            year_month_memberId: {
+              ...nextMonth(),
+              memberId: id,
+            },
           },
         });
       },

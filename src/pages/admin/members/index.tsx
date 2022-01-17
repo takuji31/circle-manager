@@ -16,7 +16,13 @@ import { getSession } from 'next-auth/react';
 import React, { useMemo } from 'react';
 import { AdminLayout } from '../../../components/admin_filter';
 import { Circles, getCircleName, nextMonth } from '../../../model';
-import { Circle, MonthCircle, useAdminMembersQuery } from '../../../apollo';
+import {
+  Circle,
+  ListedCircleFragment,
+  ListedMonthSurveyAnswerFragment,
+  MonthCircle,
+  useAdminMembersQuery,
+} from '../../../apollo';
 import { prisma } from '../../../database';
 import Link, { NextLinkComposed } from '../../../components/link';
 import * as Icons from '@mui/icons-material';
@@ -70,6 +76,39 @@ const MemberList: NextPage<Props> = ({ monthCircleNames }) => {
         width: 200,
       },
       {
+        field: 'nextMonthSurveyAnswer',
+        headerName: '来月の在籍希望',
+        width: 200,
+        valueFormatter: (params: GridValueFormatterParams) => {
+          const value = params.value as ListedMonthSurveyAnswerFragment;
+          const answer = value?.value;
+          if (!answer || answer == 'None') {
+            return '未回答';
+          } else {
+            return answer == 'Saikyo'
+              ? '西京ファーム'
+              : answer == 'Umamusume'
+              ? 'ウマ娘愛好会'
+              : answer == 'Leave'
+              ? '脱退'
+              : '脱退(Discord残留)';
+          }
+        },
+        renderCell: (params: GridRenderCellParams) => {
+          const value = params.value as MonthCircle;
+
+          if (!value) {
+            return params.formattedValue;
+          }
+
+          return (
+            <Link href={`/month_circles/${value.id}`}>
+              {params.formattedValue}
+            </Link>
+          );
+        },
+      },
+      {
         field: 'nextMonthCircle',
         headerName: '来月のサークル',
         width: 200,
@@ -78,7 +117,7 @@ const MemberList: NextPage<Props> = ({ monthCircleNames }) => {
         valueFormatter: (params: GridValueFormatterParams) => {
           const value = params.value as MonthCircle;
           if (!value || value.circle?.id == Circles.specialIds.noAnswer) {
-            return '未回答';
+            return '未確定';
           } else {
             return value.circle ? getCircleName(value.circle) : '';
           }
