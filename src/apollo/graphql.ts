@@ -1,3 +1,4 @@
+import { Temporal } from 'proposal-temporal';
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
 import { FieldPolicy, FieldReadFunction, TypePolicies, TypePolicy } from '@apollo/client/cache';
@@ -20,6 +21,8 @@ export type Scalars = {
   BigInt: any;
   /** The `Byte` scalar type represents byte value as a Buffer */
   Bytes: any;
+  /** ISO8601 Date string */
+  Date: Temporal.PlainDate;
   /** A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar. */
   DateTime: any;
   /** An arbitrary-precision Decimal type */
@@ -75,6 +78,18 @@ export type Member = {
   signUp?: Maybe<SignUp>;
   thisMonthCircle?: Maybe<MonthCircle>;
   trainerId?: Maybe<Scalars['String']>;
+};
+
+/** Umastagramから取得した各メンバーのファン数 */
+export type MemberFanCount = {
+  __typename?: 'MemberFanCount';
+  avg: Scalars['BigInt'];
+  circle: CircleKey;
+  id: Scalars['ID'];
+  member?: Maybe<Member>;
+  name: Scalars['String'];
+  predicted: Scalars['BigInt'];
+  total: Scalars['BigInt'];
 };
 
 export type Month = {
@@ -197,6 +212,13 @@ export type QueryMonthCircleArgs = {
 export type QueryMonthSurveyArgs = {
   month: Scalars['String'];
   year: Scalars['String'];
+};
+
+/** 特定の日または月のファン数ランキング */
+export type Ranking = {
+  __typename?: 'Ranking';
+  date: Scalars['Date'];
+  fanCounts: Array<MemberFanCount>;
 };
 
 /** 加入申請 */
@@ -1123,6 +1145,16 @@ export type MemberFieldPolicy = {
 	thisMonthCircle?: FieldPolicy<any> | FieldReadFunction<any>,
 	trainerId?: FieldPolicy<any> | FieldReadFunction<any>
 };
+export type MemberFanCountKeySpecifier = ('avg' | 'circle' | 'id' | 'member' | 'name' | 'predicted' | 'total' | MemberFanCountKeySpecifier)[];
+export type MemberFanCountFieldPolicy = {
+	avg?: FieldPolicy<any> | FieldReadFunction<any>,
+	circle?: FieldPolicy<any> | FieldReadFunction<any>,
+	id?: FieldPolicy<any> | FieldReadFunction<any>,
+	member?: FieldPolicy<any> | FieldReadFunction<any>,
+	name?: FieldPolicy<any> | FieldReadFunction<any>,
+	predicted?: FieldPolicy<any> | FieldReadFunction<any>,
+	total?: FieldPolicy<any> | FieldReadFunction<any>
+};
 export type MonthKeySpecifier = ('month' | 'survey' | 'year' | MonthKeySpecifier)[];
 export type MonthFieldPolicy = {
 	month?: FieldPolicy<any> | FieldReadFunction<any>,
@@ -1184,6 +1216,11 @@ export type QueryFieldPolicy = {
 	siteMetadata?: FieldPolicy<any> | FieldReadFunction<any>,
 	thisMonth?: FieldPolicy<any> | FieldReadFunction<any>
 };
+export type RankingKeySpecifier = ('date' | 'fanCounts' | RankingKeySpecifier)[];
+export type RankingFieldPolicy = {
+	date?: FieldPolicy<any> | FieldReadFunction<any>,
+	fanCounts?: FieldPolicy<any> | FieldReadFunction<any>
+};
 export type SignUpKeySpecifier = ('circle' | 'id' | 'invited' | 'joined' | 'member' | SignUpKeySpecifier)[];
 export type SignUpFieldPolicy = {
 	circle?: FieldPolicy<any> | FieldReadFunction<any>,
@@ -1215,6 +1252,10 @@ export type StrictTypedTypePolicies = {
 		keyFields?: false | MemberKeySpecifier | (() => undefined | MemberKeySpecifier),
 		fields?: MemberFieldPolicy,
 	},
+	MemberFanCount?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | MemberFanCountKeySpecifier | (() => undefined | MemberFanCountKeySpecifier),
+		fields?: MemberFanCountFieldPolicy,
+	},
 	Month?: Omit<TypePolicy, "fields" | "keyFields"> & {
 		keyFields?: false | MonthKeySpecifier | (() => undefined | MonthKeySpecifier),
 		fields?: MonthFieldPolicy,
@@ -1238,6 +1279,10 @@ export type StrictTypedTypePolicies = {
 	Query?: Omit<TypePolicy, "fields" | "keyFields"> & {
 		keyFields?: false | QueryKeySpecifier | (() => undefined | QueryKeySpecifier),
 		fields?: QueryFieldPolicy,
+	},
+	Ranking?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | RankingKeySpecifier | (() => undefined | RankingKeySpecifier),
+		fields?: RankingFieldPolicy,
 	},
 	SignUp?: Omit<TypePolicy, "fields" | "keyFields"> & {
 		keyFields?: false | SignUpKeySpecifier | (() => undefined | SignUpKeySpecifier),

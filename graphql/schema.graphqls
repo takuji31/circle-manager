@@ -41,6 +41,9 @@ type CreateNextMonthSurveyPayload {
   nextMonth: Month!
 }
 
+"""ISO8601 Date string"""
+scalar Date
+
 """
 A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
 """
@@ -68,6 +71,17 @@ type Member {
   signUp: SignUp
   thisMonthCircle: MonthCircle
   trainerId: String
+}
+
+"""Umastagramから取得した各メンバーのファン数"""
+type MemberFanCount {
+  avg: BigInt!
+  circle: CircleKey!
+  id: ID!
+  member: Member
+  name: String!
+  predicted: BigInt!
+  total: BigInt!
 }
 
 type Month {
@@ -140,6 +154,12 @@ type Query {
   signUps: [SignUp!]!
   siteMetadata: SiteMetadata!
   thisMonth: Month!
+}
+
+"""特定の日または月のファン数ランキング"""
+type Ranking {
+  date: Date!
+  fanCounts: [MemberFanCount!]!
 }
 
 """加入申請"""

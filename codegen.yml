@@ -4,6 +4,8 @@ documents: 'graphql/**/*.gql'
 generates:
   src/apollo/graphql.ts:
     plugins:
+      - add:
+          content: "import { Temporal } from 'proposal-temporal';"
       - 'typescript'
       - 'typescript-operations'
       - 'typescript-react-apollo'
@@ -15,6 +17,8 @@ generates:
       withComponent: false
       exportFragmentSpreadSubTypes: true
       documentMode: graphQLTag
+      scalars:
+        Date: 'Temporal.PlainDate'
 
   src/apollo/page.tsx:
     plugins:
