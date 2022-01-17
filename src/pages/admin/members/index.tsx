@@ -94,19 +94,6 @@ const MemberList: NextPage<Props> = ({ monthCircleNames }) => {
               : '脱退(Discord残留)';
           }
         },
-        renderCell: (params: GridRenderCellParams) => {
-          const value = params.value as MonthCircle;
-
-          if (!value) {
-            return params.formattedValue;
-          }
-
-          return (
-            <Link href={`/month_circles/${value.id}`}>
-              {params.formattedValue}
-            </Link>
-          );
-        },
       },
       {
         field: 'nextMonthCircle',
