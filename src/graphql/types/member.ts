@@ -66,12 +66,10 @@ export const Member = objectType({
       type: MonthSurveyAnswer,
       description: '次の月の在籍希望アンケート回答',
       resolve({ id }, _, { prisma }) {
-        return prisma.monthSurveyAnswer.findUnique({
+        return prisma.monthSurveyAnswer.findFirst({
           where: {
-            year_month_memberId: {
-              ...nextMonth(),
-              memberId: id,
-            },
+            ...nextMonth(),
+            memberId: id,
           },
         });
       },
