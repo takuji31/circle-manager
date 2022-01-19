@@ -11,6 +11,17 @@ export function isCircleId(id: string): id is CircleId {
   return false;
 }
 
+export function isNotificationChannelId(
+  id: string
+): id is NotificationChannelId {
+  for (const channelId of Object.values(NotificationChannelId)) {
+    if (channelId == id) {
+      return true;
+    }
+  }
+  return false;
+}
+
 export const Circles = {
   maxMembers: 30,
   specialIds: {
@@ -54,6 +65,29 @@ export const Circles = {
         return Circle.jo;
     }
   },
+
+  findByRawNotificationChannelId(id: string): Circle | null {
+    if (!isNotificationChannelId(id)) {
+      return null;
+    } else {
+      return this.findByNotificationChannelId(id);
+    }
+  },
+
+  findByNotificationChannelId(channelId: NotificationChannelId): Circle {
+    switch (channelId) {
+      case NotificationChannelId.saikyo:
+        return Circle.saikyo;
+      case NotificationChannelId.shin:
+        return Circle.shin;
+      case NotificationChannelId.ha:
+        return Circle.ha;
+      case NotificationChannelId.jo:
+        return Circle.jo;
+      default:
+        throw new Error(`Unknown id ${channelId}`);
+    }
+  },
 };
 
 export const CircleId = {
@@ -64,47 +98,48 @@ export const CircleId = {
 } as const;
 export type CircleId = typeof CircleId[keyof typeof CircleId];
 
+export const NotificationChannelId = {
+  saikyo: isProduction ? '911553699434881064' : '927518449884876841',
+  shin: isProduction ? '860387060706574402' : '927518500950519848',
+  ha: isProduction ? '871221691496431727' : '927518539106103348',
+  jo: isProduction ? '860387101417406474' : '927518571318378496',
+} as const;
+export type NotificationChannelId =
+  typeof NotificationChannelId[keyof typeof NotificationChannelId];
+
 interface ICircle {
   id: CircleId;
   key: CircleKey;
   name: string;
-  notificationChannelId: string;
+  notificationChannelId: NotificationChannelId;
 }
 
 const Saikyo: ICircle = {
   id: CircleId.saikyo,
   key: CircleKey.Saikyo,
   name: '西京ファーム',
-  notificationChannelId: isProduction
-    ? '911553699434881064'
-    : '927518449884876841',
+  notificationChannelId: NotificationChannelId.saikyo,
 } as const;
 
 const Shin: ICircle = {
   id: CircleId.shin,
   key: CircleKey.Shin,
   name: 'シン・ウマ娘愛好会',
-  notificationChannelId: isProduction
-    ? '860387060706574402'
-    : '927518500950519848',
+  notificationChannelId: NotificationChannelId.shin,
 } as const;
 
 const Ha: ICircle = {
   id: CircleId.ha,
   key: CircleKey.Ha,
   name: 'ウマ娘新愛好会:破',
-  notificationChannelId: isProduction
-    ? '871221691496431727'
-    : '927518539106103348',
+  notificationChannelId: NotificationChannelId.ha,
 } as const;
 
 const Jo: ICircle = {
   id: CircleId.jo,
   key: CircleKey.Jo,
   name: 'ウマ娘新愛好会:序',
-  notificationChannelId: isProduction
-    ? '860387101417406474'
-    : '927518571318378496',
+  notificationChannelId: NotificationChannelId.jo,
 } as const;
 
 export const Circle = {

@@ -9,6 +9,8 @@ import { Client, Intents, Options } from 'discord.js';
 import { config } from 'dotenv';
 import { nextMonthCircleCommand } from './next_month_circle';
 import { Emoji } from '../model/emoji';
+import { Circle, Circles } from '../model';
+import { updateFanCountEvent } from './circle/update_fan_count';
 
 config();
 
@@ -74,8 +76,14 @@ client.on('guildMemberUpdate', async (oldMember, newMember) => {
   await updateMemberNicknameEvent(oldMember, newMember);
 });
 
-client.on('messageCreate', async () => {
+client.on('messageCreate', async (message) => {
   console.log('messageCreated');
+  const notificationCircle = Circles.findByRawNotificationChannelId(
+    message.channel.id
+  );
+  if (notificationCircle) {
+    updateFanCountEvent(message, notificationCircle);
+  }
 });
 
 client.on('interactionCreate', async (interaction) => {
