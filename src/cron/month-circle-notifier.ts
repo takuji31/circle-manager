@@ -4,6 +4,7 @@ import { prisma } from './../database/prisma';
 import { config } from 'dotenv';
 import { sendDirectMessagesIfPossible } from '../discord/message';
 import { Temporal } from 'proposal-temporal';
+import { monthSurveyAnswerLabel } from '../model/month_survey_answer';
 
 config();
 
@@ -12,10 +13,7 @@ config();
   const month = nextMonth();
   const members = await prisma.member.findMany({
     include: {
-      monthCircles: {
-        include: {
-          circle: true,
-        },
+      MonthSurveyAnswer: {
         where: {
           ...month,
         },
@@ -23,8 +21,10 @@ config();
     },
     where: {
       leavedAt: null,
-      monthCircles: {
-        some: { ...month },
+      MonthSurveyAnswer: {
+        some: {
+          ...month,
+        },
       },
     },
   });
@@ -52,10 +52,8 @@ config();
   await sendDirectMessagesIfPossible(
     members,
     (member) => {
-      const circleName = member.monthCircles[0]?.circle?.name;
-      if (!circleName) {
-        throw new Error('No circle');
-      }
+      const answer = member.MonthSurveyAnswer[0]?.value!;
+      const circleName = monthSurveyAnswerLabel(answer);
       return `※このメッセージは自動送信です。\n\nあなたの来月の在籍希望は「${circleName}」です。\n変更がある場合は期限(${expiredAt})までに在籍希望アンケートに回答し直してください。\n期限を過ぎた場合ご希望に添えない可能性があります。\n\nよろしくお願いします。`;
     },
     (

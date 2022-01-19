@@ -26,6 +26,7 @@ import {
 import { prisma } from '../../../database';
 import Link, { NextLinkComposed } from '../../../components/link';
 import * as Icons from '@mui/icons-material';
+import { monthSurveyAnswerLabel } from '../../../model/month_survey_answer';
 
 export interface Props {
   monthCircleNames: Array<string>;
@@ -85,13 +86,7 @@ const MemberList: NextPage<Props> = ({ monthCircleNames }) => {
           if (!answer || answer == 'None') {
             return '未回答';
           } else {
-            return answer == 'Saikyo'
-              ? '西京ファーム'
-              : answer == 'Umamusume'
-              ? 'ウマ娘愛好会'
-              : answer == 'Leave'
-              ? '脱退'
-              : '脱退(Discord残留)';
+            return monthSurveyAnswerLabel(answer);
           }
         },
       },

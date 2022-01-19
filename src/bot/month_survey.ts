@@ -9,6 +9,7 @@ import {
   MonthSurveyAnswerValue,
 } from '@prisma/client';
 import { isValidMonthSurveyEmoji, MonthSurveyEmoji } from '../model/emoji';
+import { monthSurveyAnswerLabel } from '../model/month_survey_answer';
 
 export const monthSurveyReaction: ReactionHandlerWithData<MonthSurvey> = async (
   reaction,
@@ -151,15 +152,7 @@ export const monthSurveyShowReaction: ReactionHandlerWithData<
   } else {
     await user.send(
       `あなたの${year}年${month}月の在籍希望は「${
-        value == 'Saikyo'
-          ? '西京ファーム'
-          : value == 'Umamusume'
-          ? 'ウマ娘愛好会'
-          : value == 'Leave'
-          ? '脱退'
-          : value == 'Ob'
-          ? '脱退(Discord残留)'
-          : ''
+        value ? monthSurveyAnswerLabel(value) : ''
       }」です。変更がある場合は期限内に再度希望内容の絵文字でリアクションしてください。`
     );
   }
