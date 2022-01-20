@@ -32,9 +32,7 @@ export const MembersField = queryField('members', {
     return ctx.prisma.member.findMany({
       orderBy: [
         {
-          circle: {
-            order: 'asc',
-          },
+          circleKey: 'asc',
         },
         {
           circleRole: 'asc',
