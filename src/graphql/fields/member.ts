@@ -30,6 +30,9 @@ export const MembersField = queryField('members', {
   type: nonNull(list(nonNull(Member))),
   resolve(_, __, ctx) {
     return ctx.prisma.member.findMany({
+      where: {
+        leavedAt: null,
+      },
       orderBy: [
         {
           circleKey: 'asc',
