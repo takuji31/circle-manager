@@ -17,9 +17,12 @@ export const trainerIdCommand = async (interaction: CommandInteraction) => {
     return;
   }
 
+  const url = `${process.env.BASE_URL}/members/${member.pathname}/edit`;
   interaction.editReply({
-    content: member.trainerId
-      ? `あなたのトレーナーIDは \`${member.trainerId}\` です。`
-      : `トレーナーIDが登録されていません。`,
+    content:
+      (member.trainerId
+        ? `あなたのトレーナーIDは \`${member.trainerId}\` です。`
+        : `トレーナーIDが登録されていません。`) +
+      `\nトレーナーIDの登録・変更は下記のURLから行ってください。\n${url}`,
   });
 };
