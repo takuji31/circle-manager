@@ -31,6 +31,15 @@ export interface UmastagramCircle {
   predictedAvg: string;
 }
 
+const toHalfWidthString = (str: string) => {
+  return str
+    .replace(/[Ａ-Ｚａ-ｚ０-９]/g, (s) => {
+      return String.fromCharCode(s.charCodeAt(0) - 0xfee0);
+    })
+    .replace('：', ':')
+    .replace('　', ' ');
+};
+
 export async function crawlUmastagram(
   url: string,
   circle: Circle,
@@ -182,9 +191,6 @@ export async function crawlUmastagram(
     const dbMembers = await prisma.member.findMany({
       where: {
         circleKey,
-        name: {
-          in: [...members.map((member) => member.name)],
-        },
       },
     });
 
@@ -203,7 +209,9 @@ export async function crawlUmastagram(
       prisma.memberFanCount.createMany({
         data: [
           ...members.map((member) => {
-            const dbMember = dbMembers.find((m) => m.name == member.name);
+            const dbMember = dbMembers.find(
+              (m) => toHalfWidthString(m.name) == toHalfWidthString(member.name)
+            );
             const memberId = dbMember?.id ?? null;
             return {
               circle: circleKey,
