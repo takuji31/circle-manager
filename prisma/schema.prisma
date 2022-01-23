@@ -94,6 +94,7 @@ model MonthSurvey {
   @@unique([year, month])
 }
 
+/// 在籍希望アンケートの回答
 model MonthSurveyAnswer {
   id        String                  @id @default(uuid()) @db.VarChar(255)
   year      String                  @db.Char(4)
