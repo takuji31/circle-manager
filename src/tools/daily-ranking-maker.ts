@@ -19,15 +19,12 @@ config();
 
 (async () => {
   const { year, month } = thisMonth();
-  const { year: nextYear, month: _nextMonth } = nextMonth();
+  const _nextMonth = nextMonth();
 
   const today = Temporal.now.plainDate('iso8601', 'Asia/Tokyo');
 
   const monthSurvey = await prisma.monthSurvey.findFirst({
-    where: {
-      year,
-      month,
-    },
+    where: { ..._nextMonth },
   });
 
   const useMonthSurveyAnswer =
@@ -50,8 +47,8 @@ config();
         ),
         lt: new Date(
           Temporal.PlainDate.from({
-            year: parseInt(nextYear),
-            month: parseInt(_nextMonth),
+            year: parseInt(_nextMonth.year),
+            month: parseInt(_nextMonth.month),
             day: 1,
           }).toString()
         ),
@@ -93,8 +90,7 @@ config();
               member: {
                 MonthSurveyAnswer: {
                   some: {
-                    year,
-                    month,
+                    ..._nextMonth,
                     value: MonthSurveyAnswerValue.Umamusume,
                   },
                 },
