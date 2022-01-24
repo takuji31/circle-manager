@@ -42,9 +42,14 @@ export const UpdateSignUpMutation = mutationField('updateSignUp', {
       } catch (e) {
         console.log(e);
       }
+      const circle = Circles.findByRawId(circleId);
+      if (!circle) {
+        throw new Error(`Unknown circle id ${circleId}`);
+      }
+
       await ctx.prisma.member.update({
         where: { id: memberId },
-        data: { circleId },
+        data: { circleKey: circle.key },
       });
     }
 

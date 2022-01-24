@@ -1,7 +1,6 @@
 import { sendSetupMessage } from './../discord/member/setup_message';
 import { trainerIdCommand } from './member/trainer_id';
 import { updateMemberNicknameEvent } from './member/update_member_nickname';
-import { registerNextMonthCircleCommand } from './register_next_month_circle';
 import { monthSurveyReaction, monthSurveyShowReaction } from './month_survey';
 import { registerTrainerIdCommand } from './register_trainer_id';
 import { PrismaClient } from '@prisma/client';
@@ -42,7 +41,7 @@ client.on('guildMemberRemove', async (member) => {
     await prisma.member.update({
       where: { id: member.id },
       data: {
-        circleId: null,
+        circleKey: null,
         leavedAt: new Date(),
       },
     });
@@ -97,9 +96,6 @@ client.on('interactionCreate', async (interaction) => {
     }
     if (interaction.commandName == 'trainer-id') {
       trainerIdCommand(interaction);
-    }
-    if (interaction.commandName == 'register-next-month-circle') {
-      registerNextMonthCircleCommand(interaction);
     }
   } catch (e) {
     console.log('Error when interactionCreate %s', e);

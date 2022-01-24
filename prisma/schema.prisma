@@ -22,7 +22,6 @@ model Circle {
   selectableByUser    Boolean       @default(true)
   selectableByAdmin   Boolean       @default(true)
   selectableInSurvey  Boolean       @default(true)
-  members             Member[]
   monthCircles        MonthCircle[]
   currentMonthCircles MonthCircle[] @relation("currentCircle")
   signUps             SignUp[]
@@ -44,8 +43,6 @@ model Member {
   status           MemberStatus     @default(Joined)
   joinedAt         DateTime
   leavedAt         DateTime?
-  circleId         String?          @db.VarChar(255)
-  circle           Circle?          @relation(fields: [circleId], references: [id])
   circleKey        CircleKey?       @default(dbgenerated("NULL"))
   monthCircles     MonthCircle[]
   signUp           SignUp?
@@ -55,7 +52,7 @@ model Member {
   @@unique([pathname])
   @@index([leavedAt])
   @@index([joinedAt])
-  @@index([circleId, circleRole, joinedAt])
+  @@index([circleKey, circleRole, joinedAt])
 }
 
 enum CircleRole {

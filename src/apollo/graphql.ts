@@ -130,6 +130,7 @@ export type MonthSurvey = {
   year: Scalars['String'];
 };
 
+/** 在籍希望アンケートの回答 */
 export type MonthSurveyAnswer = {
   __typename?: 'MonthSurveyAnswer';
   circleKey: CircleKey;

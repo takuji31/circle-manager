@@ -94,7 +94,7 @@ export const MonthSurvey = objectType({
         return prisma.monthCircle.findMany({
           where: {
             member: {
-              circleId: { not: null },
+              circleKey: { not: null },
             },
             year: parent.year,
             month: parent.month,
@@ -112,7 +112,7 @@ export const MonthSurvey = objectType({
           where: {
             AND: [
               {
-                circleId: {
+                circleKey: {
                   not: null,
                 },
               },

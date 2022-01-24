@@ -21,9 +21,6 @@ export const monthSurveyReaction: ReactionHandlerWithData<MonthSurvey> = async (
 
   const member = await prisma.member.findUnique({
     where: { id: user.id },
-    include: {
-      circle: true,
-    },
   });
 
   if (!member) {
@@ -36,7 +33,7 @@ export const monthSurveyReaction: ReactionHandlerWithData<MonthSurvey> = async (
   }
 
   const { year, month } = data;
-  const { id: memberId, circleKey, status, circle: currentCircle } = member;
+  const { id: memberId, circleKey, status } = member;
 
   if (!circleKey) {
     await user.send('サークルに所属していません。');

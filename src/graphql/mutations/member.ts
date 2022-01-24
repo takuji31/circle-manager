@@ -37,7 +37,6 @@ export const UpdateMembers = mutationField('updateMembers', {
         data: {
           status: MemberStatus.Leaved,
           circleKey: null,
-          circleId: null,
         },
       }),
       ...members.map((member) => {
@@ -91,7 +90,6 @@ export const UpdateMembers = mutationField('updateMembers', {
         leavedAt: { not: null },
       },
       data: {
-        circleId: null,
         circleKey: null,
       },
     });
