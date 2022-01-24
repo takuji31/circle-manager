@@ -12,23 +12,6 @@ config();
 
 (async () => {
   try {
-    const circles = await prisma.circle.findMany({
-      where: { selectableByUser: true },
-      orderBy: { order: 'asc' },
-    });
-
-    const nextMonthCircleCommand = new SlashCommandBuilder()
-      .setName('register-next-month-circle')
-      .setDescription('[開発中]来月の在籍希望アンケートを先行して回答します');
-    const circleOption = new SlashCommandStringOption()
-      .setName('circle')
-      .setRequired(true)
-      .setDescription('所属したいサークル');
-
-    circles.map((circle) => {
-      circleOption.addChoice(circle.name, circle.id);
-    });
-
     const commands = [
       new SlashCommandBuilder()
         .setName('next-month-circle')
@@ -45,7 +28,6 @@ config();
       new SlashCommandBuilder()
         .setName('trainer-id')
         .setDescription('登録されているあなたのトレーナーIDを表示します。'),
-      nextMonthCircleCommand.addStringOption(circleOption),
     ].map((command) => command.toJSON());
 
     const rest = createDiscordRestClient();

@@ -31,35 +31,37 @@ export const UpdateMemberMonthCircleMutation = mutationField(
         throw new Error('member not found');
       }
 
-      const { circleId: currentCircleId } = member;
+      const { circleKey: currentCircleKey } = member;
       let monthCircle = await prisma.monthCircle.findUnique({
         where: { year_month_memberId: { memberId, year, month } },
       });
 
-      if (currentCircleId) {
-        monthCircle = await prisma.monthCircle.upsert({
-          where: {
-            year_month_memberId: {
-              year,
-              month,
-              memberId,
-            },
-          },
-          create: {
-            year,
-            month,
-            memberId,
-            circleId,
-            currentCircleId,
-          },
-          update: {
-            year,
-            month,
-            memberId,
-            circleId,
-            currentCircleId,
-          },
-        });
+      // TODO: MonthCircleをCircleKeyに対応させる
+      if (currentCircleKey) {
+        throw new Error('Not working now');
+        // monthCircle = await prisma.monthCircle.upsert({
+        //   where: {
+        //     year_month_memberId: {
+        //       year,
+        //       month,
+        //       memberId,
+        //     },
+        //   },
+        //   create: {
+        //     year,
+        //     month,
+        //     memberId,
+        //     circleId,
+        //     currentCircleId: currentCircleKey,
+        //   },
+        //   update: {
+        //     year,
+        //     month,
+        //     memberId,
+        //     circleId,
+        //     currentCircleId: currentCircleKey,
+        //   },
+        // });
       } else if (user.isAdmin) {
         monthCircle = await prisma.monthCircle.update({
           where: {

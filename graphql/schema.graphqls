@@ -121,6 +121,7 @@ type MonthSurvey {
   year: String!
 }
 
+"""在籍希望アンケートの回答"""
 type MonthSurveyAnswer {
   circleKey: CircleKey!
   id: ID!
