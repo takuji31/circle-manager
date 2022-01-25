@@ -205,7 +205,7 @@ const AdminTopContent = () => {
                 return (
                   <TableRow key={`signup_${signUp.id}`}>
                     <TableCell>{signUp.member.name}</TableCell>
-                    <TableCell>{signUp.circle.name}</TableCell>
+                    <TableCell>{signUp?.circle?.name}</TableCell>
                     <TableCell>{signUp.member.trainerId ?? '未入力'}</TableCell>
                     <TableCell>
                       <InvitedCheckBox
