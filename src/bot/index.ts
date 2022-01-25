@@ -1,4 +1,4 @@
-import { sendSetupMessage } from './../discord/member/setup_message';
+import { sendSetupMessage } from '../discord/member/messages';
 import { trainerIdCommand } from './member/trainer_id';
 import { updateMemberNicknameEvent } from './member/update_member_nickname';
 import { monthSurveyReaction, monthSurveyShowReaction } from './month_survey';

@@ -1,4 +1,4 @@
-import { sendSetupMessage } from './../discord/member/setup_message';
+import { sendSetupMessage } from '../discord/member/messages';
 import { Guild } from './../model/guild';
 import { prisma } from '../database';
 import { nextMonth } from '../model';

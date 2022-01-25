@@ -4,6 +4,7 @@ import { nonNull, mutationField } from 'nexus';
 import { createDiscordRestClient } from '../../discord';
 import { Guild } from '../../model';
 import { SignUp, UpdateSignUpMutationInput } from '../types';
+import { sendInvitedMessage } from '../../discord/member/messages';
 
 export const UpdateSignUpMutation = mutationField('updateSignUp', {
   type: nonNull(SignUp),
@@ -12,9 +13,13 @@ export const UpdateSignUpMutation = mutationField('updateSignUp', {
   },
   async resolve(_, { input: { memberId, circleKey, invited, joined } }, ctx) {
     let signUp = await ctx.prisma.signUp.findUnique({
+      include: {
+        member: true,
+      },
       where: { id: memberId },
     });
 
+    const signUpInvited = signUp?.invited;
     const circle = circleKey
       ? Circles.findByCircleKey(circleKey)
       : signUp?.circleKey
@@ -28,6 +33,9 @@ export const UpdateSignUpMutation = mutationField('updateSignUp', {
     } else {
       signUp = await ctx.prisma.signUp.update({
         where: { id: memberId },
+        include: {
+          member: true,
+        },
         data: {
           id: memberId,
           circleKey: circle?.key,
@@ -35,6 +43,10 @@ export const UpdateSignUpMutation = mutationField('updateSignUp', {
           joined: joined ?? undefined,
         },
       });
+    }
+
+    if (circle && invited && !signUpInvited) {
+      await sendInvitedMessage(signUp.member, circle, 'signUp');
     }
 
     if (circle && joined) {
