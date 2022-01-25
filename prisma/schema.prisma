@@ -65,7 +65,7 @@ model MonthCircle {
   member           Member           @relation(fields: [memberId], references: [id])
   year             String           @db.Char(4)
   month            String           @db.Char(2)
-  currentCircleKey CircleKey
+  currentCircleKey CircleKey?
   state            MonthCircleState
   kicked           Boolean          @default(false)
   invited          Boolean          @default(false)
