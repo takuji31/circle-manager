@@ -171,6 +171,7 @@ export interface NexusGenObjects {
     date: NexusGenScalars['Date']; // Date!
   }
   SignUp: { // root type
+    circleKey?: NexusGenEnums['CircleKey'] | null; // CircleKey
     id: string; // ID!
     invited: boolean; // Boolean!
     joined: boolean; // Boolean!
@@ -285,7 +286,8 @@ export interface NexusGenFieldTypes {
     fanCounts: NexusGenRootTypes['MemberFanCount'][]; // [MemberFanCount!]!
   }
   SignUp: { // field return type
-    circle: NexusGenRootTypes['Circle']; // Circle!
+    circle: NexusGenRootTypes['Circle'] | null; // Circle
+    circleKey: NexusGenEnums['CircleKey'] | null; // CircleKey
     id: string; // ID!
     invited: boolean; // Boolean!
     joined: boolean; // Boolean!
@@ -396,6 +398,7 @@ export interface NexusGenFieldTypeNames {
   }
   SignUp: { // field return type name
     circle: 'Circle'
+    circleKey: 'CircleKey'
     id: 'ID'
     invited: 'Boolean'
     joined: 'Boolean'

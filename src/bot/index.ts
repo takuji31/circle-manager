@@ -64,6 +64,19 @@ client.on('guildMemberAdd', async (member) => {
         leavedAt: null,
       },
     });
+    await prisma.signUp.upsert({
+      where: { id: member.id },
+      create: {
+        id: member.id,
+      },
+      // renew si
+      update: {
+        circleKey: null,
+        createdAt: new Date(),
+        invited: false,
+        joined: false,
+      },
+    });
     if (process.env.NODE_ENV != 'production') return;
     await sendSetupMessage(createdMember);
   } catch (e) {
