@@ -84,7 +84,7 @@ export interface NexusGenInputs {
     kicked?: boolean | null; // Boolean
   }
   UpdateSignUpMutationInput: { // input type
-    circleId?: string | null; // String
+    circleKey?: NexusGenEnums['CircleKey'] | null; // CircleKey
     invited?: boolean | null; // Boolean
     joined?: boolean | null; // Boolean
     memberId: string; // String!

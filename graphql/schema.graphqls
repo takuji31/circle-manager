@@ -203,7 +203,7 @@ input UpdateMonthCircleMutationInput {
 }
 
 input UpdateSignUpMutationInput {
-  circleId: String = null
+  circleKey: CircleKey = null
   invited: Boolean = null
   joined: Boolean = null
   memberId: String!

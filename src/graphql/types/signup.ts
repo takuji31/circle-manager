@@ -1,5 +1,5 @@
 import { objectType, inputObjectType } from 'nexus';
-import { SignUp as T } from 'nexus-prisma';
+import { CircleKey, SignUp as T } from 'nexus-prisma';
 import { Circles } from '../../model';
 import { Circle } from './circle';
 
@@ -25,7 +25,7 @@ export const UpdateSignUpMutationInput = inputObjectType({
   name: 'UpdateSignUpMutationInput',
   definition(t) {
     t.nonNull.string('memberId');
-    t.string('circleId', { default: null });
+    t.field('circleKey', { type: 'CircleKey', default: null });
     t.boolean('invited', { default: null });
     t.boolean('joined', { default: null });
   },

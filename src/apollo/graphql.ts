@@ -263,13 +263,13 @@ export type UpdateMonthCircleMutationInput = {
 };
 
 export type UpdateSignUpMutationInput = {
-  circleId?: Maybe<Scalars['String']>;
+  circleKey?: Maybe<CircleKey>;
   invited?: Maybe<Scalars['Boolean']>;
   joined?: Maybe<Scalars['Boolean']>;
   memberId: Scalars['String'];
 };
 
-export type ListedCircleFragment = { __typename?: 'Circle', id: string, name: string };
+export type ListedCircleFragment = { __typename?: 'Circle', id: string, key: CircleKey, name: string };
 
 export type ListedMemberFragment = { __typename?: 'Member', id: string, name: string, trainerId?: string | null | undefined };
 
@@ -277,15 +277,15 @@ export type FullMemberFragment = { __typename?: 'Member', id: string, pathname: 
 
 export type MonthAndSurveyFragment = { __typename?: 'Month', year: string, month: string, survey?: { __typename?: 'MonthSurvey', id: string, year: string, month: string, expiredAt: any } | null | undefined };
 
-export type MonthAndSurveyWithMembersFragment = { __typename?: 'Month', year: string, month: string, survey?: { __typename?: 'MonthSurvey', id: string, year: string, month: string, expiredAt: any, answers: Array<{ __typename?: 'MonthCircle', id: string, year: string, month: string, member: { __typename?: 'Member', id: string, name: string, trainerId?: string | null | undefined }, circle: { __typename?: 'Circle', id: string, name: string } }>, noAnswerMembers: Array<{ __typename?: 'Member', id: string, name: string }>, monthSurveyAnswers: Array<{ __typename?: 'MonthSurveyAnswer', id: string, year: string, month: string, circleKey: CircleKey, value?: MonthSurveyAnswerValue | null | undefined }> } | null | undefined };
+export type MonthAndSurveyWithMembersFragment = { __typename?: 'Month', year: string, month: string, survey?: { __typename?: 'MonthSurvey', id: string, year: string, month: string, expiredAt: any, answers: Array<{ __typename?: 'MonthCircle', id: string, year: string, month: string, member: { __typename?: 'Member', id: string, name: string, trainerId?: string | null | undefined }, circle: { __typename?: 'Circle', id: string, key: CircleKey, name: string } }>, noAnswerMembers: Array<{ __typename?: 'Member', id: string, name: string }>, monthSurveyAnswers: Array<{ __typename?: 'MonthSurveyAnswer', id: string, year: string, month: string, circleKey: CircleKey, value?: MonthSurveyAnswerValue | null | undefined }> } | null | undefined };
 
-export type MemberMonthCircleFragment = { __typename?: 'MonthCircle', id: string, year: string, month: string, circle: { __typename?: 'Circle', id: string, name: string } };
+export type MemberMonthCircleFragment = { __typename?: 'MonthCircle', id: string, year: string, month: string, circle: { __typename?: 'Circle', id: string, key: CircleKey, name: string } };
 
-export type FullMonthCircleFragment = { __typename?: 'MonthCircle', kicked: boolean, invited: boolean, joined: boolean, id: string, year: string, month: string, currentCircle: { __typename?: 'Circle', id: string, name: string }, member: { __typename?: 'Member', id: string, name: string, trainerId?: string | null | undefined }, circle: { __typename?: 'Circle', id: string, name: string } };
+export type FullMonthCircleFragment = { __typename?: 'MonthCircle', kicked: boolean, invited: boolean, joined: boolean, id: string, year: string, month: string, currentCircle: { __typename?: 'Circle', id: string, key: CircleKey, name: string }, member: { __typename?: 'Member', id: string, name: string, trainerId?: string | null | undefined }, circle: { __typename?: 'Circle', id: string, key: CircleKey, name: string } };
 
 export type ListedMonthSurveyAnswerFragment = { __typename?: 'MonthSurveyAnswer', id: string, year: string, month: string, circleKey: CircleKey, value?: MonthSurveyAnswerValue | null | undefined };
 
-export type ListedSignUpFragment = { __typename?: 'SignUp', id: string, invited: boolean, joined: boolean, member: { __typename?: 'Member', id: string, name: string, trainerId?: string | null | undefined }, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined };
+export type ListedSignUpFragment = { __typename?: 'SignUp', id: string, invited: boolean, joined: boolean, member: { __typename?: 'Member', id: string, name: string, trainerId?: string | null | undefined }, circle?: { __typename?: 'Circle', id: string, key: CircleKey, name: string } | null | undefined };
 
 export type CreateNextMonthSurveyMutationVariables = Exact<{ [key: string]: never; }>;
 
@@ -300,7 +300,7 @@ export type UpdateMemberMonthCircleMutationVariables = Exact<{
 }>;
 
 
-export type UpdateMemberMonthCircleMutation = { __typename?: 'Mutation', updateMemberMonthCircle?: { __typename?: 'UpdateMemberMonthCirclePayload', monthCircle: { __typename?: 'MonthCircle', id: string, year: string, month: string, circle: { __typename?: 'Circle', id: string, name: string } } } | null | undefined };
+export type UpdateMemberMonthCircleMutation = { __typename?: 'Mutation', updateMemberMonthCircle?: { __typename?: 'UpdateMemberMonthCirclePayload', monthCircle: { __typename?: 'MonthCircle', id: string, year: string, month: string, circle: { __typename?: 'Circle', id: string, key: CircleKey, name: string } } } | null | undefined };
 
 export type UpdateMemberMutationVariables = Exact<{
   input: UpdateMemberMutationInput;
@@ -312,24 +312,24 @@ export type UpdateMemberMutation = { __typename?: 'Mutation', updateMember: { __
 export type UpdateMembersMutationVariables = Exact<{ [key: string]: never; }>;
 
 
-export type UpdateMembersMutation = { __typename?: 'Mutation', updateMembers: Array<{ __typename?: 'Member', id: string, name: string, trainerId?: string | null | undefined, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined, thisMonthCircle?: { __typename?: 'MonthCircle', id: string, year: string, month: string, circle: { __typename?: 'Circle', id: string, name: string } } | null | undefined, nextMonthCircle?: { __typename?: 'MonthCircle', id: string, year: string, month: string, circle: { __typename?: 'Circle', id: string, name: string } } | null | undefined }> };
+export type UpdateMembersMutation = { __typename?: 'Mutation', updateMembers: Array<{ __typename?: 'Member', id: string, name: string, trainerId?: string | null | undefined, circle?: { __typename?: 'Circle', id: string, key: CircleKey, name: string } | null | undefined, thisMonthCircle?: { __typename?: 'MonthCircle', id: string, year: string, month: string, circle: { __typename?: 'Circle', id: string, key: CircleKey, name: string } } | null | undefined, nextMonthCircle?: { __typename?: 'MonthCircle', id: string, year: string, month: string, circle: { __typename?: 'Circle', id: string, key: CircleKey, name: string } } | null | undefined }> };
 
 export type UpdateMonthCircleMutationVariables = Exact<{
   data: UpdateMonthCircleMutationInput;
 }>;
 
 
-export type UpdateMonthCircleMutation = { __typename?: 'Mutation', updateMonthCircle?: { __typename?: 'UpdateMemberMonthCirclePayload', monthCircle: { __typename?: 'MonthCircle', kicked: boolean, invited: boolean, joined: boolean, id: string, year: string, month: string, currentCircle: { __typename?: 'Circle', id: string, name: string }, member: { __typename?: 'Member', id: string, name: string, trainerId?: string | null | undefined, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined }, circle: { __typename?: 'Circle', id: string, name: string } } } | null | undefined };
+export type UpdateMonthCircleMutation = { __typename?: 'Mutation', updateMonthCircle?: { __typename?: 'UpdateMemberMonthCirclePayload', monthCircle: { __typename?: 'MonthCircle', kicked: boolean, invited: boolean, joined: boolean, id: string, year: string, month: string, currentCircle: { __typename?: 'Circle', id: string, name: string }, member: { __typename?: 'Member', id: string, name: string, trainerId?: string | null | undefined, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined }, circle: { __typename?: 'Circle', id: string, key: CircleKey, name: string } } } | null | undefined };
 
 export type UpdateSetupMutationVariables = Exact<{
   memberId: Scalars['String'];
-  circleId: Scalars['String'];
+  circleKey: CircleKey;
   trainerId: Scalars['String'];
   name: Scalars['String'];
 }>;
 
 
-export type UpdateSetupMutation = { __typename?: 'Mutation', updateSignUp: { __typename?: 'SignUp', id: string, invited: boolean, joined: boolean, member: { __typename?: 'Member', id: string, name: string, trainerId?: string | null | undefined }, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined }, updateMember: { __typename?: 'Member', id: string, pathname: string, name: string, trainerId?: string | null | undefined, setupCompleted: boolean, circleRole: CircleRole, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined } };
+export type UpdateSetupMutation = { __typename?: 'Mutation', updateSignUp: { __typename?: 'SignUp', id: string, invited: boolean, joined: boolean, member: { __typename?: 'Member', id: string, name: string, trainerId?: string | null | undefined }, circle?: { __typename?: 'Circle', id: string, key: CircleKey, name: string } | null | undefined }, updateMember: { __typename?: 'Member', id: string, pathname: string, name: string, trainerId?: string | null | undefined, setupCompleted: boolean, circleRole: CircleRole, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined } };
 
 export type UpdateSignUpMutationVariables = Exact<{
   memberId: Scalars['String'];
@@ -338,17 +338,17 @@ export type UpdateSignUpMutationVariables = Exact<{
 }>;
 
 
-export type UpdateSignUpMutation = { __typename?: 'Mutation', updateSignUp: { __typename?: 'SignUp', id: string, invited: boolean, joined: boolean, member: { __typename?: 'Member', id: string, name: string, trainerId?: string | null | undefined }, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined } };
+export type UpdateSignUpMutation = { __typename?: 'Mutation', updateSignUp: { __typename?: 'SignUp', id: string, invited: boolean, joined: boolean, member: { __typename?: 'Member', id: string, name: string, trainerId?: string | null | undefined }, circle?: { __typename?: 'Circle', id: string, key: CircleKey, name: string } | null | undefined } };
 
 export type AdminCirclesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type AdminCirclesQuery = { __typename?: 'Query', circles: Array<{ __typename?: 'Circle', id: string, name: string }> };
+export type AdminCirclesQuery = { __typename?: 'Query', circles: Array<{ __typename?: 'Circle', id: string, key: CircleKey, name: string }> };
 
 export type AdminMembersQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type AdminMembersQuery = { __typename?: 'Query', members: Array<{ __typename?: 'Member', id: string, pathname: string, name: string, trainerId?: string | null | undefined, circleRole: CircleRole, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined, thisMonthCircle?: { __typename?: 'MonthCircle', id: string, year: string, month: string, circle: { __typename?: 'Circle', id: string, name: string } } | null | undefined, nextMonthCircle?: { __typename?: 'MonthCircle', id: string, year: string, month: string, circle: { __typename?: 'Circle', id: string, name: string } } | null | undefined, nextMonthSurveyAnswer?: { __typename?: 'MonthSurveyAnswer', id: string, year: string, month: string, circleKey: CircleKey, value?: MonthSurveyAnswerValue | null | undefined } | null | undefined }> };
+export type AdminMembersQuery = { __typename?: 'Query', members: Array<{ __typename?: 'Member', id: string, pathname: string, name: string, trainerId?: string | null | undefined, circleRole: CircleRole, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined, thisMonthCircle?: { __typename?: 'MonthCircle', id: string, year: string, month: string, circle: { __typename?: 'Circle', id: string, key: CircleKey, name: string } } | null | undefined, nextMonthCircle?: { __typename?: 'MonthCircle', id: string, year: string, month: string, circle: { __typename?: 'Circle', id: string, key: CircleKey, name: string } } | null | undefined, nextMonthSurveyAnswer?: { __typename?: 'MonthSurveyAnswer', id: string, year: string, month: string, circleKey: CircleKey, value?: MonthSurveyAnswerValue | null | undefined } | null | undefined }> };
 
 export type MonthSurveyQueryVariables = Exact<{
   year: Scalars['String'];
@@ -356,19 +356,19 @@ export type MonthSurveyQueryVariables = Exact<{
 }>;
 
 
-export type MonthSurveyQuery = { __typename?: 'Query', monthSurvey?: { __typename?: 'MonthSurvey', id: string, year: string, month: string, expiredAt: any, move: Array<{ __typename?: 'MonthCircle', kicked: boolean, invited: boolean, joined: boolean, id: string, year: string, month: string, currentCircle: { __typename?: 'Circle', id: string, name: string }, member: { __typename?: 'Member', id: string, name: string, trainerId?: string | null | undefined }, circle: { __typename?: 'Circle', id: string, name: string } }>, leave: Array<{ __typename?: 'MonthCircle', kicked: boolean, invited: boolean, joined: boolean, id: string, year: string, month: string, currentCircle: { __typename?: 'Circle', id: string, name: string }, member: { __typename?: 'Member', id: string, name: string, trainerId?: string | null | undefined }, circle: { __typename?: 'Circle', id: string, name: string } }>, kick: Array<{ __typename?: 'MonthCircle', kicked: boolean, invited: boolean, joined: boolean, id: string, year: string, month: string, currentCircle: { __typename?: 'Circle', id: string, name: string }, member: { __typename?: 'Member', id: string, name: string, trainerId?: string | null | undefined }, circle: { __typename?: 'Circle', id: string, name: string } }> } | null | undefined };
+export type MonthSurveyQuery = { __typename?: 'Query', monthSurvey?: { __typename?: 'MonthSurvey', id: string, year: string, month: string, expiredAt: any, move: Array<{ __typename?: 'MonthCircle', kicked: boolean, invited: boolean, joined: boolean, id: string, year: string, month: string, currentCircle: { __typename?: 'Circle', id: string, key: CircleKey, name: string }, member: { __typename?: 'Member', id: string, name: string, trainerId?: string | null | undefined }, circle: { __typename?: 'Circle', id: string, key: CircleKey, name: string } }>, leave: Array<{ __typename?: 'MonthCircle', kicked: boolean, invited: boolean, joined: boolean, id: string, year: string, month: string, currentCircle: { __typename?: 'Circle', id: string, key: CircleKey, name: string }, member: { __typename?: 'Member', id: string, name: string, trainerId?: string | null | undefined }, circle: { __typename?: 'Circle', id: string, key: CircleKey, name: string } }>, kick: Array<{ __typename?: 'MonthCircle', kicked: boolean, invited: boolean, joined: boolean, id: string, year: string, month: string, currentCircle: { __typename?: 'Circle', id: string, key: CircleKey, name: string }, member: { __typename?: 'Member', id: string, name: string, trainerId?: string | null | undefined }, circle: { __typename?: 'Circle', id: string, key: CircleKey, name: string } }> } | null | undefined };
 
 export type AdminTopQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type AdminTopQuery = { __typename?: 'Query', thisMonth: { __typename?: 'Month', year: string, month: string, survey?: { __typename?: 'MonthSurvey', id: string, year: string, month: string, expiredAt: any } | null | undefined }, nextMonth: { __typename?: 'Month', year: string, month: string, survey?: { __typename?: 'MonthSurvey', id: string, year: string, month: string, expiredAt: any, answers: Array<{ __typename?: 'MonthCircle', id: string, year: string, month: string, member: { __typename?: 'Member', id: string, name: string, trainerId?: string | null | undefined }, circle: { __typename?: 'Circle', id: string, name: string } }>, noAnswerMembers: Array<{ __typename?: 'Member', id: string, name: string }>, monthSurveyAnswers: Array<{ __typename?: 'MonthSurveyAnswer', id: string, year: string, month: string, circleKey: CircleKey, value?: MonthSurveyAnswerValue | null | undefined }> } | null | undefined }, siteMetadata: { __typename?: 'SiteMetadata', activeMembers: number }, signUps: Array<{ __typename?: 'SignUp', id: string, invited: boolean, joined: boolean, member: { __typename?: 'Member', id: string, name: string, trainerId?: string | null | undefined }, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined }> };
+export type AdminTopQuery = { __typename?: 'Query', thisMonth: { __typename?: 'Month', year: string, month: string, survey?: { __typename?: 'MonthSurvey', id: string, year: string, month: string, expiredAt: any } | null | undefined }, nextMonth: { __typename?: 'Month', year: string, month: string, survey?: { __typename?: 'MonthSurvey', id: string, year: string, month: string, expiredAt: any, answers: Array<{ __typename?: 'MonthCircle', id: string, year: string, month: string, member: { __typename?: 'Member', id: string, name: string, trainerId?: string | null | undefined }, circle: { __typename?: 'Circle', id: string, key: CircleKey, name: string } }>, noAnswerMembers: Array<{ __typename?: 'Member', id: string, name: string }>, monthSurveyAnswers: Array<{ __typename?: 'MonthSurveyAnswer', id: string, year: string, month: string, circleKey: CircleKey, value?: MonthSurveyAnswerValue | null | undefined }> } | null | undefined }, siteMetadata: { __typename?: 'SiteMetadata', activeMembers: number }, signUps: Array<{ __typename?: 'SignUp', id: string, invited: boolean, joined: boolean, member: { __typename?: 'Member', id: string, name: string, trainerId?: string | null | undefined }, circle?: { __typename?: 'Circle', id: string, key: CircleKey, name: string } | null | undefined }> };
 
 export type MemberMonthCirclesQueryVariables = Exact<{
   memberId: Scalars['String'];
 }>;
 
 
-export type MemberMonthCirclesQuery = { __typename?: 'Query', member?: { __typename?: 'Member', thisMonthCircle?: { __typename?: 'MonthCircle', id: string, year: string, month: string, circle: { __typename?: 'Circle', id: string, name: string } } | null | undefined, nextMonthCircle?: { __typename?: 'MonthCircle', id: string, year: string, month: string, circle: { __typename?: 'Circle', id: string, name: string } } | null | undefined } | null | undefined, circles: Array<{ __typename?: 'Circle', id: string, name: string }> };
+export type MemberMonthCirclesQuery = { __typename?: 'Query', member?: { __typename?: 'Member', thisMonthCircle?: { __typename?: 'MonthCircle', id: string, year: string, month: string, circle: { __typename?: 'Circle', id: string, key: CircleKey, name: string } } | null | undefined, nextMonthCircle?: { __typename?: 'MonthCircle', id: string, year: string, month: string, circle: { __typename?: 'Circle', id: string, key: CircleKey, name: string } } | null | undefined } | null | undefined, circles: Array<{ __typename?: 'Circle', id: string, key: CircleKey, name: string }> };
 
 export type MemberByPathnameQueryVariables = Exact<{
   pathname: Scalars['String'];
@@ -382,14 +382,14 @@ export type MonthCircleQueryVariables = Exact<{
 }>;
 
 
-export type MonthCircleQuery = { __typename?: 'Query', monthCircle?: { __typename?: 'MonthCircle', id: string, year: string, month: string, member: { __typename?: 'Member', id: string, name: string }, circle: { __typename?: 'Circle', id: string, name: string } } | null | undefined, circles: Array<{ __typename?: 'Circle', id: string, name: string }> };
+export type MonthCircleQuery = { __typename?: 'Query', monthCircle?: { __typename?: 'MonthCircle', id: string, year: string, month: string, member: { __typename?: 'Member', id: string, name: string }, circle: { __typename?: 'Circle', id: string, key: CircleKey, name: string } } | null | undefined, circles: Array<{ __typename?: 'Circle', id: string, key: CircleKey, name: string }> };
 
 export type SetupQueryVariables = Exact<{
   pathname: Scalars['String'];
 }>;
 
 
-export type SetupQuery = { __typename?: 'Query', member?: { __typename?: 'Member', id: string, pathname: string, name: string, trainerId?: string | null | undefined, setupCompleted: boolean, circleRole: CircleRole, signUp?: { __typename?: 'SignUp', id: string, invited: boolean, joined: boolean, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined } | null | undefined, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined } | null | undefined, circles: Array<{ __typename?: 'Circle', id: string, name: string }> };
+export type SetupQuery = { __typename?: 'Query', member?: { __typename?: 'Member', id: string, pathname: string, name: string, trainerId?: string | null | undefined, setupCompleted: boolean, circleRole: CircleRole, signUp?: { __typename?: 'SignUp', id: string, invited: boolean, joined: boolean, circle?: { __typename?: 'Circle', id: string, key: CircleKey, name: string } | null | undefined } | null | undefined, circle?: { __typename?: 'Circle', id: string, name: string } | null | undefined } | null | undefined, circles: Array<{ __typename?: 'Circle', id: string, key: CircleKey, name: string }> };
 
 export const FullMemberFragmentDoc = gql`
     fragment FullMember on Member {
@@ -420,6 +420,7 @@ export const MonthAndSurveyFragmentDoc = gql`
 export const ListedCircleFragmentDoc = gql`
     fragment ListedCircle on Circle {
   id
+  key
   name
 }
     `;
@@ -714,8 +715,8 @@ export type UpdateMonthCircleMutationHookResult = ReturnType<typeof useUpdateMon
 export type UpdateMonthCircleMutationResult = Apollo.MutationResult<UpdateMonthCircleMutation>;
 export type UpdateMonthCircleMutationOptions = Apollo.BaseMutationOptions<UpdateMonthCircleMutation, UpdateMonthCircleMutationVariables>;
 export const UpdateSetupDocument = gql`
-    mutation UpdateSetup($memberId: String!, $circleId: String!, $trainerId: String!, $name: String!) {
-  updateSignUp(input: {memberId: $memberId, circleId: $circleId}) {
+    mutation UpdateSetup($memberId: String!, $circleKey: CircleKey!, $trainerId: String!, $name: String!) {
+  updateSignUp(input: {memberId: $memberId, circleKey: $circleKey}) {
     ...ListedSignUp
   }
   updateMember(
@@ -742,7 +743,7 @@ export type UpdateSetupMutationFn = Apollo.MutationFunction<UpdateSetupMutation,
  * const [updateSetupMutation, { data, loading, error }] = useUpdateSetupMutation({
  *   variables: {
  *      memberId: // value for 'memberId'
- *      circleId: // value for 'circleId'
+ *      circleKey: // value for 'circleKey'
  *      trainerId: // value for 'trainerId'
  *      name: // value for 'name'
  *   },
