@@ -15,15 +15,13 @@ generator nexusPrisma {
 }
 
 model Circle {
-  id                  String        @id @db.VarChar(255)
-  name                String
-  emoji               String?
-  order               Int           @default(0)
-  selectableByUser    Boolean       @default(true)
-  selectableByAdmin   Boolean       @default(true)
-  selectableInSurvey  Boolean       @default(true)
-  monthCircles        MonthCircle[]
-  currentMonthCircles MonthCircle[] @relation("currentCircle")
+  id                 String  @id @db.VarChar(255)
+  name               String
+  emoji              String?
+  order              Int     @default(0)
+  selectableByUser   Boolean @default(true)
+  selectableByAdmin  Boolean @default(true)
+  selectableInSurvey Boolean @default(true)
 
   @@index([order])
   @@index([selectableByAdmin, order])
@@ -60,23 +58,22 @@ enum CircleRole {
   Member
 }
 
+/// メンバーの指定した月の在籍サークル
 model MonthCircle {
-  id              String  @id @default(cuid())
-  memberId        String  @db.VarChar(255)
-  member          Member  @relation(fields: [memberId], references: [id])
-  year            String  @db.Char(4)
-  month           String  @db.Char(2)
-  circleId        String  @db.VarChar(255)
-  circle          Circle  @relation(fields: [circleId], references: [id])
-  currentCircleId String  @db.VarChar(255)
-  currentCircle   Circle  @relation(fields: [currentCircleId], references: [id], name: "currentCircle")
-  kicked          Boolean @default(false)
-  invited         Boolean @default(false)
-  joined          Boolean @default(false)
+  id               String           @id @default(cuid())
+  memberId         String           @db.VarChar(255)
+  member           Member           @relation(fields: [memberId], references: [id])
+  year             String           @db.Char(4)
+  month            String           @db.Char(2)
+  currentCircleKey CircleKey
+  state            MonthCircleState
+  kicked           Boolean          @default(false)
+  invited          Boolean          @default(false)
+  joined           Boolean          @default(false)
 
   @@unique([year, month, memberId])
   @@index([memberId])
-  @@index([year, month, circleId])
+  @@index([year, month, state])
   @@index([kicked, invited, joined, memberId])
 }
 
@@ -217,6 +214,16 @@ enum CircleKey {
 enum MemberStatus {
   NotJoined
   Joined
+  Leaved
+  OB
+  Kicked
+}
+
+enum MonthCircleState {
+  Saikyo
+  Shin
+  Ha
+  Jo
   Leaved
   OB
   Kicked

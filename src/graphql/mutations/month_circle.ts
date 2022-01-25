@@ -8,6 +8,7 @@ import {
   UpdateMemberMonthCirclePayload,
   UpdateMonthCircleMutationInput,
 } from '../types';
+import { Circles } from '../../model';
 
 export const UpdateMemberMonthCircleMutation = mutationField(
   'updateMemberMonthCircle',
@@ -92,26 +93,13 @@ export const UpdateMemberMonthCircleMutation = mutationField(
 export const UpdateMonthCircleMutation = mutationField('updateMonthCircle', {
   type: UpdateMemberMonthCirclePayload,
   args: { data: nonNull(UpdateMonthCircleMutationInput.asArg()) },
-  async resolve(_, { data: { id, kicked, invited, joined } }, { prisma }) {
-    if (kicked != null) {
-      await prisma.monthCircle.update({
-        where: { id },
-        data: { kicked },
-      });
-    }
-
-    if (invited != null) {
-      await prisma.monthCircle.update({
-        where: { id },
-        data: { invited },
-      });
-    }
-
-    if (joined != null) {
-      await prisma.monthCircle.update({
-        where: { id },
-        data: { joined },
-      });
+  async resolve(
+    _,
+    { data: { id, kicked, invited, joined } },
+    { prisma, user }
+  ) {
+    if (!user?.isAdmin) {
+      throw new Error('Forbidden');
     }
 
     const monthCircle = await prisma.monthCircle.findUnique({ where: { id } });
@@ -119,9 +107,21 @@ export const UpdateMonthCircleMutation = mutationField('updateMonthCircle', {
     if (!monthCircle) {
       throw new Error('not found');
     }
+    await prisma.monthCircle.update({
+      where: { id },
+      data: {
+        kicked: kicked ?? undefined,
+        invited: invited ?? undefined,
+        joined: joined ?? undefined,
+      },
+    });
 
     const circleId = monthCircle.circleId;
     if (joined && circleId) {
+      const circle = Circles.findByRawId(circleId);
+      if (!circle) {
+        throw new Error(`Unknown circle id ${circleId}`);
+      }
       try {
         if (process.env.NODE_ENV != 'production') {
           throw new Error('Update role ignored in develop');
