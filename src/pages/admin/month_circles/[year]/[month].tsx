@@ -61,7 +61,7 @@ export const MonthCircleList: PageMonthSurveyComp = ({ data, error }) => {
               return (
                 <TableRow key={`answered_${monthCircle.id}`}>
                   <TableCell>{monthCircle.member.name}</TableCell>
-                  <TableCell>{monthCircle.currentCircle.name}</TableCell>
+                  <TableCell>{monthCircle.currentCircle?.name}</TableCell>
                   <TableCell>{monthCircle.circle?.name}</TableCell>
                   <TableCell>{monthCircle.member.trainerId}</TableCell>
                   <TableCell>
@@ -112,7 +112,7 @@ export const MonthCircleList: PageMonthSurveyComp = ({ data, error }) => {
               return (
                 <TableRow key={`leave_${monthCircle.id}`}>
                   <TableCell>{monthCircle.member.name}</TableCell>
-                  <TableCell>{monthCircle.currentCircle.name}</TableCell>
+                  <TableCell>{monthCircle.currentCircle?.name}</TableCell>
                   <TableCell>
                     <MonthCircleStateCheckbox
                       checked={monthCircle.kicked}
@@ -145,7 +145,7 @@ export const MonthCircleList: PageMonthSurveyComp = ({ data, error }) => {
               return (
                 <TableRow key={`no_answer_${monthCircle.id}`}>
                   <TableCell>{monthCircle.member.name}</TableCell>
-                  <TableCell>{monthCircle.currentCircle.name}</TableCell>
+                  <TableCell>{monthCircle.currentCircle?.name}</TableCell>
                 </TableRow>
               );
             })}

@@ -8,7 +8,7 @@ import {
   UpdateMemberMonthCirclePayload,
   UpdateMonthCircleMutationInput,
 } from '../types';
-import { Circles } from '../../model';
+import { Circles, isCircleKey } from '../../model';
 
 export const UpdateMemberMonthCircleMutation = mutationField(
   'updateMemberMonthCircle',
@@ -119,19 +119,16 @@ export const UpdateMonthCircleMutation = mutationField('updateMonthCircle', {
       },
     });
 
-    const circleId = monthCircle.circleId;
-    if (joined && circleId) {
-      const circle = Circles.findByRawId(circleId);
-      if (!circle) {
-        throw new Error(`Unknown circle id ${circleId}`);
-      }
+    const state = monthCircle.state;
+    if (joined && isCircleKey(state)) {
+      const circle = Circles.findByCircleKey(state);
       try {
         if (process.env.NODE_ENV != 'production') {
           throw new Error('Update role ignored in develop');
         }
         const rest = createDiscordRestClient();
         const roleIds = Guild.roleIds.circleIds;
-        const removingIds = roleIds.filter((id) => id != monthCircle.circleId);
+        const removingIds = roleIds.filter((id) => id != circle.id);
 
         for (const id of removingIds) {
           await rest.delete(
@@ -140,7 +137,7 @@ export const UpdateMonthCircleMutation = mutationField('updateMonthCircle', {
         }
 
         await rest.put(
-          Routes.guildMemberRole(Guild.id, monthCircle.memberId, circleId)
+          Routes.guildMemberRole(Guild.id, monthCircle.memberId, state)
         );
       } catch (e) {
         console.log(e);
