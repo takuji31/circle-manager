@@ -18,20 +18,20 @@ import { setLocale } from 'yup';
 import * as ja from 'yup-locale-ja';
 import { getCircleName } from '../../../model';
 import { PageSetupComp, ssrSetup } from '../../../apollo/page';
-import { useUpdateSetupMutation } from '../../../apollo';
+import { CircleKey, useUpdateSetupMutation } from '../../../apollo';
 import { yupResolver } from '@hookform/resolvers/yup';
 
 setLocale(ja.suggestive);
 
 type SetupFormData = {
-  circleId: string;
+  circleKey: CircleKey;
   name: string;
   trainerId: string;
 };
 
 const schema = yup
   .object({
-    circleId: yup.string().required('選択してください'),
+    circleKey: yup.string().required('選択してください'),
     name: yup.string().required(),
     trainerId: yup
       .string()
@@ -96,9 +96,9 @@ const Setup: PageSetupComp = ({ data, error }) => {
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <Controller
-                name="circleId"
+                name="circleKey"
                 control={control}
-                defaultValue={member.signUp?.circle?.id}
+                defaultValue={member.signUp?.circle?.key}
                 render={({ field, fieldState }) => {
                   return (
                     <Stack spacing={2}>
@@ -108,10 +108,10 @@ const Setup: PageSetupComp = ({ data, error }) => {
                       <ToggleButtonGroup value={field.value}>
                         {circles.map((circle) => (
                           <ToggleButton
-                            value={circle.id}
-                            key={circle.id}
+                            value={circle.key}
+                            key={circle.key}
                             onClick={() => {
-                              setValue('circleId', circle.id);
+                              setValue('circleKey', circle.key);
                             }}
                           >
                             {getCircleName(circle)}
@@ -123,6 +123,15 @@ const Setup: PageSetupComp = ({ data, error }) => {
                           {fieldState.error.message}
                         </Typography>
                       )}
+                      <Stack>
+                        <Typography variant="caption">
+                          西京ファームのノルマ 6000万人/月
+                        </Typography>
+                        <Typography variant="caption">
+                          ウマ娘愛好会のノルマ 500万人/月 稼働目標 シン
+                          4000万人/月、破 1500万人/月、序 500万人/月
+                        </Typography>
+                      </Stack>
                     </Stack>
                   );
                 }}

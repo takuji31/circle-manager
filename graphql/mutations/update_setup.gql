@@ -1,10 +1,10 @@
 mutation UpdateSetup(
   $memberId: String!
-  $circleId: String!
+  $circleKey: CircleKey!
   $trainerId: String!
   $name: String!
 ) {
-  updateSignUp(input: { memberId: $memberId, circleId: $circleId }) {
+  updateSignUp(input: { memberId: $memberId, circleKey: $circleKey }) {
     ...ListedSignUp
   }
   updateMember(

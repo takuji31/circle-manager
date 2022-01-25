@@ -10,25 +10,19 @@ export const UpdateSignUpMutation = mutationField('updateSignUp', {
   args: {
     input: nonNull(UpdateSignUpMutationInput.asArg()),
   },
-  async resolve(
-    _,
-    { input: { memberId, circleId: circleIdOrNull, invited, joined } },
-    ctx
-  ) {
+  async resolve(_, { input: { memberId, circleKey, invited, joined } }, ctx) {
     let signUp = await ctx.prisma.signUp.findUnique({
       where: { id: memberId },
     });
 
-    const circle = circleIdOrNull
-      ? Circles.findByRawId(circleIdOrNull)
+    const circle = circleKey
+      ? Circles.findByCircleKey(circleKey)
       : signUp?.circleKey
       ? Circles.findByCircleKey(signUp.circleKey)
       : null;
 
     if ((joined || invited) && !circle) {
       throw new Error('Cannot join null circle');
-    } else if (circleIdOrNull && !circle) {
-      throw new Error(`Unknown circle id ${circleIdOrNull}`);
     } else if (!signUp) {
       throw new Error(`Unknown member id ${memberId}`);
     } else {
