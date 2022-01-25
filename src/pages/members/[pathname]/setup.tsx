@@ -98,7 +98,7 @@ const Setup: PageSetupComp = ({ data, error }) => {
               <Controller
                 name="circleId"
                 control={control}
-                defaultValue={member.signUp?.circle.id}
+                defaultValue={member.signUp?.circle?.id}
                 render={({ field, fieldState }) => {
                   return (
                     <Stack spacing={2}>
