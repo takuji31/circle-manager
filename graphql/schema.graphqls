@@ -168,7 +168,8 @@ type Ranking {
 
 """加入申請"""
 type SignUp {
-  circle: Circle!
+  circle: Circle
+  circleKey: CircleKey
 
   """DiscordのユーザーID"""
   id: ID!

@@ -14,7 +14,7 @@
     "lint": "next lint",
     "bot:start": "yarn run ts-node --transpile-only src/bot/index.ts",
     "bot:dev": "yarn run ts-node src/bot/index.ts",
-    "bot:watch": "yarn run ts-node-dev --exit-child --watch src/ src/bot/index.ts",
+    "bot:watch": "yarn run ts-node-dev --respawn --exit-child --clear --watch src/ src/bot/index.ts",
     "graphql:schemagen": "yarn run ts-node --transpile-only src/graphql",
     "db:seed": "prisma db seed",
     "db:generate": "prisma generate",

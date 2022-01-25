@@ -15,36 +15,50 @@ export const UpdateSignUpMutation = mutationField('updateSignUp', {
     { input: { memberId, circleId: circleIdOrNull, invited, joined } },
     ctx
   ) {
-    const signUp = await ctx.prisma.signUp.findUnique({
+    let signUp = await ctx.prisma.signUp.findUnique({
       where: { id: memberId },
     });
 
-    if (!signUp && !circleIdOrNull) {
-      throw new Error('Not found');
+    const circle = circleIdOrNull
+      ? Circles.findByRawId(circleIdOrNull)
+      : signUp?.circleKey
+      ? Circles.findByCircleKey(signUp.circleKey)
+      : null;
+
+    if ((joined || invited) && !circle) {
+      throw new Error('Cannot join null circle');
+    } else if (circleIdOrNull && !circle) {
+      throw new Error(`Unknown circle id ${circleIdOrNull}`);
+    } else if (!signUp) {
+      throw new Error(`Unknown member id ${memberId}`);
+    } else {
+      signUp = await ctx.prisma.signUp.update({
+        where: { id: memberId },
+        data: {
+          id: memberId,
+          circleKey: circle?.key,
+          invited: invited ?? undefined,
+          joined: joined ?? undefined,
+        },
+      });
     }
 
-    const circleId = circleIdOrNull ?? signUp?.circleId;
-
-    if (joined && circleId) {
+    if (circle && joined) {
       try {
         if (process.env.NODE_ENV != 'production') {
           throw new Error('Update role ignored in develop');
         }
         const rest = createDiscordRestClient();
         const roleIds = Guild.roleIds.circleIds;
-        const removingIds = roleIds.filter((id) => id != circleId);
+        const removingIds = roleIds.filter((id) => id != circle.id);
 
         for (const id of removingIds) {
           await rest.delete(Routes.guildMemberRole(Guild.id, memberId, id));
         }
 
-        await rest.put(Routes.guildMemberRole(Guild.id, memberId, circleId));
+        await rest.put(Routes.guildMemberRole(Guild.id, memberId, circle.id));
       } catch (e) {
         console.log(e);
-      }
-      const circle = Circles.findByRawId(circleId);
-      if (!circle) {
-        throw new Error(`Unknown circle id ${circleId}`);
       }
 
       await ctx.prisma.member.update({
@@ -53,19 +67,6 @@ export const UpdateSignUpMutation = mutationField('updateSignUp', {
       });
     }
 
-    const data = {
-      invited: invited ?? undefined,
-      joined: joined ?? undefined,
-    };
-
-    return await ctx.prisma.signUp.upsert({
-      where: { id: memberId },
-      create: {
-        id: memberId,
-        circleId: circleId ?? Circles.specialIds.noAnswer,
-        ...data,
-      },
-      update: data,
-    });
+    return signUp;
   },
 });

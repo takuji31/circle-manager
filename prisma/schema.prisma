@@ -24,7 +24,6 @@ model Circle {
   selectableInSurvey  Boolean       @default(true)
   monthCircles        MonthCircle[]
   currentMonthCircles MonthCircle[] @relation("currentCircle")
-  signUps             SignUp[]
 
   @@index([order])
   @@index([selectableByAdmin, order])
@@ -118,9 +117,7 @@ enum MonthSurveyAnswerValue {
 model SignUp {
   id        String     @id @db.VarChar(255) /// DiscordのユーザーID
   member    Member     @relation(fields: [id], references: [id])
-  circleId  String     @db.VarChar(255)
-  circle    Circle     @relation(fields: [circleId], references: [id])
-  circleKey CircleKey? @default(dbgenerated("NULL"))
+  circleKey CircleKey?
   invited   Boolean    @default(false)
   joined    Boolean    @default(false)
   createdAt DateTime   @default(now())
