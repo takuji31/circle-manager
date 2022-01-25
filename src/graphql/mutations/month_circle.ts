@@ -37,32 +37,35 @@ export const UpdateMemberMonthCircleMutation = mutationField(
         where: { year_month_memberId: { memberId, year, month } },
       });
 
-      // TODO: MonthCircleをCircleKeyに対応させる
+      const circle = Circles.findByRawId(circleId);
+
+      if (!circle) {
+        throw new Error(`Unknown circle id ${circleId}`);
+      }
+
+      // TODO: MonthCircleStateで更新できるようにする
       if (currentCircleKey) {
-        throw new Error('Not working now');
-        // monthCircle = await prisma.monthCircle.upsert({
-        //   where: {
-        //     year_month_memberId: {
-        //       year,
-        //       month,
-        //       memberId,
-        //     },
-        //   },
-        //   create: {
-        //     year,
-        //     month,
-        //     memberId,
-        //     circleId,
-        //     currentCircleId: currentCircleKey,
-        //   },
-        //   update: {
-        //     year,
-        //     month,
-        //     memberId,
-        //     circleId,
-        //     currentCircleId: currentCircleKey,
-        //   },
-        // });
+        monthCircle = await prisma.monthCircle.upsert({
+          where: {
+            year_month_memberId: {
+              year,
+              month,
+              memberId,
+            },
+          },
+          create: {
+            year,
+            month,
+            memberId,
+            state: currentCircleKey,
+          },
+          update: {
+            year,
+            month,
+            memberId,
+            state: currentCircleKey,
+          },
+        });
       } else if (user.isAdmin) {
         monthCircle = await prisma.monthCircle.update({
           where: {
@@ -76,7 +79,7 @@ export const UpdateMemberMonthCircleMutation = mutationField(
             year,
             month,
             memberId,
-            circleId,
+            state: circle.key,
           },
         });
       } else {

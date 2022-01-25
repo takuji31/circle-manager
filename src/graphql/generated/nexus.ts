@@ -95,6 +95,7 @@ export interface NexusGenEnums {
   CircleFilter: "All" | "CircleSelect" | "MonthSurvey"
   CircleKey: "Ha" | "Jo" | "Saikyo" | "Shin"
   CircleRole: "Leader" | "Member" | "SubLeader"
+  MonthCircleState: "Ha" | "Jo" | "Kicked" | "Leaved" | "OB" | "Saikyo" | "Shin"
   MonthSurveyAnswerValue: "Leave" | "None" | "Ob" | "Saikyo" | "Umamusume"
 }
 
@@ -145,13 +146,13 @@ export interface NexusGenObjects {
     year: string; // String!
   }
   MonthCircle: { // root type
-    circleKey?: NexusGenEnums['CircleKey'] | null; // CircleKey
     currentCircleKey?: NexusGenEnums['CircleKey'] | null; // CircleKey
     id: string; // ID!
     invited: boolean; // Boolean!
     joined: boolean; // Boolean!
     kicked: boolean; // Boolean!
     month: string; // String!
+    state: NexusGenEnums['MonthCircleState']; // MonthCircleState!
     year: string; // String!
   }
   MonthSurvey: { // root type
@@ -235,7 +236,6 @@ export interface NexusGenFieldTypes {
   }
   MonthCircle: { // field return type
     circle: NexusGenRootTypes['Circle'] | null; // Circle
-    circleKey: NexusGenEnums['CircleKey'] | null; // CircleKey
     currentCircle: NexusGenRootTypes['Circle'] | null; // Circle
     currentCircleKey: NexusGenEnums['CircleKey'] | null; // CircleKey
     id: string; // ID!
@@ -244,6 +244,7 @@ export interface NexusGenFieldTypes {
     kicked: boolean; // Boolean!
     member: NexusGenRootTypes['Member']; // Member!
     month: string; // String!
+    state: NexusGenEnums['MonthCircleState']; // MonthCircleState!
     year: string; // String!
   }
   MonthSurvey: { // field return type
@@ -348,7 +349,6 @@ export interface NexusGenFieldTypeNames {
   }
   MonthCircle: { // field return type name
     circle: 'Circle'
-    circleKey: 'CircleKey'
     currentCircle: 'Circle'
     currentCircleKey: 'CircleKey'
     id: 'ID'
@@ -357,6 +357,7 @@ export interface NexusGenFieldTypeNames {
     kicked: 'Boolean'
     member: 'Member'
     month: 'String'
+    state: 'MonthCircleState'
     year: 'String'
   }
   MonthSurvey: { // field return type name

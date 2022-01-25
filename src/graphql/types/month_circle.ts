@@ -1,6 +1,10 @@
-import { MonthCircle as _MonthCircle } from 'nexus-prisma';
-import { inputObjectType, nonNull, objectType } from 'nexus';
-import { Circles } from '../../model';
+import {
+  MonthCircle as _MonthCircle,
+  MonthCircleState as _MonthCircleState,
+} from 'nexus-prisma';
+import { enumType, inputObjectType, nonNull, objectType } from 'nexus';
+import { Circles, isCircleKey } from '../../model';
+import { stat } from 'fs';
 
 export const MonthCircle = objectType({
   name: _MonthCircle.$name,
@@ -9,12 +13,16 @@ export const MonthCircle = objectType({
     t.field(_MonthCircle.id);
     t.field(_MonthCircle.year);
     t.field(_MonthCircle.month);
-    t.field(_MonthCircle.circleKey);
+    t.field(_MonthCircle.state);
     t.field(_MonthCircle.currentCircleKey);
     t.field('circle', {
       type: 'Circle',
-      resolve({ circleKey }, _, __) {
-        return circleKey ? Circles.findByCircleKey(circleKey) : null;
+      resolve({ state }, _, __) {
+        if (isCircleKey(state)) {
+          return Circles.findByCircleKey(state);
+        } else {
+          return null;
+        }
       },
     });
     t.field('currentCircle', {
@@ -31,6 +39,8 @@ export const MonthCircle = objectType({
     t.field(_MonthCircle.joined);
   },
 });
+
+export const MonthCircleState = enumType(_MonthCircleState);
 
 export const UpdateMemberMonthCirclePayload = objectType({
   name: 'UpdateMemberMonthCirclePayload',

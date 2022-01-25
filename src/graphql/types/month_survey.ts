@@ -22,28 +22,18 @@ export const MonthSurvey = objectType({
           where: {
             year: parent.year,
             month: parent.month,
-            circleId: {
-              not: {
-                in: [
-                  Circles.specialIds.noAnswer,
-                  Circles.specialIds.leave,
-                  Circles.specialIds.kick,
-                  Circles.specialIds.notJoined,
-                  Circles.specialIds.ob,
-                ],
-              },
+            state: {
+              notIn: ['Kicked', 'Leaved', 'OB'],
             },
           },
           orderBy: {
-            currentCircle: {
-              order: 'asc',
-            },
+            state: 'asc',
           },
         });
 
         return monthCircles.filter(
           (monthCircle: _MonthCircle) =>
-            monthCircle.circleId != monthCircle.currentCircleId
+            monthCircle.state != monthCircle.currentCircleKey
         );
       },
     });
@@ -55,14 +45,12 @@ export const MonthSurvey = objectType({
           where: {
             year: parent.year,
             month: parent.month,
-            circleId: {
-              in: [Circles.specialIds.leave, Circles.specialIds.ob],
+            state: {
+              in: ['Leaved', 'OB'],
             },
           },
           orderBy: {
-            currentCircle: {
-              order: 'asc',
-            },
+            currentCircleKey: 'asc',
           },
         });
       },
@@ -75,14 +63,10 @@ export const MonthSurvey = objectType({
           where: {
             year: parent.year,
             month: parent.month,
-            circleId: {
-              in: [Circles.specialIds.kick, Circles.specialIds.noAnswer],
-            },
+            state: 'Kicked',
           },
           orderBy: {
-            currentCircle: {
-              order: 'asc',
-            },
+            currentCircleKey: 'asc',
           },
         });
       },
@@ -98,8 +82,8 @@ export const MonthSurvey = objectType({
             },
             year: parent.year,
             month: parent.month,
-            circleId: {
-              not: Circles.specialIds.noAnswer,
+            state: {
+              not: 'Kicked',
             },
           },
         });
@@ -121,7 +105,7 @@ export const MonthSurvey = objectType({
                   some: {
                     year: parent.year,
                     month: parent.month,
-                    circleId: Circles.specialIds.noAnswer,
+                    state: 'Kicked',
                   },
                 },
               },

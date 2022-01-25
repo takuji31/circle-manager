@@ -2,6 +2,15 @@ import { CircleKey } from '@prisma/client';
 
 const isProduction = process.env.NODE_ENV == 'production';
 
+export function isCircleKey(key: string): key is CircleKey {
+  for (const circleKey of Object.values(CircleKey)) {
+    if (circleKey == key) {
+      return true;
+    }
+  }
+  return false;
+}
+
 export function isCircleId(id: string): id is CircleId {
   for (const circleId of Object.values(CircleId)) {
     if (circleId == id) {

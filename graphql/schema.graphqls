@@ -96,7 +96,6 @@ type Month {
 """メンバーの指定した月の在籍サークル"""
 type MonthCircle {
   circle: Circle
-  circleKey: CircleKey
   currentCircle: Circle
   currentCircleKey: CircleKey
   id: ID!
@@ -105,7 +104,18 @@ type MonthCircle {
   kicked: Boolean!
   member: Member!
   month: String!
+  state: MonthCircleState!
   year: String!
+}
+
+enum MonthCircleState {
+  Ha
+  Jo
+  Kicked
+  Leaved
+  OB
+  Saikyo
+  Shin
 }
 
 """在籍希望アンケート"""

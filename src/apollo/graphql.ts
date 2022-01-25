@@ -105,7 +105,6 @@ export type Month = {
 export type MonthCircle = {
   __typename?: 'MonthCircle';
   circle?: Maybe<Circle>;
-  circleKey?: Maybe<CircleKey>;
   currentCircle?: Maybe<Circle>;
   currentCircleKey?: Maybe<CircleKey>;
   id: Scalars['ID'];
@@ -114,8 +113,19 @@ export type MonthCircle = {
   kicked: Scalars['Boolean'];
   member: Member;
   month: Scalars['String'];
+  state: MonthCircleState;
   year: Scalars['String'];
 };
+
+export enum MonthCircleState {
+  Ha = 'Ha',
+  Jo = 'Jo',
+  Kicked = 'Kicked',
+  Leaved = 'Leaved',
+  Ob = 'OB',
+  Saikyo = 'Saikyo',
+  Shin = 'Shin'
+}
 
 /** 在籍希望アンケート */
 export type MonthSurvey = {
@@ -1185,10 +1195,9 @@ export type MonthFieldPolicy = {
 	survey?: FieldPolicy<any> | FieldReadFunction<any>,
 	year?: FieldPolicy<any> | FieldReadFunction<any>
 };
-export type MonthCircleKeySpecifier = ('circle' | 'circleKey' | 'currentCircle' | 'currentCircleKey' | 'id' | 'invited' | 'joined' | 'kicked' | 'member' | 'month' | 'year' | MonthCircleKeySpecifier)[];
+export type MonthCircleKeySpecifier = ('circle' | 'currentCircle' | 'currentCircleKey' | 'id' | 'invited' | 'joined' | 'kicked' | 'member' | 'month' | 'state' | 'year' | MonthCircleKeySpecifier)[];
 export type MonthCircleFieldPolicy = {
 	circle?: FieldPolicy<any> | FieldReadFunction<any>,
-	circleKey?: FieldPolicy<any> | FieldReadFunction<any>,
 	currentCircle?: FieldPolicy<any> | FieldReadFunction<any>,
 	currentCircleKey?: FieldPolicy<any> | FieldReadFunction<any>,
 	id?: FieldPolicy<any> | FieldReadFunction<any>,
@@ -1197,6 +1206,7 @@ export type MonthCircleFieldPolicy = {
 	kicked?: FieldPolicy<any> | FieldReadFunction<any>,
 	member?: FieldPolicy<any> | FieldReadFunction<any>,
 	month?: FieldPolicy<any> | FieldReadFunction<any>,
+	state?: FieldPolicy<any> | FieldReadFunction<any>,
 	year?: FieldPolicy<any> | FieldReadFunction<any>
 };
 export type MonthSurveyKeySpecifier = ('answers' | 'expiredAt' | 'id' | 'kick' | 'leave' | 'month' | 'monthSurveyAnswers' | 'move' | 'noAnswerMembers' | 'year' | MonthSurveyKeySpecifier)[];
