@@ -6,7 +6,6 @@ import { registerTrainerIdCommand } from './register_trainer_id';
 import { PrismaClient } from '@prisma/client';
 import { Client, Intents, Options } from 'discord.js';
 import { config } from 'dotenv';
-import { nextMonthCircleCommand } from './next_month_circle';
 import { Emoji } from '../model/emoji';
 import { Circle, Circles } from '../model';
 import { updateFanCountEvent } from './circle/update_fan_count';
@@ -101,9 +100,6 @@ client.on('messageCreate', async (message) => {
 client.on('interactionCreate', async (interaction) => {
   try {
     if (!interaction.isCommand()) return;
-    if (interaction.commandName == 'next-month-circle') {
-      nextMonthCircleCommand(interaction);
-    }
     if (interaction.commandName == 'register-trainer-id') {
       registerTrainerIdCommand(interaction);
     }

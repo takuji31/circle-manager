@@ -14,9 +14,6 @@ config();
   try {
     const commands = [
       new SlashCommandBuilder()
-        .setName('next-month-circle')
-        .setDescription('来月の在籍希望アンケートの回答を表示します。'),
-      new SlashCommandBuilder()
         .setName('register-trainer-id')
         .setDescription('トレーナーIDを登録します。')
         .addStringOption(
