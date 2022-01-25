@@ -145,6 +145,8 @@ export interface NexusGenObjects {
     year: string; // String!
   }
   MonthCircle: { // root type
+    circleKey?: NexusGenEnums['CircleKey'] | null; // CircleKey
+    currentCircleKey?: NexusGenEnums['CircleKey'] | null; // CircleKey
     id: string; // ID!
     invited: boolean; // Boolean!
     joined: boolean; // Boolean!
@@ -232,8 +234,10 @@ export interface NexusGenFieldTypes {
     year: string; // String!
   }
   MonthCircle: { // field return type
-    circle: NexusGenRootTypes['Circle']; // Circle!
-    currentCircle: NexusGenRootTypes['Circle']; // Circle!
+    circle: NexusGenRootTypes['Circle'] | null; // Circle
+    circleKey: NexusGenEnums['CircleKey'] | null; // CircleKey
+    currentCircle: NexusGenRootTypes['Circle'] | null; // Circle
+    currentCircleKey: NexusGenEnums['CircleKey'] | null; // CircleKey
     id: string; // ID!
     invited: boolean; // Boolean!
     joined: boolean; // Boolean!
@@ -344,7 +348,9 @@ export interface NexusGenFieldTypeNames {
   }
   MonthCircle: { // field return type name
     circle: 'Circle'
+    circleKey: 'CircleKey'
     currentCircle: 'Circle'
+    currentCircleKey: 'CircleKey'
     id: 'ID'
     invited: 'Boolean'
     joined: 'Boolean'

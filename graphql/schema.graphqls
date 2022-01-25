@@ -93,9 +93,12 @@ type Month {
   year: String!
 }
 
+"""メンバーの指定した月の在籍サークル"""
 type MonthCircle {
-  circle: Circle!
-  currentCircle: Circle!
+  circle: Circle
+  circleKey: CircleKey
+  currentCircle: Circle
+  currentCircleKey: CircleKey
   id: ID!
   invited: Boolean!
   joined: Boolean!
