@@ -1,3 +1,3 @@
-import { Temporal } from "proposal-temporal";
+import { Temporal } from 'proposal-temporal';
 
-export const JST = Temporal.TimeZone.from("Asia/Tokyo");
+export const JST = Temporal.TimeZone.from('Asia/Tokyo');

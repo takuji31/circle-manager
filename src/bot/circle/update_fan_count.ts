@@ -1,6 +1,6 @@
 import { Guild } from './../../model/guild';
 import { Message } from 'discord.js';
-import { Circle } from '../../model';
+import { Circle, JST } from '../../model';
 import { Temporal } from 'proposal-temporal';
 import { crawlUmastagram } from '../../umastagram/crawler';
 
@@ -36,7 +36,7 @@ export const updateFanCountEvent = async (message: Message, circle: Circle) => {
         before: message.id,
         limit: 100,
       });
-      const today = Temporal.now.plainDate('iso8601', 'Asia/Tokyo');
+      const today = Temporal.now.plainDateISO(JST);
       const umastagramUrlMessage = pastMessages.find((msg) => {
         return (
           urlPattern.test(msg.content) &&
