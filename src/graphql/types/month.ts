@@ -1,25 +1,33 @@
 import { Context } from './../context';
-import { nonNull, objectType } from 'nexus';
+import { list, nonNull, objectType } from 'nexus';
 import { MonthSurvey } from './month_survey';
+import { MonthCircle } from './month_circle';
 
 export const Month = objectType({
   name: 'Month',
   definition(t) {
-    t.nonNull.field('year', {
-      type: 'String',
-    });
-    t.nonNull.field('month', {
-      type: 'String',
-    });
+    t.nonNull.int('year');
+    t.nonNull.int('month');
     t.field('survey', {
       type: MonthSurvey,
-      resolve(parent, _, ctx: Context) {
-        return ctx.prisma.monthSurvey.findUnique({
+      resolve({ year, month }, _, { prisma }) {
+        return prisma.monthSurvey.findUnique({
           where: {
             year_month: {
-              year: parent.year,
-              month: parent.month,
+              year: year.toString(),
+              month: month.toString(),
             },
+          },
+        });
+      },
+    });
+    t.field('monthCircles', {
+      type: nonNull(list(nonNull(MonthCircle))),
+      resolve({ year, month }, _, { prisma }) {
+        return prisma.monthCircle.findMany({
+          where: {
+            year,
+            month,
           },
         });
       },

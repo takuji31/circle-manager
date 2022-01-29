@@ -20,6 +20,17 @@ generates:
       scalars:
         Date: 'Temporal.PlainDate'
 
+  src/graphql/generated/type.ts:
+    plugins:
+      - add:
+          content: "import { Temporal } from 'proposal-temporal';"
+      - 'typescript'
+      - 'typescript-operations'
+      - typed-document-node
+    config:
+      scalars:
+        Date: 'Temporal.PlainDate'
+
   src/apollo/page.tsx:
     plugins:
       - 'graphql-codegen-apollo-next-ssr'

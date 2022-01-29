@@ -34,6 +34,7 @@ export const MonthCircle = objectType({
       },
     });
     t.field(_MonthCircle.member);
+    t.field(_MonthCircle.state);
     t.field(_MonthCircle.kicked);
     t.field(_MonthCircle.invited);
     t.field(_MonthCircle.joined);
@@ -68,7 +69,7 @@ export const CreateMonthCirclesPayload = objectType({
     t.nonNull.int('year');
     t.nonNull.int('month');
     t.field('monthCircles', {
-      type: list(nonNull(MonthCircle)),
+      type: nonNull(list(nonNull(MonthCircle))),
     });
   },
 });

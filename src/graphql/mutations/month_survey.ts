@@ -3,7 +3,7 @@ import { Guild } from './../../model/guild';
 import { Circle, Member, MemberStatus } from '@prisma/client';
 import { Temporal } from 'proposal-temporal';
 import { createDiscordRestClient } from '../../discord';
-import { nextMonth } from '../../model';
+import { nextMonth, nextMonthInt } from '../../model';
 import { MonthSurvey as _MonthSurvey } from 'nexus-prisma';
 import { mutationField } from 'nexus';
 import { MessageEmbed } from 'discord.js';
@@ -23,10 +23,10 @@ export const CreateNextMonthSurveyMutation = mutationField(
         throw new Error('Cannot crate month survey.');
       }
 
-      const { year, month } = nextMonth();
+      const { year, month } = nextMonthInt();
       const expiredAt = Temporal.PlainDate.from({
-        year: parseInt(year),
-        month: parseInt(month),
+        year,
+        month,
         day: 1,
       })
         .subtract(Temporal.Duration.from({ days: 12 }))
@@ -35,7 +35,11 @@ export const CreateNextMonthSurveyMutation = mutationField(
           plainTime: Temporal.PlainTime.from({ hour: 0, minute: 0, second: 0 }),
         });
 
-      if (await prisma.monthSurvey.count({ where: { year, month } })) {
+      if (
+        await prisma.monthSurvey.count({
+          where: { year: year.toString(), month: month.toString() },
+        })
+      ) {
         throw new Error('Next month survey already started');
       }
 
@@ -93,8 +97,8 @@ export const CreateNextMonthSurveyMutation = mutationField(
       const monthSurvey = await prisma.monthSurvey.create({
         data: {
           id: messageId,
-          year,
-          month,
+          year: year.toString(),
+          month: month.toString(),
           expiredAt: new Date(expiredAt.epochMilliseconds),
         },
       });
@@ -112,8 +116,8 @@ export const CreateNextMonthSurveyMutation = mutationField(
         data: members.map(({ id, circleKey }: Member) => ({
           memberId: id,
           circleKey: circleKey!!,
-          year,
-          month,
+          year: year.toString(),
+          month: month.toString(),
         })),
         skipDuplicates: true,
       });

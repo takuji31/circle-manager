@@ -26,6 +26,7 @@ export const Member = objectType({
     t.field(m.joinedAt);
     t.field(m.leavedAt);
     t.field(m.circleKey);
+    t.field(m.messageChannelId);
     t.field('circle', {
       type: Circle,
       resolve({ circleKey }, _, __) {

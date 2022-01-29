@@ -39,7 +39,7 @@ enum CircleRole {
 
 type CreateMonthCirclesPayload {
   month: Int!
-  monthCircles: [MonthCircle!]
+  monthCircles: [MonthCircle!]!
   year: Int!
 }
 
@@ -70,6 +70,7 @@ type Member {
   id: ID!
   joinedAt: DateTime!
   leavedAt: DateTime
+  messageChannelId: String
   name: String!
   nextMonthCircle: MonthCircle
 
@@ -94,9 +95,10 @@ type MemberFanCount {
 }
 
 type Month {
-  month: String!
+  month: Int!
+  monthCircles: [MonthCircle!]!
   survey: MonthSurvey
-  year: String!
+  year: Int!
 }
 
 """メンバーの指定した月の在籍サークル"""
