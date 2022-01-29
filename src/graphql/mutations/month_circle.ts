@@ -4,7 +4,6 @@ import { MonthCircle as _MonthCircle } from 'nexus-prisma';
 import { intArg, mutationField, nonNull, stringArg } from 'nexus';
 import { createDiscordRestClient } from '../../discord';
 import {
-  CreateMonthCirclesMutationInput,
   CreateMonthCirclesPayload,
   UpdateMemberMonthCirclePayload,
   UpdateMonthCircleMutationInput,
@@ -13,9 +12,7 @@ import {
   Circles,
   isCircleKey,
   JST,
-  nextMonth,
   nextMonthInt,
-  thisMonth,
   thisMonthInt,
 } from '../../model';
 import { toDate, toDateTime } from '../../model/date';
@@ -25,7 +22,6 @@ import {
   CircleRole,
   MonthCircleState,
   MonthSurveyAnswerValue,
-  PrismaPromise,
 } from '@prisma/client';
 
 export const UpdateMemberMonthCircleMutation = mutationField(
