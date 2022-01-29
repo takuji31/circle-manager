@@ -87,6 +87,7 @@
     "@graphql-codegen/cli": "2.2.0",
     "@graphql-codegen/import-types-preset": "^2.1.7",
     "@graphql-codegen/introspection": "2.1.0",
+    "@graphql-codegen/typed-document-node": "^2.2.2",
     "@graphql-codegen/typescript": "2.2.2",
     "@graphql-codegen/typescript-apollo-client-helpers": "^2.1.7",
     "@graphql-codegen/typescript-operations": "2.1.6",

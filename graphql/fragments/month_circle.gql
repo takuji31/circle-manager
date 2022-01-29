@@ -15,6 +15,7 @@ fragment FullMonthCircle on MonthCircle {
   member {
     ...ListedMember
   }
+  state
   kicked
   invited
   joined

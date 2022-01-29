@@ -2,7 +2,7 @@ import {
   MonthCircle as _MonthCircle,
   MonthCircleState as _MonthCircleState,
 } from 'nexus-prisma';
-import { enumType, inputObjectType, nonNull, objectType } from 'nexus';
+import { enumType, inputObjectType, list, nonNull, objectType } from 'nexus';
 import { Circles, isCircleKey } from '../../model';
 import { stat } from 'fs';
 
@@ -34,9 +34,11 @@ export const MonthCircle = objectType({
       },
     });
     t.field(_MonthCircle.member);
+    t.field(_MonthCircle.state);
     t.field(_MonthCircle.kicked);
     t.field(_MonthCircle.invited);
     t.field(_MonthCircle.joined);
+    t.field(_MonthCircle.locked);
   },
 });
 
@@ -58,5 +60,16 @@ export const UpdateMonthCircleMutationInput = inputObjectType({
     t.boolean('kicked', { default: null });
     t.boolean('invited', { default: null });
     t.boolean('joined', { default: null });
+  },
+});
+
+export const CreateMonthCirclesPayload = objectType({
+  name: 'CreateMonthCirclesPayload',
+  definition(t) {
+    t.nonNull.int('year');
+    t.nonNull.int('month');
+    t.field('monthCircles', {
+      type: nonNull(list(nonNull(MonthCircle))),
+    });
   },
 });

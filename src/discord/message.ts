@@ -11,7 +11,7 @@ import { prisma } from '../database';
 
 export interface DirectMessageRecipient {
   id: string;
-  messageChannelId: string | null;
+  messageChannelId?: string | null;
   name: string;
 }
 

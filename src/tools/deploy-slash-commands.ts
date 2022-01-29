@@ -1,5 +1,4 @@
 import { Guild } from './../model/guild';
-import { prisma } from './../database/prisma';
 import {
   SlashCommandBuilder,
   SlashCommandStringOption,

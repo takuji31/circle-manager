@@ -20,8 +20,8 @@ export const MonthSurvey = objectType({
       async resolve(parent, _, { prisma }) {
         const monthCircles = await prisma.monthCircle.findMany({
           where: {
-            year: parent.year,
-            month: parent.month,
+            year: parseInt(parent.year),
+            month: parseInt(parent.month),
             state: {
               notIn: ['Kicked', 'Leaved', 'OB'],
             },
@@ -43,8 +43,8 @@ export const MonthSurvey = objectType({
       async resolve(parent, _, { prisma }) {
         return prisma.monthCircle.findMany({
           where: {
-            year: parent.year,
-            month: parent.month,
+            year: parseInt(parent.year),
+            month: parseInt(parent.month),
             state: {
               in: ['Leaved', 'OB'],
             },
@@ -61,8 +61,8 @@ export const MonthSurvey = objectType({
       async resolve(parent, _, { prisma }) {
         return prisma.monthCircle.findMany({
           where: {
-            year: parent.year,
-            month: parent.month,
+            year: parseInt(parent.year),
+            month: parseInt(parent.month),
             state: 'Kicked',
           },
           orderBy: {
@@ -80,8 +80,8 @@ export const MonthSurvey = objectType({
             member: {
               circleKey: { not: null },
             },
-            year: parent.year,
-            month: parent.month,
+            year: parseInt(parent.year),
+            month: parseInt(parent.month),
             state: {
               not: 'Kicked',
             },
@@ -103,8 +103,8 @@ export const MonthSurvey = objectType({
               {
                 monthCircles: {
                   some: {
-                    year: parent.year,
-                    month: parent.month,
+                    year: parseInt(parent.year),
+                    month: parseInt(parent.month),
                     state: 'Kicked',
                   },
                 },

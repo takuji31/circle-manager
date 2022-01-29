@@ -14,8 +14,8 @@ import { getCircleName } from '../model';
 
 export interface Props {
   memberId: string;
-  year: string;
-  month: string;
+  year: number;
+  month: number;
   monthCircle: MemberMonthCircleFragment | null | undefined;
   circles: Array<ListedCircleFragment>;
   canEdit: boolean;

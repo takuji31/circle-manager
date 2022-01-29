@@ -1,0 +1,10 @@
+query NextMonthCircles {
+  nextMonth {
+    monthCircles {
+      ...FullMonthCircle
+      member {
+        messageChannelId
+      }
+    }
+  }
+}

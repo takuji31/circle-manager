@@ -1,15 +1,6 @@
-import {
-  Stack,
-  ToggleButton,
-  ToggleButtonGroup,
-  Typography,
-} from '@mui/material';
+import { ToggleButton, ToggleButtonGroup } from '@mui/material';
 import React from 'react';
-import {
-  ListedCircleFragment,
-  MemberMonthCircleFragment,
-  useUpdateMemberMonthCircleMutation,
-} from '../apollo';
+import { ListedCircleFragment } from '../apollo';
 import { getCircleName } from '../model';
 
 export interface Props {

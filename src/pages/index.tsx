@@ -30,7 +30,9 @@ import {
   Circle,
   CircleId,
   nextMonth,
+  nextMonthInt,
   thisMonth,
+  thisMonthInt,
   UserWithSession,
 } from '../model';
 import MemberMonthCircle from '../components/member_month_circle';
@@ -106,14 +108,14 @@ const TopContent = ({ user }: TopContentProps) => {
             monthCircle={member.thisMonthCircle}
             circles={circles}
             canEdit={false}
-            {...thisMonth()}
+            {...thisMonthInt()}
           />
           <MemberMonthCircle
             memberId={user.id}
             monthCircle={member.nextMonthCircle}
             circles={circles}
             canEdit={true}
-            {...nextMonth()}
+            {...nextMonthInt()}
           />
         </Stack>
       )}

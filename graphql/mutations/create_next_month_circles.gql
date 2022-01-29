@@ -1,0 +1,9 @@
+mutation CreateNextMonthCircles {
+  createNextMonthCircles {
+    year
+    month
+    monthCircles {
+      ...FullMonthCircle
+    }
+  }
+}

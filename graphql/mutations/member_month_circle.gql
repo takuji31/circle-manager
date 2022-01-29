@@ -1,7 +1,7 @@
 mutation UpdateMemberMonthCircle(
   $memberId: String!
-  $year: String!
-  $month: String!
+  $year: Int!
+  $month: Int!
   $circleId: String!
 ) {
   updateMemberMonthCircle(

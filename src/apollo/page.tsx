@@ -14,6 +14,7 @@ import { getApolloClient , Context} from '../apollo';
 
 
 
+
 export async function getServerPageAdminCircles
     (options: Omit<Apollo.QueryOptions<Types.AdminCirclesQueryVariables>, 'query'>, ctx?: Context ){
         const apolloClient = getApolloClient(ctx);
@@ -258,6 +259,41 @@ export const ssrMonthCircle = {
       getServerPage: getServerPageMonthCircle,
       withPage: withPageMonthCircle,
       usePage: useMonthCircle,
+    }
+export async function getServerPageNextMonthCircles
+    (options: Omit<Apollo.QueryOptions<Types.NextMonthCirclesQueryVariables>, 'query'>, ctx?: Context ){
+        const apolloClient = getApolloClient(ctx);
+        
+        const data = await apolloClient.query<Types.NextMonthCirclesQuery>({ ...options, query: Operations.NextMonthCirclesDocument });
+        
+        const apolloState = apolloClient.cache.extract();
+
+        return {
+            props: {
+                apolloState: apolloState,
+                data: data?.data,
+                error: data?.error ?? data?.errors ?? null,
+            },
+        };
+      }
+export const useNextMonthCircles = (
+  optionsFunc?: (router: NextRouter)=> QueryHookOptions<Types.NextMonthCirclesQuery, Types.NextMonthCirclesQueryVariables>) => {
+  const router = useRouter();
+  const options = optionsFunc ? optionsFunc(router) : {};
+  return useQuery(Operations.NextMonthCirclesDocument, options);
+};
+export type PageNextMonthCirclesComp = React.FC<{data?: Types.NextMonthCirclesQuery, error?: Apollo.ApolloError}>;
+export const withPageNextMonthCircles = (optionsFunc?: (router: NextRouter)=> QueryHookOptions<Types.NextMonthCirclesQuery, Types.NextMonthCirclesQueryVariables>) => (WrappedComponent:PageNextMonthCirclesComp) : NextPage  => (props) => {
+                const router = useRouter()
+                const options = optionsFunc ? optionsFunc(router) : {};
+                const {data, error } = useQuery(Operations.NextMonthCirclesDocument, options)    
+                return <WrappedComponent {...props} data={data} error={error} /> ;
+                   
+            }; 
+export const ssrNextMonthCircles = {
+      getServerPage: getServerPageNextMonthCircles,
+      withPage: withPageNextMonthCircles,
+      usePage: useNextMonthCircles,
     }
 export async function getServerPageSetup
     (options: Omit<Apollo.QueryOptions<Types.SetupQueryVariables>, 'query'>, ctx?: Context ){
