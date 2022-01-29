@@ -71,10 +71,6 @@ declare global {
 }
 
 export interface NexusGenInputs {
-  CreateMonthCirclesMutationInput: { // input type
-    month: number; // Int!
-    year: number; // Int!
-  }
   UpdateMemberMutationInput: { // input type
     id: string; // String!
     name?: string | null; // String
@@ -284,7 +280,7 @@ export interface NexusGenFieldTypes {
     year: string; // String!
   }
   Mutation: { // field return type
-    createMonthCircles: NexusGenRootTypes['CreateMonthCirclesPayload']; // CreateMonthCirclesPayload!
+    createNextMonthCircles: NexusGenRootTypes['CreateMonthCirclesPayload']; // CreateMonthCirclesPayload!
     createNextMonthSurvey: NexusGenRootTypes['CreateNextMonthSurveyPayload'] | null; // CreateNextMonthSurveyPayload
     updateMember: NexusGenRootTypes['Member']; // Member!
     updateMemberMonthCircle: NexusGenRootTypes['UpdateMemberMonthCirclePayload'] | null; // UpdateMemberMonthCirclePayload
@@ -404,7 +400,7 @@ export interface NexusGenFieldTypeNames {
     year: 'String'
   }
   Mutation: { // field return type name
-    createMonthCircles: 'CreateMonthCirclesPayload'
+    createNextMonthCircles: 'CreateMonthCirclesPayload'
     createNextMonthSurvey: 'CreateNextMonthSurveyPayload'
     updateMember: 'Member'
     updateMemberMonthCircle: 'UpdateMemberMonthCirclePayload'
@@ -447,9 +443,6 @@ export interface NexusGenFieldTypeNames {
 
 export interface NexusGenArgTypes {
   Mutation: {
-    createMonthCircles: { // args
-      input: NexusGenInputs['CreateMonthCirclesMutationInput']; // CreateMonthCirclesMutationInput!
-    }
     updateMember: { // args
       input: NexusGenInputs['UpdateMemberMutationInput']; // UpdateMemberMutationInput!
     }

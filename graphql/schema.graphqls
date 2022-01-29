@@ -37,11 +37,6 @@ enum CircleRole {
   SubLeader
 }
 
-input CreateMonthCirclesMutationInput {
-  month: Int!
-  year: Int!
-}
-
 type CreateMonthCirclesPayload {
   month: Int!
   monthCircles: [MonthCircle!]
@@ -167,7 +162,7 @@ enum MonthSurveyAnswerValue {
 }
 
 type Mutation {
-  createMonthCircles(input: CreateMonthCirclesMutationInput!): CreateMonthCirclesPayload!
+  createNextMonthCircles: CreateMonthCirclesPayload!
   createNextMonthSurvey: CreateNextMonthSurveyPayload
   updateMember(input: UpdateMemberMutationInput!): Member!
   updateMemberMonthCircle(circleId: String!, memberId: String!, month: Int!, year: Int!): UpdateMemberMonthCirclePayload

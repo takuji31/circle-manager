@@ -61,7 +61,7 @@ export enum CircleRole {
 export type CreateMonthCirclesPayload = {
   __typename?: 'CreateMonthCirclesPayload';
   month: Scalars['Int'];
-  monthCircles: MonthCircle;
+  monthCircles?: Maybe<Array<MonthCircle>>;
   year: Scalars['Int'];
 };
 
@@ -173,7 +173,7 @@ export enum MonthSurveyAnswerValue {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  createMonthCircles?: Maybe<CreateMonthCirclesPayload>;
+  createNextMonthCircles: CreateMonthCirclesPayload;
   createNextMonthSurvey?: Maybe<CreateNextMonthSurveyPayload>;
   updateMember: Member;
   updateMemberMonthCircle?: Maybe<UpdateMemberMonthCirclePayload>;
@@ -191,8 +191,8 @@ export type MutationUpdateMemberArgs = {
 export type MutationUpdateMemberMonthCircleArgs = {
   circleId: Scalars['String'];
   memberId: Scalars['String'];
-  month: Scalars['String'];
-  year: Scalars['String'];
+  month: Scalars['Int'];
+  year: Scalars['Int'];
 };
 
 
@@ -317,8 +317,8 @@ export type CreateNextMonthSurveyMutation = { __typename?: 'Mutation', createNex
 
 export type UpdateMemberMonthCircleMutationVariables = Exact<{
   memberId: Scalars['String'];
-  year: Scalars['String'];
-  month: Scalars['String'];
+  year: Scalars['Int'];
+  month: Scalars['Int'];
   circleId: Scalars['String'];
 }>;
 
@@ -568,7 +568,7 @@ export type CreateNextMonthSurveyMutationHookResult = ReturnType<typeof useCreat
 export type CreateNextMonthSurveyMutationResult = Apollo.MutationResult<CreateNextMonthSurveyMutation>;
 export type CreateNextMonthSurveyMutationOptions = Apollo.BaseMutationOptions<CreateNextMonthSurveyMutation, CreateNextMonthSurveyMutationVariables>;
 export const UpdateMemberMonthCircleDocument = gql`
-    mutation UpdateMemberMonthCircle($memberId: String!, $year: String!, $month: String!, $circleId: String!) {
+    mutation UpdateMemberMonthCircle($memberId: String!, $year: Int!, $month: Int!, $circleId: String!) {
   updateMemberMonthCircle(
     memberId: $memberId
     year: $year
@@ -1248,9 +1248,9 @@ export type MonthSurveyAnswerFieldPolicy = {
 	value?: FieldPolicy<any> | FieldReadFunction<any>,
 	year?: FieldPolicy<any> | FieldReadFunction<any>
 };
-export type MutationKeySpecifier = ('createMonthCircles' | 'createNextMonthSurvey' | 'updateMember' | 'updateMemberMonthCircle' | 'updateMembers' | 'updateMonthCircle' | 'updateSignUp' | MutationKeySpecifier)[];
+export type MutationKeySpecifier = ('createNextMonthCircles' | 'createNextMonthSurvey' | 'updateMember' | 'updateMemberMonthCircle' | 'updateMembers' | 'updateMonthCircle' | 'updateSignUp' | MutationKeySpecifier)[];
 export type MutationFieldPolicy = {
-	createMonthCircles?: FieldPolicy<any> | FieldReadFunction<any>,
+	createNextMonthCircles?: FieldPolicy<any> | FieldReadFunction<any>,
 	createNextMonthSurvey?: FieldPolicy<any> | FieldReadFunction<any>,
 	updateMember?: FieldPolicy<any> | FieldReadFunction<any>,
 	updateMemberMonthCircle?: FieldPolicy<any> | FieldReadFunction<any>,
