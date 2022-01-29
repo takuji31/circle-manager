@@ -63,18 +63,21 @@ model MonthCircle {
   id               String           @id @default(cuid())
   memberId         String           @db.VarChar(255)
   member           Member           @relation(fields: [memberId], references: [id])
-  year             String           @db.Char(4)
-  month            String           @db.Char(2)
+  year             Int
+  month            Int
   currentCircleKey CircleKey?
   state            MonthCircleState
   kicked           Boolean          @default(false)
   invited          Boolean          @default(false)
   joined           Boolean          @default(false)
+  /// ランキングによって上書きされないよう設定されているか
+  locked           Boolean          @default(false)
 
   @@unique([year, month, memberId])
   @@index([memberId])
   @@index([year, month, state])
   @@index([kicked, invited, joined, memberId])
+  @@index([locked])
 }
 
 /// 在籍希望アンケート

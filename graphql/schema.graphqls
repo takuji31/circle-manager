@@ -37,6 +37,17 @@ enum CircleRole {
   SubLeader
 }
 
+input CreateMonthCirclesMutationInput {
+  month: Int!
+  year: Int!
+}
+
+type CreateMonthCirclesPayload {
+  month: Int!
+  monthCircles: [MonthCircle!]
+  year: Int!
+}
+
 type CreateNextMonthSurveyPayload {
   nextMonth: Month!
 }
@@ -102,10 +113,13 @@ type MonthCircle {
   invited: Boolean!
   joined: Boolean!
   kicked: Boolean!
+
+  """ランキングによって上書きされないよう設定されているか"""
+  locked: Boolean!
   member: Member!
-  month: String!
+  month: Int!
   state: MonthCircleState!
-  year: String!
+  year: Int!
 }
 
 enum MonthCircleState {
@@ -153,9 +167,10 @@ enum MonthSurveyAnswerValue {
 }
 
 type Mutation {
+  createMonthCircles(input: CreateMonthCirclesMutationInput!): CreateMonthCirclesPayload!
   createNextMonthSurvey: CreateNextMonthSurveyPayload
   updateMember(input: UpdateMemberMutationInput!): Member!
-  updateMemberMonthCircle(circleId: String!, memberId: String!, month: String!, year: String!): UpdateMemberMonthCirclePayload
+  updateMemberMonthCircle(circleId: String!, memberId: String!, month: Int!, year: Int!): UpdateMemberMonthCirclePayload
   updateMembers: [Member!]!
   updateMonthCircle(data: UpdateMonthCircleMutationInput!): UpdateMemberMonthCirclePayload
   updateSignUp(input: UpdateSignUpMutationInput!): SignUp!

@@ -71,6 +71,10 @@ declare global {
 }
 
 export interface NexusGenInputs {
+  CreateMonthCirclesMutationInput: { // input type
+    month: number; // Int!
+    year: number; // Int!
+  }
   UpdateMemberMutationInput: { // input type
     id: string; // String!
     name?: string | null; // String
@@ -119,6 +123,11 @@ export interface NexusGenObjects {
     key: NexusGenEnums['CircleKey']; // CircleKey!
     name: string; // String!
   }
+  CreateMonthCirclesPayload: { // root type
+    month: number; // Int!
+    monthCircles?: NexusGenRootTypes['MonthCircle'][] | null; // [MonthCircle!]
+    year: number; // Int!
+  }
   CreateNextMonthSurveyPayload: { // root type
     nextMonth: NexusGenRootTypes['Month']; // Month!
   }
@@ -151,9 +160,10 @@ export interface NexusGenObjects {
     invited: boolean; // Boolean!
     joined: boolean; // Boolean!
     kicked: boolean; // Boolean!
-    month: string; // String!
+    locked: boolean; // Boolean!
+    month: number; // Int!
     state: NexusGenEnums['MonthCircleState']; // MonthCircleState!
-    year: string; // String!
+    year: number; // Int!
   }
   MonthSurvey: { // root type
     expiredAt: NexusGenScalars['DateTime']; // DateTime!
@@ -201,6 +211,11 @@ export interface NexusGenFieldTypes {
     key: NexusGenEnums['CircleKey']; // CircleKey!
     name: string; // String!
   }
+  CreateMonthCirclesPayload: { // field return type
+    month: number; // Int!
+    monthCircles: NexusGenRootTypes['MonthCircle'][] | null; // [MonthCircle!]
+    year: number; // Int!
+  }
   CreateNextMonthSurveyPayload: { // field return type
     nextMonth: NexusGenRootTypes['Month']; // Month!
   }
@@ -242,10 +257,11 @@ export interface NexusGenFieldTypes {
     invited: boolean; // Boolean!
     joined: boolean; // Boolean!
     kicked: boolean; // Boolean!
+    locked: boolean; // Boolean!
     member: NexusGenRootTypes['Member']; // Member!
-    month: string; // String!
+    month: number; // Int!
     state: NexusGenEnums['MonthCircleState']; // MonthCircleState!
-    year: string; // String!
+    year: number; // Int!
   }
   MonthSurvey: { // field return type
     answers: NexusGenRootTypes['MonthCircle'][]; // [MonthCircle!]!
@@ -268,6 +284,7 @@ export interface NexusGenFieldTypes {
     year: string; // String!
   }
   Mutation: { // field return type
+    createMonthCircles: NexusGenRootTypes['CreateMonthCirclesPayload']; // CreateMonthCirclesPayload!
     createNextMonthSurvey: NexusGenRootTypes['CreateNextMonthSurveyPayload'] | null; // CreateNextMonthSurveyPayload
     updateMember: NexusGenRootTypes['Member']; // Member!
     updateMemberMonthCircle: NexusGenRootTypes['UpdateMemberMonthCirclePayload'] | null; // UpdateMemberMonthCirclePayload
@@ -314,6 +331,11 @@ export interface NexusGenFieldTypeNames {
     key: 'CircleKey'
     name: 'String'
   }
+  CreateMonthCirclesPayload: { // field return type name
+    month: 'Int'
+    monthCircles: 'MonthCircle'
+    year: 'Int'
+  }
   CreateNextMonthSurveyPayload: { // field return type name
     nextMonth: 'Month'
   }
@@ -355,10 +377,11 @@ export interface NexusGenFieldTypeNames {
     invited: 'Boolean'
     joined: 'Boolean'
     kicked: 'Boolean'
+    locked: 'Boolean'
     member: 'Member'
-    month: 'String'
+    month: 'Int'
     state: 'MonthCircleState'
-    year: 'String'
+    year: 'Int'
   }
   MonthSurvey: { // field return type name
     answers: 'MonthCircle'
@@ -381,6 +404,7 @@ export interface NexusGenFieldTypeNames {
     year: 'String'
   }
   Mutation: { // field return type name
+    createMonthCircles: 'CreateMonthCirclesPayload'
     createNextMonthSurvey: 'CreateNextMonthSurveyPayload'
     updateMember: 'Member'
     updateMemberMonthCircle: 'UpdateMemberMonthCirclePayload'
@@ -423,14 +447,17 @@ export interface NexusGenFieldTypeNames {
 
 export interface NexusGenArgTypes {
   Mutation: {
+    createMonthCircles: { // args
+      input: NexusGenInputs['CreateMonthCirclesMutationInput']; // CreateMonthCirclesMutationInput!
+    }
     updateMember: { // args
       input: NexusGenInputs['UpdateMemberMutationInput']; // UpdateMemberMutationInput!
     }
     updateMemberMonthCircle: { // args
       circleId: string; // String!
       memberId: string; // String!
-      month: string; // String!
-      year: string; // String!
+      month: number; // Int!
+      year: number; // Int!
     }
     updateMonthCircle: { // args
       data: NexusGenInputs['UpdateMonthCircleMutationInput']; // UpdateMonthCircleMutationInput!

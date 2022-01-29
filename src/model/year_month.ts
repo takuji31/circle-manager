@@ -1,9 +1,13 @@
 import { Temporal } from 'proposal-temporal';
 import { JST } from './time';
 
-export interface YearMonth {
+export interface StringYearMonth {
   year: string;
   month: string;
+}
+export interface YearMonth {
+  year: number;
+  month: number;
 }
 
 export interface ThisAndNextMonth {
@@ -13,19 +17,35 @@ export interface ThisAndNextMonth {
   nextMonth: string;
 }
 
-export const thisMonth: () => YearMonth = () => {
+export const thisMonthInt: () => YearMonth = () => {
   const yearMonth = Temporal.now.zonedDateTimeISO(JST).toPlainYearMonth();
+  return {
+    year: yearMonth.year,
+    month: yearMonth.month,
+  };
+};
+
+export const nextMonthInt: () => YearMonth = () => {
+  const yearMonth = Temporal.now
+    .zonedDateTimeISO(JST)
+    .toPlainYearMonth()
+    .add(Temporal.Duration.from({ months: 1 }));
+  return {
+    year: yearMonth.year,
+    month: yearMonth.month,
+  };
+};
+
+export const thisMonth: () => StringYearMonth = () => {
+  const yearMonth = thisMonthInt();
   return {
     year: yearMonth.year.toString(),
     month: yearMonth.month.toString(),
   };
 };
 
-export const nextMonth: () => YearMonth = () => {
-  const yearMonth = Temporal.now
-    .zonedDateTimeISO(JST)
-    .toPlainYearMonth()
-    .add(Temporal.Duration.from({ months: 1 }));
+export const nextMonth: () => StringYearMonth = () => {
+  const yearMonth = nextMonthInt();
   return {
     year: yearMonth.year.toString(),
     month: yearMonth.month.toString(),
