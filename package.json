@@ -54,6 +54,8 @@
     "@prisma/client": "^3.8.1",
     "@types/micro-cors": "^0.1.2",
     "@types/node-fetch": "^2.5.12",
+    "@urql/core": "^2.3.6",
+    "@urql/exchange-execute": "^1.2.2",
     "apollo-server-micro": "^3.3.0",
     "core-js": "^3.6.5",
     "csv": "^6.0.1",
@@ -80,6 +82,7 @@
     "swr": "^1.0.1",
     "ts-node": "^10.2.1",
     "tslib": "^2.0.0",
+    "urql": "^2.0.6",
     "yup": "^0.32.11",
     "yup-locale-ja": "^0.1.3"
   },

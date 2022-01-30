@@ -1,6 +1,6 @@
 import { config } from 'dotenv';
 import { sendDirectMessagesIfPossible } from '../discord/message';
-import { createServerSideApolloClient } from '../apollo/serverside';
+import { createUrqlClient } from '../graphql/client/serverside';
 import {
   MonthCircleState,
   NextMonthCirclesDocument,
@@ -12,13 +12,10 @@ config();
 (async () => {
   const isProduction = process.env.NODE_ENV == 'production';
 
-  const appoloClient = createServerSideApolloClient();
+  const urql = createUrqlClient();
 
-  const monthCircles = (
-    await appoloClient.query({
-      query: NextMonthCirclesDocument,
-    })
-  ).data.nextMonth.monthCircles;
+  const monthCircles = (await urql.query(NextMonthCirclesDocument).toPromise())
+    .data?.nextMonth.monthCircles;
 
   if (!monthCircles) {
     throw new Error('Cannot create month circle.');

@@ -1,26 +1,18 @@
 import { config } from 'dotenv';
-import { sendDirectMessagesIfPossible } from '../discord/message';
-import { monthSurveyAnswerLabel } from '../model/month_survey_answer';
-import { createServerSideApolloClient } from '../apollo/serverside';
-import {
-  CreateNextMonthCirclesDocument,
-  MonthCircleState,
-} from '../graphql/generated/type';
-import { Circles, isCircleKey } from '../model';
+import { CreateNextMonthCirclesDocument } from '../graphql/generated/type';
 import { sendAdminNotificationMessage } from '../discord/admin';
 import { stringify } from 'csv-stringify/sync';
+import { createUrqlClient } from '../graphql/client/serverside';
 
 config();
 
 (async () => {
   const isProduction = process.env.NODE_ENV == 'production';
 
-  const appoloClient = createServerSideApolloClient();
+  const urql = createUrqlClient();
 
   const monthCircles = (
-    await appoloClient.mutate({
-      mutation: CreateNextMonthCirclesDocument,
-    })
+    await urql.mutation(CreateNextMonthCirclesDocument).toPromise()
   ).data?.createNextMonthCircles;
 
   if (!monthCircles) {
