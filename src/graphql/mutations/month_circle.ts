@@ -215,7 +215,18 @@ export const CreateMonthCirclesMutation = mutationField(
       });
 
       const leaders = await prisma.member.findMany({
-        where: { circleRole: CircleRole.Leader },
+        where: {
+          circleRole: CircleRole.Leader,
+          MonthSurveyAnswer: {
+            some: {
+              year: year.toString(),
+              month: month.toString(),
+              value: {
+                notIn: ['Leave', 'Ob', 'None', 'Saikyo'],
+              },
+            },
+          },
+        },
       });
 
       const totalMemberCount = (
@@ -321,6 +332,7 @@ export const CreateMonthCirclesMutation = mutationField(
             locked: false,
             state: circleKey!,
           })),
+          skipDuplicates: true,
         }),
         prisma.monthCircle.createMany({
           data: rankingMembers.map(({ id: memberId }, idx) => ({
@@ -336,6 +348,7 @@ export const CreateMonthCirclesMutation = mutationField(
                 ? MonthCircleState.Ha
                 : MonthCircleState.Jo,
           })),
+          skipDuplicates: true,
         }),
       ]);
       return {
