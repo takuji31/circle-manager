@@ -22,7 +22,7 @@ config();
     );
   }
 
-  stringify([
+  const csv = stringify([
     [
       'メンバーID',
       'トレーナー名',
@@ -46,7 +46,7 @@ config();
     [
       {
         fileName: 'members.csv',
-        rawBuffer: Buffer.from('', 'utf-8'),
+        rawBuffer: Buffer.from(csv, 'utf-8'),
       },
     ]
   );
