@@ -307,7 +307,7 @@ export const CreateMonthCirclesMutation = mutationField(
         }),
         prisma.monthCircle.createMany({
           data: noRankingMembers.map(
-            ({ id: memberId, MonthSurveyAnswer: [{ value }] }) => ({
+            ({ id: memberId, circleKey, MonthSurveyAnswer: [{ value }] }) => ({
               memberId,
               year,
               month,
@@ -320,6 +320,7 @@ export const CreateMonthCirclesMutation = mutationField(
                   : value == 'None'
                   ? MonthCircleState.Kicked
                   : MonthCircleState.OB,
+              currentCircleKey: circleKey,
             })
           ),
           skipDuplicates: true,
@@ -331,11 +332,12 @@ export const CreateMonthCirclesMutation = mutationField(
             month,
             locked: false,
             state: circleKey!,
+            currentCircleKey: circleKey,
           })),
           skipDuplicates: true,
         }),
         prisma.monthCircle.createMany({
-          data: rankingMembers.map(({ id: memberId }, idx) => ({
+          data: rankingMembers.map(({ id: memberId, circleKey }, idx) => ({
             memberId,
             year,
             month,
@@ -347,6 +349,7 @@ export const CreateMonthCirclesMutation = mutationField(
                 : idx < maxMemberCount.Shin + maxMemberCount.Ha
                 ? MonthCircleState.Ha
                 : MonthCircleState.Jo,
+            currentCircleKey: circleKey,
           })),
           skipDuplicates: true,
         }),
