@@ -14,11 +14,13 @@ config();
 
   const urql = createUrqlClient();
 
-  const monthCircles = (await urql.query(NextMonthCirclesDocument).toPromise())
-    .data?.nextMonth.monthCircles;
+  const response = await urql.query(NextMonthCirclesDocument).toPromise();
+  const monthCircles = response.data?.nextMonth.monthCircles;
 
   if (!monthCircles) {
-    throw new Error('Cannot create month circle.');
+    throw new Error(
+      'Cannot create month circle. error' + response.error?.message
+    );
   }
 
   await sendDirectMessagesIfPossible(

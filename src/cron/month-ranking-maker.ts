@@ -11,12 +11,15 @@ config();
 
   const urql = createUrqlClient();
 
-  const monthCircles = (
-    await urql.mutation(CreateNextMonthCirclesDocument).toPromise()
-  ).data?.createNextMonthCircles;
+  const response = await urql
+    .mutation(CreateNextMonthCirclesDocument)
+    .toPromise();
+  const monthCircles = response.data?.createNextMonthCircles;
 
   if (!monthCircles) {
-    throw new Error('Cannot create month circle.');
+    throw new Error(
+      'Cannot create month circle. error:' + response.error?.message
+    );
   }
 
   stringify([
