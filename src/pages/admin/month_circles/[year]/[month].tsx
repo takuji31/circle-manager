@@ -139,6 +139,7 @@ export const MonthCircleList: PageMonthSurveyComp = ({ data, error }) => {
           <TableHead>
             <TableCell>名前</TableCell>
             <TableCell>現サークル</TableCell>
+            <TableCell>除名済み</TableCell>
           </TableHead>
           <TableBody>
             {monthSurvey.kick.map((monthCircle) => {
@@ -146,6 +147,16 @@ export const MonthCircleList: PageMonthSurveyComp = ({ data, error }) => {
                 <TableRow key={`no_answer_${monthCircle.id}`}>
                   <TableCell>{monthCircle.member.name}</TableCell>
                   <TableCell>{monthCircle.currentCircle?.name}</TableCell>
+                  <TableCell>
+                    <MonthCircleStateCheckbox
+                      checked={monthCircle.kicked}
+                      disabled={monthCircle.kicked && monthCircle.invited}
+                      variablesBuilder={(kicked) => ({
+                        id: monthCircle.id,
+                        kicked,
+                      })}
+                    />
+                  </TableCell>
                 </TableRow>
               );
             })}
