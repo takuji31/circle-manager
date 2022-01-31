@@ -72,7 +72,6 @@ Discordからは3日後くらいを目処に削除しますので、挨拶等あ
       }
       throw new Error(`Unknown state ${state}`);
     },
-    `来月のサークル通知の送信結果 ${!isProduction ? '(テスト)' : ''}\n`,
-    false
+    `来月のサークル通知の送信結果 ${!isProduction ? '(テスト)' : ''}\n`
   );
 })();
