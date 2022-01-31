@@ -241,61 +241,75 @@ export const CreateMonthCirclesMutation = mutationField(
           },
         })
       )._count.id;
-      const memberMaxCount = Math.floor(totalMemberCount / 30);
-      const remainderMembes = totalMemberCount % 30;
+      const newMembers = 90 - totalMemberCount;
+      const newMembersPerCircle = Math.floor(newMembers / 3);
+      const remainderNewMembers = newMembers % 3;
       const maxMemberCount: Record<Exclude<CircleKey, 'Saikyo'>, number> = {
         Shin:
-          memberMaxCount -
-          leaders.filter((m) => m.circleKey == CircleKey.Shin).length,
+          30 -
+          leaders.filter((m) => m.circleKey == CircleKey.Shin).length -
+          newMembersPerCircle,
+
         Ha:
-          memberMaxCount -
-          leaders.filter((m) => m.circleKey == CircleKey.Ha).length +
-          (remainderMembes == 2 ? 1 : 0),
+          30 -
+          leaders.filter((m) => m.circleKey == CircleKey.Ha).length -
+          newMembersPerCircle -
+          (remainderNewMembers == 2 ? 1 : 0),
         Jo:
-          memberMaxCount -
-          leaders.filter((m) => m.circleKey == CircleKey.Jo).length +
-          (remainderMembes > 0 ? 1 : 0),
+          30 -
+          leaders.filter((m) => m.circleKey == CircleKey.Jo).length -
+          newMembersPerCircle -
+          (remainderNewMembers > 0 ? 1 : 0),
       };
 
       console.log('Max member count %s', maxMemberCount);
 
-      const rankingMembers = await prisma.member.findMany({
-        include: {
-          fanCounts: {
-            where: {
-              date: {
-                gte: toDate(
-                  Temporal.PlainDate.from({
-                    year: thisMonth,
-                    month: thisMonthYear,
-                    day: 1,
-                  })
-                ),
-                lt: toDate(
-                  Temporal.PlainDate.from({
-                    year,
-                    month,
-                    day: 1,
-                  })
-                ),
+      const rankingMembers = (
+        await prisma.member.findMany({
+          include: {
+            fanCounts: {
+              where: {
+                date: {
+                  gte: toDate(
+                    Temporal.PlainDate.from({
+                      year: thisMonth,
+                      month: thisMonthYear,
+                      day: 1,
+                    })
+                  ),
+                  lt: toDate(
+                    Temporal.PlainDate.from({
+                      year,
+                      month,
+                      day: 1,
+                    })
+                  ),
+                },
+              },
+              orderBy: {
+                date: 'desc',
+              },
+              take: 1,
+            },
+          },
+          where: {
+            circleRole: {
+              not: CircleRole.Leader,
+            },
+            MonthSurveyAnswer: {
+              some: {
+                year: year.toString(),
+                month: month.toString(),
+                value: MonthSurveyAnswerValue.Umamusume,
               },
             },
-            orderBy: {
-              date: 'desc',
-            },
-            take: 1,
           },
-        },
-        where: {
-          MonthSurveyAnswer: {
-            some: {
-              year: year.toString(),
-              month: month.toString(),
-              value: MonthSurveyAnswerValue.Umamusume,
-            },
-          },
-        },
-      });
+        })
+      ).sort((a, b) =>
+        parseInt(
+          (b.fanCounts[0].predicted - a.fanCounts[0].predicted).toString()
+        )
+      );
 
       await prisma.$transaction([
         prisma.monthCircle.deleteMany({
@@ -361,9 +375,20 @@ export const CreateMonthCirclesMutation = mutationField(
           where: {
             year,
             month,
+            member: {
+              leavedAt: null,
+            },
           },
           // TODO: 最適なソート順
           orderBy: [
+            {
+              currentCircleKey: 'asc',
+            },
+            {
+              member: {
+                circleRole: 'asc',
+              },
+            },
             {
               state: 'asc',
             },
