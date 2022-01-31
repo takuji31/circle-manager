@@ -1,7 +1,7 @@
 import { Circles } from './../model/circle';
 import { config } from 'dotenv';
 import { prisma } from '../database';
-import { Guild, JST, nextMonth, thisMonth } from '../model';
+import { Guild, JST, nextMonth, nextMonthInt, thisMonth } from '../model';
 import { stringify } from 'csv-stringify/sync';
 import { createDiscordRestClient } from '../discord';
 import { Routes } from 'discord-api-types/v9';
@@ -11,20 +11,23 @@ import {
   CircleRole,
   Member,
   MemberFanCount,
+  MonthCircle,
+  MonthCircleState,
   MonthSurveyAnswerValue,
 } from '@prisma/client';
 import { toPlainDate } from '../model/date';
+import { monthCircleStateLabel } from '../model/month_circle';
 
 config();
 
 (async () => {
   const { year, month } = thisMonth();
-  const _nextMonth = nextMonth();
+  const { year: nextMonthYear, month: nextMonthMonth } = nextMonthInt();
 
   const today = Temporal.now.plainDateISO(JST);
 
   const monthSurvey = await prisma.monthSurvey.findFirst({
-    where: { ..._nextMonth },
+    where: { year: nextMonthYear.toString(), month: nextMonthMonth.toString() },
   });
 
   const useMonthSurveyAnswer =
@@ -47,8 +50,8 @@ config();
         ),
         lt: new Date(
           Temporal.PlainDate.from({
-            year: parseInt(_nextMonth.year),
-            month: parseInt(_nextMonth.month),
+            year: nextMonthYear,
+            month: nextMonthMonth,
             day: 1,
           }).toString()
         ),
@@ -56,7 +59,11 @@ config();
     },
   });
 
-  let memberFanCounts: Array<MemberFanCount & { member: Member | null }> = [];
+  let memberFanCounts: Array<
+    MemberFanCount & {
+      member: (Member & { monthCircles: Array<MonthCircle> }) | null;
+    }
+  > = [];
   const circleToUpdatedAt: Record<CircleKey, Temporal.PlainDate | null> = {
     Saikyo: null,
     Shin: null,
@@ -90,7 +97,8 @@ config();
               member: {
                 MonthSurveyAnswer: {
                   some: {
-                    ..._nextMonth,
+                    year: nextMonthYear.toString(),
+                    month: nextMonthMonth.toString(),
                     value: MonthSurveyAnswerValue.Umamusume,
                   },
                 },
@@ -99,7 +107,17 @@ config();
           : {}),
       },
       include: {
-        member: true,
+        member: {
+          include: {
+            monthCircles: {
+              where: {
+                year: nextMonthYear,
+                month: nextMonthMonth,
+              },
+              take: 1,
+            },
+          },
+        },
       },
     });
     memberFanCounts.push(...fanCounts);
@@ -133,20 +151,31 @@ config();
               'メンバー情報不明',
               '現在のサークル',
               '予測ファン数',
+              '来月のサークル(確定)',
             ],
             ...memberFanCounts
               //TODO: int
               .sort((a, b) => parseInt((b.predicted - a.predicted).toString()))
-              .map((fanCount, idx) => [
-                idx + 1,
-                fanCount.member?.circleRole == CircleRole.Leader
-                  ? 0
-                  : rankingNumber++,
-                fanCount.member?.name ?? fanCount.name,
-                fanCount.member == null,
-                Circles.findByCircleKey(fanCount.circle).name,
-                fanCount.predicted.toString(),
-              ]),
+              .map((fanCount, idx) => {
+                let ranking: number;
+                if (fanCount.member?.circleRole == CircleRole.Leader) {
+                  ranking = 0;
+                } else {
+                  ranking = rankingNumber++;
+                }
+                const monthCircleState = fanCount.member?.monthCircles[0].state;
+                return [
+                  idx + 1,
+                  ranking,
+                  fanCount.member?.name ?? fanCount.name,
+                  fanCount.member == null,
+                  Circles.findByCircleKey(fanCount.circle).name,
+                  fanCount.predicted.toString(),
+                  monthCircleState
+                    ? monthCircleStateLabel(monthCircleState)
+                    : '未確定',
+                ];
+              }),
           ]),
           'utf-8'
         ),
