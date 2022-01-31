@@ -28,6 +28,9 @@ export const Month = objectType({
           where: {
             year,
             month,
+            member: {
+              leavedAt: null,
+            },
           },
         });
       },
