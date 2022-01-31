@@ -23,6 +23,10 @@ import {
   MonthCircleState,
   MonthSurveyAnswerValue,
 } from '@prisma/client';
+import {
+  sendInvitedMessage,
+  sendKickedMessage,
+} from '../../discord/member/messages';
 
 export const UpdateMemberMonthCircleMutation = mutationField(
   'updateMemberMonthCircle',
@@ -119,12 +123,35 @@ export const UpdateMonthCircleMutation = mutationField('updateMonthCircle', {
       throw new Error('Forbidden');
     }
 
-    const monthCircle = await prisma.monthCircle.findUnique({ where: { id } });
+    const beforeMonthCircle = await prisma.monthCircle.findUnique({
+      where: { id },
+      include: {
+        member: true,
+      },
+    });
 
-    if (!monthCircle) {
+    if (!beforeMonthCircle) {
       throw new Error('not found');
     }
-    await prisma.monthCircle.update({
+
+    const member = await prisma.member.findUnique({
+      where: { id: beforeMonthCircle.member.id },
+    });
+
+    if (!member) {
+      throw new Error('Unknown member');
+    }
+
+    const {
+      kicked: beforeKicked,
+      invited: beforeInvited,
+      currentCircleKey,
+    } = beforeMonthCircle;
+    const circle = currentCircleKey
+      ? Circles.findByCircleKey(currentCircleKey)
+      : null;
+
+    const monthCircle = await prisma.monthCircle.update({
       where: { id },
       data: {
         kicked: kicked ?? undefined,
@@ -133,7 +160,25 @@ export const UpdateMonthCircleMutation = mutationField('updateMonthCircle', {
       },
     });
 
-    const state = monthCircle.state;
+    const { state } = monthCircle;
+
+    if (!beforeKicked && kicked && circle) {
+      await sendKickedMessage(
+        member,
+        circle,
+        state == 'Kicked'
+          ? 'kick'
+          : state == 'Leaved' || state == 'OB'
+          ? 'leave'
+          : 'move'
+      );
+    }
+
+    if (!beforeInvited && invited && circle && isCircleKey(state)) {
+      const newCircle = Circles.findByCircleKey(state);
+      await sendInvitedMessage(member, newCircle, 'move');
+    }
+
     if (joined && isCircleKey(state)) {
       const circle = Circles.findByCircleKey(state);
       try {
