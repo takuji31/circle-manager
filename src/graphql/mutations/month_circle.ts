@@ -196,7 +196,7 @@ export const UpdateMonthCircleMutation = mutationField('updateMonthCircle', {
         }
 
         await rest.put(
-          Routes.guildMemberRole(Guild.id, monthCircle.memberId, state)
+          Routes.guildMemberRole(Guild.id, monthCircle.memberId, circle.id)
         );
       } catch (e) {
         console.log(e);
