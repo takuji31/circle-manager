@@ -1,11 +1,8 @@
-import { prisma } from './../database/prisma';
+import * as functions from "firebase-functions";
 import { Temporal } from 'proposal-temporal';
-import { Guild } from './../model/guild';
-import { Routes } from 'discord-api-types/v9';
-import { createDiscordRestClient } from '../discord';
-import puppeteer, { Page } from 'puppeteer';
-import { Circle } from '../model';
-export interface UmastagramPage {
+import { Page, launch } from 'puppeteer';
+
+interface UmastagramPage {
   members: Array<UmastagramMember>;
   circle: UmastagramCircle;
 }
@@ -14,7 +11,7 @@ type GradeTabRow = Pick<UmastagramMember, 'name' | 'total' | 'avg'>;
 type PredictedTabRow = Pick<UmastagramMember, 'name' | 'predicted'>;
 type GoalTabRow = Pick<UmastagramMember, 'name' | 'completeDay'>;
 
-export interface UmastagramMember {
+interface UmastagramMember {
   name: string;
   total: string;
   avg: string;
@@ -22,46 +19,25 @@ export interface UmastagramMember {
   completeDay: string;
 }
 
-export interface UmastagramCircle {
+interface UmastagramCircle {
   total: string;
   avg: string;
   predictedTotal: string;
   predictedAvg: string;
 }
 
-const toHalfWidthString = (str: string) => {
-  return str
-    .replace(/[Ａ-Ｚａ-ｚ０-９]/g, (s) => {
-      return String.fromCharCode(s.charCodeAt(0) - 0xfee0);
-    })
-    .replace('：', ':')
-    .replace('　', ' ');
-};
-
 export async function crawlUmastagram(
   url: string,
-  circle: Circle,
   plainDate: Temporal.PlainDate = Temporal.now
-    .plainDate('iso8601', 'Asia/Tokyo')
+    .plainDateISO('Asia/Tokyo')
     .subtract(Temporal.Duration.from({ days: 1 }))
 ): Promise<UmastagramPage> {
-  const rest = createDiscordRestClient();
-  const date = new Date(plainDate.toString());
-
-  try {
-    // await rest.post(Routes.channelMessages(Guild.channelIds.admin), {
-    //   body: {
-    //     content: `${cirle.name}の ${yesterday.month}月${yesterday.day}日のファン数を取得しています...`,
-    //   },
-    // });
-
-    const browser = await puppeteer.launch({
+    const browser = await launch({
       headless: process.env.NODE_ENV == 'production',
       args: ['--no-sandbox'],
     });
 
     const page = await browser.newPage();
-    // page.on('console', (msg) => console.log('PAGE LOG:', msg.text()));
 
     page.setViewport({ width: 1280, height: 960 });
 
@@ -98,7 +74,7 @@ export async function crawlUmastagram(
 
     const memberPredicts: Array<PredictedTabRow> = memberPredicatedTables.map(
       (row) => {
-        const [name, _, __, predicted] = row;
+        const [name, , , predicted] = row;
 
         if (name == null || predicted == null) {
           throw new Error(`Invalid cell ${row}`);
@@ -123,7 +99,7 @@ export async function crawlUmastagram(
     );
 
     const memberGoals: Array<GoalTabRow> = memberGoalTables.map((row) => {
-      const [name, _, __, completeDay] = row;
+      const [name, , , completeDay] = row;
 
       if (name == null || completeDay == null) {
         throw new Error(`Invalid cell ${row}`);
@@ -164,13 +140,6 @@ export async function crawlUmastagram(
       return value;
     });
 
-    // const data = await page.screenshot({
-    //   path: 'screenshot.png',
-    //   encoding: 'binary',
-    //   type: 'png',
-    //   fullPage: true,
-    // });
-
     await browser.close();
 
     const circleResult = {
@@ -184,88 +153,7 @@ export async function crawlUmastagram(
       circle: circleResult,
     };
 
-    const circleKey = circle.key;
-
-    const dbMembers = await prisma.member.findMany({
-      where: {
-        circleKey,
-      },
-    });
-
-    const circleFanCountData = {
-      circle: circleKey,
-      date,
-      total: BigInt(circleResult.total.replaceAll(',', '')),
-      avg: BigInt(circleResult.avg.replaceAll(',', '')),
-      predicted: BigInt(circleResult.predictedAvg.replaceAll(',', '')),
-      predictedAvg: BigInt(circleResult.predictedTotal.replaceAll(',', '')),
-    };
-    await prisma.$transaction([
-      prisma.memberFanCount.deleteMany({
-        where: { circle: circleKey, date },
-      }),
-      prisma.memberFanCount.createMany({
-        data: [
-          ...members.map((member) => {
-            const dbMember = dbMembers.find(
-              (m) => toHalfWidthString(m.name) == toHalfWidthString(member.name)
-            );
-            const memberId = dbMember?.id ?? null;
-            return {
-              circle: circleKey,
-              date,
-              name: member.name,
-              memberId,
-              total: BigInt(member.total.replaceAll(',', '')),
-              avg: BigInt(member.avg.replaceAll(',', '')),
-              predicted: BigInt(member.predicted.replaceAll(',', '')),
-            };
-          }),
-        ],
-        skipDuplicates: false,
-      }),
-      prisma.circleFanCount.upsert({
-        where: {
-          circle_date: {
-            circle: circleKey,
-            date,
-          },
-        },
-        create: circleFanCountData,
-        update: circleFanCountData,
-      }),
-    ]);
-
-    await rest.post(Routes.channelMessages(Guild.channelIds.admin), {
-      body: {
-        content: `${circle.name}の ${plainDate.toLocaleString(
-          'ja-JP'
-        )}のファン数を取得しました。`,
-      },
-      attachments: [
-        {
-          fileName: 'result.json',
-          rawBuffer: Buffer.from(JSON.stringify(members, null, 2), 'utf-8'),
-        },
-      ],
-    });
-
     return result;
-  } catch (e) {
-    await rest.post(Routes.channelMessages(Guild.channelIds.admin), {
-      body: {
-        content:
-          `${circle.name}の ${plainDate.toLocaleString(
-            'ja-JP'
-          )}のファン数を取得できませんでした。\n` +
-          '```\n' +
-          `${e}`.substring(0, 1800) +
-          `\n` +
-          '```',
-      },
-    });
-    throw e;
-  }
 }
 
 const extractTableCells: (
@@ -309,3 +197,26 @@ const findTab = async (page: Page, tabName: string) => {
 
   return null;
 };
+
+
+export const getUmastagramFanCounts = functions
+  .runWith({
+    memory: '512MB'
+  })
+  .https.onRequest(async (request, response) => {
+    const {url} = request.query
+    if (!url) {
+      response.status(400).json({"error": "URL required"})
+      return
+    }
+    if (typeof url != 'string') {
+      response.status(400).json({"error": "URL can contains only one"})
+      return
+    }
+    try {
+      const result =await crawlUmastagram(url);
+      response.json(result);
+    } catch (e) {
+      response.status(500).json({"error": `${e}`});
+    }
+  });
