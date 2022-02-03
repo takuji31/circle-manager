@@ -1,5 +1,4 @@
 import * as functions from "firebase-functions";
-import { Temporal } from 'proposal-temporal';
 import { Page, launch } from 'puppeteer';
 
 interface UmastagramPage {
@@ -26,12 +25,7 @@ interface UmastagramCircle {
   predictedAvg: string;
 }
 
-export async function crawlUmastagram(
-  url: string,
-  plainDate: Temporal.PlainDate = Temporal.now
-    .plainDateISO('Asia/Tokyo')
-    .subtract(Temporal.Duration.from({ days: 1 }))
-): Promise<UmastagramPage> {
+export async function crawlUmastagram(url: string): Promise<UmastagramPage> {
     const browser = await launch({
       headless: process.env.NODE_ENV == 'production',
       args: ['--no-sandbox'],
