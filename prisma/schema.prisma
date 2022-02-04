@@ -14,21 +14,6 @@ generator nexusPrisma {
   provider = "nexus-prisma"
 }
 
-model Circle {
-  id                 String  @id @db.VarChar(255)
-  name               String
-  emoji              String?
-  order              Int     @default(0)
-  selectableByUser   Boolean @default(true)
-  selectableByAdmin  Boolean @default(true)
-  selectableInSurvey Boolean @default(true)
-
-  @@index([order])
-  @@index([selectableByAdmin, order])
-  @@index([selectableByUser, order])
-  @@index([selectableInSurvey, order])
-}
-
 model Member {
   id               String           @id @db.VarChar(255)
   pathname         String           @default(cuid()) @db.VarChar(255)
