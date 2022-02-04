@@ -15,15 +15,12 @@ import { GetServerSideProps, NextPage } from 'next';
 import { getSession } from 'next-auth/react';
 import React, { useMemo } from 'react';
 import { AdminLayout } from '../../../components/admin_filter';
-import { Circles, getCircleName, nextMonth } from '../../../model';
+import { Circle, Circles, getCircleName } from '../../../model';
 import {
-  Circle,
-  ListedCircleFragment,
   ListedMonthSurveyAnswerFragment,
   MonthCircle,
   useAdminMembersQuery,
 } from '../../../apollo';
-import { prisma } from '../../../database';
 import Link, { NextLinkComposed } from '../../../components/link';
 import * as Icons from '@mui/icons-material';
 import { monthSurveyAnswerLabel } from '../../../model/month_survey_answer';
@@ -181,9 +178,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async (
   } else {
     return {
       props: {
-        monthCircleNames: await (
-          await prisma.circle.findMany({ orderBy: { order: 'asc' } })
-        ).map((circle) => circle.name),
+        monthCircleNames: Object.values(Circle).map((circle) => circle.name),
       },
     };
   }
