@@ -13,7 +13,7 @@ config();
   const month = nextMonth();
   const members = await prisma.member.findMany({
     include: {
-      MonthSurveyAnswer: {
+      monthSurveyAnswer: {
         where: {
           ...month,
         },
@@ -21,7 +21,7 @@ config();
     },
     where: {
       leavedAt: null,
-      MonthSurveyAnswer: {
+      monthSurveyAnswer: {
         some: {
           ...month,
         },

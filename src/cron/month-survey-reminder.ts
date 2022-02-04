@@ -17,7 +17,7 @@ config();
         not: null,
       },
       leavedAt: null,
-      MonthSurveyAnswer: {
+      monthSurveyAnswer: {
         some: {
           ...month,
           value: MonthSurveyAnswerValue.None,

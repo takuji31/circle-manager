@@ -75,7 +75,7 @@ export const Member = objectType({
       resolve({ id }, _, { prisma }) {
         return prisma.member
           .findUnique({ where: { id } })
-          .MonthSurveyAnswer({
+          .monthSurveyAnswer({
             where: {
               ...nextMonth(),
             },
