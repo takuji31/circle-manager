@@ -8,7 +8,7 @@ const urlPattern =
   /https:\/\/umastagram.com\/circle\/grade\/graph\/share\/[a-zA-Z0-9]+/;
 
 export const updateFanCountEvent = async (message: Message, circle: Circle) => {
-  if (!message.content.match(/(更新|集計)しました/)) {
+  if (!message.content.match(/(更新|集計|記録|入力)しました/)) {
     return;
   }
 
