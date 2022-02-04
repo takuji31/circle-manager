@@ -1,9 +1,8 @@
-import { getCircleName, Circles } from './../../model/circle';
 import { Guild } from './../../model/guild';
-import { Circle, Member, MemberStatus } from '@prisma/client';
+import { Member, MemberStatus } from '@prisma/client';
 import { Temporal } from 'proposal-temporal';
 import { createDiscordRestClient } from '../../discord';
-import { nextMonth, nextMonthInt } from '../../model';
+import { nextMonthInt } from '../../model';
 import { MonthSurvey as _MonthSurvey } from 'nexus-prisma';
 import { mutationField } from 'nexus';
 import { MessageEmbed } from 'discord.js';
