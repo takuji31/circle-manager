@@ -7,8 +7,8 @@ import type { AppProps } from 'next/app';
 import { getSession, SessionProvider } from 'next-auth/react';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { ApolloProvider } from '@apollo/client';
-import { useApollo } from '../apollo';
+import { createUrqlClient } from '../graphql/client';
+import { Provider } from 'urql';
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache();
@@ -16,6 +16,8 @@ const clientSideEmotionCache = createEmotionCache();
 interface MyAppProps extends AppProps {
   emotionCache?: EmotionCache;
 }
+
+const urql = createUrqlClient();
 
 export default function MyApp({
   Component,
@@ -34,11 +36,9 @@ export default function MyApp({
     [prefersDarkMode]
   );
 
-  const apolloClient = useApollo(pageProps);
-
   return (
     <SessionProvider session={pageProps.session}>
-      <ApolloProvider client={apolloClient}>
+      <Provider value={urql}>
         <CacheProvider value={emotionCache}>
           <Head>
             <title>ウマ娘愛好会グループ</title>
@@ -53,7 +53,7 @@ export default function MyApp({
             <Component {...pageProps} />
           </ThemeProvider>
         </CacheProvider>
-      </ApolloProvider>
+      </Provider>
     </SessionProvider>
   );
 }
