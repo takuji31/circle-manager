@@ -30,7 +30,7 @@ model Member {
   signUp           SignUp?
   fanCounts        MemberFanCount[]
 
-  MonthSurveyAnswer MonthSurveyAnswer[]
+  monthSurveyAnswer MonthSurveyAnswer[]
   @@unique([pathname])
   @@index([leavedAt])
   @@index([joinedAt])

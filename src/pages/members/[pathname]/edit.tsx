@@ -1,18 +1,22 @@
 import { Alert, Box, FormControl, Grid, Stack, TextField } from '@mui/material';
-import { GetServerSideProps } from 'next';
+import { NextPage } from 'next';
 import Layout from '../../../components/layout';
 import React, { useState } from 'react';
-import {
-  PageMemberByPathnameComp,
-  ssrMemberByPathname,
-} from '../../../apollo/page';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import { useUpdateMemberMutation } from '../../../apollo';
 import { LoadingButton } from '@mui/lab';
 import * as yup from 'yup';
 import { setLocale } from 'yup';
 import * as ja from 'yup-locale-ja';
 import { yupResolver } from '@hookform/resolvers/yup';
+import {
+  getServerSidePropsWithUrql,
+  withUrqlClient,
+} from '../../../graphql/client';
+import {
+  MemberByPathnameDocument,
+  UpdateMemberDocument,
+} from '../../../graphql/generated/type';
+import { useMutation, useQuery } from 'urql';
 
 setLocale(ja.suggestive);
 
@@ -32,21 +36,26 @@ type MemberFormData = {
   trainerId: string | null;
 };
 
-export const Pathname: PageMemberByPathnameComp = ({ data, error }) => {
+interface Props {
+  pathname: string;
+}
+
+export const Pathname: NextPage<Props> = ({ pathname }) => {
+  const [{ data, error }] = useQuery({
+    query: MemberByPathnameDocument,
+    variables: { pathname },
+  });
   const member = data?.member;
   const [isCompleted, setCompleted] = useState(false);
-  const [mutation, { loading: isUpdating }] = useUpdateMemberMutation({
-    onCompleted: () => {
-      setCompleted(true);
-    },
-  });
+  const [{ fetching: isUpdating }, mutation] =
+    useMutation(UpdateMemberDocument);
+
   const {
-    register,
     control,
-    setValue,
     handleSubmit,
     formState: { errors },
   } = useForm<MemberFormData>({ mode: 'all', resolver: yupResolver(schema) });
+
   if (error) {
     return <p>{error.message}</p>;
   } else if (!member) {
@@ -55,12 +64,14 @@ export const Pathname: PageMemberByPathnameComp = ({ data, error }) => {
 
   const formHandler: SubmitHandler<MemberFormData> = (data) => {
     mutation({
-      variables: {
-        input: {
-          id: member.id,
-          ...data,
-        },
+      input: {
+        id: member.id,
+        ...data,
       },
+    }).then((result) => {
+      if (!result.error) {
+        setCompleted(true);
+      }
     });
   };
 
@@ -123,17 +134,19 @@ export const Pathname: PageMemberByPathnameComp = ({ data, error }) => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps = (req) => {
-  const pathname = req.params?.pathname as string;
-  return ssrMemberByPathname.getServerPage({
-    variables: { pathname },
-  });
-};
+export const getServerSideProps = getServerSidePropsWithUrql<Props>(
+  async (ctx, urql, ssr) => {
+    const pathname = ctx.params?.pathname as string;
 
-export default ssrMemberByPathname.withPage((arg) => {
-  return {
-    variables: {
-      pathname: arg.query.pathname as string,
-    },
-  };
-})(Pathname);
+    await urql.query(MemberByPathnameDocument, { pathname }).toPromise();
+
+    return {
+      props: {
+        pathname,
+        urqlState: ssr.extractData(),
+      },
+    };
+  }
+);
+
+export default withUrqlClient(false)(Pathname);

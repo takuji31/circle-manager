@@ -8,33 +8,33 @@ import {
   TableRow,
   Typography,
 } from '@mui/material';
-import { GetServerSideProps } from 'next';
+import { NextPage } from 'next';
 import { ParsedUrlQuery } from 'querystring';
 import React from 'react';
 import {
+  MonthSurveyDocument,
+  UpdateMonthCircleDocument,
   UpdateMonthCircleMutationInput,
-  useUpdateMonthCircleMutation,
-} from '../../../../apollo';
-import { PageMonthSurveyComp, ssrMonthSurvey } from '../../../../apollo/page';
+} from '../../../../graphql/generated/type';
 import { AdminLayout } from '../../../../components/admin_filter';
 import { LoadingCheckBox } from '../../../../components/loading_checkbox';
-import { Circles, isLeaveCircle, shouldLeaveGuild } from '../../../../model';
-
-interface MemberWithMonthCircle {
-  id: string;
-  name: string;
-  circle: {
-    name: string;
-  };
-}
+import { Circles } from '../../../../model';
+import { useMutation, useQuery } from 'urql';
+import {
+  getServerSidePropsWithUrql,
+  withUrqlClient,
+} from '../../../../graphql/client';
 
 interface Props {
   year: string;
   month: string;
-  members: Array<MemberWithMonthCircle>;
 }
 
-export const MonthCircleList: PageMonthSurveyComp = ({ data, error }) => {
+export const MonthCircleList: NextPage<Props> = ({ year, month }) => {
+  const [{ data, error }] = useQuery({
+    query: MonthSurveyDocument,
+    variables: { year, month },
+  });
   const monthSurvey = data?.monthSurvey;
   if (error) {
     return <p>{error.message}</p>;
@@ -176,18 +176,16 @@ const MonthCircleStateCheckbox = ({
   disabled?: boolean;
   variablesBuilder: (checked: boolean) => UpdateMonthCircleMutationInput;
 }) => {
-  const [mutation, { loading }] = useUpdateMonthCircleMutation();
+  const [{ fetching }, mutation] = useMutation(UpdateMonthCircleDocument);
   return (
     <LoadingCheckBox
       checked={checked}
-      loading={loading}
+      loading={fetching}
       disabled={disabled}
       onCheckChanged={(checked) => {
         mutation({
-          variables: {
-            data: {
-              ...variablesBuilder(checked),
-            },
+          data: {
+            ...variablesBuilder(checked),
           },
         });
       }}
@@ -195,21 +193,26 @@ const MonthCircleStateCheckbox = ({
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const { year, month } = ctx.params!! as PathParams;
-  return await ssrMonthSurvey.getServerPage({ variables: { year, month } });
-};
-
 interface PathParams extends ParsedUrlQuery {
   year: string;
   month: string;
 }
 
-export default ssrMonthSurvey.withPage((arg) => {
-  return {
-    variables: {
-      year: arg?.query?.year as string,
-      month: arg?.query?.month as string,
-    },
-  };
-})(MonthCircleList);
+export const getServerSideProps = getServerSidePropsWithUrql<Props, PathParams>(
+  async ({ params }, urql, ssr) => {
+    const year = params?.year as string;
+    const month = params?.month as string;
+
+    await urql.query(MonthSurveyDocument, { year, month }).toPromise();
+
+    return {
+      props: {
+        year,
+        month,
+        urqlState: ssr.extractData(),
+      },
+    };
+  }
+);
+
+export default withUrqlClient(false)(MonthCircleList);

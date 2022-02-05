@@ -1,6 +1,6 @@
 import { ToggleButton, ToggleButtonGroup } from '@mui/material';
 import React from 'react';
-import { ListedCircleFragment } from '../apollo';
+import { ListedCircleFragment } from '../graphql/generated/type';
 import { getCircleName } from '../model';
 
 export interface Props {

@@ -231,7 +231,7 @@ export const CreateMonthCirclesMutation = mutationField(
 
       const noRankingMembers = await prisma.member.findMany({
         include: {
-          MonthSurveyAnswer: {
+          monthSurveyAnswer: {
             where: {
               year: year.toString(),
               month: month.toString(),
@@ -247,7 +247,7 @@ export const CreateMonthCirclesMutation = mutationField(
               locked: true,
             },
           },
-          MonthSurveyAnswer: {
+          monthSurveyAnswer: {
             some: {
               year: year.toString(),
               month: month.toString(),
@@ -262,7 +262,7 @@ export const CreateMonthCirclesMutation = mutationField(
       const leaders = await prisma.member.findMany({
         where: {
           circleRole: CircleRole.Leader,
-          MonthSurveyAnswer: {
+          monthSurveyAnswer: {
             some: {
               year: year.toString(),
               month: month.toString(),
@@ -341,7 +341,7 @@ export const CreateMonthCirclesMutation = mutationField(
             circleRole: {
               not: CircleRole.Leader,
             },
-            MonthSurveyAnswer: {
+            monthSurveyAnswer: {
               some: {
                 year: year.toString(),
                 month: month.toString(),
@@ -366,7 +366,7 @@ export const CreateMonthCirclesMutation = mutationField(
         }),
         prisma.monthCircle.createMany({
           data: noRankingMembers.map(
-            ({ id: memberId, circleKey, MonthSurveyAnswer: [{ value }] }) => ({
+            ({ id: memberId, circleKey, monthSurveyAnswer: [{ value }] }) => ({
               memberId,
               year,
               month,

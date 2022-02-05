@@ -9,7 +9,7 @@ import {
   ToggleButtonGroup,
   Typography,
 } from '@mui/material';
-import { GetServerSideProps } from 'next';
+import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import Layout from '../../../components/layout';
@@ -17,9 +17,17 @@ import * as yup from 'yup';
 import { setLocale } from 'yup';
 import * as ja from 'yup-locale-ja';
 import { getCircleName } from '../../../model';
-import { PageSetupComp, ssrSetup } from '../../../apollo/page';
-import { CircleKey, useUpdateSetupMutation } from '../../../apollo';
 import { yupResolver } from '@hookform/resolvers/yup';
+import {
+  getServerSidePropsWithUrql,
+  withUrqlClient,
+} from '../../../graphql/client';
+import {
+  CircleKey,
+  SetupDocument,
+  UpdateSetupDocument,
+} from '../../../graphql/generated/type';
+import { useMutation, useQuery } from 'urql';
 
 setLocale(ja.suggestive);
 
@@ -43,7 +51,16 @@ const schema = yup
   })
   .required();
 
-const Setup: PageSetupComp = ({ data, error }) => {
+interface Props {
+  pathname: string;
+}
+
+const Setup: NextPage<Props> = ({ pathname }) => {
+  const [{ data, error }] = useQuery({
+    query: SetupDocument,
+    variables: { pathname },
+  });
+
   const {
     register,
     control,
@@ -52,7 +69,7 @@ const Setup: PageSetupComp = ({ data, error }) => {
     formState: { errors },
   } = useForm<SetupFormData>({ mode: 'all', resolver: yupResolver(schema) });
 
-  const [mutation, { loading }] = useUpdateSetupMutation();
+  const [{ fetching }, mutation] = useMutation(UpdateSetupDocument);
 
   const member = data?.member;
   const circles = data?.circles;
@@ -66,10 +83,8 @@ const Setup: PageSetupComp = ({ data, error }) => {
   const formHandler: SubmitHandler<SetupFormData> = (data) => {
     console.log('onSubmit');
     mutation({
-      variables: {
-        memberId: member.id,
-        ...data,
-      },
+      memberId: member.id,
+      ...data,
     }).then(() => {});
   };
 
@@ -187,7 +202,7 @@ const Setup: PageSetupComp = ({ data, error }) => {
             <Grid container item xs={12} justifyContent="flex-end">
               <Grid item>
                 <LoadingButton
-                  loading={loading}
+                  loading={fetching}
                   type="submit"
                   variant="contained"
                 >
@@ -202,17 +217,19 @@ const Setup: PageSetupComp = ({ data, error }) => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps = (req) => {
-  const pathname = req.params?.pathname as string;
-  return ssrSetup.getServerPage({
-    variables: { pathname },
-  });
-};
+export const getServerSideProps = getServerSidePropsWithUrql<Props>(
+  async (ctx, urql, ssr) => {
+    const pathname = ctx.params?.pathname as string;
 
-export default ssrSetup.withPage((arg) => {
-  return {
-    variables: {
-      pathname: arg.query.pathname as string,
-    },
-  };
-})(Setup);
+    await urql.query(SetupDocument, { pathname }).toPromise();
+
+    return {
+      props: {
+        pathname,
+        urqlState: ssr.extractData(),
+      },
+    };
+  }
+);
+
+export default withUrqlClient(false)(Setup);

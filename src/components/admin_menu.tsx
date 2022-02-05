@@ -2,28 +2,31 @@ import { LoadingButton } from '@mui/lab';
 import {
   Button,
   CircularProgress,
-  IconButton,
   Menu,
   MenuItem,
   Typography,
 } from '@mui/material';
-import React, { useState } from 'react';
+import React from 'react';
 import { NextLinkComposed } from './link';
 import useUser from '../hooks/user';
 import * as Icons from '@mui/icons-material';
-import { useAdminCirclesQuery, useUpdateMembersMutation } from '../apollo';
 import PopupState, { bindMenu, bindTrigger } from 'material-ui-popup-state';
+import { useMutation, useQuery } from 'urql';
+import {
+  AdminCirclesDocument,
+  UpdateMembersDocument,
+} from '../graphql/generated/type';
 
 export const AdminMenu = () => {
-  const { user, status } = useUser();
-  const [mutation, { data, loading, error }] = useUpdateMembersMutation();
+  const { user } = useUser();
+  const [{ fetching }, mutation] = useMutation(UpdateMembersDocument);
   if (!user || !user.isMember || !user.isAdmin) {
     return <></>;
   } else {
     return (
       <>
         <LoadingButton
-          loading={loading}
+          loading={fetching}
           color="inherit"
           startIcon={<Icons.AdminPanelSettings />}
           onClick={() => {
@@ -41,8 +44,8 @@ export const AdminMenu = () => {
 };
 
 const CircleMenu: React.VFC = () => {
-  const { data, loading, error } = useAdminCirclesQuery();
-  if (loading || !data) {
+  const [{ data, fetching, error }] = useQuery({ query: AdminCirclesDocument });
+  if (fetching || !data) {
     return <CircularProgress color="inherit" />;
   } else if (error) {
     return (

@@ -5,11 +5,12 @@ import {
   Typography,
 } from '@mui/material';
 import React from 'react';
+import { useMutation } from 'urql';
 import {
   ListedCircleFragment,
   MemberMonthCircleFragment,
-  useUpdateMemberMonthCircleMutation,
-} from '../apollo';
+  UpdateMemberMonthCircleDocument,
+} from '../graphql/generated/type';
 import { getCircleName } from '../model';
 
 export interface Props {
@@ -29,7 +30,7 @@ export default function MemberMonthCircle({
   circles,
   canEdit,
 }: Props) {
-  const [mutation] = useUpdateMemberMonthCircleMutation();
+  const [state, mutation] = useMutation(UpdateMemberMonthCircleDocument);
   return (
     <Stack spacing={2}>
       <Typography variant="h6">{`${year}年${month}月の在籍希望`}</Typography>
@@ -49,12 +50,10 @@ export default function MemberMonthCircle({
                   key={circle.id}
                   onClick={() => {
                     mutation({
-                      variables: {
-                        circleId: circle.id,
-                        memberId,
-                        year,
-                        month,
-                      },
+                      circleId: circle.id,
+                      memberId,
+                      year,
+                      month,
                     }).then(() => {
                       return;
                     });

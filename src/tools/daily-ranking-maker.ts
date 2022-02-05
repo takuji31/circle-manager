@@ -95,7 +95,7 @@ config();
         ...(useMonthSurveyAnswer
           ? {
               member: {
-                MonthSurveyAnswer: {
+                monthSurveyAnswer: {
                   some: {
                     year: nextMonthYear.toString(),
                     month: nextMonthMonth.toString(),

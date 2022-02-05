@@ -3,8 +3,6 @@ import * as React from 'react';
 import {
   Box,
   Button,
-  Checkbox,
-  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -26,28 +24,19 @@ import {
   TableBody,
   TableCell,
 } from '@mui/material';
-import {
-  Circle,
-  CircleId,
-  nextMonth,
-  nextMonthInt,
-  thisMonth,
-  thisMonthInt,
-  UserWithSession,
-} from '../model';
+import { nextMonthInt, thisMonthInt, UserWithSession } from '../model';
 import MemberMonthCircle from '../components/member_month_circle';
 import {
-  useAdminTopQuery,
-  useCreateNextMonthSurveyMutation,
-  useMemberMonthCirclesQuery,
-  useUpdateSignUpMutation,
-} from '../apollo';
+  AdminTopDocument,
+  CreateNextMonthSurveyDocument,
+  UpdateSignUpDocument,
+} from '../graphql/generated/type';
 import { useMemo } from 'react';
 import { Temporal } from 'proposal-temporal';
 import Link from '../components/link';
-import { ssrAdminMembers, ssrAdminTop } from '../apollo/page';
 import { LoadingCheckBox } from '../components/loading_checkbox';
 import { MonthSurveyAnswerValue } from '@prisma/client';
+import { useMutation, useQuery } from 'urql';
 
 const Home: NextPage = (props) => {
   const { user, status } = useUser();
@@ -86,47 +75,11 @@ interface TopContentProps {
   user: UserWithSession;
 }
 
-const TopContent = ({ user }: TopContentProps) => {
-  const { data, loading, error } = useMemberMonthCirclesQuery({
-    variables: {
-      memberId: user.id,
-    },
-  });
-  const member = data?.member;
-  const circles = data?.circles;
-  return (
-    <>
-      {status == 'loading' && (
-        <Box sx={{ width: '100%' }}>
-          <LinearProgress />
-        </Box>
-      )}
-      {member && circles && (
-        <Stack spacing={2}>
-          <MemberMonthCircle
-            memberId={user.id}
-            monthCircle={member.thisMonthCircle}
-            circles={circles}
-            canEdit={false}
-            {...thisMonthInt()}
-          />
-          <MemberMonthCircle
-            memberId={user.id}
-            monthCircle={member.nextMonthCircle}
-            circles={circles}
-            canEdit={true}
-            {...nextMonthInt()}
-          />
-        </Stack>
-      )}
-    </>
-  );
-};
-
 const AdminTopContent = () => {
-  const { data } = ssrAdminTop.usePage();
-  const [mutation, { loading: creating, error: mutationError }] =
-    useCreateNextMonthSurveyMutation();
+  const [{ data }] = useQuery({ query: AdminTopDocument });
+  const [{ fetching: creating, error: mutationError }, mutation] = useMutation(
+    CreateNextMonthSurveyDocument
+  );
   const thisMonth = data?.thisMonth;
   const nextMonth = data?.nextMonth;
   const answers = data?.nextMonth.survey?.monthSurveyAnswers;
@@ -349,14 +302,12 @@ const InvitedCheckBox: (props: {
   invited: boolean;
   memberId: string;
 }) => JSX.Element = ({ invited, memberId }) => {
-  const [mutation, { loading }] = useUpdateSignUpMutation();
+  const [{ fetching }, mutation] = useMutation(UpdateSignUpDocument);
   return (
     <LoadingCheckBox
       checked={invited}
-      loading={loading}
-      onCheckChanged={(checked) =>
-        mutation({ variables: { memberId, invited: checked } })
-      }
+      loading={fetching}
+      onCheckChanged={(checked) => mutation({ memberId, invited: checked })}
     />
   );
 };
@@ -365,20 +316,14 @@ const JoinedCheckBox: (props: {
   joined: boolean;
   memberId: string;
 }) => JSX.Element = ({ joined, memberId }) => {
-  const [mutation, { loading }] = useUpdateSignUpMutation();
+  const [{ fetching }, mutation] = useMutation(UpdateSignUpDocument);
   return (
     <LoadingCheckBox
       checked={joined}
-      loading={loading}
-      onCheckChanged={(checked) =>
-        mutation({ variables: { memberId, joined: checked } })
-      }
+      loading={fetching}
+      onCheckChanged={(checked) => mutation({ memberId, joined: checked })}
     />
   );
-};
-
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  return await ssrAdminMembers.getServerPage({});
 };
 
 export default Home;

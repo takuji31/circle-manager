@@ -17,13 +17,14 @@ import React, { useMemo } from 'react';
 import { AdminLayout } from '../../../components/admin_filter';
 import { Circle, Circles, getCircleName } from '../../../model';
 import {
+  AdminMembersDocument,
   ListedMonthSurveyAnswerFragment,
   MonthCircle,
-  useAdminMembersQuery,
-} from '../../../apollo';
+} from '../../../graphql/generated/type';
 import Link, { NextLinkComposed } from '../../../components/link';
 import * as Icons from '@mui/icons-material';
 import { monthSurveyAnswerLabel } from '../../../model/month_survey_answer';
+import { useQuery } from 'urql';
 
 export interface Props {
   monthCircleNames: Array<string>;
@@ -138,12 +139,12 @@ const MemberList: NextPage<Props> = ({ monthCircleNames }) => {
     [monthCircleNames]
   );
 
-  const { data, error, loading } = useAdminMembersQuery();
+  const [{ data, error, fetching }] = useQuery({ query: AdminMembersDocument });
   const members = data?.members as GridRowsProp;
 
   return (
     <AdminLayout title="メンバー一覧">
-      {loading && (
+      {fetching && (
         <Box>
           <LinearProgress />
         </Box>

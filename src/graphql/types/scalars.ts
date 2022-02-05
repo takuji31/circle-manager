@@ -6,11 +6,11 @@ export const DateScalar = scalarType({
   name: 'Date',
   asNexusMethod: 'date',
   description: 'ISO8601 Date string',
-  parseValue(value: string) {
-    return Temporal.PlainDate.from(value);
+  parseValue(inputValue) {
+    return Temporal.PlainDate.from(inputValue as string);
   },
-  serialize(value: Temporal.PlainDate) {
-    return value.toString();
+  serialize(outputValue) {
+    return (outputValue as Temporal.PlainDate).toString();
   },
   parseLiteral(ast) {
     if (ast.kind === Kind.STRING) {

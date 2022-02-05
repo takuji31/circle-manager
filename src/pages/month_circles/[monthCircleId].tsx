@@ -4,16 +4,16 @@ import { GetStaticPaths, GetStaticProps, NextPage } from 'next';
 import React from 'react';
 import Layout from '../../components/layout';
 import MemberMonthCircle from '../../components/member_month_circle';
-import { nextMonth, thisMonth } from '../../model';
-import { useMonthCircleQuery } from '../../apollo';
-import { prisma } from '../../database';
+import { useQuery } from 'urql';
+import { MonthCircleDocument } from '../../graphql/generated/type';
 
 interface Props {
   monthCircleId: string;
 }
 
 const MemberMonthCirclePage: NextPage<Props> = ({ monthCircleId }) => {
-  const { data, loading, error } = useMonthCircleQuery({
+  const [{ data, fetching }] = useQuery({
+    query: MonthCircleDocument,
     variables: {
       monthCircleId,
     },
@@ -28,7 +28,7 @@ const MemberMonthCirclePage: NextPage<Props> = ({ monthCircleId }) => {
           : 'Loading...'
       }
     >
-      {loading && <LinearProgress />}
+      {fetching && <LinearProgress />}
       {circles && monthCircle && (
         <Box p={2}>
           <MemberMonthCircle
