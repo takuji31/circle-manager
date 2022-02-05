@@ -5,7 +5,7 @@ export const SignUps = queryField('signUps', {
   type: nonNull(list(nonNull(SignUp))),
   async resolve(_, __, ctx) {
     return ctx.prisma.signUp.findMany({
-      where: { joined: false },
+      where: { joined: false, member: { leavedAt: null } },
       orderBy: { createdAt: 'asc' },
     });
   },
