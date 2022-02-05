@@ -52,7 +52,7 @@ config();
   await sendDirectMessagesIfPossible(
     members,
     (member) => {
-      const answer = member.MonthSurveyAnswer[0]?.value!;
+      const answer = member.monthSurveyAnswer[0]?.value!;
       const circleName = monthSurveyAnswerLabel(answer);
       return `※このメッセージは自動送信です。\n\nあなたの来月の在籍希望は「${circleName}」です。\n変更がある場合は期限(${expiredAt})までに在籍希望アンケートに回答し直してください。\n期限を過ぎた場合ご希望に添えない可能性があります。\n\nよろしくお願いします。`;
     },

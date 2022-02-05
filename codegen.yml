@@ -2,24 +2,6 @@ overwrite: true
 schema: 'graphql/schema.graphqls'
 documents: 'graphql/**/*.gql'
 generates:
-  src/apollo/graphql.ts:
-    plugins:
-      - add:
-          content: "import { Temporal } from 'proposal-temporal';"
-      - 'typescript'
-      - 'typescript-operations'
-      - 'typescript-react-apollo'
-      - 'typescript-apollo-client-helpers'
-    config:
-      reactApolloVersion: 3
-      withHooks: true
-      withHOC: false
-      withComponent: false
-      exportFragmentSpreadSubTypes: true
-      documentMode: graphQLTag
-      scalars:
-        Date: 'Temporal.PlainDate'
-
   src/graphql/generated/type.ts:
     plugins:
       - add:
@@ -31,19 +13,3 @@ generates:
       dedupeFragments: true
       scalars:
         Date: 'Temporal.PlainDate'
-
-  src/apollo/page.tsx:
-    plugins:
-      - 'graphql-codegen-apollo-next-ssr'
-    config:
-      documentMode: external
-      importDocumentNodeExternallyFrom: ./graphql
-      reactApolloVersion: 3
-      withHooks: true
-      contextType: 'Context'
-      contextTypeRequired: false
-      apolloClientInstanceImport: '../apollo'
-      # apolloStateKey: '__APOLLO_STATE__'
-    preset: import-types
-    presetConfig:
-      typesPath: ./graphql
