@@ -104,25 +104,25 @@ const AdminTopContent = () => {
       ];
     }
   }, [answers]);
-  const expiredAtString = useMemo(() => {
-    const expiredAt = data?.nextMonth?.survey?.expiredAt as string;
-    if (!expiredAt) {
-      return null;
-    } else {
-      const zonedDateTime = Temporal.Instant.from(expiredAt).toZonedDateTime({
-        timeZone: 'Asia/Tokyo',
-        calendar: 'iso8601',
-      });
-      return zonedDateTime.toLocaleString('ja-JP', {
-        year: 'numeric',
-        month: 'long',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-      });
-    }
-  }, [data?.nextMonth?.survey?.expiredAt]);
+  // const expiredAtString = useMemo(() => {
+  //   const expiredAt = data?.nextMonth?.survey?.expiredAt as string;
+  //   if (!expiredAt) {
+  //     return null;
+  //   } else {
+  //     const zonedDateTime = Temporal.Instant.from(expiredAt).toZonedDateTime({
+  //       timeZone: 'Asia/Tokyo',
+  //       calendar: 'iso8601',
+  //     });
+  //     return zonedDateTime.toLocaleString('ja-JP', {
+  //       year: 'numeric',
+  //       month: 'long',
+  //       day: '2-digit',
+  //       hour: '2-digit',
+  //       minute: '2-digit',
+  //       second: '2-digit',
+  //     });
+  //   }
+  // }, [data?.nextMonth?.survey?.expiredAt]);
 
   const [open, setOpen] = React.useState(false);
   const theme = useTheme();
@@ -227,7 +227,7 @@ const AdminTopContent = () => {
               {nextMonth.survey && (
                 <>
                   <Typography variant="body1">
-                    開始済み(期限: {expiredAtString ?? ''})
+                    開始済み{/* (期限: {expiredAtString ?? ''}) */}
                   </Typography>
                   <TableContainer>
                     <TableHead>
