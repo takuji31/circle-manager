@@ -126,7 +126,6 @@ export const MonthCircleList: NextPage<Props> = ({ year, month }) => {
                   <TableCell>
                     <Checkbox
                       checked={monthCircle.state == MonthCircleState.Ob}
-                      disabled={true}
                     />
                   </TableCell>
                 </TableRow>
