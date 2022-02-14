@@ -12,13 +12,13 @@ import { NextPage } from 'next';
 import { ParsedUrlQuery } from 'querystring';
 import React from 'react';
 import {
+  MonthCircleState,
   MonthSurveyDocument,
   UpdateMonthCircleDocument,
   UpdateMonthCircleMutationInput,
 } from '../../../../graphql/generated/type';
 import { AdminLayout } from '../../../../components/admin_filter';
 import { LoadingCheckBox } from '../../../../components/loading_checkbox';
-import { Circles } from '../../../../model';
 import { useMutation, useQuery } from 'urql';
 import {
   getServerSidePropsWithUrql,
@@ -59,7 +59,7 @@ export const MonthCircleList: NextPage<Props> = ({ year, month }) => {
           <TableBody>
             {monthSurvey.move.map((monthCircle) => {
               return (
-                <TableRow key={`answered_${monthCircle.id}`}>
+                <TableRow key={monthCircle.id}>
                   <TableCell>{monthCircle.member.name}</TableCell>
                   <TableCell>{monthCircle.currentCircle?.name}</TableCell>
                   <TableCell>{monthCircle.circle?.name}</TableCell>
@@ -110,7 +110,7 @@ export const MonthCircleList: NextPage<Props> = ({ year, month }) => {
           <TableBody>
             {monthSurvey.leave.map((monthCircle) => {
               return (
-                <TableRow key={`leave_${monthCircle.id}`}>
+                <TableRow key={monthCircle.id}>
                   <TableCell>{monthCircle.member.name}</TableCell>
                   <TableCell>{monthCircle.currentCircle?.name}</TableCell>
                   <TableCell>
@@ -125,7 +125,7 @@ export const MonthCircleList: NextPage<Props> = ({ year, month }) => {
                   </TableCell>
                   <TableCell>
                     <Checkbox
-                      checked={monthCircle.circle?.id == Circles.specialIds.ob}
+                      checked={monthCircle.state == MonthCircleState.Ob}
                       disabled={true}
                     />
                   </TableCell>
@@ -144,7 +144,7 @@ export const MonthCircleList: NextPage<Props> = ({ year, month }) => {
           <TableBody>
             {monthSurvey.kick.map((monthCircle) => {
               return (
-                <TableRow key={`no_answer_${monthCircle.id}`}>
+                <TableRow key={monthCircle.id}>
                   <TableCell>{monthCircle.member.name}</TableCell>
                   <TableCell>{monthCircle.currentCircle?.name}</TableCell>
                   <TableCell>
