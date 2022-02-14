@@ -9,7 +9,7 @@ import {
   UpdateMonthCircleMutationInput,
 } from '../types';
 import { Circles, isCircleKey, nextMonthInt } from '../../model';
-import { setupDayjs } from '../../model/date';
+import { dayjs } from '../../model/date';
 import {
   CircleKey,
   CircleRole,
@@ -20,9 +20,6 @@ import {
   sendInvitedMessage,
   sendKickedMessage,
 } from '../../discord/member/messages';
-import dayjs from 'dayjs';
-
-setupDayjs();
 
 export const UpdateMemberMonthCircleMutation = mutationField(
   'updateMemberMonthCircle',

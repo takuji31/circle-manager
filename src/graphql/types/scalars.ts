@@ -1,9 +1,7 @@
-import dayjs from 'dayjs';
+import { Dayjs } from 'dayjs';
 import { Kind } from 'graphql';
 import { scalarType } from 'nexus';
-import { setupDayjs } from '../../model/date';
-
-setupDayjs();
+import { dayjs } from '../../model/date';
 
 export const DateScalar = scalarType({
   name: 'Date',
@@ -17,7 +15,7 @@ export const DateScalar = scalarType({
     return dayjs(inputValue as string);
   },
   serialize(outputValue) {
-    return (outputValue as dayjs.Dayjs).toJSON();
+    return (outputValue as Dayjs).toJSON();
   },
   parseLiteral(ast) {
     if (ast.kind === Kind.STRING) {

@@ -14,12 +14,10 @@ import {
   MonthSurveyAnswerValue,
 } from '@prisma/client';
 import { monthCircleStateLabel } from '../model/month_circle';
-import dayjs from 'dayjs';
-import { setupDayjs } from '../model/date';
+import { dayjs } from '../model/date';
+import { Dayjs } from 'dayjs';
 
 config();
-
-setupDayjs();
 
 (async () => {
   const { year, month } = thisMonth();
@@ -54,7 +52,7 @@ setupDayjs();
       member: (Member & { monthCircles: Array<MonthCircle> }) | null;
     }
   > = [];
-  const circleToUpdatedAt: Record<CircleKey, dayjs.Dayjs | null> = {
+  const circleToUpdatedAt: Record<CircleKey, Dayjs | null> = {
     Saikyo: null,
     Shin: null,
     Ha: null,

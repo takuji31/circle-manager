@@ -11,10 +11,7 @@ import {
 } from 'discord-api-types/v9';
 import { CreateNextMonthSurveyPayload } from '../types';
 import { Emoji, MonthSurveyEmoji } from '../../model/emoji';
-import dayjs from 'dayjs';
-import { setupDayjs } from '../../model/date';
-
-setupDayjs();
+import { dayjs } from '../../model/date';
 
 export const CreateNextMonthSurveyMutation = mutationField(
   'createNextMonthSurvey',

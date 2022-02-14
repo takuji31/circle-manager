@@ -2,13 +2,11 @@ import { Guild } from './../../model/guild';
 import { Message } from 'discord.js';
 import { Circle } from '../../model';
 import { crawlUmastagram } from '../../umastagram/crawler';
-import dayjs from 'dayjs';
-import { setupDayjs } from '../../model/date';
+import { dayjs } from '../../model/date';
 
 const urlPattern =
   /https:\/\/umastagram.com\/circle\/grade\/graph\/share\/[a-zA-Z0-9]+/;
 
-setupDayjs();
 export const updateFanCountEvent = async (message: Message, circle: Circle) => {
   if (!message.content.match(/(更新|集計|記録|入力)しました/)) {
     return;

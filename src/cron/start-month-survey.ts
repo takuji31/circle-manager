@@ -11,7 +11,7 @@ import {
   Routes,
 } from 'discord-api-types/v9';
 import { Emoji, MonthSurveyEmoji } from '../model/emoji';
-import dayjs from 'dayjs';
+import { dayjs } from '../model/date';
 
 config();
 

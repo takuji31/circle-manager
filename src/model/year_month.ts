@@ -1,5 +1,4 @@
-import dayjs from 'dayjs';
-import { setupDayjs } from './date';
+import { dayjs } from './date';
 
 export interface StringYearMonth {
   year: string;
@@ -16,8 +15,6 @@ export interface ThisAndNextMonth {
   nextYear: string;
   nextMonth: string;
 }
-
-setupDayjs();
 
 export const thisMonthInt: () => YearMonth = () => {
   const now = dayjs();

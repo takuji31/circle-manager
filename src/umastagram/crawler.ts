@@ -4,8 +4,8 @@ import { Routes } from 'discord-api-types/v9';
 import { createDiscordRestClient } from '../discord';
 import { Circle } from '../model';
 import fetch from 'node-fetch';
-import dayjs, { Dayjs } from 'dayjs';
-import { setupDayjs } from '../model/date';
+import { Dayjs } from 'dayjs';
+import { dayjs } from '../model/date';
 export interface UmastagramPage {
   members: Array<UmastagramMember>;
   circle: UmastagramCircle;
@@ -34,8 +34,6 @@ const toHalfWidthString = (str: string) => {
     .replace('：', ':')
     .replace('　', ' ');
 };
-
-setupDayjs();
 
 export async function crawlUmastagram(
   url: string,

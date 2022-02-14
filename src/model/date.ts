@@ -1,4 +1,4 @@
-import dayjs, { PluginFunc } from 'dayjs';
+import _dayjs, { PluginFunc } from 'dayjs';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
 import isLeapYear from 'dayjs/plugin/isLeapYear';
 import timezone from 'dayjs/plugin/timezone';
@@ -6,6 +6,10 @@ import utc from 'dayjs/plugin/utc';
 import duration from 'dayjs/plugin/duration';
 import arraySupport from 'dayjs/plugin/arraySupport';
 import 'dayjs/locale/ja';
+
+declare global {
+  var _isDayjsSetupCompleted: boolean;
+}
 
 const monthsOneIndexed: PluginFunc<unknown> = (_, dayjsClass, __) => {
   if ((dayjsClass.prototype as any).zeroIndexedMonth) {
@@ -21,21 +25,8 @@ const monthsOneIndexed: PluginFunc<unknown> = (_, dayjsClass, __) => {
   Object.defineProperty(dayjsClass.prototype, 'month', {
     configurable: true,
     enumerable: false,
-    writable: true,
-    value: function (this: dayjs.Dayjs, value?: number) {
-      if (value === undefined) {
-        return baseMonthFn.bind(this)() + 1;
-      } else {
-        value = value - 1;
-        return baseMonthFn.bind(this)(value);
-      }
-    },
-  });
-  Object.defineProperty(dayjsClass.prototype, 'month', {
-    configurable: true,
-    enumerable: false,
-    writable: true,
-    value: function (this: dayjs.Dayjs, value?: number) {
+    writable: false,
+    value: function (this: _dayjs.Dayjs, value?: number) {
       if (value === undefined) {
         return baseMonthFn.bind(this)() + 1;
       } else {
@@ -46,20 +37,22 @@ const monthsOneIndexed: PluginFunc<unknown> = (_, dayjsClass, __) => {
   });
 };
 
-let _dayjsSetupCompleted = false;
-
-export const setupDayjs = () => {
-  if (_dayjsSetupCompleted) {
+(() => {
+  if (globalThis._isDayjsSetupCompleted) {
     return;
   }
-  dayjs.extend(localizedFormat);
-  dayjs.extend(isLeapYear);
-  dayjs.extend(utc);
-  dayjs.extend(timezone);
-  dayjs.extend(monthsOneIndexed);
-  dayjs.extend(duration);
-  dayjs.extend(arraySupport);
-  dayjs.locale('ja');
-  dayjs.tz.setDefault('Asia/Tokyo');
-  _dayjsSetupCompleted = true;
-};
+
+  _dayjs.extend(localizedFormat);
+  _dayjs.extend(isLeapYear);
+  _dayjs.extend(utc);
+  _dayjs.extend(timezone);
+  _dayjs.extend(monthsOneIndexed);
+  _dayjs.extend(duration);
+  _dayjs.extend(arraySupport);
+  _dayjs.locale('ja');
+  _dayjs.tz.setDefault('Asia/Tokyo');
+
+  globalThis._isDayjsSetupCompleted = true;
+})();
+
+export const dayjs: typeof _dayjs = _dayjs;

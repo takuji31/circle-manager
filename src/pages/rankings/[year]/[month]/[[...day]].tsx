@@ -1,8 +1,9 @@
-import dayjs from 'dayjs';
+import { Dayjs } from 'dayjs';
 import { GetServerSideProps, NextPage } from 'next';
 import { isArray } from 'nexus/dist/utils';
 import { ParsedUrlQuery } from 'querystring';
 import { prisma } from '../../../../database';
+import { dayjs } from '../../../../model/date';
 
 const RankingPage: NextPage<{ year: number; month: number; day: number }> = ({
   year,
@@ -34,7 +35,7 @@ export const getServerSideProps: GetServerSideProps<Props, Params> = async ({
   const { year, month, day: dayOrNull } = params;
   let monthStartDate = dayjs([parseInt(year), parseInt(month), 1]);
   let nextMonthStartDate = monthStartDate.add(dayjs.duration({ days: 1 }));
-  let date: dayjs.Dayjs;
+  let date: Dayjs;
   let day: number | null;
   try {
     if (dayOrNull && isArray(dayOrNull) && dayOrNull.length == 1) {

@@ -35,9 +35,7 @@ import Link from '../components/link';
 import { LoadingCheckBox } from '../components/loading_checkbox';
 import { MonthSurveyAnswerValue } from '@prisma/client';
 import { useMutation, useQuery } from 'urql';
-import dayjs from 'dayjs';
-import 'dayjs/locale/ja';
-import { setupDayjs } from '../model/date';
+import { dayjs } from '../model/date';
 
 const Home: NextPage = (props) => {
   const { user, status } = useUser();
@@ -110,7 +108,6 @@ const AdminTopContent = () => {
     if (!expiredAt) {
       return null;
     } else {
-      setupDayjs();
       const date = dayjs(expiredAt);
       return date.format('llll');
     }

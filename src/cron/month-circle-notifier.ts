@@ -4,12 +4,9 @@ import { prisma } from './../database/prisma';
 import { config } from 'dotenv';
 import { sendDirectMessagesIfPossible } from '../discord/message';
 import { monthSurveyAnswerLabel } from '../model/month_survey_answer';
-import dayjs from 'dayjs';
-import { setupDayjs } from '../model/date';
+import { dayjs } from '../model/date';
 
 config();
-
-setupDayjs();
 
 (async () => {
   const isProduction = process.env.NODE_ENV == 'production';
