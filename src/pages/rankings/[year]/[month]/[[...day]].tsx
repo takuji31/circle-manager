@@ -1,9 +1,8 @@
+import dayjs from 'dayjs';
 import { GetServerSideProps, NextPage } from 'next';
 import { isArray } from 'nexus/dist/utils';
-import { Temporal } from 'proposal-temporal';
 import { ParsedUrlQuery } from 'querystring';
 import { prisma } from '../../../../database';
-import { toDate } from '../../../../model/date';
 
 const RankingPage: NextPage<{ year: number; month: number; day: number }> = ({
   year,
@@ -33,15 +32,9 @@ export const getServerSideProps: GetServerSideProps<Props, Params> = async ({
     };
   }
   const { year, month, day: dayOrNull } = params;
-  let monthStartDate = Temporal.PlainDate.from({
-    year: parseInt(year),
-    month: parseInt(month),
-    day: 1,
-  });
-  let nextMonthStartDate = monthStartDate.add(
-    Temporal.Duration.from({ months: 1 })
-  );
-  let date: Temporal.PlainDate;
+  let monthStartDate = dayjs([parseInt(year), parseInt(month), 1]);
+  let nextMonthStartDate = monthStartDate.add(dayjs.duration({ days: 1 }));
+  let date: dayjs.Dayjs;
   let day: number | null;
   try {
     if (dayOrNull && isArray(dayOrNull) && dayOrNull.length == 1) {
@@ -57,8 +50,8 @@ export const getServerSideProps: GetServerSideProps<Props, Params> = async ({
         },
         where: {
           date: {
-            gte: toDate(monthStartDate),
-            lt: toDate(nextMonthStartDate),
+            gte: monthStartDate.toDate(),
+            lt: nextMonthStartDate.toDate(),
           },
         },
       });
@@ -70,7 +63,7 @@ export const getServerSideProps: GetServerSideProps<Props, Params> = async ({
       };
     }
 
-    date = monthStartDate.with({ day });
+    date = monthStartDate.day(day);
   } catch (e) {
     return {
       notFound: true,

@@ -1,6 +1,6 @@
 import { Guild } from './../../model/guild';
 import { Message } from 'discord.js';
-import { Circle, JST } from '../../model';
+import { Circle } from '../../model';
 import { crawlUmastagram } from '../../umastagram/crawler';
 import dayjs from 'dayjs';
 import { setupDayjs } from '../../model/date';
