@@ -79,6 +79,7 @@ type Member {
   pathname: String!
   setupCompleted: Boolean!
   signUp: SignUp
+  status: MemberStatus!
   thisMonthCircle: MonthCircle
   trainerId: String
 }
@@ -92,6 +93,14 @@ type MemberFanCount {
   name: String!
   predicted: BigInt!
   total: BigInt!
+}
+
+enum MemberStatus {
+  Joined
+  Kicked
+  Leaved
+  NotJoined
+  OB
 }
 
 type Month {

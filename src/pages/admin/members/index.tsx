@@ -19,12 +19,14 @@ import { Circle, Circles, getCircleName } from '../../../model';
 import {
   AdminMembersDocument,
   ListedMonthSurveyAnswerFragment,
+  MemberStatus,
   MonthCircle,
 } from '../../../graphql/generated/type';
 import Link, { NextLinkComposed } from '../../../components/link';
 import * as Icons from '@mui/icons-material';
 import { monthSurveyAnswerLabel } from '../../../model/month_survey_answer';
 import { useQuery } from 'urql';
+import { memberStatusLabel } from '../../../model/member';
 
 export interface Props {
   monthCircleNames: Array<string>;
@@ -39,13 +41,9 @@ const MemberList: NextPage<Props> = ({ monthCircleNames }) => {
         width: 200,
       },
       {
-        field: 'circle',
-        headerName: 'サークル名',
+        field: 'memberState',
+        headerName: '所属/状態',
         width: 200,
-        valueFormatter: (params: GridValueFormatterParams) => {
-          const circle = params.value as Circle | null;
-          return circle?.name;
-        },
       },
       {
         field: 'circleRole',
@@ -140,7 +138,7 @@ const MemberList: NextPage<Props> = ({ monthCircleNames }) => {
   );
 
   const [{ data, error, fetching }] = useQuery({ query: AdminMembersDocument });
-  const members = data?.members as GridRowsProp;
+  const members = data?.members;
 
   return (
     <AdminLayout title="メンバー一覧">
@@ -157,7 +155,14 @@ const MemberList: NextPage<Props> = ({ monthCircleNames }) => {
               Toolbar: GridToolbar,
             }}
             autoHeight
-            rows={members}
+            rows={members.map((member) => {
+              return {
+                ...member,
+                memberState: member.circle
+                  ? member.circle.name
+                  : memberStatusLabel(member.status),
+              };
+            })}
             columns={columns}
           />
         </div>

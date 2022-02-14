@@ -96,6 +96,7 @@ export interface NexusGenEnums {
   CircleFilter: "All" | "CircleSelect" | "MonthSurvey"
   CircleKey: "Ha" | "Jo" | "Saikyo" | "Shin"
   CircleRole: "Leader" | "Member" | "SubLeader"
+  MemberStatus: "Joined" | "Kicked" | "Leaved" | "NotJoined" | "OB"
   MonthCircleState: "Ha" | "Jo" | "Kicked" | "Leaved" | "OB" | "Saikyo" | "Shin"
   MonthSurveyAnswerValue: "Leave" | "None" | "Ob" | "Saikyo" | "Umamusume"
 }
@@ -138,6 +139,7 @@ export interface NexusGenObjects {
     name: string; // String!
     pathname: string; // String!
     setupCompleted: boolean; // Boolean!
+    status: NexusGenEnums['MemberStatus']; // MemberStatus!
     trainerId?: string | null; // String
   }
   MemberFanCount: { // root type
@@ -231,6 +233,7 @@ export interface NexusGenFieldTypes {
     pathname: string; // String!
     setupCompleted: boolean; // Boolean!
     signUp: NexusGenRootTypes['SignUp'] | null; // SignUp
+    status: NexusGenEnums['MemberStatus']; // MemberStatus!
     thisMonthCircle: NexusGenRootTypes['MonthCircle'] | null; // MonthCircle
     trainerId: string | null; // String
   }
@@ -353,6 +356,7 @@ export interface NexusGenFieldTypeNames {
     pathname: 'String'
     setupCompleted: 'Boolean'
     signUp: 'SignUp'
+    status: 'MemberStatus'
     thisMonthCircle: 'MonthCircle'
     trainerId: 'String'
   }

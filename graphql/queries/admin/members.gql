@@ -9,6 +9,7 @@ query AdminMembers {
       name
     }
     circleRole
+    status
     thisMonthCircle {
       ...MemberMonthCircle
     }

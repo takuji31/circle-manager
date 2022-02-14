@@ -1,10 +1,4 @@
-import {
-  Circles,
-  nextMonth,
-  nextMonthInt,
-  thisMonth,
-  thisMonthInt,
-} from '../../model';
+import { Circles, nextMonth, nextMonthInt, thisMonthInt } from '../../model';
 import * as Nexus from 'nexus-prisma';
 import { enumType, inputObjectType, objectType } from 'nexus';
 import { Circle } from './circle';
@@ -23,6 +17,7 @@ export const Member = objectType({
     t.field(m.name);
     t.field(m.trainerId);
     t.field(m.setupCompleted);
+    t.field(m.status);
     t.field(m.joinedAt);
     t.field(m.leavedAt);
     t.field(m.circleKey);
@@ -87,6 +82,8 @@ export const Member = objectType({
 });
 
 export const CircleRole = enumType(Nexus.CircleRole);
+
+export const MemberStatus = enumType(Nexus.MemberStatus);
 
 export const UpdateMemberMutationInput = inputObjectType({
   name: 'UpdateMemberMutationInput',
