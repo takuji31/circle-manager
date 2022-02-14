@@ -1,22 +1,21 @@
 import { Circles } from './../model/circle';
 import { config } from 'dotenv';
 import { prisma } from '../database';
-import { Guild, JST, nextMonth, nextMonthInt, thisMonth } from '../model';
+import { Guild, nextMonthInt, thisMonth } from '../model';
 import { stringify } from 'csv-stringify/sync';
 import { createDiscordRestClient } from '../discord';
 import { Routes } from 'discord-api-types/v9';
-import { Temporal } from 'proposal-temporal';
 import {
   CircleKey,
   CircleRole,
   Member,
   MemberFanCount,
   MonthCircle,
-  MonthCircleState,
   MonthSurveyAnswerValue,
 } from '@prisma/client';
-import { toPlainDate } from '../model/date';
 import { monthCircleStateLabel } from '../model/month_circle';
+import { dayjs } from '../model/date';
+import { Dayjs } from 'dayjs';
 
 config();
 
@@ -24,15 +23,13 @@ config();
   const { year, month } = thisMonth();
   const { year: nextMonthYear, month: nextMonthMonth } = nextMonthInt();
 
-  const today = Temporal.now.plainDateISO(JST);
-
   const monthSurvey = await prisma.monthSurvey.findFirst({
     where: { year: nextMonthYear.toString(), month: nextMonthMonth.toString() },
   });
 
+  const now = dayjs();
   const useMonthSurveyAnswer =
-    monthSurvey != null &&
-    Temporal.PlainDate.compare(today, toPlainDate(monthSurvey.expiredAt)) > 0;
+    monthSurvey != null && now.isAfter(monthSurvey.expiredAt);
 
   const groupBy = await prisma.memberFanCount.groupBy({
     _max: {
@@ -41,20 +38,11 @@ config();
     by: ['circle'],
     where: {
       date: {
-        gte: new Date(
-          Temporal.PlainDate.from({
-            year: parseInt(year),
-            month: parseInt(month),
-            day: 1,
-          }).toString()
-        ),
-        lt: new Date(
-          Temporal.PlainDate.from({
-            year: nextMonthYear,
-            month: nextMonthMonth,
-            day: 1,
-          }).toString()
-        ),
+        gte: now.startOf('month').toDate(),
+        lt: now
+          .startOf('month')
+          .add(dayjs.duration({ months: 1 }))
+          .toDate(),
       },
     },
   });
@@ -64,7 +52,7 @@ config();
       member: (Member & { monthCircles: Array<MonthCircle> }) | null;
     }
   > = [];
-  const circleToUpdatedAt: Record<CircleKey, Temporal.PlainDate | null> = {
+  const circleToUpdatedAt: Record<CircleKey, Dayjs | null> = {
     Saikyo: null,
     Shin: null,
     Ha: null,
@@ -77,12 +65,7 @@ config();
       continue;
     }
 
-    const updatedAt = Temporal.PlainDate.from({
-      year: date.getFullYear(),
-      month: date.getMonth() + 1,
-      day: date.getDate(),
-    });
-    circleToUpdatedAt[circle] = updatedAt;
+    circleToUpdatedAt[circle] = dayjs(date);
 
     if (!useMonthSurveyAnswer && circle == CircleKey.Saikyo) {
       continue;
@@ -134,7 +117,7 @@ config();
           .map((entry) => {
             const [key, updatedAt] = entry;
             return `${Circles.findByCircleKey(key as CircleKey).name} : ${
-              updatedAt ? updatedAt.toLocaleString('ja-JP') : '更新なし'
+              updatedAt ? updatedAt.format('L') : '更新なし'
             }`;
           })
           .join('\n'),

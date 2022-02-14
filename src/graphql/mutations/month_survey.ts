@@ -1,6 +1,5 @@
 import { Guild } from './../../model/guild';
 import { Member, MemberStatus } from '@prisma/client';
-import { Temporal } from 'proposal-temporal';
 import { createDiscordRestClient } from '../../discord';
 import { nextMonthInt } from '../../model';
 import { MonthSurvey as _MonthSurvey } from 'nexus-prisma';
@@ -12,6 +11,7 @@ import {
 } from 'discord-api-types/v9';
 import { CreateNextMonthSurveyPayload } from '../types';
 import { Emoji, MonthSurveyEmoji } from '../../model/emoji';
+import { dayjs } from '../../model/date';
 
 export const CreateNextMonthSurveyMutation = mutationField(
   'createNextMonthSurvey',
@@ -23,16 +23,10 @@ export const CreateNextMonthSurveyMutation = mutationField(
       }
 
       const { year, month } = nextMonthInt();
-      const expiredAt = Temporal.PlainDate.from({
-        year,
-        month,
-        day: 1,
-      })
-        .subtract(Temporal.Duration.from({ days: 12 }))
-        .toZonedDateTime({
-          timeZone: 'Asia/Tokyo',
-          plainTime: Temporal.PlainTime.from({ hour: 0, minute: 0, second: 0 }),
-        });
+      const expiredAt = dayjs()
+        .startOf('month')
+        .add(dayjs.duration({ months: 1 }))
+        .subtract(dayjs.duration({ days: 12 }));
 
       if (
         await prisma.monthSurvey.count({
@@ -57,16 +51,7 @@ export const CreateNextMonthSurveyMutation = mutationField(
           '対象外の方',
           'このメッセージが送信された時点で加入申請中のメンバー/来月復帰予定のないOB'
         )
-        .addField(
-          '期限',
-          `${expiredAt.toLocaleString('ja-JP', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-            weekday: 'short',
-            hour: 'numeric',
-          })}まで`
-        )
+        .addField('期限', `${expiredAt.format('llll')}まで`)
         .addField('回答方法', 'このメッセージにリアクション');
 
       embed.addField('西京ファーム', Emoji.a, true);
@@ -98,7 +83,7 @@ export const CreateNextMonthSurveyMutation = mutationField(
           id: messageId,
           year: year.toString(),
           month: month.toString(),
-          expiredAt: new Date(expiredAt.epochMilliseconds),
+          expiredAt: expiredAt.toDate(),
         },
       });
 

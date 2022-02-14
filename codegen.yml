@@ -5,11 +5,11 @@ generates:
   src/graphql/generated/type.ts:
     plugins:
       - add:
-          content: "import { Temporal } from 'proposal-temporal';"
+          content: "import { Dayjs } from 'dayjs';"
       - 'typescript'
       - 'typescript-operations'
       - typed-document-node
     config:
       dedupeFragments: true
       scalars:
-        Date: 'Temporal.PlainDate'
+        Date: Dayjs

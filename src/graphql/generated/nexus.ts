@@ -5,6 +5,7 @@
 
 
 import type { Context } from "./../context"
+import type { Dayjs } from "dayjs"
 import type { core } from "nexus"
 declare global {
   interface NexusGenCustomInputMethods<TypeName extends string> {
@@ -107,7 +108,7 @@ export interface NexusGenScalars {
   ID: string
   BigInt: any
   Bytes: any
-  Date: any
+  Date: Dayjs
   DateTime: any
   Decimal: any
   Json: any

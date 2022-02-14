@@ -8,15 +8,8 @@ import {
   UpdateMemberMonthCirclePayload,
   UpdateMonthCircleMutationInput,
 } from '../types';
-import {
-  Circles,
-  isCircleKey,
-  JST,
-  nextMonthInt,
-  thisMonthInt,
-} from '../../model';
-import { toDate, toDateTime } from '../../model/date';
-import { Temporal } from 'proposal-temporal';
+import { Circles, isCircleKey, nextMonthInt } from '../../model';
+import { dayjs } from '../../model/date';
 import {
   CircleKey,
   CircleRole,
@@ -215,13 +208,14 @@ export const CreateMonthCirclesMutation = mutationField(
     type: nonNull(CreateMonthCirclesPayload),
     async resolve(_, __, { prisma }) {
       const { year, month } = nextMonthInt();
-      const { year: thisMonthYear, month: thisMonth } = thisMonthInt();
+      const now = dayjs();
+
       const monthSurvey = await prisma.monthSurvey.findFirst({
         where: {
           year: year.toString(),
           month: month.toString(),
           expiredAt: {
-            lte: toDateTime(Temporal.now.zonedDateTimeISO(JST)),
+            lte: now.toDate(),
           },
         },
       });
@@ -315,20 +309,11 @@ export const CreateMonthCirclesMutation = mutationField(
             fanCounts: {
               where: {
                 date: {
-                  gte: toDate(
-                    Temporal.PlainDate.from({
-                      year: thisMonth,
-                      month: thisMonthYear,
-                      day: 1,
-                    })
-                  ),
-                  lt: toDate(
-                    Temporal.PlainDate.from({
-                      year,
-                      month,
-                      day: 1,
-                    })
-                  ),
+                  gte: now.startOf('month').toDate(),
+                  lt: now
+                    .startOf('month')
+                    .add(dayjs.duration({ months: 1 }))
+                    .toDate(),
                 },
               },
               orderBy: {

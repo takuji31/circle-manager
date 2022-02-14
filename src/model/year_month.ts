@@ -1,5 +1,4 @@
-import { Temporal } from 'proposal-temporal';
-import { JST } from './time';
+import { dayjs } from './date';
 
 export interface StringYearMonth {
   year: string;
@@ -18,21 +17,20 @@ export interface ThisAndNextMonth {
 }
 
 export const thisMonthInt: () => YearMonth = () => {
-  const yearMonth = Temporal.now.zonedDateTimeISO(JST).toPlainYearMonth();
+  const now = dayjs();
   return {
-    year: yearMonth.year,
-    month: yearMonth.month,
+    year: now.year(),
+    month: now.month(),
   };
 };
 
 export const nextMonthInt: () => YearMonth = () => {
-  const yearMonth = Temporal.now
-    .zonedDateTimeISO(JST)
-    .toPlainYearMonth()
-    .add(Temporal.Duration.from({ months: 1 }));
+  const nextMonth = dayjs()
+    .startOf('month')
+    .add(dayjs.duration({ months: 1 }));
   return {
-    year: yearMonth.year,
-    month: yearMonth.month,
+    year: nextMonth.year(),
+    month: nextMonth.month(),
   };
 };
 

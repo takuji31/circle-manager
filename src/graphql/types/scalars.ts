@@ -1,20 +1,25 @@
+import { Dayjs } from 'dayjs';
 import { Kind } from 'graphql';
 import { scalarType } from 'nexus';
-import { Temporal } from 'proposal-temporal';
+import { dayjs } from '../../model/date';
 
 export const DateScalar = scalarType({
   name: 'Date',
   asNexusMethod: 'date',
   description: 'ISO8601 Date string',
+  sourceType: {
+    module: 'dayjs',
+    export: 'Dayjs',
+  },
   parseValue(inputValue) {
-    return Temporal.PlainDate.from(inputValue as string);
+    return dayjs(inputValue as string);
   },
   serialize(outputValue) {
-    return (outputValue as Temporal.PlainDate).toString();
+    return (outputValue as Dayjs).toJSON();
   },
   parseLiteral(ast) {
     if (ast.kind === Kind.STRING) {
-      return Temporal.PlainDate.from(ast.value);
+      return dayjs(ast.value);
     }
     return null;
   },

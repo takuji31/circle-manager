@@ -1,4 +1,4 @@
-import { Temporal } from 'proposal-temporal';
+import { Dayjs } from 'dayjs';
 import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
@@ -20,7 +20,7 @@ export type Scalars = {
   /** The `Byte` scalar type represents byte value as a Buffer */
   Bytes: any;
   /** ISO8601 Date string */
-  Date: Temporal.PlainDate;
+  Date: Dayjs;
   /** A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar. */
   DateTime: any;
   /** An arbitrary-precision Decimal type */

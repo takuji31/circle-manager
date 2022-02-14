@@ -1,10 +1,9 @@
-import { Circles } from './../model/circle';
 import { nextMonth } from './../model/year_month';
 import { prisma } from './../database/prisma';
 import { config } from 'dotenv';
 import { sendDirectMessagesIfPossible } from '../discord/message';
-import { Temporal } from 'proposal-temporal';
 import { MonthSurveyAnswerValue } from '@prisma/client';
+import { dayjs } from '../model/date';
 
 config();
 
@@ -32,20 +31,7 @@ config();
     return;
   }
   const messages: Array<string> = [];
-  const expiredAt = Temporal.Instant.fromEpochMilliseconds(
-    monthSurvey.expiredAt.getTime()
-  )
-    .toZonedDateTime({
-      timeZone: 'Asia/Tokyo',
-      calendar: 'iso8601',
-    })
-    .toLocaleString('ja-JP', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      weekday: 'short',
-      hour: 'numeric',
-    });
+  const expiredAt = dayjs(monthSurvey.expiredAt).format('llll');
   await sendDirectMessagesIfPossible(
     members,
     () => {

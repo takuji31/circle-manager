@@ -1,4 +1,4 @@
-import type { GetServerSideProps, NextPage } from 'next';
+import type { NextPage } from 'next';
 import * as React from 'react';
 import {
   Box,
@@ -24,19 +24,18 @@ import {
   TableBody,
   TableCell,
 } from '@mui/material';
-import { nextMonthInt, thisMonthInt, UserWithSession } from '../model';
-import MemberMonthCircle from '../components/member_month_circle';
+import { UserWithSession } from '../model';
 import {
   AdminTopDocument,
   CreateNextMonthSurveyDocument,
   UpdateSignUpDocument,
 } from '../graphql/generated/type';
 import { useMemo } from 'react';
-import { Temporal } from 'proposal-temporal';
 import Link from '../components/link';
 import { LoadingCheckBox } from '../components/loading_checkbox';
 import { MonthSurveyAnswerValue } from '@prisma/client';
 import { useMutation, useQuery } from 'urql';
+import { dayjs } from '../model/date';
 
 const Home: NextPage = (props) => {
   const { user, status } = useUser();
@@ -104,25 +103,15 @@ const AdminTopContent = () => {
       ];
     }
   }, [answers]);
-  // const expiredAtString = useMemo(() => {
-  //   const expiredAt = data?.nextMonth?.survey?.expiredAt as string;
-  //   if (!expiredAt) {
-  //     return null;
-  //   } else {
-  //     const zonedDateTime = Temporal.Instant.from(expiredAt).toZonedDateTime({
-  //       timeZone: 'Asia/Tokyo',
-  //       calendar: 'iso8601',
-  //     });
-  //     return zonedDateTime.toLocaleString('ja-JP', {
-  //       year: 'numeric',
-  //       month: 'long',
-  //       day: '2-digit',
-  //       hour: '2-digit',
-  //       minute: '2-digit',
-  //       second: '2-digit',
-  //     });
-  //   }
-  // }, [data?.nextMonth?.survey?.expiredAt]);
+  const expiredAtString = useMemo(() => {
+    const expiredAt = data?.nextMonth?.survey?.expiredAt as string;
+    if (!expiredAt) {
+      return null;
+    } else {
+      const date = dayjs(expiredAt);
+      return date.format('llll');
+    }
+  }, [data?.nextMonth?.survey?.expiredAt]);
 
   const [open, setOpen] = React.useState(false);
   const theme = useTheme();
@@ -227,7 +216,7 @@ const AdminTopContent = () => {
               {nextMonth.survey && (
                 <>
                   <Typography variant="body1">
-                    開始済み{/* (期限: {expiredAtString ?? ''}) */}
+                    開始済み(期限: {expiredAtString ?? ''})
                   </Typography>
                   <TableContainer>
                     <TableHead>

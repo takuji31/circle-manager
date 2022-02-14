@@ -1,6 +1,4 @@
-import { Circles, getCircleName } from './../model/circle';
 import { ReactionHandlerWithData } from './types';
-import { Temporal } from 'proposal-temporal';
 import { prisma } from '../database';
 import {
   CircleKey,
@@ -27,7 +25,7 @@ export const monthSurveyReaction: ReactionHandlerWithData<MonthSurvey> = async (
     return;
   }
 
-  if (data.expiredAt.getTime() <= Temporal.now.instant().epochMilliseconds) {
+  if (data.expiredAt.getTime() <= new Date().getTime()) {
     await user.send('在籍希望アンケートの期限が過ぎています。');
     return;
   }

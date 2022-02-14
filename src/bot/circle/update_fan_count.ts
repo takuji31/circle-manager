@@ -1,8 +1,8 @@
 import { Guild } from './../../model/guild';
 import { Message } from 'discord.js';
-import { Circle, JST } from '../../model';
-import { Temporal } from 'proposal-temporal';
+import { Circle } from '../../model';
 import { crawlUmastagram } from '../../umastagram/crawler';
+import { dayjs } from '../../model/date';
 
 const urlPattern =
   /https:\/\/umastagram.com\/circle\/grade\/graph\/share\/[a-zA-Z0-9]+/;
@@ -36,13 +36,10 @@ export const updateFanCountEvent = async (message: Message, circle: Circle) => {
         before: message.id,
         limit: 100,
       });
-      const today = Temporal.now.plainDateISO(JST);
+      const today = dayjs();
       const umastagramUrlMessage = pastMessages.find((msg) => {
-        return (
-          urlPattern.test(msg.content) &&
-          today.year == msg.createdAt.getFullYear() &&
-          today.month == msg.createdAt.getMonth() + 1
-        );
+        const createdAt = dayjs(msg.createdAt);
+        return urlPattern.test(msg.content) && today.isSame(createdAt, 'month');
       });
       if (!umastagramUrlMessage) {
         throw new Error('UmastagramのURLが直近100件のメッセージにありません。');
