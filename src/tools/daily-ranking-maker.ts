@@ -146,7 +146,8 @@ config();
                 } else {
                   ranking = rankingNumber++;
                 }
-                const monthCircleState = fanCount.member?.monthCircles[0].state;
+                const monthCircleState =
+                  fanCount.member?.monthCircles[0]?.state;
                 return [
                   idx + 1,
                   ranking,
