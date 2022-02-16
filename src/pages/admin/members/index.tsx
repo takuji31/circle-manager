@@ -79,7 +79,9 @@ const MemberList: NextPage<Props> = ({ monthCircleNames }) => {
         valueFormatter: (params: GridValueFormatterParams) => {
           const value = params.value as ListedMonthSurveyAnswerFragment;
           const answer = value?.value;
-          if (!answer || answer == 'None') {
+          if (!answer) {
+            return '対象外';
+          } else if (answer == 'None') {
             return '未回答';
           } else {
             return monthSurveyAnswerLabel(answer);
