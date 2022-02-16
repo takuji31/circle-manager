@@ -39,6 +39,18 @@ export const UpdateMembers = mutationField('updateMembers', {
           circleKey: null,
         },
       }),
+      prisma.member.updateMany({
+        where: {
+          id: {
+            notIn: [...members.map((member) => member.user?.id!)],
+          },
+          status: MemberStatus.Leaved,
+          leavedAt: null,
+        },
+        data: {
+          leavedAt: new Date(),
+        },
+      }),
       ...members.map((member) => {
         const user = member.user!;
         const circleIdOrNull = member.roles.filter(
