@@ -3,7 +3,7 @@ import { config } from 'dotenv';
 import { Guild } from '../model/guild';
 import { Member, MemberStatus } from '@prisma/client';
 import { createDiscordRestClient } from '../discord';
-import { nextMonth } from '../model';
+import { nextMonth, nextMonthInt } from '../model';
 import { MonthSurvey as _MonthSurvey } from 'nexus-prisma';
 import { MessageEmbed } from 'discord.js';
 import {
@@ -16,7 +16,7 @@ import { dayjs } from '../model/date';
 config();
 
 (async () => {
-  const { year, month } = nextMonth();
+  const { year, month } = nextMonthInt();
   const expiredAt = dayjs()
     .startOf('month')
     .add(dayjs.duration({ months: 1 }))

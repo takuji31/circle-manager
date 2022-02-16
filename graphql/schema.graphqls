@@ -147,11 +147,11 @@ type MonthSurvey {
   id: ID!
   kick: [MonthCircle!]!
   leave: [MonthCircle!]!
-  month: String!
+  month: Int!
   monthSurveyAnswers: [MonthSurveyAnswer!]!
   move: [MonthCircle!]!
   noAnswerMembers: [Member!]!
-  year: String!
+  year: Int!
 }
 
 """在籍希望アンケートの回答"""
@@ -159,9 +159,9 @@ type MonthSurveyAnswer {
   circleKey: CircleKey!
   id: ID!
   member: Member!
-  month: String!
+  month: Int!
   value: MonthSurveyAnswerValue
-  year: String!
+  year: Int!
 }
 
 enum MonthSurveyAnswerValue {
@@ -187,7 +187,7 @@ type Query {
   member(id: String, pathname: String): Member
   members: [Member!]!
   monthCircle(monthCircleId: String!): MonthCircle
-  monthSurvey(month: String!, year: String!): MonthSurvey
+  monthSurvey(month: Int!, year: Int!): MonthSurvey
   nextMonth: Month!
   signUps: [SignUp!]!
   siteMetadata: SiteMetadata!

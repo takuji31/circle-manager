@@ -68,8 +68,8 @@ model MonthCircle {
 /// 在籍希望アンケート
 model MonthSurvey {
   id        String   @id @db.VarChar(255) /// アンケートのメッセージID
-  year      String   @db.VarChar(4)
-  month     String   @db.VarChar(2)
+  year      Int
+  month     Int
   expiredAt DateTime
 
   @@unique([year, month])
@@ -78,8 +78,8 @@ model MonthSurvey {
 /// 在籍希望アンケートの回答
 model MonthSurveyAnswer {
   id        String                  @id @default(uuid()) @db.VarChar(255)
-  year      String                  @db.Char(4)
-  month     String                  @db.Char(2)
+  year      Int
+  month     Int
   memberId  String                  @db.VarChar(255)
   member    Member                  @relation(fields: [memberId], references: [id])
   circleKey CircleKey

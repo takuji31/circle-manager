@@ -7,7 +7,6 @@ import {
   GridColDef,
   GridRenderCellParams,
   GridRowParams,
-  GridRowsProp,
   GridToolbar,
   GridValueFormatterParams,
 } from '@mui/x-data-grid';
@@ -19,7 +18,6 @@ import { Circle, Circles, getCircleName } from '../../../model';
 import {
   AdminMembersDocument,
   ListedMonthSurveyAnswerFragment,
-  MemberStatus,
   MonthCircle,
 } from '../../../graphql/generated/type';
 import Link, { NextLinkComposed } from '../../../components/link';
