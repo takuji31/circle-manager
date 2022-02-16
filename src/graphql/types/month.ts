@@ -14,8 +14,8 @@ export const Month = objectType({
         return prisma.monthSurvey.findUnique({
           where: {
             year_month: {
-              year: year.toString(),
-              month: month.toString(),
+              year,
+              month,
             },
           },
         });

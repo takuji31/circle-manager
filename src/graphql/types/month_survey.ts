@@ -17,11 +17,11 @@ export const MonthSurvey = objectType({
 
     t.field('move', {
       type: nonNull(list(nonNull(MonthCircle))),
-      async resolve(parent, _, { prisma }) {
+      async resolve({ year, month }, _, { prisma }) {
         const monthCircles = await prisma.monthCircle.findMany({
           where: {
-            year: parseInt(parent.year),
-            month: parseInt(parent.month),
+            year,
+            month,
             state: {
               notIn: ['Kicked', 'Leaved', 'OB'],
             },
@@ -40,11 +40,11 @@ export const MonthSurvey = objectType({
 
     t.field('leave', {
       type: nonNull(list(nonNull(MonthCircle))),
-      async resolve(parent, _, { prisma }) {
+      async resolve({ year, month }, _, { prisma }) {
         return prisma.monthCircle.findMany({
           where: {
-            year: parseInt(parent.year),
-            month: parseInt(parent.month),
+            year,
+            month,
             state: {
               in: ['Leaved', 'OB'],
             },
@@ -58,11 +58,11 @@ export const MonthSurvey = objectType({
 
     t.field('kick', {
       type: nonNull(list(nonNull(MonthCircle))),
-      async resolve(parent, _, { prisma }) {
+      async resolve({ year, month }, _, { prisma }) {
         return prisma.monthCircle.findMany({
           where: {
-            year: parseInt(parent.year),
-            month: parseInt(parent.month),
+            year,
+            month,
             state: 'Kicked',
           },
           orderBy: {
@@ -74,14 +74,14 @@ export const MonthSurvey = objectType({
 
     t.field('answers', {
       type: nonNull(list(nonNull(MonthCircle))),
-      resolve(parent, _, { prisma }) {
+      resolve({ year, month }, _, { prisma }) {
         return prisma.monthCircle.findMany({
           where: {
             member: {
               circleKey: { not: null },
             },
-            year: parseInt(parent.year),
-            month: parseInt(parent.month),
+            year,
+            month,
             state: {
               not: 'Kicked',
             },
@@ -91,7 +91,7 @@ export const MonthSurvey = objectType({
     });
     t.field('noAnswerMembers', {
       type: nonNull(list(nonNull(Member))),
-      resolve(parent, _, { prisma }) {
+      resolve({ year, month }, _, { prisma }) {
         return prisma.member.findMany({
           where: {
             AND: [
@@ -103,8 +103,8 @@ export const MonthSurvey = objectType({
               {
                 monthCircles: {
                   some: {
-                    year: parseInt(parent.year),
-                    month: parseInt(parent.month),
+                    year,
+                    month,
                     state: 'Kicked',
                   },
                 },

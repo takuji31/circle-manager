@@ -21,10 +21,10 @@ config();
 
 (async () => {
   const { year, month } = thisMonth();
-  const { year: nextMonthYear, month: nextMonthMonth } = nextMonthInt();
+  const nextMonth = nextMonthInt();
 
   const monthSurvey = await prisma.monthSurvey.findFirst({
-    where: { year: nextMonthYear.toString(), month: nextMonthMonth.toString() },
+    where: nextMonth,
   });
 
   const now = dayjs();
@@ -80,8 +80,7 @@ config();
               member: {
                 monthSurveyAnswer: {
                   some: {
-                    year: nextMonthYear.toString(),
-                    month: nextMonthMonth.toString(),
+                    ...nextMonth,
                     value: MonthSurveyAnswerValue.Umamusume,
                   },
                 },
@@ -93,10 +92,7 @@ config();
         member: {
           include: {
             monthCircles: {
-              where: {
-                year: nextMonthYear,
-                month: nextMonthMonth,
-              },
+              where: nextMonth,
               take: 1,
             },
           },

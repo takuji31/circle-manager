@@ -72,7 +72,7 @@ export const Member = objectType({
           .findUnique({ where: { id } })
           .monthSurveyAnswer({
             where: {
-              ...nextMonth(),
+              ...nextMonthInt(),
             },
           })
           .then((values) => values[0]);

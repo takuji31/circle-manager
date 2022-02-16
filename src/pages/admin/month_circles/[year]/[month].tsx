@@ -33,7 +33,7 @@ interface Props {
 export const MonthCircleList: NextPage<Props> = ({ year, month }) => {
   const [{ data, error }] = useQuery({
     query: MonthSurveyDocument,
-    variables: { year, month },
+    variables: { year: parseInt(year), month: parseInt(month) },
   });
   const monthSurvey = data?.monthSurvey;
   if (error) {
@@ -202,7 +202,12 @@ export const getServerSideProps = getServerSidePropsWithUrql<Props, PathParams>(
     const year = params?.year as string;
     const month = params?.month as string;
 
-    await urql.query(MonthSurveyDocument, { year, month }).toPromise();
+    await urql
+      .query(MonthSurveyDocument, {
+        year: parseInt(year),
+        month: parseInt(month),
+      })
+      .toPromise();
 
     return {
       props: {

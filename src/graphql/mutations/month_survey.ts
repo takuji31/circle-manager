@@ -30,7 +30,7 @@ export const CreateNextMonthSurveyMutation = mutationField(
 
       if (
         await prisma.monthSurvey.count({
-          where: { year: year.toString(), month: month.toString() },
+          where: { year, month },
         })
       ) {
         throw new Error('Next month survey already started');
@@ -81,8 +81,8 @@ export const CreateNextMonthSurveyMutation = mutationField(
       const monthSurvey = await prisma.monthSurvey.create({
         data: {
           id: messageId,
-          year: year.toString(),
-          month: month.toString(),
+          year,
+          month,
           expiredAt: expiredAt.toDate(),
         },
       });
@@ -100,8 +100,8 @@ export const CreateNextMonthSurveyMutation = mutationField(
         data: members.map(({ id, circleKey }: Member) => ({
           memberId: id,
           circleKey: circleKey!!,
-          year: year.toString(),
-          month: month.toString(),
+          year,
+          month,
         })),
         skipDuplicates: true,
       });

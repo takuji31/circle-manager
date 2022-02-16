@@ -1,4 +1,4 @@
-query MonthSurvey($year: String!, $month: String!) {
+query MonthSurvey($year: Int!, $month: Int!) {
   monthSurvey(year: $year, month: $month) {
     id
     year

@@ -212,8 +212,8 @@ export const CreateMonthCirclesMutation = mutationField(
 
       const monthSurvey = await prisma.monthSurvey.findFirst({
         where: {
-          year: year.toString(),
-          month: month.toString(),
+          year,
+          month,
           expiredAt: {
             lte: now.toDate(),
           },
@@ -227,8 +227,8 @@ export const CreateMonthCirclesMutation = mutationField(
         include: {
           monthSurveyAnswer: {
             where: {
-              year: year.toString(),
-              month: month.toString(),
+              year,
+              month,
             },
             take: 1,
           },
@@ -236,15 +236,15 @@ export const CreateMonthCirclesMutation = mutationField(
         where: {
           monthCircles: {
             none: {
-              year: year,
-              month: month,
+              year,
+              month,
               locked: true,
             },
           },
           monthSurveyAnswer: {
             some: {
-              year: year.toString(),
-              month: month.toString(),
+              year,
+              month,
               value: {
                 in: ['Leave', 'Ob', 'None', 'Saikyo'],
               },
@@ -258,8 +258,8 @@ export const CreateMonthCirclesMutation = mutationField(
           circleRole: CircleRole.Leader,
           monthSurveyAnswer: {
             some: {
-              year: year.toString(),
-              month: month.toString(),
+              year,
+              month,
               value: {
                 notIn: ['Leave', 'Ob', 'None', 'Saikyo'],
               },
@@ -274,8 +274,8 @@ export const CreateMonthCirclesMutation = mutationField(
             id: true,
           },
           where: {
-            year: year.toString(),
-            month: month.toString(),
+            year,
+            month,
             value: MonthSurveyAnswerValue.Umamusume,
           },
         })
@@ -328,8 +328,8 @@ export const CreateMonthCirclesMutation = mutationField(
             },
             monthSurveyAnswer: {
               some: {
-                year: year.toString(),
-                month: month.toString(),
+                year,
+                month,
                 value: MonthSurveyAnswerValue.Umamusume,
               },
             },

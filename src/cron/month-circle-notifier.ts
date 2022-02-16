@@ -1,5 +1,4 @@
-import { Circles } from './../model/circle';
-import { nextMonth } from './../model/year_month';
+import { nextMonthInt } from './../model/year_month';
 import { prisma } from './../database/prisma';
 import { config } from 'dotenv';
 import { sendDirectMessagesIfPossible } from '../discord/message';
@@ -10,7 +9,7 @@ config();
 
 (async () => {
   const isProduction = process.env.NODE_ENV == 'production';
-  const month = nextMonth();
+  const month = nextMonthInt();
   const members = await prisma.member.findMany({
     include: {
       monthSurveyAnswer: {
