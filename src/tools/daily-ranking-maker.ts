@@ -134,7 +134,7 @@ config();
             ],
             ...memberFanCounts
               //TODO: int
-              .sort((a, b) => parseInt((b.predicted - a.predicted).toString()))
+              .sort((a, b) => parseInt((b.avg - a.avg).toString()))
               .map((fanCount, idx) => {
                 let ranking: number;
                 if (fanCount.member?.circleRole == CircleRole.Leader) {
