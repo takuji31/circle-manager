@@ -336,9 +336,7 @@ export const CreateMonthCirclesMutation = mutationField(
           },
         })
       ).sort((a, b) =>
-        parseInt(
-          (b.fanCounts[0].predicted - a.fanCounts[0].predicted).toString()
-        )
+        parseInt((b.fanCounts[0].avg - a.fanCounts[0].avg).toString())
       );
 
       await prisma.$transaction([
