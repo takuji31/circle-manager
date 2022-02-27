@@ -1,10 +1,11 @@
 import { Guild } from './../../model/guild';
 import { Routes } from 'discord-api-types/v9';
 import { MonthCircle as _MonthCircle } from 'nexus-prisma';
-import { intArg, mutationField, nonNull, stringArg } from 'nexus';
+import { mutationField, nonNull } from 'nexus';
 import { createDiscordRestClient } from '../../discord';
 import {
   CreateMonthCirclesPayload,
+  UpdateMemberMonthCircleMutationInput,
   UpdateMemberMonthCirclePayload,
   UpdateMonthCircleMutationInput,
 } from '../types';
@@ -13,6 +14,7 @@ import { dayjs } from '../../model/date';
 import {
   CircleKey,
   CircleRole,
+  MemberStatus,
   MonthCircleState,
   MonthSurveyAnswerValue,
 } from '@prisma/client';
@@ -26,14 +28,15 @@ export const UpdateMemberMonthCircleMutation = mutationField(
   {
     type: UpdateMemberMonthCirclePayload,
     args: {
-      memberId: nonNull(stringArg()),
-      year: nonNull(intArg()),
-      month: nonNull(intArg()),
-      circleId: nonNull(stringArg()),
+      input: nonNull(UpdateMemberMonthCircleMutationInput.asArg()),
     },
-    async resolve(_, { year, month, memberId, circleId }, { user, prisma }) {
-      if (user?.id != memberId && !user?.isAdmin) {
-        throw new Error("Cannot update this user's month circle.");
+    async resolve(
+      _,
+      { input: { year, month, memberId, state, locked } },
+      { user, prisma }
+    ) {
+      if (!user?.isAdmin) {
+        throw new Error('Cannot update');
       }
       const member = await prisma.member.findUnique({
         where: { id: memberId },
@@ -43,58 +46,39 @@ export const UpdateMemberMonthCircleMutation = mutationField(
         throw new Error('member not found');
       }
 
-      const { circleKey: currentCircleKey } = member;
       let monthCircle = await prisma.monthCircle.findUnique({
         where: { year_month_memberId: { memberId, year, month } },
       });
 
-      const circle = Circles.findByRawId(circleId);
-
-      if (!circle) {
-        throw new Error(`Unknown circle id ${circleId}`);
+      if (!monthCircle && !state) {
+        throw new Error('Cannot create without state');
       }
 
-      // TODO: MonthCircleStateで更新できるようにする
-      if (currentCircleKey) {
-        monthCircle = await prisma.monthCircle.upsert({
-          where: {
-            year_month_memberId: {
-              year,
-              month,
-              memberId,
-            },
-          },
-          create: {
-            year,
-            month,
-            memberId,
-            state: currentCircleKey,
-          },
-          update: {
-            year,
-            month,
-            memberId,
-            state: currentCircleKey,
-          },
-        });
-      } else if (user.isAdmin) {
+      if (
+        member.status == MemberStatus.Leaved ||
+        member.status == MemberStatus.Kicked
+      ) {
+        throw new Error('This member was leaved');
+      }
+
+      if (monthCircle) {
         monthCircle = await prisma.monthCircle.update({
-          where: {
-            year_month_memberId: {
-              year,
-              month,
-              memberId,
-            },
-          },
+          where: { year_month_memberId: { year, month, memberId } },
           data: {
-            year,
-            month,
-            memberId,
-            state: circle.key,
+            state: state ?? undefined,
+            locked: locked ?? undefined,
           },
         });
       } else {
-        throw new Error('This member was leaved');
+        monthCircle = await prisma.monthCircle.create({
+          data: {
+            memberId,
+            year,
+            month,
+            state: state!,
+            locked: locked ?? false,
+          },
+        });
       }
 
       return {

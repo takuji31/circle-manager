@@ -14,7 +14,7 @@ import { GetServerSideProps, NextPage } from 'next';
 import { getSession } from 'next-auth/react';
 import React, { useMemo } from 'react';
 import { AdminLayout } from '../../../components/admin_filter';
-import { Circle, Circles, getCircleName } from '../../../model';
+import { Circle, Circles, getCircleName, nextMonthInt } from '../../../model';
 import {
   AdminMembersDocument,
   ListedMonthSurveyAnswerFragment,
@@ -25,6 +25,7 @@ import * as Icons from '@mui/icons-material';
 import { monthSurveyAnswerLabel } from '../../../model/month_survey_answer';
 import { useQuery } from 'urql';
 import { memberStatusLabel } from '../../../model/member';
+import { monthCircleStateLabel } from '../../../model/month_circle';
 
 export interface Props {
   monthCircleNames: Array<string>;
@@ -94,21 +95,21 @@ const MemberList: NextPage<Props> = ({ monthCircleNames }) => {
         valueOptions: monthCircleNames,
         valueFormatter: (params: GridValueFormatterParams) => {
           const value = params.value as MonthCircle;
-          if (!value || value.circle?.id == Circles.specialIds.noAnswer) {
+          if (!value) {
             return '未確定';
           } else {
-            return value.circle ? getCircleName(value.circle) : '';
+            return value.state ? monthCircleStateLabel(value.state) : '未確定';
           }
         },
         renderCell: (params: GridRenderCellParams) => {
           const value = params.value as MonthCircle;
-
-          if (!value) {
-            return params.formattedValue;
-          }
+          const pathname = params.row.pathname;
+          const { year, month } = nextMonthInt();
 
           return (
-            <Link href={`/month_circles/${value.id}`}>
+            <Link
+              href={`/admin/members/${pathname}/month_circles/${year}/${month}`}
+            >
               {params.formattedValue}
             </Link>
           );

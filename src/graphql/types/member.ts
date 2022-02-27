@@ -1,6 +1,6 @@
 import { Circles, nextMonth, nextMonthInt, thisMonthInt } from '../../model';
 import * as Nexus from 'nexus-prisma';
-import { enumType, inputObjectType, objectType } from 'nexus';
+import { enumType, inputObjectType, intArg, nonNull, objectType } from 'nexus';
 import { Circle } from './circle';
 import { MonthCircle } from './month_circle';
 import { SignUp } from './signup';
@@ -53,6 +53,24 @@ export const Member = objectType({
           .monthCircles({
             where: {
               ...nextMonthInt(),
+            },
+          })
+          .then((monthCircles) => monthCircles[0]);
+      },
+    });
+    t.field('monthCircle', {
+      type: MonthCircle,
+      args: {
+        year: nonNull(intArg()),
+        month: nonNull(intArg()),
+      },
+      resolve({ id }, { year, month }, ctx) {
+        return ctx.prisma.member
+          .findUnique({ where: { id } })
+          .monthCircles({
+            where: {
+              year,
+              month,
             },
           })
           .then((monthCircles) => monthCircles[0]);
