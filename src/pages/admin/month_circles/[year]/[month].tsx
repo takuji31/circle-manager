@@ -1,5 +1,11 @@
 import {
+  Button,
   Checkbox,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   Stack,
   TableBody,
   TableCell,
@@ -10,7 +16,7 @@ import {
 } from '@mui/material';
 import { NextPage } from 'next';
 import { ParsedUrlQuery } from 'querystring';
-import React from 'react';
+import React, { ReactElement, useState } from 'react';
 import {
   MonthCircleState,
   MonthSurveyDocument,
@@ -24,6 +30,7 @@ import {
   getServerSidePropsWithUrql,
   withUrqlClient,
 } from '../../../../graphql/client';
+import { JsxElement } from 'typescript';
 
 interface Props {
   year: string;
@@ -154,6 +161,23 @@ export const MonthCircleList: NextPage<Props> = ({ year, month }) => {
                         id: monthCircle.id,
                         kicked,
                       })}
+                      confirmation={
+                        <>
+                          <DialogContentText>
+                            {monthCircle.member.name}
+                            さんをDiscordからBANします。
+                          </DialogContentText>
+                          <DialogContentText>
+                            - 1日の5時を過ぎましたか？
+                          </DialogContentText>
+                          <DialogContentText>
+                            - サークルから除名しましたか？
+                          </DialogContentText>
+                          <DialogContentText>
+                            - 除名取消ではありませんか？
+                          </DialogContentText>
+                        </>
+                      }
                     />
                   </TableCell>
                 </TableRow>
@@ -166,29 +190,63 @@ export const MonthCircleList: NextPage<Props> = ({ year, month }) => {
   );
 };
 
+interface Confirmation {
+  message: string;
+}
+
 const MonthCircleStateCheckbox = ({
   checked,
   disabled,
   variablesBuilder,
+  confirmation,
 }: {
   checked: boolean;
   disabled?: boolean;
   variablesBuilder: (checked: boolean) => UpdateMonthCircleMutationInput;
+  confirmation?: React.ReactElement<any, any>;
 }) => {
   const [{ fetching }, mutation] = useMutation(UpdateMonthCircleDocument);
+  const [open, setOpen] = useState(false);
+  const handleClose = () => setOpen(false);
   return (
-    <LoadingCheckBox
-      checked={checked}
-      loading={fetching}
-      disabled={disabled}
-      onCheckChanged={(checked) => {
-        mutation({
-          data: {
-            ...variablesBuilder(checked),
-          },
-        });
-      }}
-    />
+    <>
+      {confirmation && (
+        <Dialog
+          open={open}
+          onClose={() => {
+            setOpen(false);
+          }}
+          aria-labelledby="responsive-dialog-title"
+        >
+          <DialogTitle id="responsive-dialog-title">確認</DialogTitle>
+          <DialogContent>{confirmation}</DialogContent>
+          <DialogActions>
+            <Button disabled={fetching} autoFocus onClick={handleClose}>
+              いいえ
+            </Button>
+            <Button disabled={fetching} onClick={handleClose} autoFocus>
+              はい
+            </Button>
+          </DialogActions>
+        </Dialog>
+      )}
+      <LoadingCheckBox
+        checked={checked}
+        loading={fetching}
+        disabled={disabled}
+        onCheckChanged={(checked) => {
+          if (confirmation && checked) {
+            setOpen(true);
+          } else {
+            mutation({
+              data: {
+                ...variablesBuilder(checked),
+              },
+            });
+          }
+        }}
+      />
+    </>
   );
 };
 

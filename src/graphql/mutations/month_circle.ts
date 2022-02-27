@@ -149,6 +149,19 @@ export const UpdateMonthCircleMutation = mutationField('updateMonthCircle', {
           ? 'leave'
           : 'move'
       );
+
+      if (state == 'Kicked' && process.env.NODE_ENV == 'production') {
+        const rest = createDiscordRestClient();
+        try {
+          await rest.put(Routes.guildBan(Guild.id, member.id), {
+            headers: {
+              'X-Audit-Log-Reason': `サークル除名による自動BAN`,
+            },
+          });
+        } catch (e) {
+          console.log(e);
+        }
+      }
     }
 
     if (!beforeInvited && invited && circle && isCircleKey(state)) {
