@@ -44,6 +44,21 @@ export const MonthCircle = objectType({
 
 export const MonthCircleState = enumType(_MonthCircleState);
 
+export const UpdateMemberMonthCircleMutationInput = inputObjectType({
+  name: 'UpdateMemberMonthCircleMutationInput',
+  definition(t) {
+    t.nonNull.string('memberId');
+    t.nonNull.int('year');
+    t.nonNull.int('month');
+    t.field({
+      name: 'state',
+      type: MonthCircleState,
+      default: undefined,
+    });
+    t.boolean('locked', { default: undefined });
+  },
+});
+
 export const UpdateMemberMonthCirclePayload = objectType({
   name: 'UpdateMemberMonthCirclePayload',
   definition(t) {

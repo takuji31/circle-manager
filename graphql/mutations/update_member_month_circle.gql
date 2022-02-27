@@ -1,0 +1,9 @@
+mutation UpdateMemberMonthCircle(
+  $input: UpdateMemberMonthCircleMutationInput!
+) {
+  updateMemberMonthCircle(input: $input) {
+    monthCircle {
+      ...MemberMonthCircle
+    }
+  }
+}
