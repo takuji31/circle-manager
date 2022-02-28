@@ -468,6 +468,9 @@ export interface NexusGenArgTypes {
     }
   }
   Mutation: {
+    createNextMonthCircles: { // args
+      withoutNewMembers: boolean; // Boolean!
+    }
     updateMember: { // args
       input: NexusGenInputs['UpdateMemberMutationInput']; // UpdateMemberMutationInput!
     }

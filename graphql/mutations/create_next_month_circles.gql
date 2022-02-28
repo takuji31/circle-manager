@@ -1,5 +1,5 @@
 mutation CreateNextMonthCircles {
-  createNextMonthCircles {
+  createNextMonthCircles(withoutNewMembers: true) {
     year
     month
     monthCircles {

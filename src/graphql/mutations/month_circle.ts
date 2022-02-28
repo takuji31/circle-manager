@@ -1,7 +1,7 @@
 import { Guild } from './../../model/guild';
 import { Routes } from 'discord-api-types/v9';
 import { MonthCircle as _MonthCircle } from 'nexus-prisma';
-import { mutationField, nonNull } from 'nexus';
+import { booleanArg, mutationField, nonNull } from 'nexus';
 import { createDiscordRestClient } from '../../discord';
 import {
   CreateMonthCirclesPayload,
@@ -203,7 +203,10 @@ export const CreateMonthCirclesMutation = mutationField(
   'createNextMonthCircles',
   {
     type: nonNull(CreateMonthCirclesPayload),
-    async resolve(_, __, { prisma }) {
+    args: {
+      withoutNewMembers: nonNull(booleanArg({ default: false })),
+    },
+    async resolve(_, { withoutNewMembers }, { prisma }) {
       const { year, month } = nextMonthInt();
       const now = dayjs();
 
@@ -278,8 +281,10 @@ export const CreateMonthCirclesMutation = mutationField(
         })
       )._count.id;
       const newMembers = 90 - totalMemberCount;
-      const newMembersPerCircle = Math.floor(newMembers / 3);
-      const remainderNewMembers = newMembers % 3;
+      const newMembersPerCircle = withoutNewMembers
+        ? 0
+        : Math.floor(newMembers / 3);
+      const remainderNewMembers = withoutNewMembers ? 0 : newMembers % 3;
       const maxMemberCount: Record<Exclude<CircleKey, 'Saikyo'>, number> = {
         Shin:
           30 -

@@ -174,7 +174,7 @@ enum MonthSurveyAnswerValue {
 }
 
 type Mutation {
-  createNextMonthCircles: CreateMonthCirclesPayload!
+  createNextMonthCircles(withoutNewMembers: Boolean! = false): CreateMonthCirclesPayload!
   createNextMonthSurvey: CreateNextMonthSurveyPayload
   updateMember(input: UpdateMemberMutationInput!): Member!
   updateMemberMonthCircle(input: UpdateMemberMonthCircleMutationInput!): UpdateMemberMonthCirclePayload
