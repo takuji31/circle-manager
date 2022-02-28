@@ -268,6 +268,27 @@ export const CreateMonthCirclesMutation = mutationField(
         },
       });
 
+      const lockedMembers = await prisma.member.findMany({
+        include: {
+          monthCircles: {
+            where: {
+              year,
+              month,
+            },
+            take: 1,
+          },
+        },
+        where: {
+          monthCircles: {
+            some: {
+              year,
+              month,
+              locked: true,
+            },
+          },
+        },
+      });
+
       const totalMemberCount = (
         await prisma.monthSurveyAnswer.aggregate({
           _count: {
@@ -289,16 +310,25 @@ export const CreateMonthCirclesMutation = mutationField(
         Shin:
           30 -
           leaders.filter((m) => m.circleKey == CircleKey.Shin).length -
+          lockedMembers.filter(
+            (m) => m.monthCircles[0].state == MonthCircleState.Shin
+          ).length -
           newMembersPerCircle,
 
         Ha:
           30 -
           leaders.filter((m) => m.circleKey == CircleKey.Ha).length -
+          lockedMembers.filter(
+            (m) => m.monthCircles[0].state == MonthCircleState.Ha
+          ).length -
           newMembersPerCircle -
           (remainderNewMembers == 2 ? 1 : 0),
         Jo:
           30 -
           leaders.filter((m) => m.circleKey == CircleKey.Jo).length -
+          lockedMembers.filter(
+            (m) => m.monthCircles[0].state == MonthCircleState.Jo
+          ).length -
           newMembersPerCircle -
           (remainderNewMembers > 0 ? 1 : 0),
       };
@@ -333,6 +363,13 @@ export const CreateMonthCirclesMutation = mutationField(
                 year,
                 month,
                 value: MonthSurveyAnswerValue.Umamusume,
+              },
+            },
+            monthCircles: {
+              none: {
+                year,
+                month,
+                locked: true,
               },
             },
           },
