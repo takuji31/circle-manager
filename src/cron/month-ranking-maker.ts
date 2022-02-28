@@ -9,8 +9,6 @@ import { monthCircleStateLabel } from '../model/month_circle';
 config();
 
 (async () => {
-  const isProduction = process.env.NODE_ENV == 'production';
-
   const urql = createUrqlClient();
 
   const response = await urql
