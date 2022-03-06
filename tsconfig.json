@@ -16,5 +16,5 @@
     "incremental": true
   },
   "include": ["next-env.d.ts", "global.d.ts", "**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules", "firebase"]
+  "exclude": ["node_modules", "firebase", "**/*.spec.ts"]
 }
