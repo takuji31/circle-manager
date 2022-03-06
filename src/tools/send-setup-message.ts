@@ -1,11 +1,7 @@
 import { sendSetupMessage } from '../discord/member/messages';
-import { Guild } from './../model/guild';
 import { prisma } from '../database';
-import { nextMonth } from '../model';
-import { RESTPostAPIChannelMessageResult, Routes } from 'discord-api-types/v9';
 import { createDiscordRestClient } from '../discord';
 import { config } from 'dotenv';
-import { MessageEmbed } from 'discord.js';
 
 config();
 

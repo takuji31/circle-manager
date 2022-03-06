@@ -1,4 +1,4 @@
-import { Circles, nextMonth, nextMonthInt, thisMonthInt } from '../../model';
+import { Circles, nextMonthInt, thisMonthInt } from '../../model';
 import * as Nexus from 'nexus-prisma';
 import { enumType, inputObjectType, intArg, nonNull, objectType } from 'nexus';
 import { Circle } from './circle';

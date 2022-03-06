@@ -1,7 +1,7 @@
 import { Circles } from './../model/circle';
 import { config } from 'dotenv';
 import { prisma } from '../database';
-import { Guild, nextMonthInt, thisMonth } from '../model';
+import { Guild, nextMonthInt, thisMonthInt } from '../model';
 import { stringify } from 'csv-stringify/sync';
 import { createDiscordRestClient } from '../discord';
 import { Routes } from 'discord-api-types/v9';
@@ -20,7 +20,7 @@ import { Dayjs } from 'dayjs';
 config();
 
 (async () => {
-  const { year, month } = thisMonth();
+  const { year, month } = thisMonthInt();
   const nextMonth = nextMonthInt();
 
   const monthSurvey = await prisma.monthSurvey.findFirst({

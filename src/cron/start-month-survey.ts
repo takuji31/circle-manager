@@ -3,7 +3,7 @@ import { config } from 'dotenv';
 import { Guild } from '../model/guild';
 import { Member, MemberStatus } from '@prisma/client';
 import { createDiscordRestClient } from '../discord';
-import { nextMonth, nextMonthInt } from '../model';
+import { nextMonthInt } from '../model';
 import { MonthSurvey as _MonthSurvey } from 'nexus-prisma';
 import { MessageEmbed } from 'discord.js';
 import {
