@@ -6,6 +6,7 @@ import utc from 'dayjs/plugin/utc';
 import duration from 'dayjs/plugin/duration';
 import arraySupport from 'dayjs/plugin/arraySupport';
 import 'dayjs/locale/ja';
+import { ChronoField, TemporalAdjuster } from '@js-joda/core';
 
 declare global {
   var _isDayjsSetupCompleted: boolean;
@@ -56,3 +57,13 @@ const monthsOneIndexed: PluginFunc<unknown> = (_, dayjsClass, __) => {
 })();
 
 export const dayjs: typeof _dayjs = _dayjs;
+
+export const startOfMonth: TemporalAdjuster = {
+  adjustInto(temporal) {
+    const startOfDay = temporal.isSupported(ChronoField.SECOND_OF_DAY)
+      ? temporal.with(ChronoField.SECOND_OF_DAY, 0)
+      : temporal;
+
+    return startOfDay.with(ChronoField.DAY_OF_MONTH, 1);
+  },
+};
