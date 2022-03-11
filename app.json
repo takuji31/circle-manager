@@ -2,7 +2,7 @@
   "cron": [
     {
       "command": "yarn run cron:legend-race-reminder",
-      "schedule": "0 21 12,13,14,15 3 2022"
+      "schedule": "0 21 12,13,14,15 3 *"
     },
     {
       "command": "yarn run cron:month-survey-reminder",
