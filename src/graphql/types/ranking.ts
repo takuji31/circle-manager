@@ -1,3 +1,4 @@
+import { convert } from '@js-joda/core';
 import { list, nonNull, objectType } from 'nexus';
 import { Circle } from '../../model';
 import { MemberFanCount } from './member_fan_count';
@@ -12,7 +13,7 @@ export const Ranking = objectType({
       resolve({ date }, _, { prisma }) {
         return prisma.memberFanCount.findMany({
           where: {
-            date: date.toDate(),
+            date: convert(date).toDate(),
             circle: {
               // TODO: with month survey
               in: [Circle.shin.key, Circle.ha.key, Circle.jo.key],
