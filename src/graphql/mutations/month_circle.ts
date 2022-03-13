@@ -10,7 +10,6 @@ import {
   UpdateMonthCircleMutationInput,
 } from '../types';
 import { Circles, isCircleKey, nextMonthInt } from '../../model';
-import { dayjs } from '../../model/date';
 import {
   CircleKey,
   CircleRole,
@@ -22,6 +21,12 @@ import {
   sendInvitedMessage,
   sendKickedMessage,
 } from '../../discord/member/messages';
+import {
+  convert,
+  TemporalAdjusters,
+  ZonedDateTime,
+  ZoneId,
+} from '@js-joda/core';
 
 export const UpdateMemberMonthCircleMutation = mutationField(
   'updateMemberMonthCircle',
@@ -208,14 +213,14 @@ export const CreateMonthCirclesMutation = mutationField(
     },
     async resolve(_, { withoutNewMembers }, { prisma }) {
       const { year, month } = nextMonthInt();
-      const now = dayjs();
+      const now = ZonedDateTime.now(ZoneId.of('Asia/Tokyo'));
 
       const monthSurvey = await prisma.monthSurvey.findFirst({
         where: {
           year,
           month,
           expiredAt: {
-            lte: now.toDate(),
+            lte: convert(now).toDate(),
           },
         },
       });
@@ -335,17 +340,21 @@ export const CreateMonthCirclesMutation = mutationField(
 
       console.log('Max member count %s', maxMemberCount);
 
+      const firstDayOfMonth = now
+        .toLocalDate()
+        .with(TemporalAdjusters.firstDayOfMonth());
       const rankingMembers = (
         await prisma.member.findMany({
           include: {
             fanCounts: {
               where: {
                 date: {
-                  gte: now.startOf('month').toDate(),
-                  lt: now
-                    .startOf('month')
-                    .add(dayjs.duration({ months: 1 }))
-                    .toDate(),
+                  gte: convert(firstDayOfMonth).toDate(),
+                  lt: convert(
+                    firstDayOfMonth.with(
+                      TemporalAdjusters.firstDayOfNextMonth()
+                    )
+                  ).toDate(),
                 },
               },
               orderBy: {

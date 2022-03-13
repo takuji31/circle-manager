@@ -4,8 +4,8 @@ import { Routes } from 'discord-api-types/v9';
 import { createDiscordRestClient } from '../discord';
 import { Circle } from '../model';
 import fetch from 'node-fetch';
-import { Dayjs } from 'dayjs';
-import { dayjs } from '../model/date';
+import { convert, DateTimeFormatter, LocalDate } from '@js-joda/core';
+import { DateFormats } from '../model/date';
 export interface UmastagramPage {
   members: Array<UmastagramMember>;
   circle: UmastagramCircle;
@@ -38,10 +38,10 @@ const toHalfWidthString = (str: string) => {
 export async function crawlUmastagram(
   url: string,
   circle: Circle,
-  day: Dayjs = dayjs().subtract(dayjs.duration({ days: 1 }))
+  day: LocalDate = LocalDate.now().minusDays(1)
 ): Promise<UmastagramPage> {
   const rest = createDiscordRestClient();
-  const date = day.toDate();
+  const date = convert(day).toDate();
 
   try {
     const response = await fetch(
@@ -114,7 +114,7 @@ export async function crawlUmastagram(
     await rest.post(Routes.channelMessages(Guild.channelIds.admin), {
       body: {
         content: `${circle.name}の ${day.format(
-          'L'
+          DateFormats.ymd
         )}のファン数を取得しました。`,
       },
       attachments: [
@@ -131,7 +131,7 @@ export async function crawlUmastagram(
       body: {
         content:
           `${circle.name}の ${day.format(
-            'L'
+            DateFormats.ymd
           )}のファン数を取得できませんでした。\n` +
           '```\n' +
           `${e}`.substring(0, 1800) +

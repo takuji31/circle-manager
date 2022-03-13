@@ -5,11 +5,11 @@ generates:
   src/graphql/generated/type.ts:
     plugins:
       - add:
-          content: "import { Dayjs } from 'dayjs';"
+          content: "import { LocalDate } from '@js-joda/core';"
       - 'typescript'
       - 'typescript-operations'
       - typed-document-node
     config:
       dedupeFragments: true
       scalars:
-        Date: Dayjs
+        Date: LocalDate

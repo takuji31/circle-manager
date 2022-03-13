@@ -35,7 +35,8 @@ import Link from '../components/link';
 import { LoadingCheckBox } from '../components/loading_checkbox';
 import { MonthSurveyAnswerValue } from '@prisma/client';
 import { useMutation, useQuery } from 'urql';
-import { dayjs } from '../model/date';
+import { DateTimeFormatter, ZonedDateTime, ZoneId } from '@js-joda/core';
+import { DateFormats } from '../model/date';
 
 const Home: NextPage = (props) => {
   const { user, status } = useUser();
@@ -108,8 +109,10 @@ const AdminTopContent = () => {
     if (!expiredAt) {
       return null;
     } else {
-      const date = dayjs(expiredAt);
-      return date.format('llll');
+      const date = ZonedDateTime.from(
+        DateTimeFormatter.ISO_ZONED_DATE_TIME.parse(expiredAt)
+      ).withZoneSameInstant(ZoneId.SYSTEM);
+      return date.format(DateFormats.dateTime);
     }
   }, [data?.nextMonth?.survey?.expiredAt]);
 

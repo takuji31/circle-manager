@@ -1,9 +1,8 @@
-import { Dayjs } from 'dayjs';
+import { convert, LocalDate, TemporalAdjusters } from '@js-joda/core';
 import { GetServerSideProps, NextPage } from 'next';
 import { isArray } from 'nexus/dist/utils';
 import { ParsedUrlQuery } from 'querystring';
 import { prisma } from '../../../../database';
-import { dayjs } from '../../../../model/date';
 
 const RankingPage: NextPage<{ year: number; month: number; day: number }> = ({
   year,
@@ -33,9 +32,11 @@ export const getServerSideProps: GetServerSideProps<Props, Params> = async ({
     };
   }
   const { year, month, day: dayOrNull } = params;
-  let monthStartDate = dayjs([parseInt(year), parseInt(month), 1]);
-  let nextMonthStartDate = monthStartDate.add(dayjs.duration({ days: 1 }));
-  let date: Dayjs;
+  let monthStartDate = LocalDate.of(parseInt(year), parseInt(month), 1);
+  let nextMonthStartDate = monthStartDate.with(
+    TemporalAdjusters.firstDayOfNextMonth()
+  );
+  let date: LocalDate;
   let day: number | null;
   try {
     if (dayOrNull && isArray(dayOrNull) && dayOrNull.length == 1) {
@@ -51,8 +52,8 @@ export const getServerSideProps: GetServerSideProps<Props, Params> = async ({
         },
         where: {
           date: {
-            gte: monthStartDate.toDate(),
-            lt: nextMonthStartDate.toDate(),
+            gte: convert(monthStartDate).toDate(),
+            lt: convert(nextMonthStartDate).toDate(),
           },
         },
       });
@@ -64,7 +65,7 @@ export const getServerSideProps: GetServerSideProps<Props, Params> = async ({
       };
     }
 
-    date = monthStartDate.day(day);
+    date = monthStartDate.withDayOfMonth(day);
   } catch (e) {
     return {
       notFound: true,

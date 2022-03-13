@@ -2,7 +2,7 @@ import { Guild } from './../../model/guild';
 import { Message } from 'discord.js';
 import { Circle } from '../../model';
 import { crawlUmastagram } from '../../umastagram/crawler';
-import { dayjs } from '../../model/date';
+import { LocalDate, nativeJs } from '@js-joda/core';
 
 const urlPattern =
   /https:\/\/umastagram.com\/circle\/grade\/graph\/share\/[a-zA-Z0-9]+/;
@@ -36,10 +36,15 @@ export const updateFanCountEvent = async (message: Message, circle: Circle) => {
         before: message.id,
         limit: 100,
       });
-      const today = dayjs();
+      const firstDayOfMonth = LocalDate.now();
       const umastagramUrlMessage = pastMessages.find((msg) => {
-        const createdAt = dayjs(msg.createdAt);
-        return urlPattern.test(msg.content) && today.isSame(createdAt, 'month');
+        // TODO: 1日の場合は前月分を探すようにする
+        const createdAt = LocalDate.from(nativeJs(msg.createdAt));
+        return (
+          urlPattern.test(msg.content) &&
+          createdAt.year() == firstDayOfMonth.year() &&
+          createdAt.monthValue() == firstDayOfMonth.monthValue()
+        );
       });
       if (!umastagramUrlMessage) {
         throw new Error('UmastagramのURLが直近100件のメッセージにありません。');

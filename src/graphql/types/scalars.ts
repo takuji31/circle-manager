@@ -1,25 +1,24 @@
-import { Dayjs } from 'dayjs';
+import { LocalDate } from '@js-joda/core';
 import { Kind } from 'graphql';
 import { scalarType } from 'nexus';
-import { dayjs } from '../../model/date';
 
 export const DateScalar = scalarType({
   name: 'Date',
   asNexusMethod: 'date',
   description: 'ISO8601 Date string',
   sourceType: {
-    module: 'dayjs',
-    export: 'Dayjs',
+    module: '@js-joda/core',
+    export: 'LocalDate',
   },
   parseValue(inputValue) {
-    return dayjs(inputValue as string);
+    return LocalDate.parse(inputValue as string);
   },
   serialize(outputValue) {
-    return (outputValue as Dayjs).toJSON();
+    return (outputValue as LocalDate).toString();
   },
   parseLiteral(ast) {
     if (ast.kind === Kind.STRING) {
-      return dayjs(ast.value);
+      return LocalDate.parse(ast.value);
     }
     return null;
   },

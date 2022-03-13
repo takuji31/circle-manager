@@ -11,16 +11,16 @@ import {
   Routes,
 } from 'discord-api-types/v9';
 import { Emoji, MonthSurveyEmoji } from '../model/emoji';
-import { dayjs } from '../model/date';
+import { DateFormats } from '../model/date';
+import { convert, LocalDate, TemporalAdjusters } from '@js-joda/core';
 
 config();
 
 (async () => {
   const { year, month } = nextMonthInt();
-  const expiredAt = dayjs()
-    .startOf('month')
-    .add(dayjs.duration({ months: 1 }))
-    .subtract(dayjs.duration({ days: 12 }));
+  const expiredAt = LocalDate.now()
+    .with(TemporalAdjusters.firstDayOfNextMonth())
+    .minusDays(12);
 
   if (await prisma.monthSurvey.count({ where: { year, month } })) {
     throw new Error('Next month survey already started');
@@ -41,7 +41,10 @@ config();
       '対象外の方',
       'このメッセージが送信された時点で加入申請中のメンバー/来月復帰予定のないOB'
     )
-    .addField('期限', `${expiredAt.format('llll')}まで`)
+    .addField(
+      '期限',
+      `${expiredAt.atStartOfDay().format(DateFormats.dateWithHour)}まで`
+    )
     .addField('回答方法', 'このメッセージにリアクション');
 
   embed.addField('西京ファーム', Emoji.a, true);
@@ -70,7 +73,7 @@ config();
       id: messageId,
       year,
       month,
-      expiredAt: expiredAt.toDate(),
+      expiredAt: convert(expiredAt).toDate(),
     },
   });
 

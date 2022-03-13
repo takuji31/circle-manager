@@ -1,4 +1,3 @@
-import { dayjs } from './date';
 import { LocalDate } from '@js-joda/core';
 
 export interface YearMonth {

@@ -14,8 +14,14 @@ import {
   MonthSurveyAnswerValue,
 } from '@prisma/client';
 import { monthCircleStateLabel } from '../model/month_circle';
-import { dayjs } from '../model/date';
-import { Dayjs } from 'dayjs';
+import {
+  convert,
+  DateTimeFormatter,
+  LocalDate,
+  nativeJs,
+  TemporalAdjusters,
+} from '@js-joda/core';
+import { DateFormats } from '../model/date';
 
 config();
 
@@ -27,9 +33,10 @@ config();
     where: nextMonth,
   });
 
-  const now = dayjs();
+  const now = LocalDate.now();
   const useMonthSurveyAnswer =
-    monthSurvey != null && now.isAfter(monthSurvey.expiredAt);
+    monthSurvey != null &&
+    now.isAfter(LocalDate.from(nativeJs(monthSurvey.expiredAt)));
 
   const groupBy = await prisma.memberFanCount.groupBy({
     _max: {
@@ -38,11 +45,8 @@ config();
     by: ['circle'],
     where: {
       date: {
-        gte: now.startOf('month').toDate(),
-        lt: now
-          .startOf('month')
-          .add(dayjs.duration({ months: 1 }))
-          .toDate(),
+        gte: convert(now.with(TemporalAdjusters.firstDayOfMonth())).toDate(),
+        lt: convert(now.with(TemporalAdjusters.firstDayOfNextMonth())).toDate(),
       },
     },
   });
@@ -52,7 +56,7 @@ config();
       member: (Member & { monthCircles: Array<MonthCircle> }) | null;
     }
   > = [];
-  const circleToUpdatedAt: Record<CircleKey, Dayjs | null> = {
+  const circleToUpdatedAt: Record<CircleKey, LocalDate | null> = {
     Saikyo: null,
     Shin: null,
     Ha: null,
@@ -65,7 +69,7 @@ config();
       continue;
     }
 
-    circleToUpdatedAt[circle] = dayjs(date);
+    circleToUpdatedAt[circle] = LocalDate.from(nativeJs(date));
 
     if (!useMonthSurveyAnswer && circle == CircleKey.Saikyo) {
       continue;
@@ -113,7 +117,7 @@ config();
           .map((entry) => {
             const [key, updatedAt] = entry;
             return `${Circles.findByCircleKey(key as CircleKey).name} : ${
-              updatedAt ? updatedAt.format('L') : '更新なし'
+              updatedAt ? updatedAt.format(DateFormats.ymd) : '更新なし'
             }`;
           })
           .join('\n'),
