@@ -40,7 +40,7 @@ export async function crawlUmastagram(
   day: LocalDate = LocalDate.yesterday()
 ): Promise<UmastagramPage> {
   const rest = createDiscordRestClient();
-  const date = convert(day).toDate();
+  const date = day.toUTCDate();
 
   try {
     const response = await fetch(
