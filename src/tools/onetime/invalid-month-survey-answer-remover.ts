@@ -1,6 +1,6 @@
 import { config } from 'dotenv';
-import { prisma } from '../database';
-import { nextMonthInt } from '../model';
+import { prisma } from '../../database';
+import { nextMonthInt } from '../../model';
 import { MemberStatus, MonthSurveyAnswerValue } from '@prisma/client';
 
 config();
