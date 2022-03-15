@@ -1,4 +1,4 @@
-import { convert } from '@js-joda/core';
+import { convert } from '../../model/date';
 import { list, nonNull, objectType } from 'nexus';
 import { Circle } from '../../model';
 import { MemberFanCount } from './member_fan_count';

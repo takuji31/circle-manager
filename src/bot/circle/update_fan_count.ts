@@ -2,7 +2,7 @@ import { Guild } from './../../model/guild';
 import { Message } from 'discord.js';
 import { Circle } from '../../model';
 import { crawlUmastagram } from '../../umastagram/crawler';
-import { LocalDate, nativeJs } from '@js-joda/core';
+import { LocalDate } from '../../model/date';
 
 const urlPattern =
   /https:\/\/umastagram.com\/circle\/grade\/graph\/share\/[a-zA-Z0-9]+/;
@@ -36,14 +36,12 @@ export const updateFanCountEvent = async (message: Message, circle: Circle) => {
         before: message.id,
         limit: 100,
       });
-      const firstDayOfMonth = LocalDate.now();
+      const firstDayOfMonth = LocalDate.firstDayOfThisMonth();
       const umastagramUrlMessage = pastMessages.find((msg) => {
         // TODO: 1日の場合は前月分を探すようにする
-        const createdAt = LocalDate.from(nativeJs(msg.createdAt));
+        const createdAt = LocalDate.fromUTCDate(msg.createdAt);
         return (
-          urlPattern.test(msg.content) &&
-          createdAt.year() == firstDayOfMonth.year() &&
-          createdAt.monthValue() == firstDayOfMonth.monthValue()
+          urlPattern.test(msg.content) && createdAt.isSameMonth(firstDayOfMonth)
         );
       });
       if (!umastagramUrlMessage) {

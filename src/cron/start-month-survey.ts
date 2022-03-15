@@ -11,16 +11,13 @@ import {
   Routes,
 } from 'discord-api-types/v9';
 import { Emoji, MonthSurveyEmoji } from '../model/emoji';
-import { DateFormats } from '../model/date';
-import { convert, LocalDate, TemporalAdjusters } from '@js-joda/core';
+import { DateFormats, LocalDate, convert } from '../model/date';
 
 config();
 
 (async () => {
   const { year, month } = nextMonthInt();
-  const expiredAt = LocalDate.now()
-    .with(TemporalAdjusters.firstDayOfNextMonth())
-    .minusDays(12);
+  const expiredAt = LocalDate.firstDayOfNextMonth().minusDays(12);
 
   if (await prisma.monthSurvey.count({ where: { year, month } })) {
     throw new Error('Next month survey already started');

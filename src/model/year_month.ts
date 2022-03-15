@@ -1,4 +1,4 @@
-import { LocalDate } from '@js-joda/core';
+import { LocalDate } from './date';
 
 export interface YearMonth {
   year: number;
@@ -6,7 +6,7 @@ export interface YearMonth {
 }
 
 export const thisMonthInt: () => YearMonth = () => {
-  const now = LocalDate.now().withDayOfMonth(1);
+  const now = LocalDate.firstDayOfThisMonth();
   return {
     year: now.year(),
     month: now.monthValue(),
@@ -14,7 +14,7 @@ export const thisMonthInt: () => YearMonth = () => {
 };
 
 export const nextMonthInt: () => YearMonth = () => {
-  const nextMonth = LocalDate.now().withDayOfMonth(1).plusMonths(1);
+  const nextMonth = LocalDate.firstDayOfNextMonth();
   return {
     year: nextMonth.year(),
     month: nextMonth.monthValue(),

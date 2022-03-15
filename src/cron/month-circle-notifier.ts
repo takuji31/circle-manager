@@ -3,8 +3,7 @@ import { prisma } from './../database/prisma';
 import { config } from 'dotenv';
 import { sendDirectMessagesIfPossible } from '../discord/message';
 import { monthSurveyAnswerLabel } from '../model/month_survey_answer';
-import { DateFormats } from '../model/date';
-import { nativeJs, ZonedDateTime, ZoneId } from '@js-joda/core';
+import { DateFormats, ZonedDateTime } from '../model/date';
 
 config();
 
@@ -35,9 +34,9 @@ config();
     return;
   }
   const messages: Array<string> = [];
-  const expiredAt = ZonedDateTime.from(
-    nativeJs(monthSurvey.expiredAt, ZoneId.of('Asia/Tokyo'))
-  ).format(DateFormats.dateWithHour);
+  const expiredAt = ZonedDateTime.fromDate(monthSurvey.expiredAt).format(
+    DateFormats.dateWithHour
+  );
   await sendDirectMessagesIfPossible(
     members,
     (member) => {

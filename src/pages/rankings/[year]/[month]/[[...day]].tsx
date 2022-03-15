@@ -1,4 +1,4 @@
-import { convert, LocalDate, TemporalAdjusters } from '@js-joda/core';
+import { convert, LocalDate, TemporalAdjusters } from '../../../../model/date';
 import { GetServerSideProps, NextPage } from 'next';
 import { isArray } from 'nexus/dist/utils';
 import { ParsedUrlQuery } from 'querystring';

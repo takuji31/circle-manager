@@ -11,8 +11,7 @@ import {
 } from 'discord-api-types/v9';
 import { CreateNextMonthSurveyPayload } from '../types';
 import { Emoji, MonthSurveyEmoji } from '../../model/emoji';
-import { DateFormats } from '../../model/date';
-import { convert, LocalDate, TemporalAdjusters } from '@js-joda/core';
+import { DateFormats, convert, LocalDate } from '../../model/date';
 
 export const CreateNextMonthSurveyMutation = mutationField(
   'createNextMonthSurvey',
@@ -24,9 +23,7 @@ export const CreateNextMonthSurveyMutation = mutationField(
       }
 
       const { year, month } = nextMonthInt();
-      const expiredAt = LocalDate.now()
-        .with(TemporalAdjusters.firstDayOfNextMonth())
-        .minusDays(12);
+      const expiredAt = LocalDate.firstDayOfNextMonth().minusDays(12);
 
       if (
         await prisma.monthSurvey.count({

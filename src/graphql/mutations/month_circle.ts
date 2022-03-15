@@ -22,11 +22,11 @@ import {
   sendKickedMessage,
 } from '../../discord/member/messages';
 import {
+  ZonedDateTime,
   convert,
   TemporalAdjusters,
-  ZonedDateTime,
-  ZoneId,
-} from '@js-joda/core';
+  LocalDate,
+} from '../../model/date';
 
 export const UpdateMemberMonthCircleMutation = mutationField(
   'updateMemberMonthCircle',
@@ -213,7 +213,7 @@ export const CreateMonthCirclesMutation = mutationField(
     },
     async resolve(_, { withoutNewMembers }, { prisma }) {
       const { year, month } = nextMonthInt();
-      const now = ZonedDateTime.now(ZoneId.of('Asia/Tokyo'));
+      const now = ZonedDateTime.nowJST();
 
       const monthSurvey = await prisma.monthSurvey.findFirst({
         where: {
@@ -340,9 +340,7 @@ export const CreateMonthCirclesMutation = mutationField(
 
       console.log('Max member count %s', maxMemberCount);
 
-      const firstDayOfMonth = now
-        .toLocalDate()
-        .with(TemporalAdjusters.firstDayOfMonth());
+      const firstDayOfMonth = LocalDate.firstDayOfThisMonth();
       const rankingMembers = (
         await prisma.member.findMany({
           include: {

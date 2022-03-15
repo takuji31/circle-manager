@@ -3,8 +3,7 @@ import { prisma } from './../database/prisma';
 import { config } from 'dotenv';
 import { sendDirectMessagesIfPossible } from '../discord/message';
 import { MonthSurveyAnswerValue } from '@prisma/client';
-import { DateFormats } from '../model/date';
-import { nativeJs, ZonedDateTime, ZoneId } from '@js-joda/core';
+import { DateFormats, nativeJs, ZonedDateTime, ZoneId } from '../model/date';
 
 config();
 

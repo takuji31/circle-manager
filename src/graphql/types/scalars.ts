@@ -1,4 +1,4 @@
-import { LocalDate } from '@js-joda/core';
+import { LocalDate } from '../../model/date';
 import { Kind } from 'graphql';
 import { scalarType } from 'nexus';
 

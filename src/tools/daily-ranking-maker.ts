@@ -16,12 +16,11 @@ import {
 import { monthCircleStateLabel } from '../model/month_circle';
 import {
   convert,
-  DateTimeFormatter,
   LocalDate,
-  nativeJs,
   TemporalAdjusters,
-} from '@js-joda/core';
-import { DateFormats } from '../model/date';
+  ZonedDateTime,
+  DateFormats,
+} from '../model/date';
 
 config();
 
@@ -33,10 +32,10 @@ config();
     where: nextMonth,
   });
 
-  const now = LocalDate.now();
+  const now = ZonedDateTime.nowJST();
   const useMonthSurveyAnswer =
     monthSurvey != null &&
-    now.isAfter(LocalDate.from(nativeJs(monthSurvey.expiredAt)));
+    now.isAfter(ZonedDateTime.fromDate(monthSurvey.expiredAt));
 
   const groupBy = await prisma.memberFanCount.groupBy({
     _max: {
@@ -69,7 +68,7 @@ config();
       continue;
     }
 
-    circleToUpdatedAt[circle] = LocalDate.from(nativeJs(date));
+    circleToUpdatedAt[circle] = LocalDate.fromUTCDate(date);
 
     if (!useMonthSurveyAnswer && circle == CircleKey.Saikyo) {
       continue;

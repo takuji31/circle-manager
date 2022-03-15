@@ -4,8 +4,7 @@ import { Routes } from 'discord-api-types/v9';
 import { createDiscordRestClient } from '../discord';
 import { Circle } from '../model';
 import fetch from 'node-fetch';
-import { convert, DateTimeFormatter, LocalDate } from '@js-joda/core';
-import { DateFormats } from '../model/date';
+import { DateFormats, LocalDate, convert } from '../model/date';
 export interface UmastagramPage {
   members: Array<UmastagramMember>;
   circle: UmastagramCircle;
@@ -38,7 +37,7 @@ const toHalfWidthString = (str: string) => {
 export async function crawlUmastagram(
   url: string,
   circle: Circle,
-  day: LocalDate = LocalDate.now().minusDays(1)
+  day: LocalDate = LocalDate.yesterday()
 ): Promise<UmastagramPage> {
   const rest = createDiscordRestClient();
   const date = convert(day).toDate();
