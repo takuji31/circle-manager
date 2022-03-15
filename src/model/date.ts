@@ -36,10 +36,14 @@ declare module '@js-joda/core' {
   interface LocalDate {
     isSameMonth(other: LocalDate): boolean;
     toUTCDate(): Date;
+    atStartOfDayJST(): ZonedDateTime;
   }
   namespace ZonedDateTime {
     function nowJST(): ZonedDateTime;
     function fromDate(date: Date): ZonedDateTime;
+  }
+  interface ZonedDateTime {
+    toDate(): Date;
   }
 }
 LocalDate.today = () => LocalDate.now(JST);
@@ -58,4 +62,11 @@ LocalDate.prototype.isSameMonth = function (other) {
 };
 LocalDate.prototype.toUTCDate = function () {
   return convert(this, ZoneId.UTC).toDate();
+};
+LocalDate.prototype.atStartOfDayJST = function () {
+  return this.atStartOfDay(JST);
+};
+
+ZonedDateTime.prototype.toDate = function () {
+  return convert(this).toDate();
 };

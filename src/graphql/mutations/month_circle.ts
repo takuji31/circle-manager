@@ -220,7 +220,7 @@ export const CreateMonthCirclesMutation = mutationField(
           year,
           month,
           expiredAt: {
-            lte: convert(now).toDate(),
+            lte: now.toDate(),
           },
         },
       });
@@ -340,19 +340,14 @@ export const CreateMonthCirclesMutation = mutationField(
 
       console.log('Max member count %s', maxMemberCount);
 
-      const firstDayOfMonth = LocalDate.firstDayOfThisMonth();
       const rankingMembers = (
         await prisma.member.findMany({
           include: {
             fanCounts: {
               where: {
                 date: {
-                  gte: convert(firstDayOfMonth).toDate(),
-                  lt: convert(
-                    firstDayOfMonth.with(
-                      TemporalAdjusters.firstDayOfNextMonth()
-                    )
-                  ).toDate(),
+                  gte: LocalDate.firstDayOfThisMonth().toUTCDate(),
+                  lt: LocalDate.firstDayOfNextMonth().toUTCDate(),
                 },
               },
               orderBy: {

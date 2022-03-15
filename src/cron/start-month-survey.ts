@@ -70,7 +70,7 @@ config();
       id: messageId,
       year,
       month,
-      expiredAt: convert(expiredAt).toDate(),
+      expiredAt: expiredAt.atStartOfDayJST().toDate(),
     },
   });
 

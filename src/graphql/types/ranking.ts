@@ -13,7 +13,7 @@ export const Ranking = objectType({
       resolve({ date }, _, { prisma }) {
         return prisma.memberFanCount.findMany({
           where: {
-            date: convert(date).toDate(),
+            date: date.toUTCDate(),
             circle: {
               // TODO: with month survey
               in: [Circle.shin.key, Circle.ha.key, Circle.jo.key],

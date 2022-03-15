@@ -44,8 +44,8 @@ config();
     by: ['circle'],
     where: {
       date: {
-        gte: convert(now.with(TemporalAdjusters.firstDayOfMonth())).toDate(),
-        lt: convert(now.with(TemporalAdjusters.firstDayOfNextMonth())).toDate(),
+        gte: LocalDate.firstDayOfThisMonth().toUTCDate(),
+        lt: LocalDate.firstDayOfNextMonth().toUTCDate(),
       },
     },
   });

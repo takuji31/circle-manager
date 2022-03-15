@@ -52,8 +52,8 @@ export const getServerSideProps: GetServerSideProps<Props, Params> = async ({
         },
         where: {
           date: {
-            gte: convert(monthStartDate).toDate(),
-            lt: convert(nextMonthStartDate).toDate(),
+            gte: monthStartDate.toUTCDate(),
+            lt: nextMonthStartDate.toUTCDate(),
           },
         },
       });
