@@ -9,7 +9,7 @@ const fixedSuffix = '-fixed-20220315';
 (async () => {
   //
   /**
-   * 2月26日更新分〜3月15日更新分が2月24日〜3月13日のものとして記録されていた。
+   * 2月26日〜3月16日更新分(2月25日〜3月15日分)が2月24日〜3月14日のものとして記録されていた。
    * ただしUTCで0時以降(JSTで9時以降)に更新されたものは日付があっているのでそこだけは除外する
    * ↑に該当するもの一覧：
    * - 西京ファーム
@@ -20,7 +20,7 @@ const fixedSuffix = '-fixed-20220315';
    *   - 3/1
    */
   const startDate = LocalDate.of(2022, 2, 24).toUTCDate();
-  const endDate = LocalDate.of(2022, 3, 13).toUTCDate();
+  const endDate = LocalDate.of(2022, 3, 14).toUTCDate();
 
   console.log('Fix circle fan count');
   // 2/28日の更新は2回あって1回目のデータが不正(2/26日分)なので消す
