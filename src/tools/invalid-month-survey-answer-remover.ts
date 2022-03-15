@@ -1,22 +1,7 @@
-import { Circles } from './../model/circle';
 import { config } from 'dotenv';
 import { prisma } from '../database';
-import { Guild, nextMonthInt, thisMonthInt } from '../model';
-import { stringify } from 'csv-stringify/sync';
-import { createDiscordRestClient } from '../discord';
-import { Routes } from 'discord-api-types/v9';
-import {
-  CircleKey,
-  CircleRole,
-  Member,
-  MemberFanCount,
-  MemberStatus,
-  MonthCircle,
-  MonthSurveyAnswerValue,
-} from '@prisma/client';
-import { monthCircleStateLabel } from '../model/month_circle';
-import { convert, LocalDate, nativeJs, TemporalAdjusters } from '@js-joda/core';
-import { DateFormats } from '../model/date';
+import { nextMonthInt } from '../model';
+import { MemberStatus, MonthSurveyAnswerValue } from '@prisma/client';
 
 config();
 
