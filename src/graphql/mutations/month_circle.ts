@@ -27,6 +27,7 @@ import {
   TemporalAdjusters,
   LocalDate,
 } from '../../model/date';
+import { setMemberCircleRole } from '../../discord/role';
 
 export const UpdateMemberMonthCircleMutation = mutationField(
   'updateMemberMonthCircle',
@@ -166,6 +167,15 @@ export const UpdateMonthCircleMutation = mutationField('updateMonthCircle', {
         } catch (e) {
           console.log(e);
         }
+      } else if (
+        (state == MonthCircleState.OB || state == MonthCircleState.Leaved) &&
+        process.env.NODE_ENV == 'production'
+      ) {
+        const rest = createDiscordRestClient();
+        try {
+        } catch (e) {
+          console.log(e);
+        }
       }
     }
 
@@ -180,19 +190,7 @@ export const UpdateMonthCircleMutation = mutationField('updateMonthCircle', {
         if (process.env.NODE_ENV != 'production') {
           throw new Error('Update role ignored in develop');
         }
-        const rest = createDiscordRestClient();
-        const roleIds = Guild.roleIds.circleIds;
-        const removingIds = roleIds.filter((id) => id != circle.id);
-
-        for (const id of removingIds) {
-          await rest.delete(
-            Routes.guildMemberRole(Guild.id, monthCircle.memberId, id)
-          );
-        }
-
-        await rest.put(
-          Routes.guildMemberRole(Guild.id, monthCircle.memberId, circle.id)
-        );
+        await setMemberCircleRole(monthCircle.memberId, circle.id);
       } catch (e) {
         console.log(e);
       }

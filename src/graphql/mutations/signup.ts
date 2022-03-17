@@ -5,6 +5,7 @@ import { createDiscordRestClient } from '../../discord';
 import { Guild } from '../../model';
 import { SignUp, UpdateSignUpMutationInput } from '../types';
 import { sendInvitedMessage } from '../../discord/member/messages';
+import { setMemberCircleRole } from '../../discord/role';
 
 export const UpdateSignUpMutation = mutationField('updateSignUp', {
   type: nonNull(SignUp),
@@ -54,15 +55,7 @@ export const UpdateSignUpMutation = mutationField('updateSignUp', {
         if (process.env.NODE_ENV != 'production') {
           throw new Error('Update role ignored in develop');
         }
-        const rest = createDiscordRestClient();
-        const roleIds = Guild.roleIds.circleIds;
-        const removingIds = roleIds.filter((id) => id != circle.id);
-
-        for (const id of removingIds) {
-          await rest.delete(Routes.guildMemberRole(Guild.id, memberId, id));
-        }
-
-        await rest.put(Routes.guildMemberRole(Guild.id, memberId, circle.id));
+        await setMemberCircleRole(memberId, circle.id);
       } catch (e) {
         console.log(e);
       }
