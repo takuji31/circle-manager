@@ -1,5 +1,5 @@
 query AdminCircles {
-  circles(filter: CircleSelect) {
+  circles {
     ...ListedCircle
   }
 }
