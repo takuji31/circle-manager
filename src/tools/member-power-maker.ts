@@ -85,7 +85,7 @@ class MemberPower {
     },
     where: {
       circleKey: {
-        in: [CircleKey.Shin, CircleKey.Ha, CircleKey.Jo],
+        in: [CircleKey.Saikyo, CircleKey.Shin, CircleKey.Ha, CircleKey.Jo],
       },
       status: MemberStatus.Joined,
       monthSurveyAnswer: {
@@ -93,7 +93,7 @@ class MemberPower {
           year: 2022,
           month: 4,
           value: {
-            in: [MonthSurveyAnswerValue.Umamusume, MonthSurveyAnswerValue.None],
+            in: [MonthSurveyAnswerValue.Umamusume],
           },
         },
       },
