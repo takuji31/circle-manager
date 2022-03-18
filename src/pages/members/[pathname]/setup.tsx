@@ -140,11 +140,14 @@ const Setup: NextPage<Props> = ({ pathname }) => {
                       )}
                       <Stack>
                         <Typography variant="caption">
-                          西京ファームのノルマ 6000万人/月
+                          西京ファームのノルマ 1億人/月
                         </Typography>
                         <Typography variant="caption">
-                          ウマ娘愛好会のノルマ 500万人/月 稼働目標 シン
-                          4000万人/月、破 1500万人/月、序 500万人/月
+                          ウマ娘愛好会(シン・ウマ娘愛好会、ウマ娘新愛好会:破)のノルマ
+                          1500万人/月
+                        </Typography>
+                        <Typography variant="caption">
+                          シン・ウマ娘愛好会の稼働目標 4000万人/月
                         </Typography>
                       </Stack>
                     </Stack>
