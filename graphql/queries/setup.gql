@@ -10,7 +10,7 @@ query Setup($pathname: String!) {
       joined
     }
   }
-  circles(filter: CircleSelect) {
+  circles {
     ...ListedCircle
   }
 }

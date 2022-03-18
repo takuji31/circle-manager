@@ -12,8 +12,3 @@ export const Circle = objectType({
 });
 
 export const CircleKey = enumType(Nexus.CircleKey);
-
-export const CircleFilter = enumType({
-  name: 'CircleFilter',
-  members: ['All', 'CircleSelect', 'MonthSurvey'],
-});

@@ -18,12 +18,6 @@ type Circle {
   name: String!
 }
 
-enum CircleFilter {
-  All
-  CircleSelect
-  MonthSurvey
-}
-
 enum CircleKey {
   Ha
   Jo
@@ -184,7 +178,7 @@ type Mutation {
 }
 
 type Query {
-  circles(filter: CircleFilter = All): [Circle!]!
+  circles: [Circle!]!
   member(id: String, pathname: String): Member
   members: [Member!]!
   monthCircle(monthCircleId: String!): MonthCircle

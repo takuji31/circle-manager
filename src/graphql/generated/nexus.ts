@@ -100,7 +100,6 @@ export interface NexusGenInputs {
 }
 
 export interface NexusGenEnums {
-  CircleFilter: "All" | "CircleSelect" | "MonthSurvey"
   CircleKey: "Ha" | "Jo" | "Saikyo" | "Shin"
   CircleRole: "Leader" | "Member" | "SubLeader"
   MemberStatus: "Joined" | "Kicked" | "Leaved" | "NotJoined" | "OB"
@@ -485,9 +484,6 @@ export interface NexusGenArgTypes {
     }
   }
   Query: {
-    circles: { // args
-      filter: NexusGenEnums['CircleFilter'] | null; // CircleFilter
-    }
     member: { // args
       id?: string | null; // String
       pathname?: string | null; // String
