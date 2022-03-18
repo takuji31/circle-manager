@@ -304,12 +304,15 @@ export const CreateMonthCirclesMutation = mutationField(
           },
         })
       )._count.id;
-      const newMembers = 90 - totalMemberCount;
+      const newMembers = 60 - totalMemberCount;
       const newMembersPerCircle = withoutNewMembers
         ? 0
-        : Math.floor(newMembers / 3);
-      const remainderNewMembers = withoutNewMembers ? 0 : newMembers % 3;
-      const maxMemberCount: Record<Exclude<CircleKey, 'Saikyo'>, number> = {
+        : Math.floor(newMembers / 2);
+      const remainderNewMembers = withoutNewMembers ? 0 : newMembers % 2;
+      const maxMemberCount: Record<
+        Exclude<CircleKey, 'Saikyo' | 'Jo'>,
+        number
+      > = {
         Shin:
           30 -
           leaders.filter((m) => m.circleKey == CircleKey.Shin).length -
@@ -323,14 +326,6 @@ export const CreateMonthCirclesMutation = mutationField(
           leaders.filter((m) => m.circleKey == CircleKey.Ha).length -
           lockedMembers.filter(
             (m) => m.monthCircles[0].state == MonthCircleState.Ha
-          ).length -
-          newMembersPerCircle -
-          (remainderNewMembers == 2 ? 1 : 0),
-        Jo:
-          30 -
-          leaders.filter((m) => m.circleKey == CircleKey.Jo).length -
-          lockedMembers.filter(
-            (m) => m.monthCircles[0].state == MonthCircleState.Jo
           ).length -
           newMembersPerCircle -
           (remainderNewMembers > 0 ? 1 : 0),
@@ -429,7 +424,7 @@ export const CreateMonthCirclesMutation = mutationField(
                 ? MonthCircleState.Shin
                 : idx < maxMemberCount.Shin + maxMemberCount.Ha
                 ? MonthCircleState.Ha
-                : MonthCircleState.Jo,
+                : MonthCircleState.OB,
             currentCircleKey: circleKey,
           })),
           skipDuplicates: true,

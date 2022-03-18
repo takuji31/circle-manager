@@ -14,13 +14,7 @@ import {
   MonthSurveyAnswerValue,
 } from '@prisma/client';
 import { monthCircleStateLabel } from '../model/month_circle';
-import {
-  convert,
-  LocalDate,
-  TemporalAdjusters,
-  ZonedDateTime,
-  DateFormats,
-} from '../model/date';
+import { LocalDate, ZonedDateTime, DateFormats } from '../model/date';
 
 config();
 
@@ -113,6 +107,7 @@ config();
       content:
         `${year}年${month}月のランキング\n\n各サークルの最終更新日` +
         Object.entries(circleToUpdatedAt)
+          .filter((entry) => entry[1] != null)
           .map((entry) => {
             const [key, updatedAt] = entry;
             return `${Circles.findByCircleKey(key as CircleKey).name} : ${
