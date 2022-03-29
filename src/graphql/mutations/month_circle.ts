@@ -81,6 +81,7 @@ export const UpdateMemberMonthCircleMutation = mutationField(
             memberId,
             year,
             month,
+            currentCircleKey: member.circleKey,
             state: state!,
             locked: locked ?? false,
           },
