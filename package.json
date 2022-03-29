@@ -34,9 +34,6 @@
     "ts-node": "ts-node --compiler-options {\\\"module\\\":\\\"commonjs\\\"} ",
     "ts-node-dev": "ts-node-dev --compiler-options {\\\"module\\\":\\\"commonjs\\\"} "
   },
-  "prisma": {
-    "seed": "yarn run ts-node src/database/seed.ts"
-  },
   "cacheDirectories": [
     ".next/cache"
   ],

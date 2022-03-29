@@ -71,8 +71,8 @@ export async function crawlUmastagram(
       date,
       total: BigInt(circleResult.total.replaceAll(',', '')),
       avg: BigInt(circleResult.avg.replaceAll(',', '')),
-      predicted: BigInt(circleResult.predictedAvg.replaceAll(',', '')),
-      predictedAvg: BigInt(circleResult.predictedTotal.replaceAll(',', '')),
+      predicted: BigInt(circleResult.predictedTotal.replaceAll(',', '')),
+      predictedAvg: BigInt(circleResult.predictedAvg.replaceAll(',', '')),
     };
     await prisma.$transaction([
       prisma.memberFanCount.deleteMany({
