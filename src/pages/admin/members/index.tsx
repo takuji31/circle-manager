@@ -14,7 +14,7 @@ import { GetServerSideProps, NextPage } from 'next';
 import { getSession } from 'next-auth/react';
 import React, { useMemo } from 'react';
 import { AdminLayout } from '../../../components/admin_filter';
-import { Circle, Circles, getCircleName, nextMonthInt } from '../../../model';
+import { Circle, nextMonthInt } from '../../../model';
 import {
   AdminMembersDocument,
   ListedMonthSurveyAnswerFragment,
