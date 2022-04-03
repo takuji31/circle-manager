@@ -30,6 +30,7 @@
     "cron:month-ranking-maker": "yarn run ts-node src/cron/month-ranking-maker",
     "cron:month-ranking-notifier": "yarn run ts-node src/cron/month-ranking-notifier",
     "cron:legend-race-reminder": "yarn run ts-node src/cron/legend-race-reminder",
+    "cron:team-race-reminder": "yarn run ts-node src/cron/team-race-reminder",
     "tools:daily-ranking-maker": "yarn run ts-node src/tools/daily-ranking-maker",
     "ts-node": "ts-node --compiler-options {\\\"module\\\":\\\"commonjs\\\"} ",
     "ts-node-dev": "ts-node-dev --compiler-options {\\\"module\\\":\\\"commonjs\\\"} "

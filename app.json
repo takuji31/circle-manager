@@ -1,6 +1,10 @@
 {
   "cron": [
     {
+      "command": "yarn run cron:team-race-reminder",
+      "schedule": "0 21 * * 0"
+    },
+    {
       "command": "yarn run cron:legend-race-reminder",
       "schedule": "0 21 12,13,14,15 3 *"
     },
