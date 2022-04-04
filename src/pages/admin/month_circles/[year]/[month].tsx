@@ -16,7 +16,7 @@ import {
 } from '@mui/material';
 import { NextPage } from 'next';
 import { ParsedUrlQuery } from 'querystring';
-import React, { ReactElement, useState } from 'react';
+import React, { ReactElement, useMemo, useState } from 'react';
 import {
   MonthCircleState,
   MonthSurveyDocument,
@@ -31,6 +31,7 @@ import {
   withUrqlClient,
 } from '../../../../graphql/client';
 import { JsxElement } from 'typescript';
+import { DateFormats, ZonedDateTime } from '../../../../model/date';
 
 interface Props {
   year: string;
@@ -113,6 +114,7 @@ export const MonthCircleList: NextPage<Props> = ({ year, month }) => {
             <TableCell>現サークル</TableCell>
             <TableCell>除名済み</TableCell>
             <TableCell>Discord残留</TableCell>
+            <TableCell>Discord脱退</TableCell>
           </TableHead>
           <TableBody>
             {monthSurvey.leave.map((monthCircle) => {
@@ -135,6 +137,11 @@ export const MonthCircleList: NextPage<Props> = ({ year, month }) => {
                       checked={monthCircle.state == MonthCircleState.Ob}
                     />
                   </TableCell>
+                  <TableCell>
+                    <MemberLeavedMessage
+                      leavedAt={monthCircle.member.leavedAt}
+                    />
+                  </TableCell>
                 </TableRow>
               );
             })}
@@ -146,6 +153,7 @@ export const MonthCircleList: NextPage<Props> = ({ year, month }) => {
             <TableCell>名前</TableCell>
             <TableCell>現サークル</TableCell>
             <TableCell>除名済み</TableCell>
+            <TableCell>Discord脱退</TableCell>
           </TableHead>
           <TableBody>
             {monthSurvey.kick.map((monthCircle) => {
@@ -180,6 +188,11 @@ export const MonthCircleList: NextPage<Props> = ({ year, month }) => {
                       }
                     />
                   </TableCell>
+                  <TableCell>
+                    <MemberLeavedMessage
+                      leavedAt={monthCircle.member.leavedAt}
+                    />
+                  </TableCell>
                 </TableRow>
               );
             })}
@@ -188,6 +201,20 @@ export const MonthCircleList: NextPage<Props> = ({ year, month }) => {
       </Stack>
     </AdminLayout>
   );
+};
+
+const MemberLeavedMessage: React.FC<{
+  leavedAt: string | null | undefined;
+}> = ({ leavedAt }) => {
+  const leavedAtString = useMemo(() => {
+    if (!leavedAt) {
+      return null;
+    }
+    return ZonedDateTime.fromDate(new Date(leavedAt)).format(
+      DateFormats.dateTime
+    );
+  }, [leavedAt]);
+  return <>{leavedAt ? `脱退済み(${leavedAtString})` : '未'}</>;
 };
 
 interface Confirmation {
