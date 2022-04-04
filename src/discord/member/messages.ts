@@ -30,7 +30,7 @@ export const sendInvitedMessage = async (
   await sendDirectMessageIfPossible(
     member,
     `${fromCircle.name}から勧誘を送信しました。
-勧誘を承認してサークルに加入してください。
+前のサークルから除名され次第、勧誘を承認してサークルに加入してください。
 また、加入時にサークルのメンバー一覧を開いて自分のファン数が写るようにスクリーンショットを撮影して <#870289174232702986> に貼り付けてください。\n` +
       (reason == 'signUp'
         ? 'それではこれからよろしくお願いします！'

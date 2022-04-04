@@ -85,7 +85,7 @@ export const MonthCircleList: NextPage<Props> = ({ year, month }) => {
                   <TableCell>
                     <MonthCircleStateCheckbox
                       checked={monthCircle.invited}
-                      disabled={!monthCircle.kicked || monthCircle.joined}
+                      disabled={monthCircle.joined}
                       variablesBuilder={(invited) => ({
                         id: monthCircle.id,
                         invited,
