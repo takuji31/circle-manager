@@ -274,7 +274,6 @@ export interface NexusGenFieldTypes {
     year: number; // Int!
   }
   MonthSurvey: { // field return type
-    answers: NexusGenRootTypes['MonthCircle'][]; // [MonthCircle!]!
     expiredAt: NexusGenScalars['DateTime']; // DateTime!
     id: string; // ID!
     kick: NexusGenRootTypes['MonthCircle'][]; // [MonthCircle!]!
@@ -282,7 +281,6 @@ export interface NexusGenFieldTypes {
     month: number; // Int!
     monthSurveyAnswers: NexusGenRootTypes['MonthSurveyAnswer'][]; // [MonthSurveyAnswer!]!
     move: NexusGenRootTypes['MonthCircle'][]; // [MonthCircle!]!
-    noAnswerMembers: NexusGenRootTypes['Member'][]; // [Member!]!
     year: number; // Int!
   }
   MonthSurveyAnswer: { // field return type
@@ -398,7 +396,6 @@ export interface NexusGenFieldTypeNames {
     year: 'Int'
   }
   MonthSurvey: { // field return type name
-    answers: 'MonthCircle'
     expiredAt: 'DateTime'
     id: 'ID'
     kick: 'MonthCircle'
@@ -406,7 +403,6 @@ export interface NexusGenFieldTypeNames {
     month: 'Int'
     monthSurveyAnswers: 'MonthSurveyAnswer'
     move: 'MonthCircle'
-    noAnswerMembers: 'Member'
     year: 'Int'
   }
   MonthSurveyAnswer: { // field return type name

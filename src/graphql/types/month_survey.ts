@@ -26,9 +26,17 @@ export const MonthSurvey = objectType({
               notIn: ['Kicked', 'Leaved', 'OB'],
             },
           },
-          orderBy: {
-            state: 'asc',
-          },
+          orderBy: [
+            {
+              currentCircleKey: 'asc',
+            },
+            {
+              state: 'asc',
+            },
+            {
+              member: { joinedAt: 'asc' },
+            },
+          ],
         });
 
         return monthCircles.filter(
@@ -49,9 +57,17 @@ export const MonthSurvey = objectType({
               in: ['Leaved', 'OB'],
             },
           },
-          orderBy: {
-            currentCircleKey: 'asc',
-          },
+          orderBy: [
+            {
+              currentCircleKey: 'asc',
+            },
+            {
+              state: 'asc',
+            },
+            {
+              member: { joinedAt: 'asc' },
+            },
+          ],
         });
       },
     });
@@ -65,52 +81,17 @@ export const MonthSurvey = objectType({
             month,
             state: 'Kicked',
           },
-          orderBy: {
-            currentCircleKey: 'asc',
-          },
-        });
-      },
-    });
-
-    t.field('answers', {
-      type: nonNull(list(nonNull(MonthCircle))),
-      resolve({ year, month }, _, { prisma }) {
-        return prisma.monthCircle.findMany({
-          where: {
-            member: {
-              circleKey: { not: null },
+          orderBy: [
+            {
+              currentCircleKey: 'asc',
             },
-            year,
-            month,
-            state: {
-              not: 'Kicked',
+            {
+              state: 'asc',
             },
-          },
-        });
-      },
-    });
-    t.field('noAnswerMembers', {
-      type: nonNull(list(nonNull(Member))),
-      resolve({ year, month }, _, { prisma }) {
-        return prisma.member.findMany({
-          where: {
-            AND: [
-              {
-                circleKey: {
-                  not: null,
-                },
-              },
-              {
-                monthCircles: {
-                  some: {
-                    year,
-                    month,
-                    state: 'Kicked',
-                  },
-                },
-              },
-            ],
-          },
+            {
+              member: { joinedAt: 'asc' },
+            },
+          ],
         });
       },
     });
@@ -128,7 +109,9 @@ export const MonthSurvey = objectType({
               circleKey: 'asc',
             },
             {
-              value: 'asc',
+              member: {
+                joinedAt: 'asc',
+              },
             },
           ],
         });
