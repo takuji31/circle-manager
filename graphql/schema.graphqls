@@ -135,7 +135,6 @@ enum MonthCircleState {
 
 """在籍希望アンケート"""
 type MonthSurvey {
-  answers: [MonthCircle!]!
   expiredAt: DateTime!
 
   """アンケートのメッセージID"""
@@ -145,7 +144,6 @@ type MonthSurvey {
   month: Int!
   monthSurveyAnswers: [MonthSurveyAnswer!]!
   move: [MonthCircle!]!
-  noAnswerMembers: [Member!]!
   year: Int!
 }
 

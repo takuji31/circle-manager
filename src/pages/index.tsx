@@ -246,7 +246,7 @@ const AdminTopContent = () => {
                               {count}{' '}
                               {value == MonthSurveyAnswerValue.Saikyo && '/ 30'}
                               {value == MonthSurveyAnswerValue.Umamusume &&
-                                '/ 90'}
+                                '/ 60'}
                             </TableCell>
                           </TableRow>
                         );
@@ -254,8 +254,12 @@ const AdminTopContent = () => {
                       <TableRow>
                         <TableCell>回答済み合計</TableCell>
                         <TableCell>
-                          {nextMonth.survey.answers.length}/
-                          {data.siteMetadata.activeMembers}
+                          {nextMonth.survey.monthSurveyAnswers.filter(
+                            (answer) =>
+                              answer.value &&
+                              answer.value != MonthSurveyAnswerValue.None
+                          )}{' '}
+                          / {nextMonth.survey.monthSurveyAnswers.length}
                         </TableCell>
                       </TableRow>
                     </TableBody>
