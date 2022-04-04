@@ -61,6 +61,13 @@ export default NextAuth({
       return token;
     },
     async session({ session, token, user }) {
+      const member = await prisma.member.findFirst({
+        where: { id: token.id as string },
+      });
+      if (member) {
+        session.role = member.circleRole;
+        session.circleKey = member.circleKey;
+      }
       // Send properties to the client, like an access_token from a provider.
       session.id = token.id;
       session.accessToken = token.accessToken;

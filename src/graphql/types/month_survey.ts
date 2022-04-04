@@ -1,6 +1,4 @@
 import { MonthCircle } from './month_circle';
-import { Member } from './member';
-import { Circles } from '../../model';
 import { MonthSurvey as _MonthSurvey } from 'nexus-prisma';
 import { MonthCircle as _MonthCircle } from '@prisma/client';
 import { nonNull, objectType, list } from 'nexus';
