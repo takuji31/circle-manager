@@ -147,15 +147,19 @@ export const UpdateMonthCircleMutation = mutationField('updateMonthCircle', {
     const { state } = monthCircle;
 
     if (!beforeKicked && kicked && circle) {
-      await sendKickedMessage(
-        member,
-        circle,
-        state == 'Kicked'
-          ? 'kick'
-          : state == 'Leaved' || state == 'OB'
-          ? 'leave'
-          : 'move'
-      );
+      try {
+        await sendKickedMessage(
+          member,
+          circle,
+          state == 'Kicked'
+            ? 'kick'
+            : state == 'Leaved' || state == 'OB'
+            ? 'leave'
+            : 'move'
+        );
+      } catch (e) {
+        console.log(e);
+      }
 
       if (state == 'Kicked' && process.env.NODE_ENV == 'production') {
         const rest = createDiscordRestClient();
@@ -169,11 +173,14 @@ export const UpdateMonthCircleMutation = mutationField('updateMonthCircle', {
           console.log(e);
         }
       } else if (
-        (state == MonthCircleState.OB || state == MonthCircleState.Leaved) &&
-        process.env.NODE_ENV == 'production'
+        state == MonthCircleState.OB ||
+        state == MonthCircleState.Leaved
       ) {
-        const rest = createDiscordRestClient();
         try {
+          await setMemberCircleRole(
+            member.id,
+            state == MonthCircleState.OB ? Guild.roleIds.ob : null
+          );
         } catch (e) {
           console.log(e);
         }
@@ -188,9 +195,6 @@ export const UpdateMonthCircleMutation = mutationField('updateMonthCircle', {
     if (joined && isCircleKey(state)) {
       const circle = Circles.findByCircleKey(state);
       try {
-        if (process.env.NODE_ENV != 'production') {
-          throw new Error('Update role ignored in develop');
-        }
         await setMemberCircleRole(monthCircle.memberId, circle.id);
       } catch (e) {
         console.log(e);

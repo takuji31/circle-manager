@@ -52,9 +52,6 @@ export const UpdateSignUpMutation = mutationField('updateSignUp', {
 
     if (circle && joined) {
       try {
-        if (process.env.NODE_ENV != 'production') {
-          throw new Error('Update role ignored in develop');
-        }
         await setMemberCircleRole(memberId, circle.id);
       } catch (e) {
         console.log(e);
