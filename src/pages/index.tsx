@@ -36,6 +36,7 @@ import { LoadingCheckBox } from '../components/loading_checkbox';
 import { MonthSurveyAnswerValue } from '@prisma/client';
 import { useMutation, useQuery } from 'urql';
 import { DateFormats, ZonedDateTime, ZoneId } from '../model/date';
+import { withUrqlClient } from '../graphql/client';
 
 const Home: NextPage = (props) => {
   const { user, status } = useUser();
@@ -321,4 +322,4 @@ const JoinedCheckBox: (props: {
   );
 };
 
-export default Home;
+export default withUrqlClient()(Home);

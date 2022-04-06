@@ -8,6 +8,7 @@ import {
 } from '@mui/material';
 import React from 'react';
 import { useMutation, useQuery } from 'urql';
+import { withUrqlClient } from '../graphql/client';
 import {
   AdminMemberMonthCircleDocument,
   MonthCircleState,
@@ -21,7 +22,7 @@ export interface Props {
   month: number;
 }
 
-export default function MemberMonthCircle({ memberId, year, month }: Props) {
+const MemberMonthCircle: React.VFC<Props> = ({ memberId, year, month }) => {
   const [{ data, fetching }, refetch] = useQuery({
     query: AdminMemberMonthCircleDocument,
     variables: {
@@ -86,4 +87,6 @@ export default function MemberMonthCircle({ memberId, year, month }: Props) {
       />
     </Stack>
   );
-}
+};
+
+export default MemberMonthCircle;

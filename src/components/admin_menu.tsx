@@ -37,62 +37,15 @@ export const AdminMenu = () => {
         >
           メンバー表更新
         </LoadingButton>
-        <CircleMenu />
+        <Button
+          color="inherit"
+          startIcon={<Icons.AdminPanelSettings />}
+          component={NextLinkComposed}
+          to="/admin/members"
+        >
+          メンバー一覧
+        </Button>
       </>
     );
   }
-};
-
-const CircleMenu: React.VFC = () => {
-  const [{ data, fetching, error }] = useQuery({ query: AdminCirclesDocument });
-  if (fetching || !data) {
-    return <CircularProgress color="inherit" />;
-  } else if (error) {
-    return (
-      <Typography color="error" variant="caption">
-        {error.message}
-      </Typography>
-    );
-  }
-
-  return (
-    <>
-      <Button
-        color="inherit"
-        startIcon={<Icons.AdminPanelSettings />}
-        component={NextLinkComposed}
-        to="/admin/members"
-      >
-        メンバー一覧
-      </Button>
-      <PopupState variant="popover" popupId="demo-popup-menu">
-        {(popupState) => (
-          <>
-            <Button
-              startIcon={<Icons.AdminPanelSettings />}
-              size="large"
-              {...bindTrigger(popupState)}
-              color="inherit"
-            >
-              サークル
-            </Button>
-            <Menu {...bindMenu(popupState)}>
-              {data.circles.map((circle) => {
-                return (
-                  <MenuItem
-                    component={NextLinkComposed}
-                    onClick={popupState.close}
-                    to={`/admin/circles/${circle.id}`}
-                    key={`circle_menu_${circle.id}`}
-                  >
-                    {circle.name}
-                  </MenuItem>
-                );
-              })}
-            </Menu>
-          </>
-        )}
-      </PopupState>
-    </>
-  );
 };

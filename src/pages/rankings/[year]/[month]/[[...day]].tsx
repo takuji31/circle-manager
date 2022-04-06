@@ -3,6 +3,7 @@ import { GetServerSideProps, NextPage } from 'next';
 import { isArray } from 'nexus/dist/utils';
 import { ParsedUrlQuery } from 'querystring';
 import { prisma } from '../../../../database';
+import { withUrqlClient } from '../../../../graphql/client';
 
 const RankingPage: NextPage<{ year: number; month: number; day: number }> = ({
   year,
@@ -81,4 +82,4 @@ export const getServerSideProps: GetServerSideProps<Props, Params> = async ({
   };
 };
 
-export default RankingPage;
+export default withUrqlClient()(RankingPage);

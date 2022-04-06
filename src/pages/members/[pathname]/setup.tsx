@@ -62,7 +62,6 @@ const Setup: NextPage<Props> = ({ pathname }) => {
   });
 
   const {
-    register,
     control,
     setValue,
     handleSubmit,

@@ -26,6 +26,7 @@ import { monthSurveyAnswerLabel } from '../../../model/month_survey_answer';
 import { useQuery } from 'urql';
 import { memberStatusLabel } from '../../../model/member';
 import { monthCircleStateLabel } from '../../../model/month_circle';
+import { withUrqlClient } from '../../../graphql/client';
 
 export interface Props {
   monthCircleNames: Array<string>;
@@ -191,4 +192,4 @@ export const getServerSideProps: GetServerSideProps<Props> = async (
   }
 };
 
-export default MemberList;
+export default withUrqlClient()(MemberList);
