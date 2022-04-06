@@ -10,6 +10,11 @@ const Channels = {
   channelSettings: '960040529343688754', // チャンネル表示設定
 } as const;
 
+const Category = {
+  personalChannels: '961271360821280808', // 個人チャンネル
+  testPersonalChannels: '961304324649140295', // 個人チャンネルテスト用
+} as const;
+
 export const Guild = {
   id: '839400642664595506',
   roleIds: {
@@ -25,6 +30,9 @@ export const Guild = {
     ],
     ob: '889835308189900810',
     notJoined: '902440950176034816',
+    personalChannelViewer: isProduction
+      ? '960501109355610153'
+      : '863393688357044234',
   },
   channelIds: {
     all: isProduction ? Channels.all : Channels.botTest,
@@ -32,5 +40,10 @@ export const Guild = {
     random: isProduction ? Channels.random : Channels.botTest,
     channelSettings: isProduction ? Channels.channelSettings : Channels.botTest,
     commandExecutor: '908319798700703794',
+  },
+  categoryIds: {
+    personalChannel: isProduction
+      ? Category.personalChannels
+      : Category.testPersonalChannels,
   },
 } as const;

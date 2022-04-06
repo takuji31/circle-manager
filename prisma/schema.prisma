@@ -143,11 +143,11 @@ model CircleFanCount {
 
 /// 個人チャンネル
 model PersonalChannel {
-  id       String @id @db.VarChar(255)
-  memberId String @db.VarChar(255)
-  member   Member @relation(fields: [memberId], references: [id])
+  id        String @id @db.VarChar(255)
+  channelId String @db.VarChar(255)
+  member    Member @relation(fields: [id], references: [id])
 
-  @@index([memberId, id])
+  @@index([id, channelId])
 }
 
 // for NextAuth

@@ -2,12 +2,9 @@ import { createDiscordRestClient } from '../discord';
 import { config } from 'dotenv';
 import { createRedisClient, RedisKeys } from '../redis';
 import {
-  APIEmbed,
   APIMessage,
   RESTGetAPIChannelMessageResult,
-  RESTPatchAPIChannelMessageJSONBody,
   RESTPatchAPIChannelMessageResult,
-  RESTPostAPIChannelMessageJSONBody,
   RESTPostAPIChannelMessageResult,
   Routes,
 } from 'discord-api-types/v9';
@@ -46,7 +43,7 @@ config();
       )
       .addField(
         '開設方法',
-        'このチャンネルに:pen:でリアクションすると開設されます。'
+        'このメッセージに:pencil2:でリアクションすると開設されます。'
       )
       .addField(
         '閉鎖方法',

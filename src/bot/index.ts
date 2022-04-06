@@ -6,9 +6,11 @@ import { registerTrainerIdCommand } from './register_trainer_id';
 import { PrismaClient } from '@prisma/client';
 import { Client, Intents, Options } from 'discord.js';
 import { config } from 'dotenv';
-import { Emoji } from '../model/emoji';
-import { Circle, Circles } from '../model';
+import { Emoji, MonthSurveyEmoji } from '../model/emoji';
+import { Circles } from '../model';
 import { updateFanCountEvent } from './circle/update_fan_count';
+import { createRedisClient, RedisClient, RedisKeys } from '../redis';
+import { createPersonalChannel } from './member/create_personal_channes';
 
 config();
 
@@ -26,11 +28,14 @@ const client = new Client({
 
 const prisma = new PrismaClient();
 
+let redis: RedisClient;
+
 client.on('guildUpdate', async (guild) => {
   console.log('guildUpdate %s', guild);
 });
 
 client.on('ready', async () => {
+  redis = await createRedisClient();
   console.log('ready');
 });
 
@@ -121,15 +126,34 @@ client.on('messageReactionAdd', async (reaction, user) => {
       return;
     }
 
-    const survey = await prisma.monthSurvey.findUnique({
-      where: {
-        id: reaction.message.id,
-      },
-    });
-    if (survey && emoji == Emoji.eyes) {
-      monthSurveyShowReaction(reaction, user, emoji, survey);
-    } else if (survey) {
-      monthSurveyReaction(reaction, user, emoji, survey);
+    if (
+      Object.values(MonthSurveyEmoji).includes(emoji as any) ||
+      emoji == Emoji.eyes
+    ) {
+      const survey = await prisma.monthSurvey.findUnique({
+        where: {
+          id: reaction.message.id,
+        },
+      });
+      if (survey && emoji == Emoji.eyes) {
+        monthSurveyShowReaction(reaction, user, emoji, survey);
+        return;
+      } else if (survey) {
+        monthSurveyReaction(reaction, user, emoji, survey);
+        return;
+      }
+    }
+
+    if (emoji == Emoji.pen) {
+      const messageId = await redis.get(RedisKeys.personalChannelMessageId);
+      if (reaction.message.id == messageId) {
+        await createPersonalChannel(
+          reaction,
+          user,
+          emoji,
+          reaction.message.guild!
+        );
+      }
     }
   } catch (e) {
     console.log('Error when messageReactionAdd %s', e);
