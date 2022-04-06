@@ -84,6 +84,7 @@
     "react-dom": "^18.0.0",
     "react-hook-form": "^7.29.0",
     "react-is": "^17.0.2",
+    "redis": "^4.0.6",
     "regenerator-runtime": "0.13.7",
     "scuid": "^1.1.0",
     "swr": "^1.0.1",
