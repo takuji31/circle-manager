@@ -37,6 +37,7 @@ import {
 } from '../../../../graphql/client';
 import { DateFormats, ZonedDateTime } from '../../../../model/date';
 import useUser from '../../../../hooks/user';
+import { check } from 'prettier';
 
 interface Props {
   year: string;
@@ -303,32 +304,38 @@ const MonthCircleStateCheckbox = ({
   variablesBuilder: (checked: boolean) => UpdateMonthCircleMutationInput;
   confirmation?: React.ReactElement<any, any>;
 }) => {
+  const [afterChecked, setAfterChecked] = useState(checked);
   const [{ fetching }, mutation] = useMutation(UpdateMonthCircleDocument);
   const [open, setOpen] = useState(false);
-  const handleClose = () => setOpen(false);
+  const handleClose = () => {
+    setOpen(false);
+    mutation({
+      data: {
+        ...variablesBuilder(afterChecked),
+      },
+    })
+      .then(() => {})
+      .catch((error) => {
+        console.log('error: %s', error);
+      })
+      .finally(() => setOpen(false));
+  };
   return (
     <>
       {confirmation && (
         <Dialog
           open={open}
-          onClose={() => {
-            mutation({
-              data: {
-                ...variablesBuilder(checked),
-              },
-            })
-              .then(() => {})
-              .catch((error) => {
-                console.log('error: %s', error);
-              })
-              .finally(() => setOpen(false));
-          }}
+          onClose={() => setOpen(false)}
           aria-labelledby="responsive-dialog-title"
         >
           <DialogTitle id="responsive-dialog-title">確認</DialogTitle>
           <DialogContent>{confirmation}</DialogContent>
           <DialogActions>
-            <Button disabled={fetching} autoFocus onClick={handleClose}>
+            <Button
+              disabled={fetching}
+              autoFocus
+              onClick={() => setOpen(false)}
+            >
               いいえ
             </Button>
             <Button disabled={fetching} onClick={handleClose} autoFocus>
@@ -343,8 +350,9 @@ const MonthCircleStateCheckbox = ({
         disabled={disabled}
         onCheckChanged={(checked) => {
           if (confirmation && checked) {
+            setAfterChecked(checked);
             setOpen(true);
-          } else if (!confirmation) {
+          } else {
             mutation({
               data: {
                 ...variablesBuilder(checked),
