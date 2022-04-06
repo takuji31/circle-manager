@@ -1,6 +1,6 @@
 import { ContextFunction } from 'apollo-server-core';
 import { getSession } from 'next-auth/react';
-import { PrismaClient } from '@prisma/client';
+import { CircleKey, CircleRole, PrismaClient } from '@prisma/client';
 import { UserWithSession } from '../model';
 import { prisma } from '../database';
 
@@ -12,12 +12,7 @@ export type Context = {
 export const createContext: ContextFunction = async ({ req }) => {
   const session = await getSession({ req });
   const user: UserWithSession | null = session
-    ? {
-        id: session.id as string,
-        name: session.name as string,
-        isAdmin: session.isAdmin as boolean,
-        isMember: session.isMember as boolean,
-      }
+    ? (session as unknown as UserWithSession)
     : null;
   return {
     prisma,
