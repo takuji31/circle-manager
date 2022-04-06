@@ -312,7 +312,16 @@ const MonthCircleStateCheckbox = ({
         <Dialog
           open={open}
           onClose={() => {
-            setOpen(false);
+            mutation({
+              data: {
+                ...variablesBuilder(checked),
+              },
+            })
+              .then(() => {})
+              .catch((error) => {
+                console.log('error: %s', error);
+              })
+              .finally(() => setOpen(false));
           }}
           aria-labelledby="responsive-dialog-title"
         >
@@ -335,12 +344,17 @@ const MonthCircleStateCheckbox = ({
         onCheckChanged={(checked) => {
           if (confirmation && checked) {
             setOpen(true);
-          } else {
+          } else if (!confirmation) {
             mutation({
               data: {
                 ...variablesBuilder(checked),
               },
-            });
+            })
+              .then(() => {})
+              .catch((error) => {
+                console.log('error: %s', error);
+              })
+              .finally(() => setOpen(false));
           }
         }}
       />
