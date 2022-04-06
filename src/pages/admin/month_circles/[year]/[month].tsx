@@ -6,12 +6,9 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-  FormControl,
   FormControlLabel,
   FormGroup,
   FormHelperText,
-  Input,
-  InputLabel,
   Stack,
   TableBody,
   TableCell,
@@ -22,7 +19,7 @@ import {
 } from '@mui/material';
 import { NextPage } from 'next';
 import { ParsedUrlQuery } from 'querystring';
-import React, { ReactElement, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   CircleKey,
   CircleRole,
@@ -38,7 +35,6 @@ import {
   getServerSidePropsWithUrql,
   withUrqlClient,
 } from '../../../../graphql/client';
-import { JsxElement } from 'typescript';
 import { DateFormats, ZonedDateTime } from '../../../../model/date';
 import useUser from '../../../../hooks/user';
 
