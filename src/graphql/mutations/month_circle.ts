@@ -147,15 +147,19 @@ export const UpdateMonthCircleMutation = mutationField('updateMonthCircle', {
     const { state } = monthCircle;
 
     if (!beforeKicked && kicked && circle) {
-      await sendKickedMessage(
-        member,
-        circle,
-        state == 'Kicked'
-          ? 'kick'
-          : state == 'Leaved' || state == 'OB'
-          ? 'leave'
-          : 'move'
-      );
+      try {
+        await sendKickedMessage(
+          member,
+          circle,
+          state == 'Kicked'
+            ? 'kick'
+            : state == 'Leaved' || state == 'OB'
+            ? 'leave'
+            : 'move'
+        );
+      } catch (e) {
+        console.log(e);
+      }
 
       if (state == 'Kicked' && process.env.NODE_ENV == 'production') {
         const rest = createDiscordRestClient();
