@@ -6,6 +6,7 @@
     "start": "next start",
     "dev": "NODE_OPTIONS='--inspect' next dev",
     "prebuild": "yarn run db:migrate:deploy && yarn run gen",
+    "postinstall": "yarn run gen",
     "build": "next build",
     "test": "jest",
     "gen": "yarn run db:generate && yarn run graphql:schemagen --nexusTypegen && yarn run graphql:codegen",
