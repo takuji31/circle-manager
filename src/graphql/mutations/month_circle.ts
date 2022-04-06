@@ -173,11 +173,14 @@ export const UpdateMonthCircleMutation = mutationField('updateMonthCircle', {
           console.log(e);
         }
       } else if (
-        (state == MonthCircleState.OB || state == MonthCircleState.Leaved) &&
-        process.env.NODE_ENV == 'production'
+        state == MonthCircleState.OB ||
+        state == MonthCircleState.Leaved
       ) {
-        const rest = createDiscordRestClient();
         try {
+          await setMemberCircleRole(
+            member.id,
+            state == MonthCircleState.OB ? Guild.roleIds.ob : null
+          );
         } catch (e) {
           console.log(e);
         }
@@ -192,9 +195,6 @@ export const UpdateMonthCircleMutation = mutationField('updateMonthCircle', {
     if (joined && isCircleKey(state)) {
       const circle = Circles.findByCircleKey(state);
       try {
-        if (process.env.NODE_ENV != 'production') {
-          throw new Error('Update role ignored in develop');
-        }
         await setMemberCircleRole(monthCircle.memberId, circle.id);
       } catch (e) {
         console.log(e);
