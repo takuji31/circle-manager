@@ -81,7 +81,7 @@
     "node-fetch": "2",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
-    "react-hook-form": "7.21.1",
+    "react-hook-form": "^7.29.0",
     "react-is": "^17.0.2",
     "regenerator-runtime": "0.13.7",
     "scuid": "^1.1.0",
