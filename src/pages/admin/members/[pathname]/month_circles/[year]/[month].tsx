@@ -60,6 +60,8 @@ export const getServerSideProps = getServerSidePropsWithUrql<Props, Params>(
   }
 );
 
-const AdminMemberMonthCircle = withUrqlClient(false)(MemberMonthCirclePage);
+const AdminMemberMonthCircle = withUrqlClient({ ssr: false })(
+  MemberMonthCirclePage
+);
 
 export default AdminMemberMonthCircle;

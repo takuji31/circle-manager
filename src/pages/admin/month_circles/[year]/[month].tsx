@@ -379,4 +379,4 @@ export const getServerSideProps = getServerSidePropsWithUrql<Props, PathParams>(
   }
 );
 
-export default withUrqlClient(false)(MonthCircleList);
+export default withUrqlClient({ ssr: false })(MonthCircleList);

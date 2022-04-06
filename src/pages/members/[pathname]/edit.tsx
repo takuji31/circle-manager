@@ -149,4 +149,4 @@ export const getServerSideProps = getServerSidePropsWithUrql<Props>(
   }
 );
 
-export default withUrqlClient(false)(Pathname);
+export default withUrqlClient({ ssr: false })(Pathname);

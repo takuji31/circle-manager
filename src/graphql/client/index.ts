@@ -14,6 +14,7 @@ import {
   initUrqlClient as _initUrqlClient,
   SSRExchange,
   SSRData,
+  WithUrqlClientOptions,
 } from 'next-urql';
 import { ParsedUrlQuery } from 'querystring';
 import {
@@ -28,19 +29,13 @@ import {
 
 const isSSR = typeof window == 'undefined';
 
-export const withUrqlClient = (ssr: boolean = true) => {
-  return _withUrqlClient(
-    (ssr, ctx) => {
-      return {
-        url: (isSSR ? process.env.BASE_URL : '') + '/api/graphql',
-        exchanges: [dedupExchange, cacheExchange, ssr, fetchExchange],
-      };
-    },
-    {
-      staleWhileRevalidate: true,
-      ssr,
-    }
-  );
+export const withUrqlClient = (options: WithUrqlClientOptions = {}) => {
+  return _withUrqlClient((ssr, ctx) => {
+    return {
+      url: (isSSR ? process.env.BASE_URL : '') + '/api/graphql',
+      exchanges: [dedupExchange, cacheExchange, ssr, fetchExchange],
+    };
+  }, options);
 };
 
 export function getServerSidePropsWithUrql<

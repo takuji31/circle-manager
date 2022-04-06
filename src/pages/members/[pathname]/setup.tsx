@@ -235,4 +235,4 @@ export const getServerSideProps = getServerSidePropsWithUrql<Props>(
   }
 );
 
-export default withUrqlClient(false)(Setup);
+export default withUrqlClient({ ssr: false })(Setup);
