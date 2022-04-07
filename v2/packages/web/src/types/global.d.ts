@@ -5,6 +5,6 @@ declare namespace NodeJS {
     readonly DISCORD_CLIENT_SECRET: string;
     readonly DISCORD_BOT_TOKEN: string;
     readonly BASE_URL: string;
-    readonly SECRET: string;
+    readonly NEXTAUTH_SECRET: string;
   }
 }
