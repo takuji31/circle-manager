@@ -7,7 +7,7 @@ export const setMemberCircleRole = async (
   roleId: string | null,
   force: boolean = false
 ) => {
-  if (process.env.NODE_ENV != 'production' || !force) {
+  if (process.env.NODE_ENV != 'production' && !force) {
     throw new Error('Update role ignored in develop');
   }
   const rest = createDiscordRestClient();
