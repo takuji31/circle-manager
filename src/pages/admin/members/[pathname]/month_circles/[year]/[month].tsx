@@ -3,13 +3,13 @@ import { NextPage } from 'next';
 import React from 'react';
 import MemberMonthCircle from '../../../../../../components/member_month_circle';
 import { MemberMonthCirclesDocument } from '../../../../../../graphql/generated/type';
-import { AdminLayout } from '../../../../../../components/admin_filter';
 import {
   getServerSidePropsWithUrql,
   withUrqlClient,
 } from '../../../../../../graphql/client';
 import { ParsedUrlQuery } from 'querystring';
 import { prisma } from '../../../../../../database';
+import Layout from '../../../../../../components/layout';
 
 interface Props {
   year: number;
@@ -25,11 +25,11 @@ interface Params extends ParsedUrlQuery {
 
 const MemberMonthCirclePage: NextPage<Props> = ({ year, month, memberId }) => {
   return (
-    <AdminLayout title="サークル編集">
+    <Layout title="サークル編集">
       <Box p={2}>
         <MemberMonthCircle year={year} month={month} memberId={memberId} />
       </Box>
-    </AdminLayout>
+    </Layout>
   );
 };
 
