@@ -15,22 +15,23 @@ generator nexusPrisma {
 }
 
 model Member {
-  id               String           @id @db.VarChar(255)
-  pathname         String           @default(cuid()) @db.VarChar(255)
-  circleRole       CircleRole       @default(Member)
-  name             String           @db.VarChar(255)
-  trainerId        String?          @db.VarChar(255)
-  messageChannelId String?          @db.VarChar(255)
-  setupCompleted   Boolean          @default(false)
-  status           MemberStatus     @default(Joined)
-  joinedAt         DateTime
-  leavedAt         DateTime?
-  circleKey        CircleKey?       @default(dbgenerated("NULL"))
-  monthCircles     MonthCircle[]
-  signUp           SignUp?
-  fanCounts        MemberFanCount[]
-
+  id                String              @id @db.VarChar(255)
+  pathname          String              @default(cuid()) @db.VarChar(255)
+  circleRole        CircleRole          @default(Member)
+  name              String              @db.VarChar(255)
+  trainerId         String?             @db.VarChar(255)
+  messageChannelId  String?             @db.VarChar(255)
+  setupCompleted    Boolean             @default(false)
+  status            MemberStatus        @default(Joined)
+  joinedAt          DateTime
+  leavedAt          DateTime?
+  circleKey         CircleKey?
+  monthCircles      MonthCircle[]
+  signUp            SignUp?
+  fanCounts         MemberFanCount[]
   monthSurveyAnswer MonthSurveyAnswer[]
+  PersonalChannel   PersonalChannel[]
+
   @@unique([pathname])
   @@index([leavedAt])
   @@index([joinedAt])
@@ -138,6 +139,15 @@ model CircleFanCount {
 
   @@unique([circle, date])
   @@index([date])
+}
+
+/// 個人チャンネル
+model PersonalChannel {
+  id        String @id @db.VarChar(255)
+  channelId String @db.VarChar(255)
+  member    Member @relation(fields: [id], references: [id])
+
+  @@index([id, channelId])
 }
 
 // for NextAuth

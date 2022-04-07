@@ -4,6 +4,7 @@ export const Emoji = {
   c: '🇨',
   d: '🇩',
   eyes: '👀',
+  pen: '✏️',
 } as const;
 type Emoji = typeof Emoji[keyof typeof Emoji];
 

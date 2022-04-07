@@ -1,4 +1,4 @@
-import { makeSchema } from 'nexus';
+import { connectionPlugin, makeSchema } from 'nexus';
 import NexusPrismaScalars from 'nexus-prisma/scalars';
 import { join } from 'path';
 import * as types from './types';
@@ -16,5 +16,6 @@ export const schema = makeSchema({
     export: 'Context',
     module: join(process.cwd(), 'src', 'graphql', 'context.ts'),
   },
+  plugins: [connectionPlugin()],
   shouldExitAfterGenerateArtifacts: process.argv.includes('--nexusTypegen'),
 });
