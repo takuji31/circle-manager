@@ -18,7 +18,7 @@ export default NextAuth({
         'https://discord.com/api/oauth2/authorize?scope=identify+email+guilds',
     }),
   ],
-  secret: process.env.SECRET,
+  secret: process.env.NEXTAUTH_SECRET,
   session: {
     strategy: 'jwt',
   },

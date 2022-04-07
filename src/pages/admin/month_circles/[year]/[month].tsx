@@ -28,7 +28,6 @@ import {
   UpdateMonthCircleDocument,
   UpdateMonthCircleMutationInput,
 } from '../../../../graphql/generated/type';
-import { AdminLayout } from '../../../../components/admin_filter';
 import { LoadingCheckBox } from '../../../../components/loading_checkbox';
 import { useMutation, useQuery } from 'urql';
 import {
@@ -38,6 +37,7 @@ import {
 import { DateFormats, ZonedDateTime } from '../../../../model/date';
 import useUser from '../../../../hooks/user';
 import { check } from 'prettier';
+import Layout from '../../../../components/layout';
 
 interface Props {
   year: string;
@@ -65,7 +65,7 @@ export const MonthCircleList: NextPage<Props> = ({ year, month }) => {
   }
 
   return (
-    <AdminLayout title={`${monthSurvey.year}年${monthSurvey.month}月の移籍表`}>
+    <Layout title={`${monthSurvey.year}年${monthSurvey.month}月の移籍表`}>
       <Stack p={2} spacing={4}>
         <Stack spacing={4} direction="row">
           <FormGroup>
@@ -271,7 +271,7 @@ export const MonthCircleList: NextPage<Props> = ({ year, month }) => {
           </TableBody>
         </TableContainer>
       </Stack>
-    </AdminLayout>
+    </Layout>
   );
 };
 

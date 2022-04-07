@@ -13,7 +13,6 @@ import {
 import { GetServerSideProps, NextPage } from 'next';
 import { getSession } from 'next-auth/react';
 import React, { useMemo } from 'react';
-import { AdminLayout } from '../../../components/admin_filter';
 import { Circle, nextMonthInt } from '../../../model';
 import {
   AdminMembersDocument,
@@ -27,6 +26,7 @@ import { useQuery } from 'urql';
 import { memberStatusLabel } from '../../../model/member';
 import { monthCircleStateLabel } from '../../../model/month_circle';
 import { withUrqlClient } from '../../../graphql/client';
+import Layout from '../../../components/layout';
 
 export interface Props {
   monthCircleNames: Array<string>;
@@ -102,6 +102,7 @@ const MemberList: NextPage<Props> = ({ monthCircleNames }) => {
             return value.state ? monthCircleStateLabel(value.state) : '未確定';
           }
         },
+        // eslint-disable-next-line react/display-name
         renderCell: (params: GridRenderCellParams) => {
           const value = params.value as MonthCircle;
           const pathname = params.row.pathname;
@@ -143,7 +144,7 @@ const MemberList: NextPage<Props> = ({ monthCircleNames }) => {
   const members = data?.members;
 
   return (
-    <AdminLayout title="メンバー一覧">
+    <Layout title="メンバー一覧">
       {fetching && (
         <Box>
           <LinearProgress />
@@ -169,7 +170,7 @@ const MemberList: NextPage<Props> = ({ monthCircleNames }) => {
           />
         </div>
       )}
-    </AdminLayout>
+    </Layout>
   );
 };
 
