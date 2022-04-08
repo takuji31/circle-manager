@@ -15,7 +15,7 @@ import { createPersonalChannel } from './member/create_personal_channes';
 config();
 
 const client = new Client({
-  partials: ['MESSAGE', 'REACTION', 'CHANNEL', 'USER'],
+  partials: ['MESSAGE', 'REACTION', 'CHANNEL', 'USER', 'GUILD_MEMBER'],
   intents: [
     Intents.FLAGS.GUILDS,
     Intents.FLAGS.GUILD_MESSAGES,
