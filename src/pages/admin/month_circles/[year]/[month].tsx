@@ -10,6 +10,7 @@ import {
   FormGroup,
   FormHelperText,
   Stack,
+  Table,
   TableBody,
   TableCell,
   TableContainer,
@@ -97,178 +98,198 @@ export const MonthCircleList: NextPage<Props> = ({ year, month }) => {
             </FormHelperText>
           </FormGroup>
         </Stack>
+
         <Typography variant="h6">移籍</Typography>
         <TableContainer>
-          <TableHead>
-            <TableCell>名前</TableCell>
-            <TableCell>現サークル</TableCell>
-            <TableCell>移籍先</TableCell>
-            <TableCell>トレーナーID</TableCell>
-            <TableCell>除名済み</TableCell>
-            <TableCell>勧誘済み</TableCell>
-            <TableCell>加入済み</TableCell>
-          </TableHead>
-          <TableBody>
-            {monthSurvey.move
-              .filter(
-                (monthCircle) =>
-                  !onlyForMe ||
-                  (user?.role == CircleRole.Leader &&
-                    monthCircle.currentCircle?.key == user?.circleKey) ||
-                  ((user?.role == CircleRole.Leader ||
-                    user?.role == CircleRole.SubLeader) &&
-                    (monthCircle.state as string) ==
-                      (user?.circleKey as string))
-              )
-              .filter((monthCircle) => !filterCompleted || !monthCircle.joined)
-              .map((monthCircle) => {
-                return (
-                  <TableRow key={monthCircle.id}>
-                    <TableCell>{monthCircle.member.name}</TableCell>
-                    <TableCell>{monthCircle.currentCircle?.name}</TableCell>
-                    <TableCell>{monthCircle.circle?.name}</TableCell>
-                    <TableCell>{monthCircle.member.trainerId}</TableCell>
-                    <TableCell>
-                      <MonthCircleStateCheckbox
-                        checked={monthCircle.kicked}
-                        disabled={monthCircle.kicked && monthCircle.invited}
-                        variablesBuilder={(kicked) => ({
-                          id: monthCircle.id,
-                          kicked,
-                        })}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <MonthCircleStateCheckbox
-                        checked={monthCircle.invited}
-                        disabled={monthCircle.joined}
-                        variablesBuilder={(invited) => ({
-                          id: monthCircle.id,
-                          invited,
-                        })}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <MonthCircleStateCheckbox
-                        checked={monthCircle.joined}
-                        disabled={!monthCircle.kicked || !monthCircle.invited}
-                        variablesBuilder={(joined) => ({
-                          id: monthCircle.id,
-                          joined,
-                        })}
-                      />
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-          </TableBody>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>名前</TableCell>
+                <TableCell>現サークル</TableCell>
+                <TableCell>移籍先</TableCell>
+                <TableCell>トレーナーID</TableCell>
+                <TableCell>除名済み</TableCell>
+                <TableCell>勧誘済み</TableCell>
+                <TableCell>加入済み</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {monthSurvey.move
+                .filter(
+                  (monthCircle) =>
+                    !onlyForMe ||
+                    (user?.role == CircleRole.Leader &&
+                      monthCircle.currentCircle?.key == user?.circleKey) ||
+                    ((user?.role == CircleRole.Leader ||
+                      user?.role == CircleRole.SubLeader) &&
+                      (monthCircle.state as string) ==
+                        (user?.circleKey as string))
+                )
+                .filter(
+                  (monthCircle) => !filterCompleted || !monthCircle.joined
+                )
+                .map((monthCircle) => {
+                  return (
+                    <TableRow key={monthCircle.id}>
+                      <TableCell>{monthCircle.member.name}</TableCell>
+                      <TableCell>{monthCircle.currentCircle?.name}</TableCell>
+                      <TableCell>{monthCircle.circle?.name}</TableCell>
+                      <TableCell>{monthCircle.member.trainerId}</TableCell>
+                      <TableCell>
+                        <MonthCircleStateCheckbox
+                          checked={monthCircle.kicked}
+                          disabled={monthCircle.kicked && monthCircle.invited}
+                          variablesBuilder={(kicked) => ({
+                            id: monthCircle.id,
+                            kicked,
+                          })}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <MonthCircleStateCheckbox
+                          checked={monthCircle.invited}
+                          disabled={monthCircle.joined}
+                          variablesBuilder={(invited) => ({
+                            id: monthCircle.id,
+                            invited,
+                          })}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <MonthCircleStateCheckbox
+                          checked={monthCircle.joined}
+                          disabled={!monthCircle.kicked || !monthCircle.invited}
+                          variablesBuilder={(joined) => ({
+                            id: monthCircle.id,
+                            joined,
+                          })}
+                        />
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+            </TableBody>
+          </Table>
         </TableContainer>
+
         <Typography variant="h6">脱退予定者</Typography>
         <TableContainer>
-          <TableHead>
-            <TableCell>名前</TableCell>
-            <TableCell>現サークル</TableCell>
-            <TableCell>除名済み</TableCell>
-            <TableCell>Discord残留</TableCell>
-            <TableCell>Discord脱退</TableCell>
-          </TableHead>
-          <TableBody>
-            {monthSurvey.leave
-              .filter(
-                (monthCircle) =>
-                  !onlyForMe ||
-                  (user?.role == CircleRole.Leader &&
-                    monthCircle.currentCircle?.key == user?.circleKey)
-              )
-              .filter((monthCircle) => !filterCompleted || !monthCircle.kicked)
-              .map((monthCircle) => {
-                return (
-                  <TableRow key={monthCircle.id}>
-                    <TableCell>{monthCircle.member.name}</TableCell>
-                    <TableCell>{monthCircle.currentCircle?.name}</TableCell>
-                    <TableCell>
-                      <MonthCircleStateCheckbox
-                        checked={monthCircle.kicked}
-                        disabled={monthCircle.kicked && monthCircle.invited}
-                        variablesBuilder={(kicked) => ({
-                          id: monthCircle.id,
-                          kicked,
-                        })}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Checkbox
-                        checked={monthCircle.state == MonthCircleState.Ob}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <MemberLeavedMessage
-                        leavedAt={monthCircle.member.leavedAt}
-                      />
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-          </TableBody>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>名前</TableCell>
+                <TableCell>現サークル</TableCell>
+                <TableCell>除名済み</TableCell>
+                <TableCell>Discord残留</TableCell>
+                <TableCell>Discord脱退</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {monthSurvey.leave
+                .filter(
+                  (monthCircle) =>
+                    !onlyForMe ||
+                    (user?.role == CircleRole.Leader &&
+                      monthCircle.currentCircle?.key == user?.circleKey)
+                )
+                .filter(
+                  (monthCircle) => !filterCompleted || !monthCircle.kicked
+                )
+                .map((monthCircle) => {
+                  return (
+                    <TableRow key={monthCircle.id}>
+                      <TableCell>{monthCircle.member.name}</TableCell>
+                      <TableCell>{monthCircle.currentCircle?.name}</TableCell>
+                      <TableCell>
+                        <MonthCircleStateCheckbox
+                          checked={monthCircle.kicked}
+                          disabled={monthCircle.kicked && monthCircle.invited}
+                          variablesBuilder={(kicked) => ({
+                            id: monthCircle.id,
+                            kicked,
+                          })}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Checkbox
+                          checked={monthCircle.state == MonthCircleState.Ob}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <MemberLeavedMessage
+                          leavedAt={monthCircle.member.leavedAt}
+                        />
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+            </TableBody>
+          </Table>
         </TableContainer>
         <Typography variant="h6">除名者(未回答含む)</Typography>
         <TableContainer>
-          <TableHead>
-            <TableCell>名前</TableCell>
-            <TableCell>現サークル</TableCell>
-            <TableCell>除名済み</TableCell>
-            <TableCell>Discord脱退</TableCell>
-          </TableHead>
-          <TableBody>
-            {monthSurvey.kick
-              .filter(
-                (monthCircle) =>
-                  !onlyForMe ||
-                  (user?.role == CircleRole.Leader &&
-                    monthCircle.currentCircle?.key == user?.circleKey)
-              )
-              .filter((monthCircle) => !filterCompleted || !monthCircle.kicked)
-              .map((monthCircle) => {
-                return (
-                  <TableRow key={monthCircle.id}>
-                    <TableCell>{monthCircle.member.name}</TableCell>
-                    <TableCell>{monthCircle.currentCircle?.name}</TableCell>
-                    <TableCell>
-                      <MonthCircleStateCheckbox
-                        checked={monthCircle.kicked}
-                        disabled={monthCircle.kicked && monthCircle.invited}
-                        variablesBuilder={(kicked) => ({
-                          id: monthCircle.id,
-                          kicked,
-                        })}
-                        confirmation={
-                          <>
-                            <DialogContentText>
-                              {monthCircle.member.name}
-                              さんをDiscordからBANします。
-                            </DialogContentText>
-                            <DialogContentText>
-                              - 1日の5時を過ぎましたか？
-                            </DialogContentText>
-                            <DialogContentText>
-                              - サークルから除名しましたか？
-                            </DialogContentText>
-                            <DialogContentText>
-                              - 除名取消ではありませんか？
-                            </DialogContentText>
-                          </>
-                        }
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <MemberLeavedMessage
-                        leavedAt={monthCircle.member.leavedAt}
-                      />
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-          </TableBody>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>名前</TableCell>
+                <TableCell>現サークル</TableCell>
+                <TableCell>除名済み</TableCell>
+                <TableCell>Discord脱退</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {monthSurvey.kick
+                .filter(
+                  (monthCircle) =>
+                    !onlyForMe ||
+                    (user?.role == CircleRole.Leader &&
+                      monthCircle.currentCircle?.key == user?.circleKey)
+                )
+                .filter(
+                  (monthCircle) => !filterCompleted || !monthCircle.kicked
+                )
+                .map((monthCircle) => {
+                  return (
+                    <TableRow key={monthCircle.id}>
+                      <TableCell>{monthCircle.member.name}</TableCell>
+                      <TableCell>{monthCircle.currentCircle?.name}</TableCell>
+                      <TableCell>
+                        <MonthCircleStateCheckbox
+                          checked={monthCircle.kicked}
+                          disabled={monthCircle.kicked && monthCircle.invited}
+                          variablesBuilder={(kicked) => ({
+                            id: monthCircle.id,
+                            kicked,
+                          })}
+                          confirmation={
+                            <>
+                              <DialogContentText>
+                                {monthCircle.member.name}
+                                さんをDiscordからBANします。
+                              </DialogContentText>
+                              <DialogContentText>
+                                - 1日の5時を過ぎましたか？
+                              </DialogContentText>
+                              <DialogContentText>
+                                - サークルから除名しましたか？
+                              </DialogContentText>
+                              <DialogContentText>
+                                - 除名取消ではありませんか？
+                              </DialogContentText>
+                            </>
+                          }
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <MemberLeavedMessage
+                          leavedAt={monthCircle.member.leavedAt}
+                        />
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+            </TableBody>
+          </Table>
         </TableContainer>
       </Stack>
     </Layout>
