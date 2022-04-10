@@ -1,21 +1,11 @@
 import { LoadingButton } from '@mui/lab';
-import {
-  Button,
-  CircularProgress,
-  Menu,
-  MenuItem,
-  Typography,
-} from '@mui/material';
+import { Button } from '@mui/material';
 import React from 'react';
 import { NextLinkComposed } from './link';
 import useUser from '../hooks/user';
 import * as Icons from '@mui/icons-material';
-import PopupState, { bindMenu, bindTrigger } from 'material-ui-popup-state';
-import { useMutation, useQuery } from 'urql';
-import {
-  AdminCirclesDocument,
-  UpdateMembersDocument,
-} from '../graphql/generated/type';
+import { useMutation } from 'urql';
+import { UpdateMembersDocument } from '../graphql/generated/type';
 
 export const AdminMenu = () => {
   const { user } = useUser();
