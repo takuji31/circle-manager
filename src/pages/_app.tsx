@@ -7,12 +7,15 @@ import type { AppProps } from 'next/app';
 import { getSession, SessionProvider } from 'next-auth/react';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { NextPageWithLayout } from '../libs/page_with_layout';
+import Layout from '../components/layout';
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache();
 
 interface MyAppProps extends AppProps {
   emotionCache?: EmotionCache;
+  Component: NextPageWithLayout;
 }
 
 export default function MyApp({
@@ -31,6 +34,7 @@ export default function MyApp({
       }),
     [prefersDarkMode]
   );
+  const getLayout = Component.getLayout ?? ((page) => <Layout>{page}</Layout>);
 
   return (
     <SessionProvider session={pageProps.session}>
@@ -42,7 +46,7 @@ export default function MyApp({
         <ThemeProvider theme={theme}>
           {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
           <CssBaseline />
-          <Component {...pageProps} />
+          {getLayout(<Component {...pageProps} />)}
         </ThemeProvider>
       </CacheProvider>
     </SessionProvider>
