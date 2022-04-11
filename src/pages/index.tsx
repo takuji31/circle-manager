@@ -54,7 +54,7 @@ const Home: NextPage = (props) => {
         </Typography>
       </Box>
     );
-  } else if (status == 'authenticated' && !user.isMember) {
+  } else if (status == 'authenticated' && !user?.isMember) {
     return (
       <Box p={2}>
         <Typography variant="body1">
