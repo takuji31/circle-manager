@@ -10,6 +10,7 @@ import {
 import { ParsedUrlQuery } from 'querystring';
 import { prisma } from '../../../../../../database';
 import Layout from '../../../../../../components/layout';
+import { useTitle } from '../../../../../../recoil/title';
 
 interface Props {
   year: number;
@@ -24,12 +25,11 @@ interface Params extends ParsedUrlQuery {
 }
 
 const MemberMonthCirclePage: NextPage<Props> = ({ year, month, memberId }) => {
+  useTitle('サークル編集');
   return (
-    <Layout title="サークル編集">
-      <Box p={2}>
-        <MemberMonthCircle year={year} month={month} memberId={memberId} />
-      </Box>
-    </Layout>
+    <Box p={2}>
+      <MemberMonthCircle year={year} month={month} memberId={memberId} />
+    </Box>
   );
 };
 

@@ -7,19 +7,23 @@ import { AdminMenu } from './admin_menu';
 import * as Icons from '@mui/icons-material';
 import { NextLinkComposed } from './link';
 import { useRouter } from 'next/router';
+import { useTitle } from '../recoil/title';
 
 type LayoutProps = {
   children: React.ReactNode;
   title?: string;
 };
 
-const Layout = ({ children, title = 'ウマ娘愛好会' }: LayoutProps) => {
+const Layout = ({ children, title }: LayoutProps) => {
   const router = useRouter();
+  const [titleFromState] = useTitle();
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Head>
         <title>
-          {title == 'ウマ娘愛好会' ? title : title + ' - ウマ娘愛好会'}
+          {!title && !titleFromState
+            ? 'ウマ娘愛好会'
+            : (titleFromState ?? title) + ' - ウマ娘愛好会'}
         </title>
       </Head>
       <AppBar position="static">
@@ -38,7 +42,7 @@ const Layout = ({ children, title = 'ウマ娘愛好会' }: LayoutProps) => {
             </IconButton>
           )}
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            {title}
+            {titleFromState ?? title ?? 'ウマ娘愛好会'}
           </Typography>
           <AdminMenu />
           {/* <CircleListButton /> */}

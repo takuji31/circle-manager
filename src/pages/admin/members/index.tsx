@@ -27,12 +27,14 @@ import { memberStatusLabel } from '../../../model/member';
 import { monthCircleStateLabel } from '../../../model/month_circle';
 import { withUrqlClient } from '../../../graphql/client';
 import Layout from '../../../components/layout';
+import { useTitle } from '../../../recoil/title';
 
 export interface Props {
   monthCircleNames: Array<string>;
 }
 
 const MemberList: NextPage<Props> = ({ monthCircleNames }) => {
+  useTitle('メンバー一覧');
   const columns: Array<GridColDef> = useMemo(
     () => [
       {
@@ -143,34 +145,34 @@ const MemberList: NextPage<Props> = ({ monthCircleNames }) => {
   const [{ data, error, fetching }] = useQuery({ query: AdminMembersDocument });
   const members = data?.members;
 
+  if (fetching) {
+    return (
+      <Box>
+        <LinearProgress />
+      </Box>
+    );
+  } else if (error) {
+    return <p>エラーが起きました {error.message}</p>;
+  }
+
   return (
-    <Layout title="メンバー一覧">
-      {fetching && (
-        <Box>
-          <LinearProgress />
-        </Box>
-      )}
-      {error && <p>エラーが起きました {error.message}</p>}
-      {members && (
-        <div style={{ height: 400, width: '100%' }}>
-          <DataGrid
-            components={{
-              Toolbar: GridToolbar,
-            }}
-            autoHeight
-            rows={members.map((member) => {
-              return {
-                ...member,
-                memberState: member.circle
-                  ? member.circle.name
-                  : memberStatusLabel(member.status),
-              };
-            })}
-            columns={columns}
-          />
-        </div>
-      )}
-    </Layout>
+    <div style={{ height: 400, width: '100%' }}>
+      <DataGrid
+        components={{
+          Toolbar: GridToolbar,
+        }}
+        autoHeight
+        rows={members!.map((member) => {
+          return {
+            ...member,
+            memberState: member.circle
+              ? member.circle.name
+              : memberStatusLabel(member.status),
+          };
+        })}
+        columns={columns}
+      />
+    </div>
   );
 };
 

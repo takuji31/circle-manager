@@ -40,40 +40,37 @@ import { withUrqlClient } from '../graphql/client';
 
 const Home: NextPage = (props) => {
   const { user, status } = useUser();
+  if (status == 'loading') {
+    return (
+      <Box sx={{ width: '100%' }}>
+        <LinearProgress />
+      </Box>
+    );
+  } else if (status == 'unauthenticated') {
+    return (
+      <Box p={2}>
+        <Typography variant="body1">
+          Discordでログインを押してDiscordのアカウントでログインしてください。
+        </Typography>
+      </Box>
+    );
+  } else if (status == 'authenticated' && !user.isMember) {
+    return (
+      <Box p={2}>
+        <Typography variant="body1">
+          サークルメンバーではありません、サークル加入についてはサークルメンバーまでご連絡ください。
+        </Typography>
+      </Box>
+    );
+  }
+
   return (
-    <Layout>
-      {status == 'loading' && (
-        <Box sx={{ width: '100%' }}>
-          <LinearProgress />
-        </Box>
-      )}
-      {status == 'unauthenticated' && (
-        <Box p={2}>
-          <Typography variant="body1">
-            Discordでログインを押してDiscordのアカウントでログインしてください。
-          </Typography>
-        </Box>
-      )}
-      {status == 'authenticated' && !user?.isMember && (
-        <Box p={2}>
-          <Typography variant="body1">
-            サークルメンバーではありません、サークル加入についてはサークルメンバーまでご連絡ください。
-          </Typography>
-        </Box>
-      )}
-      {status == 'authenticated' && user && user?.isMember && (
-        <Stack p={2} spacing={4}>
-          {/* <TopContent user={user} /> */}
-          {user.isAdmin && <AdminTopContent />}
-        </Stack>
-      )}
-    </Layout>
+    <Stack p={2} spacing={4}>
+      {/* <TopContent user={user} /> */}
+      {user!.isAdmin && <AdminTopContent />}
+    </Stack>
   );
 };
-
-interface TopContentProps {
-  user: UserWithSession;
-}
 
 const AdminTopContent = () => {
   const [{ data }] = useQuery({ query: AdminTopDocument });
