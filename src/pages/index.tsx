@@ -9,6 +9,7 @@ import {
   DialogContentText,
   DialogTitle,
   Grid,
+  Table,
   TableRow,
   Typography,
   useMediaQuery,
@@ -137,36 +138,40 @@ const AdminTopContent = () => {
         <Typography variant="h6">加入申請</Typography>
         {data?.signUps && !!data.signUps.length && (
           <TableContainer>
-            <TableHead>
-              <TableCell>名前</TableCell>
-              <TableCell>サークル</TableCell>
-              <TableCell>トレーナーID</TableCell>
-              <TableCell>勧誘送信済み</TableCell>
-              <TableCell>加入済み</TableCell>
-            </TableHead>
-            <TableBody>
-              {data.signUps.map((signUp) => {
-                return (
-                  <TableRow key={`signup_${signUp.id}`}>
-                    <TableCell>{signUp.member.name}</TableCell>
-                    <TableCell>{signUp?.circle?.name}</TableCell>
-                    <TableCell>{signUp.member.trainerId ?? '未入力'}</TableCell>
-                    <TableCell>
-                      <InvitedCheckBox
-                        invited={signUp.invited}
-                        memberId={signUp.member.id}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <JoinedCheckBox
-                        joined={signUp.joined}
-                        memberId={signUp.member.id}
-                      />
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
+            <Table>
+              <TableHead>
+                <TableCell>名前</TableCell>
+                <TableCell>サークル</TableCell>
+                <TableCell>トレーナーID</TableCell>
+                <TableCell>勧誘送信済み</TableCell>
+                <TableCell>加入済み</TableCell>
+              </TableHead>
+              <TableBody>
+                {data.signUps.map((signUp) => {
+                  return (
+                    <TableRow key={`signup_${signUp.id}`}>
+                      <TableCell>{signUp.member.name}</TableCell>
+                      <TableCell>{signUp?.circle?.name}</TableCell>
+                      <TableCell>
+                        {signUp.member.trainerId ?? '未入力'}
+                      </TableCell>
+                      <TableCell>
+                        <InvitedCheckBox
+                          invited={signUp.invited}
+                          memberId={signUp.member.id}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <JoinedCheckBox
+                          joined={signUp.joined}
+                          memberId={signUp.member.id}
+                        />
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
           </TableContainer>
         )}
         {data?.signUps && !data.signUps.length && (
@@ -219,48 +224,55 @@ const AdminTopContent = () => {
                     開始済み(期限: {expiredAtString ?? ''})
                   </Typography>
                   <TableContainer>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>サークル</TableCell>
-                        <TableCell>回答数/最大人数</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {circleIdToMemberCount.map(({ value, count }) => {
-                        return (
-                          <TableRow key={`month_survey_answer_count_${value}`}>
-                            <TableCell>
-                              {value == MonthSurveyAnswerValue.Saikyo
-                                ? '西京ファーム'
-                                : value == MonthSurveyAnswerValue.Umamusume
-                                ? 'ウマ娘愛好会'
-                                : value == MonthSurveyAnswerValue.Leave
-                                ? '脱退'
-                                : value == MonthSurveyAnswerValue.Ob
-                                ? '脱退(Discord残留)'
-                                : '未回答'}
-                            </TableCell>
-                            <TableCell>
-                              {count}{' '}
-                              {value == MonthSurveyAnswerValue.Saikyo && '/ 30'}
-                              {value == MonthSurveyAnswerValue.Umamusume &&
-                                '/ 60'}
-                            </TableCell>
-                          </TableRow>
-                        );
-                      })}
-                      <TableRow>
-                        <TableCell>回答済み合計</TableCell>
-                        <TableCell>
-                          {nextMonth.survey.monthSurveyAnswers.filter(
-                            (answer) =>
-                              answer.value &&
-                              answer.value != MonthSurveyAnswerValue.None
-                          )}{' '}
-                          / {nextMonth.survey.monthSurveyAnswers.length}
-                        </TableCell>
-                      </TableRow>
-                    </TableBody>
+                    <Table>
+                      <TableHead>
+                        <TableRow>
+                          <TableCell>サークル</TableCell>
+                          <TableCell>回答数/最大人数</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {circleIdToMemberCount.map(({ value, count }) => {
+                          return (
+                            <TableRow
+                              key={`month_survey_answer_count_${value}`}
+                            >
+                              <TableCell>
+                                {value == MonthSurveyAnswerValue.Saikyo
+                                  ? '西京ファーム'
+                                  : value == MonthSurveyAnswerValue.Umamusume
+                                  ? 'ウマ娘愛好会'
+                                  : value == MonthSurveyAnswerValue.Leave
+                                  ? '脱退'
+                                  : value == MonthSurveyAnswerValue.Ob
+                                  ? '脱退(Discord残留)'
+                                  : '未回答'}
+                              </TableCell>
+                              <TableCell>
+                                {count}{' '}
+                                {value == MonthSurveyAnswerValue.Saikyo &&
+                                  '/ 30'}
+                                {value == MonthSurveyAnswerValue.Umamusume &&
+                                  '/ 60'}
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
+                        <TableRow>
+                          <TableCell>回答済み合計</TableCell>
+                          <TableCell>
+                            {
+                              nextMonth.survey.monthSurveyAnswers.filter(
+                                (answer) =>
+                                  answer.value &&
+                                  answer.value != MonthSurveyAnswerValue.None
+                              ).length
+                            }{' '}
+                            / {nextMonth.survey.monthSurveyAnswers.length}
+                          </TableCell>
+                        </TableRow>
+                      </TableBody>
+                    </Table>
                   </TableContainer>
                 </>
               )}
