@@ -5,5 +5,9 @@
       "yarn workspace functions run build"
     ],
     "source": "packages/functions"
+  },
+  "firestore": {
+    "rules": "./packages/functions/firestore.rules",
+    "indexes": "./packages/functions/firestore.indexes.json"
   }
 }
