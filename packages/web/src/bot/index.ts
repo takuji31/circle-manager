@@ -56,6 +56,9 @@ client.on('guildMemberRemove', async (member) => {
 
 client.on('guildMemberAdd', async (member) => {
   console.log('Member added %s', member);
+  if (member.user.bot) {
+    return;
+  }
   try {
     const createdMember = await prisma.member.upsert({
       where: { id: member.id },
