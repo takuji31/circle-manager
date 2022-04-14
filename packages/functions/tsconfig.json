@@ -10,8 +10,5 @@
     "lib": ["ESNext", "DOM"]
   },
   "compileOnSave": true,
-  "include": [
-    "src",
-    "./puppeteer-bug-fix.d.ts"
-  ]
+  "include": ["src", "./puppeteer-bug-fix.d.ts"]
 }
