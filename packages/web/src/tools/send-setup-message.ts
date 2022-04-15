@@ -19,8 +19,9 @@ const rest = createDiscordRestClient();
       throw new Error(`Member id:${memberId} not found.`);
     }
 
-    await sendSetupMessage(member);
+    const message = await sendSetupMessage(member);
+    console.log('message sent');
   } catch (error) {
     console.error(error);
   }
-})();
+})().catch((e) => console.log(e));

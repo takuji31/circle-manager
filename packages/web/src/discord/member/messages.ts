@@ -4,7 +4,7 @@ import { sendDirectMessageIfPossible } from '../message';
 
 export const sendSetupMessage = async (member: Member) => {
   const setupUrl = `${process.env.BASE_URL}/members/${member.pathname}/setup`;
-  await sendDirectMessageIfPossible(
+  return await sendDirectMessageIfPossible(
     member,
     `ウマ娘愛好会グループへようこそ。以下の手順に従って加入手続きを行ってください。
 1. サーバールールの確認画面がでてくるので、確認して同意してください。送信を押しても先に進めない場合はDiscordのアプリが最新かどうか確認してください。
@@ -15,7 +15,8 @@ export const sendSetupMessage = async (member: Member) => {
 
 不明な点がありましたら <#870289174232702986> で気軽に質問してください！
 
-それではこれからよろしくお願いします。`
+それではこれからよろしくお願いします。`,
+    true
   );
 };
 
