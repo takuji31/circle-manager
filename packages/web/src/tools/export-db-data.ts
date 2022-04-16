@@ -5,12 +5,6 @@ import * as fs from 'fs/promises';
 
 config();
 
-namespace global {
-  declare interface BigInt {
-    toJSON: () => string;
-  }
-}
-
 (async () => {
   const data: DbTableData = {
     members: await prisma.member.findMany({
