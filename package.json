@@ -10,7 +10,7 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "yarn workspace web run build"
+    "build": "yarn workspace web build"
   },
   "engines": {
     "node": "^16.13.2",
