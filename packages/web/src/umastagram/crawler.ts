@@ -126,6 +126,7 @@ export async function crawlUmastagram(
 
     return result;
   } catch (e) {
+    console.log(e);
     await rest.post(Routes.channelMessages(Guild.channelIds.admin), {
       body: {
         content:
