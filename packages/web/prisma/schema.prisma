@@ -2,12 +2,14 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider             = "mysql"
+  url                  = env("DATABASE_URL")
+  referentialIntegrity = "prisma"
 }
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["referentialIntegrity"]
 }
 
 generator nexusPrisma {
@@ -26,6 +28,8 @@ model Member {
   joinedAt          DateTime
   leavedAt          DateTime?
   circleKey         CircleKey?
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
   monthCircles      MonthCircle[]
   signUp            SignUp?
   fanCounts         MemberFanCount[]
@@ -58,6 +62,8 @@ model MonthCircle {
   joined           Boolean          @default(false)
   /// ランキングによって上書きされないよう設定されているか
   locked           Boolean          @default(false)
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
 
   @@unique([year, month, memberId])
   @@index([memberId])
@@ -72,6 +78,8 @@ model MonthSurvey {
   year      Int
   month     Int
   expiredAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([year, month])
 }
@@ -85,6 +93,8 @@ model MonthSurveyAnswer {
   member    Member                  @relation(fields: [memberId], references: [id])
   circleKey CircleKey
   value     MonthSurveyAnswerValue? @default(None)
+  createdAt DateTime                @default(now())
+  updatedAt DateTime                @updatedAt
 
   @@unique([year, month, memberId])
   @@index([memberId])
@@ -107,6 +117,7 @@ model SignUp {
   invited   Boolean    @default(false)
   joined    Boolean    @default(false)
   createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
 
   @@index([joined])
 }
@@ -122,6 +133,8 @@ model MemberFanCount {
   predicted BigInt
   memberId  String?   @db.VarChar(255)
   member    Member?   @relation(fields: [memberId], references: [id])
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
   @@index([date, circle])
   @@index([memberId, date])
@@ -136,6 +149,8 @@ model CircleFanCount {
   avg          BigInt
   predicted    BigInt
   predictedAvg BigInt
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 
   @@unique([circle, date])
   @@index([date])
@@ -143,9 +158,11 @@ model CircleFanCount {
 
 /// 個人チャンネル
 model PersonalChannel {
-  id        String @id @db.VarChar(255)
-  channelId String @db.VarChar(255)
-  member    Member @relation(fields: [id], references: [id])
+  id        String   @id @db.VarChar(255)
+  channelId String   @db.VarChar(255)
+  member    Member   @relation(fields: [id], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([id, channelId])
 }
