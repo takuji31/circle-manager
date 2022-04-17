@@ -1,8 +1,8 @@
 import { Guild } from './../../model/guild';
-import { Message } from 'discord.js';
-import { Circle } from '../../model';
+import { Message, TextChannel } from 'discord.js';
+import { Circle, Circles } from '../../model';
 import { crawlUmastagram } from '../../umastagram/crawler';
-import { LocalDate } from '../../model/date';
+import { DateFormats, LocalDate } from '../../model/date';
 
 const urlPattern =
   /https:\/\/umastagram.com\/circle\/grade\/graph\/share\/[a-zA-Z0-9]+/;
@@ -75,5 +75,87 @@ export const updateFanCountEvent = async (message: Message, circle: Circle) => {
 
   try {
     await crawlUmastagram(umastagramUrl, circle);
+  } catch (e) {}
+};
+
+export const updateFanCountFromChannel = async ({
+  circle,
+  notificationChannel,
+  year,
+  month,
+  day,
+}: {
+  circle: Circle;
+  notificationChannel: TextChannel;
+  year: number | null;
+  month: number | null;
+  day: number | null;
+}) => {
+  const today = LocalDate.today();
+  const date = LocalDate.of(
+    year ?? today.year(),
+    month ?? today.monthValue(),
+    day ?? today.dayOfMonth()
+  );
+
+  const adminChannel = notificationChannel.guild.channels.resolve(
+    Guild.channelIds.admin
+  );
+  if (
+    !adminChannel ||
+    !adminChannel.isText() ||
+    adminChannel.type !== 'GUILD_TEXT'
+  ) {
+    throw new Error(`Admin Channel not found ${Guild.channelIds.admin}`);
+  }
+
+  let notificationMessage = `${date.format(
+    DateFormats.ymd
+  )} のファン数更新を開始します <#${notificationChannel.id}>`;
+  const notification = await adminChannel.send(notificationMessage);
+
+  let umastagramUrl: string;
+  try {
+    const pastMessages = await notificationChannel.messages.fetch({
+      limit: 100,
+    });
+    const firstDayOfMonth = LocalDate.firstDayOfThisMonth();
+    const umastagramUrlMessage = pastMessages.find((msg) => {
+      // TODO: 1日の場合は前月分を探すようにする
+      const createdAt = LocalDate.fromUTCDate(msg.createdAt);
+      return (
+        urlPattern.test(msg.content) && createdAt.isSameMonth(firstDayOfMonth)
+      );
+    });
+    if (!umastagramUrlMessage) {
+      throw new Error('UmastagramのURLが直近100件のメッセージにありません。');
+    }
+    umastagramUrl = (urlPattern.exec(umastagramUrlMessage.content) ?? [])[0];
+    console.log(
+      'Found Umastagram URL in past message %s',
+      umastagramUrlMessage
+    );
+  } catch (e) {
+    await notification.edit(
+      notificationMessage +
+        `\n\n` +
+        `UmastagramのURLを発見できませんでした。エラー↓\n` +
+        '```' +
+        `${e}`.substring(0, 1800) +
+        '\n```'
+    );
+    return;
+  }
+
+  notificationMessage =
+    notificationMessage +
+    `\n\n` +
+    'UmastagramのURLを発見しました... `' +
+    umastagramUrl +
+    '`\n';
+  await notification.edit(notificationMessage);
+
+  try {
+    await crawlUmastagram(umastagramUrl, circle, date);
   } catch (e) {}
 };

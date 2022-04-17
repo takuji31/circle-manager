@@ -33,6 +33,7 @@ export const Guild = {
     personalChannelViewer: isProduction
       ? '960501109355610153'
       : '863393688357044234',
+    administrators: '863393688357044234',
   },
   channelIds: {
     all: isProduction ? Channels.all : Channels.botTest,
