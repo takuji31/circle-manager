@@ -7,8 +7,11 @@ import { PrismaClient } from '@prisma/client';
 import { Client, Intents, Options } from 'discord.js';
 import { config } from 'dotenv';
 import { Emoji, MonthSurveyEmoji } from '../model/emoji';
-import { Circles } from '../model';
-import { updateFanCountEvent } from './circle/update_fan_count';
+import { Circles, isCircleKey } from '../model';
+import {
+  updateFanCountEvent,
+  updateFanCountFromChannel,
+} from './circle/update_fan_count';
 import { createRedisClient, RedisClient, RedisKeys } from '../redis';
 import { createPersonalChannel } from './member/create_personal_channes';
 
@@ -109,10 +112,51 @@ client.on('interactionCreate', async (interaction) => {
   try {
     if (!interaction.isCommand()) return;
     if (interaction.commandName == 'register-trainer-id') {
-      registerTrainerIdCommand(interaction);
+      await registerTrainerIdCommand(interaction);
     }
     if (interaction.commandName == 'trainer-id') {
-      trainerIdCommand(interaction);
+      await trainerIdCommand(interaction);
+    }
+    if (interaction.commandName == 'update-fan-count') {
+      const circleKey = interaction.options.getString('circle');
+      if (!circleKey || !isCircleKey(circleKey)) {
+        interaction.reply({ content: `不明なサークルキーです ${circleKey}` });
+        return;
+      }
+
+      const circle = Circles.findByCircleKey(circleKey);
+      const notificationChannel = interaction.guild?.channels.resolve(
+        circle.notificationChannelId
+      );
+      if (
+        !notificationChannel ||
+        !notificationChannel?.isText() ||
+        notificationChannel.type != 'GUILD_TEXT'
+      ) {
+        interaction.reply({
+          content: `不明なチャンネル: ${circle.notificationChannelId}`,
+        });
+        return;
+      }
+
+      const year = interaction.options.getInteger('year', false);
+      const month = interaction.options.getInteger('year', false);
+      const day = interaction.options.getInteger('year', false);
+
+      interaction.reply({
+        content: 'ファン数取得を開始します',
+        ephemeral: true,
+      });
+
+      await updateFanCountFromChannel({
+        circle,
+        notificationChannel,
+        year,
+        month,
+        day,
+      });
+
+      interaction.editReply({ content: 'ファン数取得完了しました' });
     }
   } catch (e) {
     console.log('Error when interactionCreate %s', e);

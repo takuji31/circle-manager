@@ -1,5 +1,5 @@
 import * as functions from 'firebase-functions';
-import { Page, launch } from 'puppeteer';
+import * as puppeteer from 'puppeteer';
 
 interface UmastagramPage {
   members: Array<UmastagramMember>;
@@ -26,7 +26,7 @@ interface UmastagramCircle {
 }
 
 async function crawlUmastagram(url: string): Promise<UmastagramPage> {
-  const browser = await launch({
+  const browser = await puppeteer.launch({
     headless: process.env.NODE_ENV == 'production',
     args: ['--no-sandbox'],
   });
@@ -149,7 +149,7 @@ async function crawlUmastagram(url: string): Promise<UmastagramPage> {
 }
 
 const extractTableCells: (
-  page: Page,
+  page: puppeteer.Page,
   selector: string
 ) => Promise<Array<Array<string | null>>> = async (page, selector) => {
   const tableRows = await page.$$(selector);
@@ -166,7 +166,7 @@ const extractTableCells: (
   return rows;
 };
 
-const selectTab = async (page: Page, tabName: string) => {
+const selectTab = async (page: puppeteer.Page, tabName: string) => {
   const tab = await findTab(page, tabName);
 
   if (!tab) {
@@ -177,7 +177,7 @@ const selectTab = async (page: Page, tabName: string) => {
   await page.waitForTimeout(2000);
 };
 
-const findTab = async (page: Page, tabName: string) => {
+const findTab = async (page: puppeteer.Page, tabName: string) => {
   const tabs = await page.$$('ul.p-tabview-nav span');
 
   for (const tab of tabs) {
