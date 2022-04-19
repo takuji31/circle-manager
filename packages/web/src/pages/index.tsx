@@ -140,11 +140,13 @@ const AdminTopContent = () => {
           <TableContainer>
             <Table>
               <TableHead>
-                <TableCell>名前</TableCell>
-                <TableCell>サークル</TableCell>
-                <TableCell>トレーナーID</TableCell>
-                <TableCell>勧誘送信済み</TableCell>
-                <TableCell>加入済み</TableCell>
+                <TableRow>
+                  <TableCell>名前</TableCell>
+                  <TableCell>サークル</TableCell>
+                  <TableCell>トレーナーID</TableCell>
+                  <TableCell>勧誘送信済み</TableCell>
+                  <TableCell>加入済み</TableCell>
+                </TableRow>
               </TableHead>
               <TableBody>
                 {data.signUps.map((signUp) => {
