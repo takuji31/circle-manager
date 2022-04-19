@@ -119,25 +119,6 @@ const MemberList: NextPage<Props> = ({ monthCircleNames }) => {
           );
         },
       },
-      {
-        field: 'actions',
-        type: 'actions',
-        headerName: 'Action',
-        getActions: (params: GridRowParams) => {
-          const actions = [];
-          const pathname = params.row.pathname;
-          console.log(params.row);
-          return [
-            <GridActionsCellItem
-              key="members_pathname_url"
-              component={NextLinkComposed}
-              to={`/members/${pathname}/edit`}
-              label="編集"
-              icon={<Icons.Edit />}
-            />,
-          ];
-        },
-      },
     ],
     [monthCircleNames]
   );
