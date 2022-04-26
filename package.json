@@ -10,10 +10,14 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "yarn workspace web build"
+    "build": "pnpm build --filter .",
+    "firebase:deploy": "firebase deploy"
   },
   "engines": {
     "node": "^16.13.2",
     "yarn": "^1.22.0"
+  },
+  "devDependencies": {
+    "npm-run-all": "^4.1.5"
   }
 }

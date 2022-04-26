@@ -1,8 +1,8 @@
 {
   "functions": {
     "predeploy": [
-      "yarn workspace functions run lint",
-      "yarn workspace functions run build"
+      "pnpm lint --filter functions",
+      "pnpm build --filter functions"
     ],
     "source": "packages/functions"
   }
