@@ -51,6 +51,7 @@ importers:
       '@graphql-codegen/typed-document-node': ^2.2.8
       '@graphql-codegen/typescript': ^2.4.8
       '@graphql-codegen/typescript-operations': ^2.3.5
+      '@graphql-typed-document-node/core': ^3.1.1
       '@hookform/resolvers': ^2.8.8
       '@js-joda/core': ^5.2.0
       '@js-joda/locale_ja': ^4.7.0
@@ -71,6 +72,7 @@ importers:
       '@urql/core': ^2.4.4
       '@urql/devtools': ^2.0.3
       '@urql/exchange-execute': ^1.2.2
+      apollo-server-core: ^3.6.7
       apollo-server-micro: ^3.6.7
       clsx: ^1.1.1
       core-js: ^3.22.2
@@ -122,6 +124,7 @@ importers:
       '@emotion/react': 11.9.0_vms7k4a4cbe6am64hex3jzgplm
       '@emotion/server': 11.4.0
       '@emotion/styled': 11.8.1_cgi3uwclkgyvsx4vxa3trpg76y
+      '@graphql-typed-document-node/core': 3.1.1_graphql@16.4.0
       '@hookform/resolvers': 2.8.8_react-hook-form@7.30.0
       '@js-joda/core': 5.2.0
       '@js-joda/locale_ja': 4.7.0_qdkvqrqx7lpyns3cqdggavmujm
@@ -136,6 +139,7 @@ importers:
       '@urql/core': 2.4.4_graphql@16.4.0
       '@urql/devtools': 2.0.3_wvuwncwnii6vqiiokzuamn6hti
       '@urql/exchange-execute': 1.2.2_graphql@16.4.0
+      apollo-server-core: 3.6.7_graphql@16.4.0
       apollo-server-micro: 3.6.7_graphql@16.4.0+micro@9.3.4
       clsx: 1.1.1
       core-js: 3.22.2
@@ -9651,6 +9655,7 @@ packages:
       typescript: 4.6.3
       v8-compile-cache-lib: 3.0.1
       yn: 3.1.1
+    dev: false
 
   /ts-node/9.1.1_typescript@4.6.3:
     resolution: {integrity: sha512-hPlt7ZACERQGf03M253ytLY3dHbGNGrAq9qIHWUY9XHYl1z7wYngSr3OQ5xmui8o2AaxsONxIzjafLUiWBo1Fg==}
