@@ -1,5 +1,5 @@
 import { Guild } from './../model/guild';
-import { PrismaPromise } from '.prisma/client';
+import { PrismaPromise } from '@prisma/client';
 import { stringify } from 'csv-stringify/sync';
 import {
   RESTPostAPIChannelMessageJSONBody,
@@ -154,10 +154,10 @@ export async function sendDirectMessagesIfPossible<
   };
   await rest.post(Routes.channelMessages(Guild.channelIds.admin), {
     body: body,
-    attachments: [
+    files: [
       {
-        fileName: 'result.csv',
-        rawBuffer: Buffer.from(csv, 'utf-8'),
+        name: 'result.csv',
+        data: Buffer.from(csv, 'utf-8'),
       },
     ],
   });
