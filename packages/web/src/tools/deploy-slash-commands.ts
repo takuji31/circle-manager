@@ -1,7 +1,6 @@
 import { Guild } from './../model/guild';
 import {
   SlashCommandBuilder,
-  SlashCommandChannelOption,
   SlashCommandIntegerOption,
   SlashCommandStringOption,
 } from '@discordjs/builders';
@@ -9,13 +8,11 @@ import { Routes } from 'discord-api-types/v9';
 import { createDiscordRestClient } from '../discord';
 import { config } from 'dotenv';
 import { Circles } from '../model';
-import { RESTPutAPIApplicationGuildCommandsResult } from 'discord-api-types';
-import { RESTPutAPIChannelPermissionJSONBody } from 'discord-api-types';
-import { OverwriteType } from 'discord-api-types';
-import { RESTPutAPIApplicationGuildCommandsJSONBody } from 'discord-api-types';
-import { RESTPutAPIApplicationCommandPermissionsResult } from 'discord-api-types';
-import { RESTPutAPIApplicationCommandPermissionsJSONBody } from 'discord-api-types';
-import { ApplicationCommandPermissionType } from 'discord-api-types';
+import {
+  RESTPutAPIApplicationGuildCommandsResult,
+  RESTPutAPIApplicationCommandPermissionsJSONBody,
+  ApplicationCommandPermissionType,
+} from 'discord-api-types/v9';
 
 config();
 
@@ -39,8 +36,11 @@ config();
         .addStringOption(
           new SlashCommandStringOption()
             .addChoices(
-              Circles.activeCircles.map((circle) => {
-                return [circle.name, circle.key];
+              ...Circles.activeCircles.map((circle) => {
+                return {
+                  name: circle.name,
+                  value: circle.key,
+                };
               })
             )
             .setName('circle')
