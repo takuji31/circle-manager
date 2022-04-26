@@ -10,8 +10,11 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "pnpm build --filter .",
-    "firebase:deploy": "firebase deploy"
+    "build": "run-p build:*",
+    "build:functions": "pnpm -F functions build",
+    "build:web": "pnpm -F web build",
+    "firebase:deploy": "firebase deploy",
+    "dev": "pnpm -F functions -F web dev"
   },
   "engines": {
     "node": "^16.13.2",
