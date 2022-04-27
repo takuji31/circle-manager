@@ -6,9 +6,9 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
+    "database": "1.0.0",
     "discord.js": "^13.6.0",
     "dotenv": "^16.0.0",
-    "database": "1.0.0",
     "model": "1.0.0"
   },
   "scripts": {
