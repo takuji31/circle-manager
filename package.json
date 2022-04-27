@@ -13,6 +13,7 @@
   "scripts": {
     "build": "run-s build:*",
     "build:web": "yarn workspace web build",
+    "build:bot": "yarn workspace bot build",
     "dev": "run-p dev:*",
     "dev:web": "yarn workspace web dev"
   },
