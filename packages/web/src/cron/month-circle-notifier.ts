@@ -1,5 +1,5 @@
 import { nextMonthInt } from './../model/year_month';
-import { prisma } from './../database/prisma';
+import { prisma } from 'database';
 import { config } from 'dotenv';
 import { sendDirectMessagesIfPossible } from '../discord/message';
 import { monthSurveyAnswerLabel } from '../model/month_survey_answer';

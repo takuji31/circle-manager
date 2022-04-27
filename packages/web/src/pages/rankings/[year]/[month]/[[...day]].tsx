@@ -2,7 +2,7 @@ import { convert, LocalDate, TemporalAdjusters } from '../../../../model/date';
 import { GetServerSideProps, NextPage } from 'next';
 import { isArray } from 'nexus/dist/utils';
 import { ParsedUrlQuery } from 'querystring';
-import { prisma } from '../../../../database';
+import { prisma } from 'database';
 import { withUrqlClient } from '../../../../graphql/client';
 
 const RankingPage: NextPage<{ year: number; month: number; day: number }> = ({

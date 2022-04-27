@@ -2,7 +2,7 @@ import { ContextFunction } from 'apollo-server-core';
 import { getSession } from 'next-auth/react';
 import { CircleKey, CircleRole, PrismaClient } from '@prisma/client';
 import { UserWithSession } from '../model';
-import { prisma } from '../database';
+import { prisma } from 'database';
 
 export type Context = {
   prisma: PrismaClient;

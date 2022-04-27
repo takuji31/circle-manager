@@ -2,7 +2,7 @@ import {
   RESTGetAPICurrentUserGuildsResult,
   Routes,
 } from 'discord-api-types/v9';
-import { prisma } from '../../../database';
+import { prisma } from 'database';
 import { createDiscordRestClient } from '../../../discord';
 import NextAuth from 'next-auth';
 import DiscordProvider from 'next-auth/providers/discord';

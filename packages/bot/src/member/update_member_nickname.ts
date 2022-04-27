@@ -1,5 +1,5 @@
 import { Guild } from "./../../model/guild";
-import { prisma } from "@circle-manager/database";
+import { prisma } from "database";
 import { GuildMember, PartialGuildMember, TextChannel } from "discord.js";
 
 export const updateMemberNicknameEvent = async (

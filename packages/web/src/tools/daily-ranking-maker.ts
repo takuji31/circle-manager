@@ -1,6 +1,6 @@
 import { Circles } from './../model/circle';
 import { config } from 'dotenv';
-import { prisma } from '../database';
+import { prisma } from 'database';
 import { Guild, nextMonthInt, thisMonthInt } from '../model';
 import { stringify } from 'csv-stringify/sync';
 import { createDiscordRestClient } from '../discord';

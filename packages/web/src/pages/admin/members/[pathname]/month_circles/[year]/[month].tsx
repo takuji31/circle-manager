@@ -8,7 +8,7 @@ import {
   withUrqlClient,
 } from '../../../../../../graphql/client';
 import { ParsedUrlQuery } from 'querystring';
-import { prisma } from '../../../../../../database';
+import { prisma } from 'database';
 import Layout from '../../../../../../components/layout';
 import { useTitle } from '../../../../../../recoil/title';
 

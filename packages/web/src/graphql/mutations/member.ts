@@ -1,4 +1,4 @@
-import { prisma } from './../../database/prisma';
+import { prisma } from 'database';
 import { Circle, Circles, Guild } from '../../model';
 import { list, mutationField, nonNull } from 'nexus';
 import { createDiscordRestClient } from '../../discord';

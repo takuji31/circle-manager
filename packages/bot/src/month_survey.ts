@@ -1,5 +1,5 @@
 import { ReactionHandlerWithData } from "./types";
-import { prisma } from "@circle-manager/database";
+import { prisma } from "database";
 import {
   CircleKey,
   MemberStatus,

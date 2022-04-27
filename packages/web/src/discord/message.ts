@@ -7,7 +7,7 @@ import {
   Routes,
 } from 'discord-api-types/rest/v9';
 import { createDiscordRestClient } from '.';
-import { prisma } from '../database';
+import { prisma } from 'database';
 
 export interface DirectMessageRecipient {
   id: string;

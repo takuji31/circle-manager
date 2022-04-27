@@ -1,4 +1,4 @@
-import { prisma } from './../database/prisma';
+import { prisma } from 'database';
 import { config } from 'dotenv';
 import { Guild } from '../model/guild';
 import { Member, MemberStatus } from '@prisma/client';

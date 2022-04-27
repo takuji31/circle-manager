@@ -1,5 +1,5 @@
 import { Guild, Permissions, TextChannel } from "discord.js";
-import { prisma } from "@circle-manager/database";
+import { prisma } from "database";
 import { ReactionHandlerWithData } from "../types";
 import { Guild as _Guild } from "../../model/guild";
 

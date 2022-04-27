@@ -1,5 +1,5 @@
 import { sendSetupMessage } from '../discord/member/messages';
-import { prisma } from '../database';
+import { prisma } from 'database';
 import { createDiscordRestClient } from '../discord';
 import { config } from 'dotenv';
 

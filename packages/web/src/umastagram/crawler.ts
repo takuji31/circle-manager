@@ -1,4 +1,4 @@
-import { prisma } from './../database/prisma';
+import { prisma } from 'database';
 import { Guild } from './../model/guild';
 import { Routes } from 'discord-api-types/v9';
 import { createDiscordRestClient } from '../discord';

@@ -1,6 +1,6 @@
 import { CircleKey } from '@prisma/client';
 import { config } from 'dotenv';
-import { prisma } from '../../database';
+import { prisma } from 'database';
 import { convert, LocalDate, ZoneId } from '../../model/date';
 
 config();
