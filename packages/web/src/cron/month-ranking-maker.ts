@@ -44,8 +44,8 @@ config();
     `${monthCircles.year}年${monthCircles.month}月のサークルメンバーを確定しました。`,
     [
       {
-        name: 'members.csv',
-        data: Buffer.from(csv, 'utf-8'),
+        fileName: 'members.csv',
+        rawBuffer: Buffer.from(csv, 'utf-8'),
       },
     ]
   );

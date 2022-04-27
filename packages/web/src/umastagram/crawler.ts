@@ -51,11 +51,11 @@ export async function crawlUmastagram(
     );
 
     if (!response.ok) {
-      const json = (await response.json()) as any;
+      const json = await response.json();
       throw new Error(json.error);
     }
 
-    const result = (await response.json()) as UmastagramPage;
+    const result: UmastagramPage = await response.json();
     const { circle: circleResult, members } = result;
 
     const circleKey = circle.key;
@@ -116,10 +116,10 @@ export async function crawlUmastagram(
           DateFormats.ymd
         )}のファン数を取得しました。`,
       },
-      files: [
+      attachments: [
         {
-          name: 'result.json',
-          data: Buffer.from(JSON.stringify(members, null, 2), 'utf-8'),
+          fileName: 'result.json',
+          rawBuffer: Buffer.from(JSON.stringify(members, null, 2), 'utf-8'),
         },
       ],
     });

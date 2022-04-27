@@ -143,10 +143,10 @@ class MemberPower {
     body: {
       content: `メンバーのファン数パワーを算出しました`,
     },
-    files: [
+    attachments: [
       {
-        name: 'member_powers.csv',
-        data: Buffer.from(
+        fileName: 'member_powers.csv',
+        rawBuffer: Buffer.from(
           stringify([
             [
               '順位',

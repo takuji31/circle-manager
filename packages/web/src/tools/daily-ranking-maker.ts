@@ -116,10 +116,10 @@ config();
           })
           .join('\n'),
     },
-    files: [
+    attachments: [
       {
-        name: 'ranking.csv',
-        data: Buffer.from(
+        fileName: 'ranking.csv',
+        rawBuffer: Buffer.from(
           stringify([
             [
               '順位',
