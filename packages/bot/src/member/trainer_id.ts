@@ -1,8 +1,8 @@
-import { CommandInteraction } from 'discord.js';
-import { prisma } from '../../database';
+import { CommandInteraction } from "discord.js";
+import { prisma } from "@circle-manager/database";
 export const trainerIdCommand = async (interaction: CommandInteraction) => {
   // ignore when develop
-  if (process.env.NODE_ENV != 'production') return;
+  if (process.env.NODE_ENV != "production") return;
 
   await interaction.deferReply({ ephemeral: true });
   const memberId = interaction.user.id;

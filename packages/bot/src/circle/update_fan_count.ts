@@ -1,8 +1,8 @@
-import { Guild } from './../../model/guild';
-import { Message, TextChannel } from 'discord.js';
-import { Circle, Circles } from '../../model';
-import { crawlUmastagram } from '../../umastagram/crawler';
-import { DateFormats, LocalDate } from '../../model/date';
+import { Guild } from "../../../web/src/model/guild";
+import { Message, TextChannel } from "discord.js";
+import { Circle } from "../../../web/src/model";
+import { crawlUmastagram } from "../../../web/src/umastagram/crawler";
+import { DateFormats, LocalDate } from "../../../web/src/model/date";
 
 const urlPattern =
   /https:\/\/umastagram.com\/circle\/grade\/graph\/share\/[a-zA-Z0-9]+/;
@@ -27,7 +27,7 @@ export const updateFanCountEvent = async (message: Message, circle: Circle) => {
   if (result) {
     umastagramUrl = result[0];
     console.log(
-      'Found Umastagram URL in notification message %s',
+      "Found Umastagram URL in notification message %s",
       umastagramUrl
     );
   } else {
@@ -45,11 +45,11 @@ export const updateFanCountEvent = async (message: Message, circle: Circle) => {
         );
       });
       if (!umastagramUrlMessage) {
-        throw new Error('UmastagramのURLが直近100件のメッセージにありません。');
+        throw new Error("UmastagramのURLが直近100件のメッセージにありません。");
       }
       umastagramUrl = (urlPattern.exec(umastagramUrlMessage.content) ?? [])[0];
       console.log(
-        'Found Umastagram URL in past message %s',
+        "Found Umastagram URL in past message %s",
         umastagramUrlMessage
       );
     } catch (e) {
@@ -57,9 +57,9 @@ export const updateFanCountEvent = async (message: Message, circle: Circle) => {
         notificationMessage +
           `\n\n` +
           `UmastagramのURLを発見できませんでした。エラー↓\n` +
-          '```' +
+          "```" +
           `${e}`.substring(0, 1800) +
-          '\n```'
+          "\n```"
       );
       return;
     }
@@ -68,9 +68,9 @@ export const updateFanCountEvent = async (message: Message, circle: Circle) => {
   notificationMessage =
     notificationMessage +
     `\n\n` +
-    'UmastagramのURLを発見しました... `' +
+    "UmastagramのURLを発見しました... `" +
     umastagramUrl +
-    '`\n';
+    "`\n";
   await notification.edit(notificationMessage);
 
   try {
@@ -104,7 +104,7 @@ export const updateFanCountFromChannel = async ({
   if (
     !adminChannel ||
     !adminChannel.isText() ||
-    adminChannel.type !== 'GUILD_TEXT'
+    adminChannel.type !== "GUILD_TEXT"
   ) {
     throw new Error(`Admin Channel not found ${Guild.channelIds.admin}`);
   }
@@ -128,11 +128,11 @@ export const updateFanCountFromChannel = async ({
       );
     });
     if (!umastagramUrlMessage) {
-      throw new Error('UmastagramのURLが直近100件のメッセージにありません。');
+      throw new Error("UmastagramのURLが直近100件のメッセージにありません。");
     }
     umastagramUrl = (urlPattern.exec(umastagramUrlMessage.content) ?? [])[0];
     console.log(
-      'Found Umastagram URL in past message %s',
+      "Found Umastagram URL in past message %s",
       umastagramUrlMessage
     );
   } catch (e) {
@@ -140,9 +140,9 @@ export const updateFanCountFromChannel = async ({
       notificationMessage +
         `\n\n` +
         `UmastagramのURLを発見できませんでした。エラー↓\n` +
-        '```' +
+        "```" +
         `${e}`.substring(0, 1800) +
-        '\n```'
+        "\n```"
     );
     return;
   }
@@ -150,9 +150,9 @@ export const updateFanCountFromChannel = async ({
   notificationMessage =
     notificationMessage +
     `\n\n` +
-    'UmastagramのURLを発見しました... `' +
+    "UmastagramのURLを発見しました... `" +
     umastagramUrl +
-    '`\n';
+    "`\n";
   await notification.edit(notificationMessage);
 
   try {

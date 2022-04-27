@@ -1,12 +1,12 @@
-import { Guild } from './../../model/guild';
-import { prisma } from './../../database/prisma';
-import { GuildMember, PartialGuildMember, TextChannel } from 'discord.js';
+import { Guild } from "./../../model/guild";
+import { prisma } from "@circle-manager/database";
+import { GuildMember, PartialGuildMember, TextChannel } from "discord.js";
 
 export const updateMemberNicknameEvent = async (
   oldMember: PartialGuildMember | GuildMember,
   newMember: GuildMember
 ) => {
-  if (process.env.NODE_ENV != 'production') return;
+  if (process.env.NODE_ENV != "production") return;
   const member = await prisma.member.findUnique({
     where: { id: oldMember.id },
   });

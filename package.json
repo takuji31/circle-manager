@@ -10,13 +10,16 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "yarn workspace web build"
+    "build": "run-s build:*",
+    "build:web": "yarn workspace web build",
+    "dev": "run-p dev:*",
+    "dev:web": "yarn workspace web dev"
   },
   "engines": {
     "node": "^16.13.2",
     "yarn": "^1.22.0"
   },
-  "dependencies": {
+  "devDependencies": {
     "typescript": "^4.6.3"
   }
 }

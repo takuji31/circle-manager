@@ -1,8 +1,7 @@
-import { Guild, Permissions, TextChannel } from 'discord.js';
-import { prisma } from '../../database';
-import { ReactionHandler, ReactionHandlerWithData } from '../types';
-import { Guild as _Guild } from '../../model/guild';
-import { use } from '@js-joda/core';
+import { Guild, Permissions, TextChannel } from "discord.js";
+import { prisma } from "@circle-manager/database";
+import { ReactionHandlerWithData } from "../types";
+import { Guild as _Guild } from "../../model/guild";
 
 export const createPersonalChannel: ReactionHandlerWithData<Guild> = async (
   reaction,
@@ -30,9 +29,9 @@ export const createPersonalChannel: ReactionHandlerWithData<Guild> = async (
   }
   if (!channel) {
     channel = await guild.channels.create(
-      member.name + (process.env.NODE_ENV == 'development' ? '_TEST' : ''),
+      member.name + (process.env.NODE_ENV == "development" ? "_TEST" : ""),
       {
-        type: 'GUILD_TEXT',
+        type: "GUILD_TEXT",
         parent: _Guild.categoryIds.personalChannel,
         permissionOverwrites: [
           {

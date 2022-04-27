@@ -5,23 +5,18 @@
     "jsx": "preserve",
     "experimentalDecorators": true,
     "module": "ESNext",
-    "rootDir": "./",
     "moduleResolution": "node",
-    "baseUrl": "./",
     "allowJs": false,
-    "outDir": "./",
     "removeComments": false,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "noImplicitAny": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "baseUrl": "."
   },
-  "references": [
-    {
-      "path": ""
-    }
-  ],
-  "include": ["packages/*/src"]
+  "files": [],
+  "include": [],
+  "exclude": []
 }
