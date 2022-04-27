@@ -93,7 +93,8 @@
     "tslib": "^2.0.0",
     "urql": "^2.1.3",
     "yup": "^0.32.11",
-    "yup-locale-ja": "^0.1.3"
+    "yup-locale-ja": "^0.1.3",
+    "@circle-manager/database": "1.0.0"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "^2.2.0",
