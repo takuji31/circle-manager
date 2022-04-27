@@ -1,4 +1,4 @@
-import { CircleKey, CircleRole } from '../graphql/generated/type';
+import { CircleKey, CircleRole } from "@prisma/client";
 
 export interface User {
   id: string;

@@ -1,4 +1,4 @@
-import { Circle, Circles } from './../../model/circle';
+import { Circle, Circles } from 'model';
 import { objectType } from 'nexus';
 export const SiteMetadata = objectType({
   name: 'SiteMetadata',

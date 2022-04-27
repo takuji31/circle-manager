@@ -34,7 +34,7 @@ import Link from '../../components/link';
 import { LoadingCheckBox } from '../../components/loading_checkbox';
 import { MonthSurveyAnswerValue } from '@prisma/client';
 import { useMutation, useQuery } from 'urql';
-import { DateFormats, ZonedDateTime, ZoneId } from '../../model/date';
+import { DateFormats, ZonedDateTime, ZoneId } from 'model';
 import { withUrqlClient } from '../../graphql/client';
 
 const AdminHome: NextPage = (props) => {

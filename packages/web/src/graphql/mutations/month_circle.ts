@@ -1,4 +1,4 @@
-import { Guild } from './../../model/guild';
+import { Guild } from 'model';
 import { Routes } from 'discord-api-types/v9';
 import { MonthCircle as _MonthCircle } from 'nexus-prisma';
 import { booleanArg, mutationField, nonNull } from 'nexus';
@@ -21,12 +21,7 @@ import {
   sendInvitedMessage,
   sendKickedMessage,
 } from '../../discord/member/messages';
-import {
-  ZonedDateTime,
-  convert,
-  TemporalAdjusters,
-  LocalDate,
-} from '../../model/date';
+import { ZonedDateTime, convert, TemporalAdjusters, LocalDate } from 'model';
 import { setMemberCircleRole } from '../../discord/role';
 
 export const UpdateMemberMonthCircleMutation = mutationField(

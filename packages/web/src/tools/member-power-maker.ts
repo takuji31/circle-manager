@@ -9,7 +9,7 @@ import {
   MemberStatus,
   MonthSurveyAnswerValue,
 } from '@prisma/client';
-import { LocalDate } from '../model/date';
+import { LocalDate } from 'model';
 
 config();
 

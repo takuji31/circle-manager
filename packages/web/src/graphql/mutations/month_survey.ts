@@ -1,4 +1,4 @@
-import { Guild } from './../../model/guild';
+import { Guild } from 'model';
 import { Member, MemberStatus } from '@prisma/client';
 import { createDiscordRestClient } from '../../discord';
 import { nextMonthInt } from 'model';
@@ -10,8 +10,8 @@ import {
   Routes,
 } from 'discord-api-types/v9';
 import { CreateNextMonthSurveyPayload } from '../types';
-import { Emoji, MonthSurveyEmoji } from '../../model/emoji';
-import { DateFormats, convert, LocalDate } from '../../model/date';
+import { Emoji, MonthSurveyEmoji } from 'model';
+import { DateFormats, convert, LocalDate } from 'model';
 
 export const CreateNextMonthSurveyMutation = mutationField(
   'createNextMonthSurvey',

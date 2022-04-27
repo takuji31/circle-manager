@@ -1,4 +1,4 @@
-import { Circles } from './../model/circle';
+import { Circles } from 'model';
 import { config } from 'dotenv';
 import { prisma } from 'database';
 import { Guild, nextMonthInt, thisMonthInt } from 'model';
@@ -13,8 +13,8 @@ import {
   MonthCircle,
   MonthSurveyAnswerValue,
 } from '@prisma/client';
-import { monthCircleStateLabel } from '../model/month_circle';
-import { LocalDate, ZonedDateTime, DateFormats } from '../model/date';
+import { monthCircleStateLabel } from 'model';
+import { LocalDate, ZonedDateTime, DateFormats } from 'model';
 
 config();
 

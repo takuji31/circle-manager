@@ -1,5 +1,5 @@
 import { config } from 'dotenv';
-import { DbTableData } from '../model/db';
+import { DbTableData } from 'model';
 import { prisma } from 'database';
 import * as fs from 'fs/promises';
 

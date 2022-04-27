@@ -1,4 +1,4 @@
-import { Guild } from './../model/guild';
+import { Guild } from 'model';
 import {
   SlashCommandBuilder,
   SlashCommandChannelOption,

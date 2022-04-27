@@ -1,4 +1,4 @@
-import { Circles } from './../../model/circle';
+import { Circles } from 'model';
 import { Routes } from 'discord-api-types/v9';
 import { nonNull, mutationField } from 'nexus';
 import { createDiscordRestClient } from '../../discord';

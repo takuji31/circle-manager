@@ -10,7 +10,7 @@ import {
 } from 'discord-api-types/v9';
 import { Guild } from 'model';
 import { MessageEmbed } from 'discord.js';
-import { Emoji } from '../model/emoji';
+import { Emoji } from 'model';
 
 config();
 
