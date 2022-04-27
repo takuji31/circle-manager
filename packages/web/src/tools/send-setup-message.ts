@@ -1,6 +1,8 @@
-import { sendSetupMessage } from '../discord/member/messages';
 import { prisma } from 'database';
-import { createDiscordRestClient } from '../discord';
+import {
+  sendSetupMessage,
+  createDiscordRestClient,
+} from '@circle-manager/discord';
 import { config } from 'dotenv';
 
 config();

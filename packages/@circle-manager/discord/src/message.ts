@@ -1,5 +1,5 @@
 import { Guild } from 'model';
-import { PrismaPromise } from '.prisma/client';
+import { PrismaPromise } from '@prisma/client';
 import { stringify } from 'csv-stringify/sync';
 import {
   RESTPostAPIChannelMessageJSONBody,

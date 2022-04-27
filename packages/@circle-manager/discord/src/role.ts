@@ -1,5 +1,5 @@
 import { Routes } from 'discord-api-types/v9';
-import { createDiscordRestClient } from '.';
+import { createDiscordRestClient } from './index';
 import { Guild } from 'model';
 
 export const setMemberCircleRole = async (

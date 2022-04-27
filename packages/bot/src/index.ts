@@ -1,4 +1,4 @@
-import { sendSetupMessage } from "../discord/member/messages";
+import { sendSetupMessage } from "@circle-manager/discord";
 import { trainerIdCommand } from "./member/trainer_id";
 import { updateMemberNicknameEvent } from "./member/update_member_nickname";
 import { monthSurveyReaction, monthSurveyShowReaction } from "./month_survey";

@@ -1,5 +1,5 @@
 import { config } from 'dotenv';
-import { sendDirectMessagesIfPossible } from '../discord/message';
+import { sendDirectMessagesIfPossible } from '@circle-manager/discord';
 import { createUrqlClient } from '../graphql/client/serverside';
 import {
   MonthCircleState,

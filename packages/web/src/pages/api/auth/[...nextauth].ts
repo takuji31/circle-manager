@@ -3,7 +3,7 @@ import {
   Routes,
 } from 'discord-api-types/v9';
 import { prisma } from 'database';
-import { createDiscordRestClient } from '../../../discord';
+import { createDiscordRestClient } from '@circle-manager/discord';
 import NextAuth from 'next-auth';
 import DiscordProvider from 'next-auth/providers/discord';
 import { PrismaAdapter } from '@next-auth/prisma-adapter';

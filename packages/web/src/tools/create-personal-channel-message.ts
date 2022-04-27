@@ -1,4 +1,4 @@
-import { createDiscordRestClient } from '../discord';
+import { createDiscordRestClient } from '@circle-manager/discord';
 import { config } from 'dotenv';
 import { createRedisClient, RedisKeys } from '@circle-manager/redis';
 import {

@@ -2,7 +2,6 @@ import { Guild } from 'model';
 import { Routes } from 'discord-api-types/v9';
 import { MonthCircle as _MonthCircle } from 'nexus-prisma';
 import { booleanArg, mutationField, nonNull } from 'nexus';
-import { createDiscordRestClient } from '../../discord';
 import {
   CreateMonthCirclesPayload,
   UpdateMemberMonthCircleMutationInput,
@@ -18,11 +17,12 @@ import {
   MonthSurveyAnswerValue,
 } from '@prisma/client';
 import {
+  createDiscordRestClient,
   sendInvitedMessage,
   sendKickedMessage,
-} from '../../discord/member/messages';
-import { ZonedDateTime, convert, TemporalAdjusters, LocalDate } from 'model';
-import { setMemberCircleRole } from '../../discord/role';
+  setMemberCircleRole,
+} from '@circle-manager/discord';
+import { ZonedDateTime, LocalDate } from 'model';
 
 export const UpdateMemberMonthCircleMutation = mutationField(
   'updateMemberMonthCircle',

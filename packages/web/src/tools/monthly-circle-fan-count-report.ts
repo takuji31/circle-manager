@@ -3,7 +3,7 @@ import { config } from 'dotenv';
 import { prisma } from 'database';
 import { Guild } from 'model';
 import { stringify } from 'csv-stringify/sync';
-import { createDiscordRestClient } from '../discord';
+import { createDiscordRestClient } from '@circle-manager/discord';
 import { Routes } from 'discord-api-types/v9';
 import {
   CircleKey,

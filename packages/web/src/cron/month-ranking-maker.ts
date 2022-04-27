@@ -1,6 +1,6 @@
 import { config } from 'dotenv';
 import { CreateNextMonthCirclesDocument } from '../graphql/generated/type';
-import { sendAdminNotificationMessage } from '../discord/admin';
+import { sendAdminNotificationMessage } from '@circle-manager/discord';
 import { stringify } from 'csv-stringify/sync';
 import { createUrqlClient } from '../graphql/client/serverside';
 import { monthCircleStateLabel } from 'model';

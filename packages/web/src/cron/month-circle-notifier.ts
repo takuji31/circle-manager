@@ -6,7 +6,7 @@ import {
 } from 'model';
 import { prisma } from 'database';
 import { config } from 'dotenv';
-import { sendDirectMessagesIfPossible } from '../discord/message';
+import { sendDirectMessagesIfPossible } from '@circle-manager/discord';
 
 config();
 

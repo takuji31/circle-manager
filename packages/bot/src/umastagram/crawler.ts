@@ -1,7 +1,7 @@
 import { prisma } from "database";
 import { Guild, Circle, DateFormats, LocalDate, convert } from "model";
 import { Routes } from "discord-api-types/v9";
-import { createDiscordRestClient } from "../discord";
+import { createDiscordRestClient } from "@circle-manager/discord";
 import fetch from "node-fetch";
 export interface UmastagramPage {
   members: Array<UmastagramMember>;

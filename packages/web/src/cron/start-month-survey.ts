@@ -9,7 +9,7 @@ import {
   LocalDate,
 } from 'model';
 import { Member, MemberStatus } from '@prisma/client';
-import { createDiscordRestClient } from '../discord';
+import { createDiscordRestClient } from '@circle-manager/discord';
 import { MonthSurvey as _MonthSurvey } from 'nexus-prisma';
 import { MessageEmbed } from 'discord.js';
 import {

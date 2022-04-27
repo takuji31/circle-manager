@@ -6,7 +6,7 @@ import {
   SlashCommandStringOption,
 } from '@discordjs/builders';
 import { Routes } from 'discord-api-types/v9';
-import { createDiscordRestClient } from '../discord';
+import { createDiscordRestClient } from '@circle-manager/discord';
 import { config } from 'dotenv';
 import { Circles } from 'model';
 import { RESTPutAPIApplicationGuildCommandsResult } from 'discord-api-types';
