@@ -1,6 +1,6 @@
 import { createDiscordRestClient } from '../discord';
 import { config } from 'dotenv';
-import { createRedisClient, RedisKeys } from '../redis';
+import { createRedisClient, RedisKeys } from '@circle-manager/redis';
 import {
   APIMessage,
   RESTGetAPIChannelMessageResult,

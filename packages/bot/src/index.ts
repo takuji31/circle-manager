@@ -11,7 +11,11 @@ import {
   updateFanCountEvent,
   updateFanCountFromChannel,
 } from "./circle/update_fan_count";
-import { createRedisClient, RedisClient, RedisKeys } from "../redis";
+import {
+  createRedisClient,
+  RedisClient,
+  RedisKeys,
+} from "@circle-manager/redis";
 import { createPersonalChannel } from "./member/create_personal_channes";
 
 config();

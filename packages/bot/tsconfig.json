@@ -1,11 +1,13 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "rootDir": "./src",
     "baseUrl": "./src",
     "outDir": "dist",
     "sourceMap": true,
-    "lib": ["ESNext"]
+    "lib": ["ESNext"],
+    "paths": {
+      "@circle-manager/*": ["../../@circle-manager/*"]
+    }
   },
   "include": ["./src/**/*"]
 }
