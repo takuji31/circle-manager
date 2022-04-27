@@ -1,6 +1,6 @@
 import { objectType, inputObjectType } from 'nexus';
 import { CircleKey, SignUp as T } from 'nexus-prisma';
-import { Circles } from '../../model';
+import { Circles } from '@circle-manager/shared/model';
 import { Circle } from './circle';
 
 export const SignUp = objectType({

@@ -1,4 +1,4 @@
-import { nextMonthInt, thisMonthInt } from '../../model';
+import { nextMonthInt, thisMonthInt } from '@circle-manager/shared/model';
 import { queryField, nonNull } from 'nexus';
 import { Month } from '../types';
 

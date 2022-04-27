@@ -1,11 +1,11 @@
 import { config } from 'dotenv';
-import { sendDirectMessagesIfPossible } from '../discord/message';
+import { sendDirectMessagesIfPossible } from '@circle-manager/shared/discord';
 import { createUrqlClient } from '../graphql/client/serverside';
 import {
   MonthCircleState,
   NextMonthCirclesDocument,
 } from '../graphql/generated/type';
-import { Circles, isCircleKey } from '../model';
+import { Circles, isCircleKey } from '@circle-manager/shared/model';
 
 config();
 

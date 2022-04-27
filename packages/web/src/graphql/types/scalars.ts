@@ -1,4 +1,4 @@
-import { LocalDate } from '../../model/date';
+import { LocalDate } from '@circle-manager/shared/model';
 import { Kind } from 'graphql';
 import { scalarType } from 'nexus';
 

@@ -1,6 +1,6 @@
-import { createDiscordRestClient } from '../discord';
+import { createDiscordRestClient } from '@circle-manager/shared/discord';
 import { config } from 'dotenv';
-import { createRedisClient, RedisKeys } from '../redis';
+import { createRedisClient, RedisKeys } from '@circle-manager/shared/redis';
 import {
   APIMessage,
   RESTGetAPIChannelMessageResult,
@@ -8,9 +8,9 @@ import {
   RESTPostAPIChannelMessageResult,
   Routes,
 } from 'discord-api-types/v9';
-import { Guild } from '../model';
+import { Guild } from '@circle-manager/shared/model';
 import { MessageEmbed } from 'discord.js';
-import { Emoji } from '../model/emoji';
+import { Emoji } from '@circle-manager/shared/model';
 
 config();
 

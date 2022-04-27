@@ -2,12 +2,12 @@ import {
   RESTGetAPICurrentUserGuildsResult,
   Routes,
 } from 'discord-api-types/v9';
-import { prisma } from '../../../database';
-import { createDiscordRestClient } from '../../../discord';
+import { prisma } from '@circle-manager/shared/database';
+import { createDiscordRestClient } from '@circle-manager/shared/discord';
 import NextAuth from 'next-auth';
 import DiscordProvider from 'next-auth/providers/discord';
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
-import { Guild } from '../../../model';
+import { Guild } from '@circle-manager/shared/model';
 import { Permissions } from 'discord.js';
 
 export default NextAuth({
