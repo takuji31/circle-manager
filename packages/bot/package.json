@@ -1,7 +1,7 @@
 {
   "name": "bot",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "dist/index.js",
   "license": "MIT",
   "private": true,
   "dependencies": {
@@ -9,5 +9,9 @@
     "dotenv": "^16.0.0",
     "database": "1.0.0",
     "model": "1.0.0"
+  },
+  "scripts": {
+    "build": "tsc --build",
+    "build:clean": "tsc --build --clean && tsc --build"
   }
 }

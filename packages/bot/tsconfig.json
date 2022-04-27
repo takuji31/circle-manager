@@ -3,7 +3,9 @@
   "compilerOptions": {
     "rootDir": "./src",
     "baseUrl": "./src",
-    "outDir": "dist"
+    "outDir": "dist",
+    "sourceMap": true,
+    "lib": ["ESNext"]
   },
   "include": ["./src/**/*"]
 }
