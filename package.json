@@ -15,5 +15,8 @@
   "engines": {
     "node": "^16.13.2",
     "yarn": "^1.22.0"
+  },
+  "dependencies": {
+    "typescript": "^4.6.3"
   }
 }
