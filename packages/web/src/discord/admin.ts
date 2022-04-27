@@ -1,4 +1,4 @@
-import { RawFile } from '@discordjs/rest';
+import { RawAttachment } from '@discordjs/rest';
 import {
   RESTPostAPIChannelMessageJSONBody,
   Routes,
@@ -8,7 +8,7 @@ import { Guild } from '../model';
 
 export async function sendAdminNotificationMessage(
   message: string,
-  files: Array<RawFile>
+  attachments: Array<RawAttachment>
 ) {
   const rest = createDiscordRestClient();
   const body: RESTPostAPIChannelMessageJSONBody = {
@@ -16,6 +16,6 @@ export async function sendAdminNotificationMessage(
   };
   await rest.post(Routes.channelMessages(Guild.channelIds.admin), {
     body: body,
-    files,
+    attachments: attachments,
   });
 }

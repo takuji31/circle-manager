@@ -1,4 +1,4 @@
-import { CircleRole } from '@prisma/client';
+import { CircleRole } from '.prisma/client';
 import { LinearProgress } from '@mui/material';
 import { Box } from '@mui/system';
 import {
