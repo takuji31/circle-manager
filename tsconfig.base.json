@@ -14,7 +14,8 @@
     "strict": true,
     "noImplicitAny": true,
     "skipLibCheck": true,
-    "baseUrl": "."
+    "baseUrl": ".",
+    "isolatedModules": true
   },
   "files": [],
   "include": [],

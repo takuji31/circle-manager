@@ -3,5 +3,10 @@
   "version": "1.0.0",
   "main": "src/index.ts",
   "license": "MIT",
-  "private": true
+  "private": true,
+  "dependencies": {
+    "@js-joda/core": "^5.2.0",
+    "@js-joda/locale_ja": "^4.7.0",
+    "@js-joda/timezone": "^2.12.0"
+  }
 }
