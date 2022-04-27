@@ -1,5 +1,5 @@
 import { Member } from '@prisma/client';
-import { Circle } from '../../model';
+import { Circle } from 'model';
 import { sendDirectMessageIfPossible } from '../message';
 
 export const sendSetupMessage = async (member: Member) => {

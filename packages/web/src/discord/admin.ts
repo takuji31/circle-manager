@@ -4,7 +4,7 @@ import {
   Routes,
 } from 'discord-api-types/rest/v9';
 import { createDiscordRestClient } from '.';
-import { Guild } from '../model';
+import { Guild } from 'model';
 
 export async function sendAdminNotificationMessage(
   message: string,

@@ -3,7 +3,7 @@ import {
   MonthCircleState as _MonthCircleState,
 } from 'nexus-prisma';
 import { enumType, inputObjectType, list, nonNull, objectType } from 'nexus';
-import { Circles, isCircleKey } from '../../model';
+import { Circles, isCircleKey } from 'model';
 import { stat } from 'fs';
 
 export const MonthCircle = objectType({

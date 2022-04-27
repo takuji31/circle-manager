@@ -1,7 +1,7 @@
 import { Guild } from './../../model/guild';
 import { Member, MemberStatus } from '@prisma/client';
 import { createDiscordRestClient } from '../../discord';
-import { nextMonthInt } from '../../model';
+import { nextMonthInt } from 'model';
 import { MonthSurvey as _MonthSurvey } from 'nexus-prisma';
 import { mutationField } from 'nexus';
 import { MessageEmbed } from 'discord.js';

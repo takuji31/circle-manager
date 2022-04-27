@@ -9,7 +9,7 @@ import {
   UpdateMemberMonthCirclePayload,
   UpdateMonthCircleMutationInput,
 } from '../types';
-import { Circles, isCircleKey, nextMonthInt } from '../../model';
+import { Circles, isCircleKey, nextMonthInt } from 'model';
 import {
   CircleKey,
   CircleRole,

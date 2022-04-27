@@ -1,9 +1,14 @@
-import { nextMonthInt } from './../model/year_month';
 import { prisma } from 'database';
 import { config } from 'dotenv';
 import { sendDirectMessagesIfPossible } from '../discord/message';
 import { MonthSurveyAnswerValue } from '@prisma/client';
-import { DateFormats, nativeJs, ZonedDateTime, ZoneId } from '../model/date';
+import {
+  DateFormats,
+  nativeJs,
+  ZonedDateTime,
+  ZoneId,
+  nextMonthInt,
+} from 'model';
 
 config();
 

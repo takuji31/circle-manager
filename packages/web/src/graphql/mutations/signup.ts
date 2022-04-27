@@ -2,7 +2,7 @@ import { Circles } from './../../model/circle';
 import { Routes } from 'discord-api-types/v9';
 import { nonNull, mutationField } from 'nexus';
 import { createDiscordRestClient } from '../../discord';
-import { Guild } from '../../model';
+import { Guild } from 'model';
 import { SignUp, UpdateSignUpMutationInput } from '../types';
 import { sendInvitedMessage } from '../../discord/member/messages';
 import { setMemberCircleRole } from '../../discord/role';

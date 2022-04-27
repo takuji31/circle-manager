@@ -1,5 +1,5 @@
 import { config } from 'dotenv';
-import { Guild } from '../model';
+import { Guild } from 'model';
 import { createDiscordRestClient } from '../discord';
 import {
   AllowedMentionsTypes,

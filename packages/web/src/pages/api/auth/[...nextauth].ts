@@ -7,7 +7,7 @@ import { createDiscordRestClient } from '../../../discord';
 import NextAuth from 'next-auth';
 import DiscordProvider from 'next-auth/providers/discord';
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
-import { Guild } from '../../../model';
+import { Guild } from 'model';
 import { Permissions } from 'discord.js';
 
 export default NextAuth({

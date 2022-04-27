@@ -5,7 +5,7 @@ import {
   MonthCircleState,
   NextMonthCirclesDocument,
 } from '../graphql/generated/type';
-import { Circles, isCircleKey } from '../model';
+import { Circles, isCircleKey } from 'model';
 
 config();
 

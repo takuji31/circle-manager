@@ -1,6 +1,6 @@
 import { config } from 'dotenv';
 import { prisma } from 'database';
-import { Circles, Guild } from '../model';
+import { Circles, Guild } from 'model';
 import { stringify } from 'csv-stringify/sync';
 import { createDiscordRestClient } from '../discord';
 import { Routes } from 'discord-api-types/v9';

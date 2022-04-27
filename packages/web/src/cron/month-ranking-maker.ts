@@ -3,7 +3,7 @@ import { CreateNextMonthCirclesDocument } from '../graphql/generated/type';
 import { sendAdminNotificationMessage } from '../discord/admin';
 import { stringify } from 'csv-stringify/sync';
 import { createUrqlClient } from '../graphql/client/serverside';
-import { monthCircleStateLabel } from '../model/month_circle';
+import { monthCircleStateLabel } from 'model';
 
 config();
 

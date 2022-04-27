@@ -16,7 +16,7 @@ import Layout from '../../../components/layout';
 import * as yup from 'yup';
 import { setLocale } from 'yup';
 import * as ja from 'yup-locale-ja';
-import { getCircleName } from '../../../model';
+import { getCircleName } from 'model';
 import { yupResolver } from '@hookform/resolvers/yup';
 import {
   getServerSidePropsWithUrql,

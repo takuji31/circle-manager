@@ -1,4 +1,4 @@
-import { UserWithSession } from '../model';
+import { UserWithSession } from 'model';
 import { useSession } from 'next-auth/react';
 import { CircleKey, CircleRole } from '../graphql/generated/type';
 export default function useUser() {
