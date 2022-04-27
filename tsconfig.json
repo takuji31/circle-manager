@@ -2,9 +2,7 @@
   "compilerOptions": {
     "incremental": true,
     "target": "es2016",
-    "jsx": "preserve",
-    "experimentalDecorators": true,
-    "module": "ESNext",
+    "module": "CommonJS",
     "moduleResolution": "node",
     "allowJs": false,
     "removeComments": false,
@@ -14,8 +12,7 @@
     "strict": true,
     "noImplicitAny": true,
     "skipLibCheck": true,
-    "baseUrl": ".",
-    "isolatedModules": true
+    "baseUrl": "."
   },
   "files": [],
   "include": [],

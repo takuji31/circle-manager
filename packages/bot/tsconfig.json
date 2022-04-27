@@ -1,13 +1,34 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
     "baseUrl": "./src",
+    "rootDir": "./src",
     "outDir": "dist",
+    "declaration": true,
+    "declarationMap": true,
     "sourceMap": true,
     "lib": ["ESNext"],
+    "moduleResolution": "Node",
     "paths": {
-      "@circle-manager/*": ["../../@circle-manager/*"]
+      "*": ["../node_modules/*", "./*"],
+      "database": ["../../database/src"],
+      "model": ["../../model/src"],
+      "@circle-manager/*": ["../../@circle-manager/*/src"]
     }
   },
-  "include": ["./src/**/*"]
+  // "include": ["./src/**/*"],
+  "references": [
+    {
+      "path": "../database"
+    },
+    {
+      "path": "../model"
+    },
+    {
+      "path": "../@circle-manager/discord"
+    },
+    {
+      "path": "../@circle-manager/redis"
+    }
+  ]
 }
