@@ -1,6 +1,6 @@
-import { LocalDate } from './date';
+import { LocalDate } from "./date";
 
-export interface YearMonth {
+interface YearMonth {
   year: number;
   month: number;
 }

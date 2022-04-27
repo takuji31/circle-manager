@@ -6,8 +6,11 @@ import {
   MonthSurvey,
   MonthSurveyAnswerValue,
 } from "@prisma/client";
-import { isValidMonthSurveyEmoji, MonthSurveyEmoji } from "../model/emoji";
-import { monthSurveyAnswerLabel } from "../model/month_survey_answer";
+import {
+  isValidMonthSurveyEmoji,
+  MonthSurveyEmoji,
+  monthSurveyAnswerLabel,
+} from "model";
 
 export const monthSurveyReaction: ReactionHandlerWithData<MonthSurvey> = async (
   reaction,

@@ -1,8 +1,7 @@
-import { Guild } from "../../../web/src/model/guild";
+import { Guild, Circle } from "model";
 import { Message, TextChannel } from "discord.js";
-import { Circle } from "../../../web/src/model";
-import { crawlUmastagram } from "../../../web/src/umastagram/crawler";
-import { DateFormats, LocalDate } from "../../../web/src/model/date";
+import { crawlUmastagram } from "umastagram/crawler";
+import { DateFormats, LocalDate } from "model";
 
 const urlPattern =
   /https:\/\/umastagram.com\/circle\/grade\/graph\/share\/[a-zA-Z0-9]+/;

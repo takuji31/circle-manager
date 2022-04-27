@@ -1,7 +1,7 @@
 import { Guild, Permissions, TextChannel } from "discord.js";
 import { prisma } from "database";
 import { ReactionHandlerWithData } from "../types";
-import { Guild as _Guild } from "../../model/guild";
+import { Guild as _Guild } from "model";
 
 export const createPersonalChannel: ReactionHandlerWithData<Guild> = async (
   reaction,

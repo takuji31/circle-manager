@@ -1,10 +1,8 @@
-import { prisma } from 'database';
-import { Guild } from './../model/guild';
-import { Routes } from 'discord-api-types/v9';
-import { createDiscordRestClient } from '../discord';
-import { Circle } from '../model';
-import fetch from 'node-fetch';
-import { DateFormats, LocalDate, convert } from '../model/date';
+import { prisma } from "database";
+import { Guild, Circle, DateFormats, LocalDate, convert } from "model";
+import { Routes } from "discord-api-types/v9";
+import { createDiscordRestClient } from "../discord";
+import fetch from "node-fetch";
 export interface UmastagramPage {
   members: Array<UmastagramMember>;
   circle: UmastagramCircle;
@@ -30,8 +28,8 @@ const toHalfWidthString = (str: string) => {
     .replace(/[Ａ-Ｚａ-ｚ０-９]/g, (s) => {
       return String.fromCharCode(s.charCodeAt(0) - 0xfee0);
     })
-    .replace('：', ':')
-    .replace('　', ' ');
+    .replace("：", ":")
+    .replace("　", " ");
 };
 
 export async function crawlUmastagram(
@@ -46,7 +44,7 @@ export async function crawlUmastagram(
     const response = await fetch(
       `https://us-central1-shin-umamusume-336911.cloudfunctions.net/getUmastagramFanCounts?url=${url}`,
       {
-        method: 'GET',
+        method: "GET",
       }
     );
 
@@ -69,10 +67,10 @@ export async function crawlUmastagram(
     const circleFanCountData = {
       circle: circleKey,
       date,
-      total: BigInt(circleResult.total.replaceAll(',', '')),
-      avg: BigInt(circleResult.avg.replaceAll(',', '')),
-      predicted: BigInt(circleResult.predictedTotal.replaceAll(',', '')),
-      predictedAvg: BigInt(circleResult.predictedAvg.replaceAll(',', '')),
+      total: BigInt(circleResult.total.replaceAll(",", "")),
+      avg: BigInt(circleResult.avg.replaceAll(",", "")),
+      predicted: BigInt(circleResult.predictedTotal.replaceAll(",", "")),
+      predictedAvg: BigInt(circleResult.predictedAvg.replaceAll(",", "")),
     };
     await prisma.$transaction([
       prisma.memberFanCount.deleteMany({
@@ -90,9 +88,9 @@ export async function crawlUmastagram(
               date,
               name: member.name,
               memberId,
-              total: BigInt(member.total.replaceAll(',', '')),
-              avg: BigInt(member.avg.replaceAll(',', '')),
-              predicted: BigInt(member.predicted.replaceAll(',', '')),
+              total: BigInt(member.total.replaceAll(",", "")),
+              avg: BigInt(member.avg.replaceAll(",", "")),
+              predicted: BigInt(member.predicted.replaceAll(",", "")),
             };
           }),
         ],
@@ -118,8 +116,8 @@ export async function crawlUmastagram(
       },
       attachments: [
         {
-          fileName: 'result.json',
-          rawBuffer: Buffer.from(JSON.stringify(members, null, 2), 'utf-8'),
+          fileName: "result.json",
+          rawBuffer: Buffer.from(JSON.stringify(members, null, 2), "utf-8"),
         },
       ],
     });
@@ -133,10 +131,10 @@ export async function crawlUmastagram(
           `${circle.name}の ${day.format(
             DateFormats.ymd
           )}のファン数を取得できませんでした。\n` +
-          '```\n' +
+          "```\n" +
           `${e}`.substring(0, 1800) +
           `\n` +
-          '```',
+          "```",
       },
     });
     throw e;

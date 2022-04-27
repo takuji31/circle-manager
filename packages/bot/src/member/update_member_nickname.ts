@@ -1,4 +1,4 @@
-import { Guild } from "./../../model/guild";
+import { Guild } from "model";
 import { prisma } from "database";
 import { GuildMember, PartialGuildMember, TextChannel } from "discord.js";
 

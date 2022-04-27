@@ -1,24 +1,23 @@
-import { sendSetupMessage } from '../discord/member/messages';
-import { trainerIdCommand } from './member/trainer_id';
-import { updateMemberNicknameEvent } from './member/update_member_nickname';
-import { monthSurveyReaction, monthSurveyShowReaction } from './month_survey';
-import { registerTrainerIdCommand } from './register_trainer_id';
-import { PrismaClient } from '@prisma/client';
-import { Client, Intents, Options } from 'discord.js';
-import { config } from 'dotenv';
-import { Emoji, MonthSurveyEmoji } from '../model/emoji';
-import { Circles, isCircleKey } from '../model';
+import { sendSetupMessage } from "../discord/member/messages";
+import { trainerIdCommand } from "./member/trainer_id";
+import { updateMemberNicknameEvent } from "./member/update_member_nickname";
+import { monthSurveyReaction, monthSurveyShowReaction } from "./month_survey";
+import { registerTrainerIdCommand } from "./register_trainer_id";
+import { PrismaClient } from "@prisma/client";
+import { Client, Intents, Options } from "discord.js";
+import { config } from "dotenv";
+import { Emoji, MonthSurveyEmoji, Circles, isCircleKey } from "model";
 import {
   updateFanCountEvent,
   updateFanCountFromChannel,
-} from './circle/update_fan_count';
-import { createRedisClient, RedisClient, RedisKeys } from '../redis';
-import { createPersonalChannel } from './member/create_personal_channes';
+} from "./circle/update_fan_count";
+import { createRedisClient, RedisClient, RedisKeys } from "../redis";
+import { createPersonalChannel } from "./member/create_personal_channes";
 
 config();
 
 const client = new Client({
-  partials: ['MESSAGE', 'REACTION', 'CHANNEL', 'USER', 'GUILD_MEMBER'],
+  partials: ["MESSAGE", "REACTION", "CHANNEL", "USER", "GUILD_MEMBER"],
   intents: [
     Intents.FLAGS.GUILDS,
     Intents.FLAGS.GUILD_MESSAGES,
@@ -33,17 +32,17 @@ const prisma = new PrismaClient();
 
 let redis: RedisClient;
 
-client.on('guildUpdate', async (guild) => {
-  console.log('guildUpdate %s', guild);
+client.on("guildUpdate", async (guild) => {
+  console.log("guildUpdate %s", guild);
 });
 
-client.on('ready', async () => {
+client.on("ready", async () => {
   redis = await createRedisClient();
-  console.log('ready');
+  console.log("ready");
 });
 
-client.on('guildMemberRemove', async (member) => {
-  console.log('Member removed %s', member);
+client.on("guildMemberRemove", async (member) => {
+  console.log("Member removed %s", member);
   try {
     await prisma.member.update({
       where: { id: member.id },
@@ -53,12 +52,12 @@ client.on('guildMemberRemove', async (member) => {
       },
     });
   } catch (e) {
-    console.log('Error when guildMemberRemove %s', e);
+    console.log("Error when guildMemberRemove %s", e);
   }
 });
 
-client.on('guildMemberAdd', async (member) => {
-  console.log('Member added %s', member);
+client.on("guildMemberAdd", async (member) => {
+  console.log("Member added %s", member);
   if (member.user.bot) {
     return;
   }
@@ -87,19 +86,19 @@ client.on('guildMemberAdd', async (member) => {
         joined: false,
       },
     });
-    if (process.env.NODE_ENV != 'production') return;
+    if (process.env.NODE_ENV != "production") return;
     await sendSetupMessage(createdMember);
   } catch (e) {
-    console.log('Error when guildMemberRemove %s', e);
+    console.log("Error when guildMemberRemove %s", e);
   }
 });
 
-client.on('guildMemberUpdate', async (oldMember, newMember) => {
+client.on("guildMemberUpdate", async (oldMember, newMember) => {
   await updateMemberNicknameEvent(oldMember, newMember);
 });
 
-client.on('messageCreate', async (message) => {
-  console.log('messageCreated');
+client.on("messageCreate", async (message) => {
+  console.log("messageCreated");
   const notificationCircle = Circles.findByRawNotificationChannelId(
     message.channel.id
   );
@@ -108,17 +107,17 @@ client.on('messageCreate', async (message) => {
   }
 });
 
-client.on('interactionCreate', async (interaction) => {
+client.on("interactionCreate", async (interaction) => {
   try {
     if (!interaction.isCommand()) return;
-    if (interaction.commandName == 'register-trainer-id') {
+    if (interaction.commandName == "register-trainer-id") {
       await registerTrainerIdCommand(interaction);
     }
-    if (interaction.commandName == 'trainer-id') {
+    if (interaction.commandName == "trainer-id") {
       await trainerIdCommand(interaction);
     }
-    if (interaction.commandName == 'update-fan-count') {
-      const circleKey = interaction.options.getString('circle');
+    if (interaction.commandName == "update-fan-count") {
+      const circleKey = interaction.options.getString("circle");
       if (!circleKey || !isCircleKey(circleKey)) {
         interaction.reply({ content: `不明なサークルキーです ${circleKey}` });
         return;
@@ -131,7 +130,7 @@ client.on('interactionCreate', async (interaction) => {
       if (
         !notificationChannel ||
         !notificationChannel?.isText() ||
-        notificationChannel.type != 'GUILD_TEXT'
+        notificationChannel.type != "GUILD_TEXT"
       ) {
         interaction.reply({
           content: `不明なチャンネル: ${circle.notificationChannelId}`,
@@ -139,12 +138,12 @@ client.on('interactionCreate', async (interaction) => {
         return;
       }
 
-      const year = interaction.options.getInteger('year', false);
-      const month = interaction.options.getInteger('year', false);
-      const day = interaction.options.getInteger('year', false);
+      const year = interaction.options.getInteger("year", false);
+      const month = interaction.options.getInteger("year", false);
+      const day = interaction.options.getInteger("year", false);
 
       interaction.reply({
-        content: 'ファン数取得を開始します',
+        content: "ファン数取得を開始します",
         ephemeral: true,
       });
 
@@ -156,14 +155,14 @@ client.on('interactionCreate', async (interaction) => {
         day,
       });
 
-      interaction.editReply({ content: 'ファン数取得完了しました' });
+      interaction.editReply({ content: "ファン数取得完了しました" });
     }
   } catch (e) {
-    console.log('Error when interactionCreate %s', e);
+    console.log("Error when interactionCreate %s", e);
   }
 });
 
-client.on('messageReactionAdd', async (reaction, user) => {
+client.on("messageReactionAdd", async (reaction, user) => {
   try {
     if (user.bot) {
       return;
@@ -203,7 +202,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
       }
     }
   } catch (e) {
-    console.log('Error when messageReactionAdd %s', e);
+    console.log("Error when messageReactionAdd %s", e);
   }
 });
 
