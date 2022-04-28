@@ -1,4 +1,4 @@
-import { Guild } from './../model/guild';
+import { Guild } from '@circle-manager/shared/model';
 import {
   SlashCommandBuilder,
   SlashCommandChannelOption,
@@ -6,9 +6,9 @@ import {
   SlashCommandStringOption,
 } from '@discordjs/builders';
 import { Routes } from 'discord-api-types/v9';
-import { createDiscordRestClient } from '../discord';
+import { createDiscordRestClient } from '@circle-manager/shared/discord';
 import { config } from 'dotenv';
-import { Circles } from '../model';
+import { Circles } from '@circle-manager/shared/model';
 import { RESTPutAPIApplicationGuildCommandsResult } from 'discord-api-types';
 import { RESTPutAPIChannelPermissionJSONBody } from 'discord-api-types';
 import { OverwriteType } from 'discord-api-types';
@@ -39,8 +39,11 @@ config();
         .addStringOption(
           new SlashCommandStringOption()
             .addChoices(
-              Circles.activeCircles.map((circle) => {
-                return [circle.name, circle.key];
+              ...Circles.activeCircles.map((circle) => {
+                return {
+                  name: circle.name,
+                  value: circle.key,
+                };
               })
             )
             .setName('circle')

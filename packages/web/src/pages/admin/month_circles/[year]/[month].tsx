@@ -35,7 +35,7 @@ import {
   getServerSidePropsWithUrql,
   withUrqlClient,
 } from '../../../../graphql/client';
-import { DateFormats, ZonedDateTime } from '../../../../model/date';
+import { DateFormats, ZonedDateTime } from '@circle-manager/shared/model';
 import useUser from '../../../../hooks/user';
 import { check } from 'prettier';
 import Layout from '../../../../components/layout';

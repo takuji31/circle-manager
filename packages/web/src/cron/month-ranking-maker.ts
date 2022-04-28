@@ -1,9 +1,9 @@
 import { config } from 'dotenv';
 import { CreateNextMonthCirclesDocument } from '../graphql/generated/type';
-import { sendAdminNotificationMessage } from '../discord/admin';
+import { sendAdminNotificationMessage } from '@circle-manager/shared/discord';
 import { stringify } from 'csv-stringify/sync';
 import { createUrqlClient } from '../graphql/client/serverside';
-import { monthCircleStateLabel } from '../model/month_circle';
+import { monthCircleStateLabel } from '@circle-manager/shared/model';
 
 config();
 
@@ -44,8 +44,8 @@ config();
     `${monthCircles.year}年${monthCircles.month}月のサークルメンバーを確定しました。`,
     [
       {
-        fileName: 'members.csv',
-        rawBuffer: Buffer.from(csv, 'utf-8'),
+        name: 'members.csv',
+        data: Buffer.from(csv, 'utf-8'),
       },
     ]
   );

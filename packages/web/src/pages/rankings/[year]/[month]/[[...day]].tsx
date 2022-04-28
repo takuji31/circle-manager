@@ -1,8 +1,12 @@
-import { convert, LocalDate, TemporalAdjusters } from '../../../../model/date';
+import {
+  convert,
+  LocalDate,
+  TemporalAdjusters,
+} from '@circle-manager/shared/model';
 import { GetServerSideProps, NextPage } from 'next';
 import { isArray } from 'nexus/dist/utils';
 import { ParsedUrlQuery } from 'querystring';
-import { prisma } from '../../../../database';
+import { prisma } from '@circle-manager/shared/database';
 import { withUrqlClient } from '../../../../graphql/client';
 
 const RankingPage: NextPage<{ year: number; month: number; day: number }> = ({

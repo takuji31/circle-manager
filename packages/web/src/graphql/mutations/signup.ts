@@ -1,11 +1,10 @@
-import { Circles } from './../../model/circle';
-import { Routes } from 'discord-api-types/v9';
+import { Circles } from '@circle-manager/shared/model';
 import { nonNull, mutationField } from 'nexus';
-import { createDiscordRestClient } from '../../discord';
-import { Guild } from '../../model';
 import { SignUp, UpdateSignUpMutationInput } from '../types';
-import { sendInvitedMessage } from '../../discord/member/messages';
-import { setMemberCircleRole } from '../../discord/role';
+import {
+  sendInvitedMessage,
+  setMemberCircleRole,
+} from '@circle-manager/shared/discord';
 
 export const UpdateSignUpMutation = mutationField('updateSignUp', {
   type: nonNull(SignUp),

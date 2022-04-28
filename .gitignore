@@ -64,3 +64,16 @@ node_modules/
 
 # dotenv environment variables file
 .env
+
+**/dist/**/*.js
+**/dist/**/*.js.map
+**/dist/**/*.d.ts
+*.tsbuildinfo
+
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions

@@ -8,13 +8,12 @@ import {
 } from '@mui/material';
 import React from 'react';
 import { useMutation, useQuery } from 'urql';
-import { withUrqlClient } from '../graphql/client';
 import {
   AdminMemberMonthCircleDocument,
   MonthCircleState,
   UpdateMemberMonthCircleDocument,
 } from '../graphql/generated/type';
-import { monthCircleStateLabel } from '../model/month_circle';
+import { monthCircleStateLabel } from '@circle-manager/shared/model';
 
 export interface Props {
   memberId: string;

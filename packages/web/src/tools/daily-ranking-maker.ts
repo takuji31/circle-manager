@@ -1,9 +1,13 @@
-import { Circles } from './../model/circle';
+import { Circles } from '@circle-manager/shared/model';
 import { config } from 'dotenv';
-import { prisma } from '../database';
-import { Guild, nextMonthInt, thisMonthInt } from '../model';
+import { prisma } from '@circle-manager/shared/database';
+import {
+  Guild,
+  nextMonthInt,
+  thisMonthInt,
+} from '@circle-manager/shared/model';
 import { stringify } from 'csv-stringify/sync';
-import { createDiscordRestClient } from '../discord';
+import { createDiscordRestClient } from '@circle-manager/shared/discord';
 import { Routes } from 'discord-api-types/v9';
 import {
   CircleKey,
@@ -13,8 +17,12 @@ import {
   MonthCircle,
   MonthSurveyAnswerValue,
 } from '@prisma/client';
-import { monthCircleStateLabel } from '../model/month_circle';
-import { LocalDate, ZonedDateTime, DateFormats } from '../model/date';
+import { monthCircleStateLabel } from '@circle-manager/shared/model';
+import {
+  LocalDate,
+  ZonedDateTime,
+  DateFormats,
+} from '@circle-manager/shared/model';
 
 config();
 
@@ -116,10 +124,10 @@ config();
           })
           .join('\n'),
     },
-    attachments: [
+    files: [
       {
-        fileName: 'ranking.csv',
-        rawBuffer: Buffer.from(
+        name: 'ranking.csv',
+        data: Buffer.from(
           stringify([
             [
               '順位',

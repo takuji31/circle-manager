@@ -1,6 +1,6 @@
-import { convert } from '../../model/date';
+import { convert } from '@circle-manager/shared/model';
 import { list, nonNull, objectType } from 'nexus';
-import { Circle } from '../../model';
+import { Circle } from '@circle-manager/shared/model';
 import { MemberFanCount } from './member_fan_count';
 
 export const Ranking = objectType({

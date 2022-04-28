@@ -1,15 +1,15 @@
 import { config } from 'dotenv';
-import { prisma } from '../database';
-import { Circles, Guild } from '../model';
+import { prisma } from '@circle-manager/shared/database';
+import { Circles, Guild } from '@circle-manager/shared/model';
 import { stringify } from 'csv-stringify/sync';
-import { createDiscordRestClient } from '../discord';
+import { createDiscordRestClient } from '@circle-manager/shared/discord';
 import { Routes } from 'discord-api-types/v9';
 import {
   CircleKey,
   MemberStatus,
   MonthSurveyAnswerValue,
 } from '@prisma/client';
-import { LocalDate } from '../model/date';
+import { LocalDate } from '@circle-manager/shared/model';
 
 config();
 
@@ -143,10 +143,10 @@ class MemberPower {
     body: {
       content: `メンバーのファン数パワーを算出しました`,
     },
-    attachments: [
+    files: [
       {
-        fileName: 'member_powers.csv',
-        rawBuffer: Buffer.from(
+        name: 'member_powers.csv',
+        data: Buffer.from(
           stringify([
             [
               '順位',

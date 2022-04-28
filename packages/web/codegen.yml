@@ -5,7 +5,7 @@ generates:
   src/graphql/generated/type.ts:
     plugins:
       - add:
-          content: "import { LocalDate } from '../../model/date';"
+          content: "import { LocalDate } from '@circle-manager/shared/model';"
       - 'typescript'
       - 'typescript-operations'
       - typed-document-node

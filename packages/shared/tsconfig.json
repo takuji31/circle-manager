@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "noEmit": true,
+    "baseUrl": "./src",
+    "rootDir": "./src",
+    "outDir": "dist",
+    "target": "ESNext",
+    "jsx": "preserve",
+    "experimentalDecorators": true,
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "allowJs": false,
+    "removeComments": false,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "noImplicitAny": true,
+    "skipLibCheck": true,
+    "paths": {
+      "*": ["../../../node_modules/*"]
+    }
+  },
+  "include": ["./src/**/*"],
+  "exclude": []
+}

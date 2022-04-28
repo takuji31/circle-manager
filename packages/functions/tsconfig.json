@@ -10,5 +10,6 @@
     "lib": ["ESNext", "DOM"]
   },
   "compileOnSave": true,
-  "include": ["src"]
+  "include": ["src"],
+  "references": []
 }

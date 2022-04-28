@@ -1,7 +1,7 @@
-import { prisma } from './../../database/prisma';
-import { Circle, Circles, Guild } from '../../model';
+import { prisma } from '@circle-manager/shared/database';
+import { Circle, Circles, Guild } from '@circle-manager/shared/model';
 import { list, mutationField, nonNull } from 'nexus';
-import { createDiscordRestClient } from '../../discord';
+import { createDiscordRestClient } from '@circle-manager/shared/discord';
 import {
   RESTGetAPIGuildMembersResult,
   Routes,
