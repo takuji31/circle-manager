@@ -15,7 +15,10 @@
     "build:web": "yarn workspace web build",
     "build:bot": "yarn workspace bot build",
     "dev": "run-p dev:*",
-    "dev:web": "yarn workspace web dev"
+    "dev:web": "yarn workspace web dev",
+    "w": "yarn workspace web",
+    "b": "yarn workspace bot",
+    "w2": "yarn workspace web2"
   },
   "engines": {
     "node": "^16.13.2",
