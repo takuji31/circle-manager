@@ -12,19 +12,23 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLocation,
 } from "@remix-run/react";
 import { Link } from "@remix-run/react";
 
 /* This example requires Tailwind CSS v2.0+ */
-import { Fragment } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
-import { BellIcon, MenuIcon, XIcon } from "@heroicons/react/outline";
+import { MenuIcon, XIcon } from "@heroicons/react/outline";
 
 import tailwindStylesheetUrl from "./styles/tailwind.css";
 import { authenticator } from "./auth.server";
 import type { SessionUser } from "@circle-manager/shared/model";
+import { Circles } from "@circle-manager/shared/model";
 import React from "react";
 import { useOptionalUser } from "./utils";
+
+import { ChevronDownIcon } from "@heroicons/react/solid";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: tailwindStylesheetUrl }];
@@ -48,14 +52,19 @@ export const loader: LoaderFunction = async ({ request }) => {
 
 export default function App() {
   return (
-    <html lang="ja" className="h-full bg-slate-50 dark:bg-neutral-900">
+    <html
+      lang="ja"
+      className="h-full bg-slate-50 text-black dark:bg-neutral-900 dark:text-white"
+    >
       <head>
         <Meta />
         <Links />
       </head>
       <body className="h-full">
-        <Navigation />
-        <Outlet />
+        <div className="min-h-full">
+          <Navigation />
+          <Outlet />
+        </div>
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
@@ -68,17 +77,44 @@ function classNames(...classes: Array<string>) {
   return classes.filter(Boolean).join(" ");
 }
 
-const navigation = [
-  { name: "Dashboard", href: "#", current: true },
-  { name: "Team", href: "#", current: false },
-  { name: "Projects", href: "#", current: false },
-  { name: "Calendar", href: "#", current: false },
+interface NavItem {
+  name: string;
+  href: string;
+}
+
+interface NestedNavItem {
+  name: string;
+  children: Array<NavItem>;
+}
+
+const adminNavigations: Array<NavItem | NestedNavItem> = [
+  { name: "トップ", href: "/" },
+  { name: "メンバー一覧", href: "/admin/members" },
+  {
+    name: "サークル一覧",
+    children: Circles.activeCircles.map((circle) => ({
+      name: circle.name,
+      href: `/circles/${circle.key}`,
+    })),
+  },
+  { name: "Projects", href: "#" },
+  { name: "Calendar", href: "#" },
 ];
+
+function isNestedNavItem(
+  navItem: NavItem | NestedNavItem
+): navItem is NestedNavItem {
+  return Object.keys(navItem).includes("children");
+}
 
 const Navigation: React.FC = () => {
   const user = useOptionalUser();
+  const location = useLocation();
   return (
-    <Disclosure as="nav" className="bg-blue-600 dark:bg-neutral-800">
+    <Disclosure
+      as="nav"
+      className="sticky top-0 w-full bg-blue-600 dark:bg-neutral-800"
+    >
       {({ open }) => (
         <>
           <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
@@ -102,36 +138,38 @@ const Navigation: React.FC = () => {
                 </div>
                 <div className="hidden sm:ml-6 sm:block">
                   <div className="flex space-x-4">
-                    {navigation.map((item) => (
-                      <a
-                        key={item.name}
-                        href={item.href}
-                        className={classNames(
-                          item.current
-                            ? "bg-gray-900 text-white"
-                            : "text-gray-300 hover:bg-gray-700 hover:text-white",
-                          "rounded-md px-3 py-2 text-sm font-medium"
-                        )}
-                        aria-current={item.current ? "page" : undefined}
-                      >
-                        {item.name}
-                      </a>
-                    ))}
+                    {user &&
+                      user.isAdmin &&
+                      adminNavigations.map((item, idx) => {
+                        if (isNestedNavItem(item)) {
+                          return (
+                            <NestedNavItemLink
+                              key={idx}
+                              item={item}
+                              pathname={location.pathname}
+                            />
+                          );
+                        } else {
+                          return (
+                            <NavItemLink
+                              key={idx}
+                              item={item}
+                              pathname={location.pathname}
+                            />
+                          );
+                        }
+                      })}
                   </div>
                 </div>
               </div>
               <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-                <button
-                  type="button"
-                  className="rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
-                >
-                  <span className="sr-only">View notifications</span>
-                  <BellIcon className="h-6 w-6" aria-hidden="true" />
-                </button>
-
                 {!user && (
-                  <Form action="/api/auth/discord" method="post">
-                    <button className="p-2 text-white">ログイン</button>
+                  <Form
+                    action="/api/auth/discord"
+                    method="post"
+                    className="block rounded-md px-2 py-2 hover:bg-neutral-200 dark:hover:bg-neutral-700"
+                  >
+                    <button>ログイン</button>
                   </Form>
                 )}
                 {/* Profile dropdown */}
@@ -156,41 +194,15 @@ const Navigation: React.FC = () => {
                       leaveFrom="transform opacity-100 scale-100"
                       leaveTo="transform opacity-0 scale-95"
                     >
-                      <Menu.Items className="absolute right-0 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                        <Menu.Item>
-                          {({ active }) => (
-                            <Link
-                              to="/"
-                              className={classNames(
-                                active ? "bg-gray-100" : "",
-                                "block px-4 py-2 text-sm text-gray-700"
-                              )}
-                            >
-                              Your Profile
-                            </Link>
-                          )}
-                        </Menu.Item>
-                        <Menu.Item>
-                          {({ active }) => (
-                            <Link
-                              to="/"
-                              className={classNames(
-                                active ? "bg-gray-100" : "",
-                                "block px-4 py-2 text-sm text-gray-700"
-                              )}
-                            >
-                              Settings
-                            </Link>
-                          )}
-                        </Menu.Item>
+                      <Menu.Items className="absolute right-0 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-neutral-700">
                         <Menu.Item>
                           {({ active }) => (
                             <Form
                               action="/auth/logout"
                               method="post"
                               className={classNames(
-                                active ? "bg-gray-100" : "",
-                                "block px-4 py-2 text-sm text-gray-700"
+                                active ? "bg-gray-100 dark:bg-neutral-600" : "",
+                                "block px-4 py-2 text-sm text-neutral-900 dark:text-neutral-100"
                               )}
                             >
                               <button className="block h-full w-full text-left">
@@ -209,7 +221,7 @@ const Navigation: React.FC = () => {
 
           <Disclosure.Panel className="sm:hidden">
             <div className="space-y-1 px-2 pt-2 pb-3">
-              {navigation.map((item) => (
+              {/* {adminNavigations.map((item) => (
                 <Disclosure.Button
                   key={item.name}
                   as={Link}
@@ -224,11 +236,71 @@ const Navigation: React.FC = () => {
                 >
                   {item.name}
                 </Disclosure.Button>
-              ))}
+              ))} */}
             </div>
           </Disclosure.Panel>
         </>
       )}
     </Disclosure>
+  );
+};
+
+const NavItemLink: React.FC<{ item: NavItem; pathname: string }> = ({
+  item,
+  pathname,
+}) => {
+  return (
+    <a
+      key={item.name}
+      href={item.href}
+      className={classNames(
+        item.href == pathname ? "bg-blue-700 dark:bg-neutral-700" : "",
+        "rounded-md bg-blue-600 px-3 py-2 text-sm font-medium dark:bg-neutral-800"
+      )}
+      aria-current={item.href ? "page" : undefined}
+    >
+      {item.name}
+    </a>
+  );
+};
+
+const NestedNavItemLink: React.FC<{
+  item: NestedNavItem;
+  pathname: string;
+}> = ({ item, pathname }) => {
+  return (
+    <Menu as="div" className="relative inline-block text-left">
+      <div>
+        <Menu.Button className="inline-flex w-full justify-center rounded-md py-2 text-sm font-medium text-white hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75">
+          {item.name}
+          <ChevronDownIcon className="ml-2 -mr-1 h-5 w-5" aria-hidden="true" />
+        </Menu.Button>
+      </div>
+      <Transition
+        as={Fragment}
+        enter="transition ease-out duration-100"
+        enterFrom="transform opacity-0 scale-95"
+        enterTo="transform opacity-100 scale-100"
+        leave="transition ease-in duration-75"
+        leaveFrom="transform opacity-100 scale-100"
+        leaveTo="transform opacity-0 scale-95"
+      >
+        <Menu.Items className="absolute right-0 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+          <div className="px-1 py-1 ">
+            <Menu.Item>
+              {({ active }) => (
+                <button
+                  className={`${
+                    active ? "bg-violet-500 text-white" : "text-gray-900"
+                  } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                >
+                  Edit
+                </button>
+              )}
+            </Menu.Item>
+          </div>
+        </Menu.Items>
+      </Transition>
+    </Menu>
   );
 };
