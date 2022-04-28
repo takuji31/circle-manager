@@ -34,6 +34,7 @@
   ],
   "dependencies": {
     "@circle-manager/shared": "1.0.0",
+    "@discordjs/rest": "^0.4.1",
     "@headlessui/react": "^1.6.0",
     "@heroicons/react": "^1.0.6",
     "@prisma/client": "^3.11.1",
