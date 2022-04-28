@@ -1,4 +1,4 @@
-app = "web2-5748"
+app = "shin-umamusume-web"
 kill_signal = "SIGINT"
 kill_timeout = 5
 processes = [ ]
