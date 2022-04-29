@@ -29,6 +29,7 @@ import React from "react";
 import { useOptionalUser } from "./utils";
 
 import { ChevronDownIcon } from "@heroicons/react/solid";
+import { classNames } from "./lib";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: tailwindStylesheetUrl }];
@@ -71,10 +72,6 @@ export default function App() {
       </body>
     </html>
   );
-}
-
-function classNames(...classes: Array<string>) {
-  return classes.filter(Boolean).join(" ");
 }
 
 interface NavItem {
