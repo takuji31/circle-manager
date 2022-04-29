@@ -6,8 +6,8 @@ import {
 import React from "react";
 import { Link } from "react-router-dom";
 import type { LoaderFunction } from "remix";
-import { json, redirect, useLoaderData } from "remix";
-import { authenticator } from "~/auth.server";
+import { json, useLoaderData } from "remix";
+import { adminOnly } from "~/auth/loader";
 import { classNames } from "~/lib";
 import { getJoinedMembers } from "~/model/member.server";
 
@@ -21,17 +21,11 @@ const getLoaderData = async () => {
   });
 };
 
-export const loader: LoaderFunction = async ({ request }) => {
-  const user = await authenticator.isAuthenticated(request, {
-    failureRedirect: "/",
-  });
-  if (!user.isAdmin) {
-    redirect("/");
-  }
+export const loader: LoaderFunction = adminOnly(async () => {
   return json<LoaderData>({
     members: await getLoaderData(),
   });
-};
+});
 
 export default function AdminMemberList() {
   const { members } = useLoaderData() as LoaderData;
