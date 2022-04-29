@@ -2,6 +2,8 @@ import {
   circleRoleLabel,
   LocalDate,
   memberStatusLabel,
+  monthCircleStateLabel,
+  monthSurveyAnswerLabel,
 } from "@circle-manager/shared/model";
 import React from "react";
 import { Link } from "react-router-dom";
@@ -16,8 +18,10 @@ type LoaderData = {
 };
 
 const getLoaderData = async () => {
+  const firstDayOfNextMonth = LocalDate.firstDayOfNextMonth();
   return await getJoinedMembers({
-    monthSurveyDate: LocalDate.firstDayOfNextMonth(),
+    monthSurveyDate: firstDayOfNextMonth,
+    monthCircleDate: firstDayOfNextMonth,
   });
 };
 
@@ -46,7 +50,7 @@ export default function AdminMemberList() {
               <table className="min-w-full divide-y divide-gray-300 dark:divide-neutral-600">
                 <thead className="bg-gray-50 dark:bg-neutral-800">
                   <tr>
-                    <TableHeaderCell extraClassName="pl-4 pr-3 sm:pl-6">
+                    <TableHeaderCell extraClassName="px-3 sm:pl-4">
                       名前
                     </TableHeaderCell>
                     <TableHeaderCell extraClassName="px-3">
@@ -58,39 +62,60 @@ export default function AdminMemberList() {
                     <TableHeaderCell extraClassName="px-3">
                       トレーナーID
                     </TableHeaderCell>
+                    <TableHeaderCell extraClassName="px-3">
+                      来月の在籍希望
+                    </TableHeaderCell>
+                    <TableHeaderCell extraClassName="px-3">
+                      来月のサークル
+                    </TableHeaderCell>
                     <TableHeaderCell extraClassName="relative pl-3 pr-4 sm:pr-6">
                       <span className="sr-only">Edit</span>
                     </TableHeaderCell>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200 bg-white dark:divide-neutral-700 dark:bg-neutral-900">
-                  {members.map((member, idx) => (
-                    <tr key={idx}>
-                      <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-black dark:text-white sm:pl-6">
-                        {member.name}
-                      </td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-black dark:text-white">
-                        {member.circle?.name ??
-                          memberStatusLabel(member.status)}
-                      </td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-black dark:text-white">
-                        {member.circle
-                          ? circleRoleLabel(member.circleRole)
-                          : ""}
-                      </td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-black dark:text-white">
-                        {member.trainerId}
-                      </td>
-                      <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                        <Link
-                          to={`/admin/members/${member.id}/`}
-                          className="text-indigo-600 hover:text-indigo-900"
-                        >
-                          <span className="sr-only">, {member.name}を</span>編集
-                        </Link>
-                      </td>
-                    </tr>
-                  ))}
+                  {members.map((member, idx) => {
+                    const answer = member.monthSurveyAnswer[0];
+                    const monthCircle = member.monthCircles[0];
+                    return (
+                      <tr key={idx}>
+                        <TableBodyCell extraClassName="pl-3 pr-3 sm:pl-4 font-medium">
+                          {member.name}
+                        </TableBodyCell>
+                        <TableBodyCell extraClassName="px-3 ">
+                          {member.circle?.name ??
+                            memberStatusLabel(member.status)}
+                        </TableBodyCell>
+                        <TableBodyCell extraClassName="px-3 ">
+                          {member.circle
+                            ? circleRoleLabel(member.circleRole)
+                            : ""}
+                        </TableBodyCell>
+                        <TableBodyCell extraClassName="px-3 ">
+                          {member.trainerId}
+                        </TableBodyCell>
+                        <TableBodyCell extraClassName="px-3 ">
+                          {answer?.value
+                            ? monthSurveyAnswerLabel(answer.value)
+                            : "対象外"}
+                        </TableBodyCell>
+                        <TableBodyCell extraClassName="px-3 ">
+                          {monthCircle?.state
+                            ? monthCircleStateLabel(monthCircle.state)
+                            : "未確定"}
+                        </TableBodyCell>
+                        <TableBodyCell extraClassName="pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                          <Link
+                            to={`/admin/members/${member.id}/`}
+                            className="text-indigo-600 hover:text-indigo-900"
+                          >
+                            <span className="sr-only">, {member.name}を</span>
+                            編集
+                          </Link>
+                        </TableBodyCell>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -115,5 +140,18 @@ const TableHeaderCell: React.FC<{
     >
       {children}
     </th>
+  );
+};
+
+const TableBodyCell: React.FC<{
+  extraClassName?: string;
+  children: React.ReactNode;
+}> = ({ extraClassName = "", children }) => {
+  return (
+    <td
+      className={classNames(extraClassName, "whitespace-nowrap py-4 text-sm")}
+    >
+      {children}
+    </td>
   );
 };

@@ -17,13 +17,31 @@ const monthSurveyAnswerInclude = (date?: LocalDate) => {
   };
 };
 
+const monthCircleInclude = (date?: LocalDate) => {
+  if (!date) {
+    return {};
+  }
+  const year = date.year();
+  const month = date.monthValue();
+  return {
+    monthCircles: {
+      where: { year, month },
+      skip: 0,
+      take: 1,
+    },
+  };
+};
+
 export const getJoinedMembers = ({
   monthSurveyDate,
+  monthCircleDate,
 }: {
   monthSurveyDate?: LocalDate;
+  monthCircleDate?: LocalDate;
 } = {}) => {
   const include = {
     ...monthSurveyAnswerInclude(monthSurveyDate),
+    ...monthCircleInclude(monthCircleDate),
   };
   return Promise.all([
     prisma.member.findMany({
