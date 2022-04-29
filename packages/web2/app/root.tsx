@@ -108,7 +108,7 @@ const Navigation: React.FC = () => {
   return (
     <Disclosure
       as="nav"
-      className="sticky top-0 w-full bg-blue-600 dark:bg-neutral-800"
+      className="sticky top-0 w-full bg-blue-600 text-white shadow-md dark:bg-neutral-800 dark:shadow-none"
     >
       {({ open }) => (
         <>
@@ -116,7 +116,7 @@ const Navigation: React.FC = () => {
             <div className="relative flex h-16 items-center justify-between">
               <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
                 {/* Mobile menu button*/}
-                <Disclosure.Button className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
+                <Disclosure.Button className="inline-flex items-center justify-center rounded-md p-2  hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
                   <span className="sr-only">Open main menu</span>
                   {open ? (
                     <XIcon className="block h-6 w-6" aria-hidden="true" />
@@ -127,7 +127,7 @@ const Navigation: React.FC = () => {
               </div>
               <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
                 <div className="flex flex-shrink-0 items-center">
-                  <span className="text-lg text-black dark:text-white">
+                  <span className="text-lg">
                     <Link to="/">ウマ娘愛好会</Link>
                   </span>
                 </div>
@@ -162,7 +162,7 @@ const Navigation: React.FC = () => {
                   <Form
                     action="/api/auth/discord"
                     method="post"
-                    className="block rounded-md px-2 py-2 hover:bg-neutral-200 dark:hover:bg-neutral-700"
+                    className="block rounded-md px-2 py-2 hover:bg-blue-700 dark:hover:bg-neutral-700"
                   >
                     <button>ログイン</button>
                   </Form>
@@ -289,8 +289,8 @@ const NestedNavItemLink: React.FC<{
                     <Link
                       to={child.href}
                       className={classNames(
-                        active ? "bg-neutral-200 dark:bg-neutral-600" : "",
-                        "group flex w-full items-center rounded-md px-4 py-2 text-base  text-white"
+                        active ? "bg-gray-100 dark:bg-gray-600" : "",
+                        "group flex w-full items-center rounded-md px-4 py-2 text-base  text-black dark:text-white"
                       )}
                     >
                       {child.name}
