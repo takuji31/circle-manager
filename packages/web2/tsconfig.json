@@ -14,7 +14,8 @@
     "strict": true,
     "baseUrl": ".",
     "paths": {
-      "~/*": ["./app/*"]
+      "~/*": ["./app/*"],
+      "@circle-manager/shared/*": ["../shared/src/*"]
     },
     "skipLibCheck": true,
     "noEmit": true,

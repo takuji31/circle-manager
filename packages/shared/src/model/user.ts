@@ -11,3 +11,5 @@ export type UserWithSession = User & {
   role: CircleRole | null;
   circleKey: CircleKey | null;
 };
+
+export type SessionUser = UserWithSession & { profileImageUrl: string | null };
