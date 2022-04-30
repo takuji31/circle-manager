@@ -15,9 +15,7 @@ import {
   useLocation,
 } from "@remix-run/react";
 import { Link } from "@remix-run/react";
-
-/* This example requires Tailwind CSS v2.0+ */
-import { Fragment, useEffect, useRef, useState } from "react";
+import { Fragment } from "react";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { MenuIcon, XIcon } from "@heroicons/react/outline";
 
@@ -64,7 +62,9 @@ export default function App() {
       <body className="h-full">
         <div className="min-h-full">
           <Navigation />
-          <Outlet />
+          <div className="px-2 py-2 sm:py-4 sm:px-4">
+            <Outlet />
+          </div>
         </div>
         <ScrollRestoration />
         <Scripts />

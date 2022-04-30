@@ -1,4 +1,3 @@
-import { use } from "@circle-manager/shared/model";
 import { useOptionalUser } from "~/utils";
 
 export default function Index() {
@@ -14,7 +13,5 @@ export default function Index() {
   } else if (!user.isAdmin) {
     return <p className="text-base">メンバー向けのページは準備中です。</p>;
   }
-  return (
-    <p className="block p-4 text-base">上部のメニューを選択してください。</p>
-  );
+  return <p className="block text-base">上部のメニューを選択してください。</p>;
 }

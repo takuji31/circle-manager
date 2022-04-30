@@ -15,6 +15,8 @@ import { getJoinedMembers } from "~/model/member.server";
 
 type LoaderData = {
   members: Awaited<ReturnType<typeof getLoaderData>>;
+  year: number;
+  month: number;
 };
 
 const getLoaderData = async () => {
@@ -26,15 +28,18 @@ const getLoaderData = async () => {
 };
 
 export const loader: LoaderFunction = adminOnly(async () => {
+  const firstDayOfNextMonth = LocalDate.firstDayOfNextMonth();
   return json<LoaderData>({
     members: await getLoaderData(),
+    year: firstDayOfNextMonth.year(),
+    month: firstDayOfNextMonth.monthValue(),
   });
 });
 
 export default function AdminMemberList() {
-  const { members } = useLoaderData() as LoaderData;
+  const { members, year, month } = useLoaderData() as LoaderData;
   return (
-    <div className="px-4 py-4 sm:px-6 lg:px-8">
+    <>
       <div className="sm:flex sm:items-center">
         <div className="sm:flex-auto">
           <h1 className="text-xl font-semibold">メンバー一覧</h1>
@@ -100,9 +105,14 @@ export default function AdminMemberList() {
                             : "対象外"}
                         </TableBodyCell>
                         <TableBodyCell extraClassName="px-3 ">
-                          {monthCircle?.state
-                            ? monthCircleStateLabel(monthCircle.state)
-                            : "未確定"}
+                          <Link
+                            to={`/admin/members/${member.id}/month_circles/${year}/${month}`}
+                            className="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
+                          >
+                            {monthCircle?.state
+                              ? monthCircleStateLabel(monthCircle.state)
+                              : "未確定"}
+                          </Link>
                         </TableBodyCell>
                         <TableBodyCell extraClassName="pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                           <Link
@@ -122,7 +132,7 @@ export default function AdminMemberList() {
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 
