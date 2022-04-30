@@ -373,9 +373,15 @@ export const CreateMonthCirclesMutation = mutationField(
             },
           },
         })
-      ).sort((a, b) =>
-        parseInt((b.fanCounts[0].avg - a.fanCounts[0].avg).toString())
-      );
+      ).sort((a, b) => {
+        console.log('%s %s', a, b);
+        return parseInt(
+          (
+            (b.fanCounts[0]?.avg ?? BigInt(0)) -
+            (a.fanCounts[0]?.avg ?? BigInt(0))
+          ).toString()
+        );
+      });
 
       await prisma.$transaction([
         prisma.monthCircle.deleteMany({
