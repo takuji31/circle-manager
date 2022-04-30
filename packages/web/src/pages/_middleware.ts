@@ -15,6 +15,7 @@ const middleware: NextMiddleware = ((
 
 export default withAuth(middleware, {
   callbacks: {
-    authorized: ({ req, token }) => !!token,
+    authorized: ({ req, token }) =>
+      !!token || req.nextUrl.pathname.startsWith('/api/'),
   },
 });
