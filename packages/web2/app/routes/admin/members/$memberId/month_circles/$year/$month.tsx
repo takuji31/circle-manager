@@ -154,14 +154,12 @@ export default function AdminMemberMonthCircle() {
                   value={state}
                   className={({ active, checked }) =>
                     classNames(
-                      state
-                        ? "cursor-pointer focus:outline-none"
-                        : "cursor-not-allowed opacity-25",
+                      "cursor-pointer focus:outline-none",
                       active ? "ring-2 ring-indigo-500 ring-offset-2" : "",
                       checked
-                        ? "border-transparent bg-primary-600 text-white hover:bg-primary-700 dark:bg-primary-600  dark:hover:bg-primary-700"
-                        : "border-gray-200 bg-white text-black hover:bg-gray-50 dark:bg-gray-700 dark:text-white  dark:hover:bg-gray-600",
-                      "text-md flex items-center justify-center rounded-md border py-3 px-3 font-medium sm:flex-1"
+                        ? "border-transparent bg-indigo-600 text-white hover:bg-indigo-700"
+                        : "border-gray-200 bg-white text-gray-900 hover:bg-gray-50",
+                      "flex items-center justify-center rounded-md border py-3 px-3 text-sm font-medium uppercase sm:flex-1"
                     )
                   }
                   disabled={!state}
@@ -176,7 +174,6 @@ export default function AdminMemberMonthCircle() {
           <div className="flex space-x-4">
             <Switch.Group as="div" className="flex items-center">
               <Switch
-                id="switch-locked"
                 disabled={
                   transition.state == "submitting" || monthCircle == null
                 }
@@ -185,12 +182,11 @@ export default function AdminMemberMonthCircle() {
                   handleSubmit({ locked });
                 }}
                 className={classNames(
-                  monthCircle?.locked
-                    ? "bg-secondary-600 dark:bg-secondary-500"
-                    : "bg-gray-200 dark:bg-gray-700",
+                  monthCircle?.locked ? "bg-indigo-600" : "bg-gray-200",
                   "relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                 )}
               >
+                <span className="sr-only">Use setting</span>
                 <span
                   aria-hidden="true"
                   className={classNames(

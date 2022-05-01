@@ -5,13 +5,17 @@ import {
   monthCircleStateLabel,
   monthSurveyAnswerLabel,
 } from "@circle-manager/shared/model";
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
 import type { LoaderFunction } from "remix";
 import { json, useLoaderData } from "remix";
 import { adminOnly } from "~/auth/loader";
-import { classNames } from "~/lib";
 import { getJoinedMembers } from "~/model/member.server";
+import Link from "~/components/link";
+import { CopyToClipboard } from "react-copy-to-clipboard";
+import {
+  ClipboardCheckIcon,
+  ClipboardCopyIcon,
+} from "@heroicons/react/outline";
 
 type LoaderData = {
   members: Awaited<ReturnType<typeof getLoaderData>>;
@@ -39,129 +43,147 @@ export const loader: LoaderFunction = adminOnly(async () => {
 export default function AdminMemberList() {
   const { members, year, month } = useLoaderData() as LoaderData;
   return (
-    <>
+    <div className="px-4 sm:px-6 lg:px-8">
       <div className="sm:flex sm:items-center">
         <div className="sm:flex-auto">
-          <h1 className="text-xl font-semibold">メンバー一覧</h1>
-          <p className="mt-2 text-sm">
+          <h1 className="text-xl font-semibold text-gray-900">メンバー一覧</h1>
+          <p className="mt-2 text-sm text-gray-700">
             Discordに加入しているメンバーの一覧です
           </p>
         </div>
       </div>
-      <div className="mt-8 flex flex-col">
-        <div className="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
-          <div className="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
-            <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
-              <table className="min-w-full divide-y divide-gray-300 dark:divide-neutral-600">
-                <thead className="bg-gray-50 dark:bg-neutral-800">
-                  <tr>
-                    <TableHeaderCell extraClassName="px-3 sm:pl-4">
-                      名前
-                    </TableHeaderCell>
-                    <TableHeaderCell extraClassName="px-3">
-                      サークル
-                    </TableHeaderCell>
-                    <TableHeaderCell extraClassName="px-3">
-                      役職
-                    </TableHeaderCell>
-                    <TableHeaderCell extraClassName="px-3">
-                      トレーナーID
-                    </TableHeaderCell>
-                    <TableHeaderCell extraClassName="px-3">
-                      来月の在籍希望
-                    </TableHeaderCell>
-                    <TableHeaderCell extraClassName="px-3">
-                      来月のサークル
-                    </TableHeaderCell>
-                    <TableHeaderCell extraClassName="relative pl-3 pr-4 sm:pr-6">
-                      <span className="sr-only">Edit</span>
-                    </TableHeaderCell>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200 bg-white dark:divide-neutral-700 dark:bg-neutral-900">
-                  {members.map((member, idx) => {
-                    const answer = member.monthSurveyAnswer[0];
-                    const monthCircle = member.monthCircles[0];
-                    return (
-                      <tr key={idx}>
-                        <TableBodyCell extraClassName="pl-3 pr-3 sm:pl-4 font-medium">
-                          {member.name}
-                        </TableBodyCell>
-                        <TableBodyCell extraClassName="px-3 ">
-                          {member.circle?.name ??
-                            memberStatusLabel(member.status)}
-                        </TableBodyCell>
-                        <TableBodyCell extraClassName="px-3 ">
-                          {member.circle
-                            ? circleRoleLabel(member.circleRole)
-                            : ""}
-                        </TableBodyCell>
-                        <TableBodyCell extraClassName="px-3 ">
-                          {member.trainerId}
-                        </TableBodyCell>
-                        <TableBodyCell extraClassName="px-3 ">
-                          {answer?.value
-                            ? monthSurveyAnswerLabel(answer.value)
-                            : "対象外"}
-                        </TableBodyCell>
-                        <TableBodyCell extraClassName="px-3 ">
-                          <Link
-                            to={`/admin/members/${member.id}/month_circles/${year}/${month}`}
-                            className="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
-                          >
-                            {monthCircle?.state
-                              ? monthCircleStateLabel(monthCircle.state)
-                              : "未確定"}
-                          </Link>
-                        </TableBodyCell>
-                        <TableBodyCell extraClassName="pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                          <Link
-                            to={`/admin/members/${member.id}/`}
-                            className="text-indigo-600 hover:text-indigo-900"
-                          >
-                            <span className="sr-only">, {member.name}を</span>
-                            編集
-                          </Link>
-                        </TableBodyCell>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
+      <div className="-mx-4 mt-8 overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:-mx-6 md:mx-0 md:rounded-lg">
+        <table className="min-w-full divide-y divide-gray-300">
+          <thead className="bg-gray-50">
+            <tr>
+              <th
+                scope="col"
+                className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6"
+              >
+                トレーナー名
+              </th>
+              <th
+                scope="col"
+                className="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 lg:table-cell"
+              >
+                サークル
+              </th>
+              <th
+                scope="col"
+                className="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sm:table-cell"
+              >
+                役職
+              </th>
+              <th
+                scope="col"
+                className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+              >
+                トレーナーID
+              </th>
+              <th
+                scope="col"
+                className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+              >
+                来月の在籍希望
+              </th>
+              <th
+                scope="col"
+                className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+              >
+                来月のサークル
+              </th>
+              {/*<th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">*/}
+              {/*  <span className="sr-only">アクション</span>*/}
+              {/*</th>*/}
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200 bg-white">
+            {members.map((member) => {
+              const answer = member.monthSurveyAnswer[0];
+              const monthCircle = member.monthCircles[0];
+              const circle =
+                member.circle?.name ?? memberStatusLabel(member.status);
+              const circleRole = member.circle
+                ? circleRoleLabel(member.circleRole)
+                : "";
+              return (
+                <tr key={member.id}>
+                  <td className="w-full max-w-0 py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:w-auto sm:max-w-none sm:pl-6">
+                    {member.name}
+                    <dl className="font-normal lg:hidden">
+                      <dt className="sr-only">サークル</dt>
+                      <dd className="mt-1 truncate text-gray-700">{circle}</dd>
+                      <dt className="sr-only sm:hidden">役職</dt>
+                      <dd className="mt-1 truncate text-gray-500 sm:hidden">
+                        {circleRole}
+                      </dd>
+                    </dl>
+                  </td>
+                  <td className="hidden px-3 py-4 text-sm text-gray-500 lg:table-cell">
+                    {circle}
+                  </td>
+                  <td className="hidden px-3 py-4 text-sm text-gray-500 sm:table-cell">
+                    {circleRole}
+                  </td>
+                  <td className="px-3 py-4 text-sm text-gray-500">
+                    <span className="inline">
+                      {member.trainerId}
+                      {member.trainerId && (
+                        <CopyTrainerIdButton trainerId={member.trainerId} />
+                      )}
+                    </span>
+                  </td>
+                  <td className="px-3 py-4 text-sm font-medium">
+                    {answer?.value
+                      ? monthSurveyAnswerLabel(answer.value)
+                      : "対象外"}
+                  </td>
+                  <td className="px-3 py-4 text-sm font-medium text-gray-500">
+                    <Link
+                      to={`/admin/members/${member.id}/month_circles/${year}/${month}`}
+                    >
+                      {monthCircle?.state
+                        ? monthCircleStateLabel(monthCircle.state)
+                        : "未確定"}
+                    </Link>
+                  </td>
+                  {/*<td className="py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">*/}
+                  {/*  <a*/}
+                  {/*    href="#"*/}
+                  {/*    className="text-indigo-600 hover:text-indigo-900"*/}
+                  {/*  >*/}
+                  {/*    Edit<span className="sr-only">, {member.name}</span>*/}
+                  {/*  </a>*/}
+                  {/*</td>*/}
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
       </div>
-    </>
+    </div>
   );
 }
 
-const TableHeaderCell: React.FC<{
-  extraClassName?: string;
-  children: React.ReactNode;
-}> = ({ extraClassName = "", children }) => {
+const CopyTrainerIdButton: React.FC<{ trainerId: string }> = ({
+  trainerId,
+}) => {
+  const [copied, setCopied] = useState(false);
   return (
-    <th
-      scope="col"
-      className={classNames(
-        extraClassName,
-        "py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-neutral-100"
+    <CopyToClipboard
+      text={trainerId}
+      onCopy={() => {
+        setCopied(true);
+        setTimeout(() => {
+          setCopied(false);
+        }, 2000);
+      }}
+    >
+      {copied ? (
+        <ClipboardCheckIcon className="h-5 w-5" />
+      ) : (
+        <ClipboardCopyIcon className="h-5 w-5" />
       )}
-    >
-      {children}
-    </th>
-  );
-};
-
-const TableBodyCell: React.FC<{
-  extraClassName?: string;
-  children: React.ReactNode;
-}> = ({ extraClassName = "", children }) => {
-  return (
-    <td
-      className={classNames(extraClassName, "whitespace-nowrap py-4 text-sm")}
-    >
-      {children}
-    </td>
+    </CopyToClipboard>
   );
 };
