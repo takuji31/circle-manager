@@ -6,6 +6,9 @@ import * as fs from 'fs/promises';
 config();
 
 (async () => {
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('This script only run development environment');
+  }
   // https://stackoverflow.com/questions/62539236/how-to-parse-a-json-data-type-bigint-in-typescript
   const data: DbTableData = JSON.parse(
     await fs.readFile('./data.json', 'utf-8'),
@@ -20,6 +23,15 @@ config();
       return value;
     }
   ) as DbTableData;
+
+  await prisma.member.deleteMany({});
+  await prisma.monthCircle.deleteMany({});
+  await prisma.monthSurvey.deleteMany({});
+  await prisma.monthSurveyAnswer.deleteMany({});
+  await prisma.signUp.deleteMany({});
+  await prisma.memberFanCount.deleteMany({});
+  await prisma.circleFanCount.deleteMany({});
+  await prisma.personalChannel.deleteMany({});
 
   await prisma.member.createMany({
     data: data.members,
