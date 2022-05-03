@@ -14,7 +14,14 @@ export const MemberName = z.preprocess(
   z.string().min(1)
 );
 export const MemberId = z.string().regex(/^0-9+$/);
-export const CircleKey = z.nativeEnum(_CircleKey);
+
+export const ActiveCircleKey = z.enum([
+  _CircleKey.Saikyo,
+  _CircleKey.Shin,
+  _CircleKey.Ha,
+]);
+export type ActiveCircleKey = z.infer<typeof ActiveCircleKey>;
+
 export const TrainerName = z.preprocess(
   (name) => (name as string).trim(),
   z.string()
