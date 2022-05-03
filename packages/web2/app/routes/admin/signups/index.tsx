@@ -24,7 +24,6 @@ import {
 import { useUser } from "~/utils";
 import { ClipboardCopyIcon, ExclamationIcon } from "@heroicons/react/outline";
 import CopyToClipboard from "react-copy-to-clipboard";
-import { json } from "@remix-run/node";
 import invariant from "tiny-invariant";
 
 type LoaderData = Awaited<ReturnType<typeof getLoaderData>>;
@@ -64,7 +63,6 @@ export const action: ActionFunction = adminOnlyAction(async ({ request }) => {
 export default function AdminSignUps() {
   const { signUps } = useLoaderData<LoaderData>();
   const user = useUser();
-  const transition = useTransition();
 
   const [showOnlyMyCircle, setShowOnlyMyCircle] = useState(false);
 

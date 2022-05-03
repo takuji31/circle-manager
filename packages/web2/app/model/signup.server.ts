@@ -1,9 +1,11 @@
 import { prisma } from "~/db.server";
 import { Circles } from "@circle-manager/shared/model";
 import {
+  sendAdminNotificationMessage,
   sendInvitedMessage,
   setMemberCircleRole,
 } from "@circle-manager/shared/discord";
+import { ActiveCircleKey } from "~/schema/member";
 
 export const getNotJoinedSignUps = ({ invited }: { invited?: boolean }) => {
   return prisma.signUp
@@ -67,5 +69,34 @@ export const joinMember = async ({ memberId }: { memberId: string }) => {
   return prisma.signUp.update({
     where: { id: memberId },
     data: { joined: true },
+  });
+};
+
+export const updateMemberSignUpCircle = async ({
+  memberId,
+  circleKey,
+}: {
+  memberId: string;
+  circleKey: ActiveCircleKey;
+}) => {
+  const member = await prisma.member.findFirst({ where: { id: memberId } });
+  if (!member) {
+    throw new Error(`Unknown member id ${memberId}`);
+  }
+  await prisma.signUp.upsert({
+    where: { id: member.id },
+    create: { id: member.id, circleKey },
+    update: { circleKey },
+  });
+  if (!member.setupCompleted) {
+    // TODO: setup
+    const circle = Circles.findByCircleKey(circleKey);
+    await sendAdminNotificationMessage(
+      `<@&${circle.id}> <@!${memberId}>さんから加入申請が送られました。 ${process.env.BASE_URL}/admin/signups`
+    );
+  }
+  await prisma.member.update({
+    where: { id: member.id },
+    data: { setupCompleted: true },
   });
 };
