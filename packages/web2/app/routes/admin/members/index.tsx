@@ -5,7 +5,7 @@ import {
   monthCircleStateLabel,
   monthSurveyAnswerLabel,
 } from "@circle-manager/shared/model";
-import React, { useState } from "react";
+import React, { Fragment, useState } from "react";
 import type { LoaderFunction } from "remix";
 import { json, useLoaderData } from "remix";
 import { adminOnly } from "~/auth/loader";
@@ -15,6 +15,29 @@ import { CopyToClipboard } from "react-copy-to-clipboard";
 import {
   ClipboardCheckIcon,
   ClipboardCopyIcon,
+} from "@heroicons/react/outline";
+import { Menu, Transition } from "@headlessui/react";
+import { classNames } from "~/lib";
+import {
+  ChatAltIcon,
+  CodeIcon,
+  DotsVerticalIcon,
+  EyeIcon,
+  FlagIcon,
+  PlusSmIcon,
+  SearchIcon,
+  ShareIcon,
+  StarIcon,
+  ThumbUpIcon,
+} from "@heroicons/react/solid";
+import {
+  BellIcon,
+  FireIcon,
+  HomeIcon,
+  MenuIcon,
+  TrendingUpIcon,
+  UserGroupIcon,
+  XIcon,
 } from "@heroicons/react/outline";
 
 type LoaderData = {
@@ -92,9 +115,9 @@ export default function AdminMemberList() {
               >
                 来月のサークル
               </th>
-              {/*<th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">*/}
-              {/*  <span className="sr-only">アクション</span>*/}
-              {/*</th>*/}
+              <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
+                <span className="sr-only">アクション</span>
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200 bg-white">
@@ -147,14 +170,64 @@ export default function AdminMemberList() {
                         : "未確定"}
                     </Link>
                   </td>
-                  {/*<td className="py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">*/}
-                  {/*  <a*/}
-                  {/*    href="#"*/}
-                  {/*    className="text-indigo-600 hover:text-indigo-900"*/}
-                  {/*  >*/}
-                  {/*    Edit<span className="sr-only">, {member.name}</span>*/}
-                  {/*  </a>*/}
-                  {/*</td>*/}
+                  <td className="py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                    <Menu as="div" className="relative inline-block text-left">
+                      <div>
+                        <Menu.Button className="-m-2 flex items-center rounded-full p-2 text-gray-400 hover:text-gray-600">
+                          <span className="sr-only">Open options</span>
+                          <DotsVerticalIcon
+                            className="h-5 w-5"
+                            aria-hidden="true"
+                          />
+                        </Menu.Button>
+                      </div>
+
+                      <Transition
+                        as={Fragment}
+                        enter="transition ease-out duration-100"
+                        enterFrom="transform opacity-0 scale-95"
+                        enterTo="transform opacity-100 scale-100"
+                        leave="transition ease-in duration-75"
+                        leaveFrom="transform opacity-100 scale-100"
+                        leaveTo="transform opacity-0 scale-95"
+                      >
+                        <Menu.Items className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                          <div className="py-1">
+                            <Menu.Item>
+                              {({ active }) => (
+                                <Link
+                                  to={`/members/pathname/${member.pathname}/setup`}
+                                  className={classNames(
+                                    active
+                                      ? "bg-gray-100 text-gray-900"
+                                      : "text-gray-700",
+                                    "flex px-4 py-2 text-sm"
+                                  )}
+                                >
+                                  <span>加入申請URLを開く</span>
+                                </Link>
+                              )}
+                            </Menu.Item>
+                            <Menu.Item>
+                              {({ active }) => (
+                                <Link
+                                  to={`/members/pathname/${member.pathname}/edit`}
+                                  className={classNames(
+                                    active
+                                      ? "bg-gray-100 text-gray-900"
+                                      : "text-gray-700",
+                                    "flex px-4 py-2 text-sm"
+                                  )}
+                                >
+                                  <span>トレーナーID登録URLを開く</span>
+                                </Link>
+                              )}
+                            </Menu.Item>
+                          </div>
+                        </Menu.Items>
+                      </Transition>
+                    </Menu>
+                  </td>
                 </tr>
               );
             })}

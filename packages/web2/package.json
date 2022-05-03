@@ -52,7 +52,8 @@
     "remix": "^1.4.3",
     "remix-auth": "^3.2.1",
     "remix-auth-discord": "^1.0.0",
-    "tiny-invariant": "^1.2.0"
+    "tiny-invariant": "^1.2.0",
+    "zod": "^3.14.4"
   },
   "devDependencies": {
     "@faker-js/faker": "^6.1.1",
