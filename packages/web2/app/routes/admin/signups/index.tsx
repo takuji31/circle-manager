@@ -64,7 +64,7 @@ export default function AdminSignUps() {
   const { signUps } = useLoaderData<LoaderData>();
   const user = useUser();
 
-  const [showOnlyMyCircle, setShowOnlyMyCircle] = useState(false);
+  const [showOnlyMyCircle, setShowOnlyMyCircle] = useState(true);
 
   const [invitedSignUps, notInvitedSignUps] = useMemo(
     () => [
