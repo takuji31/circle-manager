@@ -8,7 +8,7 @@ import { Guild } from "../model";
 
 export async function sendAdminNotificationMessage(
   message: string,
-  files: Array<RawFile>
+  files: Array<RawFile> = []
 ) {
   const rest = createDiscordRestClient();
   const body: RESTPostAPIChannelMessageJSONBody = {

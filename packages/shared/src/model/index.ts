@@ -1,4 +1,5 @@
 export * from "./circle";
+export * from "./circle_role";
 export * from "./date";
 export * from "./db";
 export * from "./emoji";
