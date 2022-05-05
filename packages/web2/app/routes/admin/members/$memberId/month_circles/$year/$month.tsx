@@ -10,6 +10,8 @@ import invariant from "tiny-invariant";
 import { adminOnly } from "~/auth/loader";
 import { prisma } from "~/db.server";
 import { classNames } from "~/lib";
+import AdminHeader from "~/components/admin/header";
+import AdminHeaderTitle from "~/components/admin/header/title";
 
 type LoaderData = Awaited<ReturnType<typeof getLoaderData>>;
 
@@ -125,16 +127,19 @@ export default function AdminMemberMonthCircle() {
 
   return (
     <div className="flex flex-col space-y-4">
-      <div>
-        <h3 className="text-lg font-medium leading-6 ">{`${member.name}さんの${year}年${month}月サークル`}</h3>
-        <p className="mt-1 max-w-2xl text-sm text-gray-600 dark:text-gray-400">
-          サークルを変更します。
-        </p>
-      </div>
+      <AdminHeader>
+        <AdminHeaderTitle
+          title={`${member.name}さんの${year}年${month}月サークル`}
+        />
+      </AdminHeader>
       <Form
         method="post"
         onChange={(event) => submit(event.currentTarget, { replace: true })}
+        className="mx-4 space-y-2 sm:mx-6 md:mx-8"
       >
+        <p className="mt-1 max-w-2xl text-sm text-gray-600 dark:text-gray-400">
+          サークルを変更します。
+        </p>
         <div className="flex flex-col justify-start space-y-4">
           <RadioGroup
             value={monthCircle?.state}

@@ -25,6 +25,10 @@ import { useUser } from "~/utils";
 import { ClipboardCopyIcon, ExclamationIcon } from "@heroicons/react/outline";
 import CopyToClipboard from "react-copy-to-clipboard";
 import invariant from "tiny-invariant";
+import AdminHeader from "~/components/admin/header";
+import AdminHeaderTitle from "~/components/admin/header/title";
+import AdminHeaderActions from "~/components/admin/header/actions";
+import AdminHeaderCircleSwitch from "~/components/admin/header/circle_switch";
 
 type LoaderData = Awaited<ReturnType<typeof getLoaderData>>;
 type SignUp = Awaited<ReturnType<typeof getNotJoinedSignUps>>[0];
@@ -83,39 +87,15 @@ export default function AdminSignUps() {
   );
   return (
     <div>
-      <div className="border-b border-gray-200 px-4 py-4 sm:flex sm:items-center sm:justify-between sm:px-6 lg:px-8">
-        <div className="min-w-0 flex-1">
-          <h1 className="text-lg font-medium leading-6 text-gray-900 sm:truncate">
-            加入申請
-          </h1>
-        </div>
-        <div className="ml-4 mt-2 flex-shrink-0">
-          <Switch.Group as="div" className="flex items-center">
-            <Switch
-              checked={showOnlyMyCircle}
-              onChange={setShowOnlyMyCircle}
-              className={classNames(
-                showOnlyMyCircle ? "bg-indigo-600" : "bg-gray-200",
-                "relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-              )}
-            >
-              <span
-                aria-hidden="true"
-                className={classNames(
-                  showOnlyMyCircle ? "translate-x-5" : "translate-x-0",
-                  "pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
-                )}
-              />
-            </Switch>
-            <Switch.Label as="span" className="ml-3">
-              <span className="cursor-pointer text-sm font-medium text-gray-900">
-                所属するサークルのものだけ表示
-              </span>
-            </Switch.Label>
-          </Switch.Group>
-        </div>
-      </div>
-
+      <AdminHeader>
+        <AdminHeaderTitle title="加入申請" />
+        <AdminHeaderActions>
+          <AdminHeaderCircleSwitch
+            checked={showOnlyMyCircle}
+            onChange={setShowOnlyMyCircle}
+          />
+        </AdminHeaderActions>
+      </AdminHeader>
       <div className="grid grid-cols-1 gap-4 px-2 py-4 sm:gap-8 sm:px-4 md:px-6">
         <Card
           header={
