@@ -15,7 +15,7 @@ import React, {
 } from "react";
 import { Dialog, Switch, Transition } from "@headlessui/react";
 import { classNames } from "~/lib";
-import Card from "~/components/card";
+import CardWithDefaultPadding from "~/components/card_with_default_padding";
 import {
   getNotJoinedSignUps,
   inviteMember,
@@ -97,7 +97,7 @@ export default function AdminSignUps() {
         </AdminHeaderActions>
       </AdminHeader>
       <div className="grid grid-cols-1 gap-4 px-2 py-4 sm:gap-8 sm:px-4 md:px-6">
-        <Card
+        <CardWithDefaultPadding
           header={
             <>
               <h3 className="text-lg font-medium leading-6 text-gray-900">
@@ -118,8 +118,8 @@ export default function AdminSignUps() {
           ) : (
             <p>勧誘待ちはありません</p>
           )}
-        </Card>
-        <Card
+        </CardWithDefaultPadding>
+        <CardWithDefaultPadding
           header={
             <>
               <h3 className="text-lg font-medium leading-6 text-gray-900">
@@ -137,7 +137,7 @@ export default function AdminSignUps() {
           ) : (
             <p>加入待ちはありません</p>
           )}
-        </Card>
+        </CardWithDefaultPadding>
       </div>
     </div>
   );
