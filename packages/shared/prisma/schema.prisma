@@ -36,7 +36,7 @@ model Member {
   PersonalChannel   PersonalChannel[]
   fanCounts UmastagramMemberFanCount[]
 
-  ScreenShots ScreenShots[]
+  ScreenShot ScreenShot[]
   @@unique([pathname])
   @@index([leavedAt])
   @@index([joinedAt])
@@ -169,11 +169,11 @@ model PersonalChannel {
 }
 
 /// ファン数記録用のスクリーンショット
-model ScreenShots {
+model ScreenShot {
   id         String    @id @default(cuid()) @db.VarChar(255)
   circleKey  CircleKey
   date       DateTime  @db.Date // 対象の日付
-  url        String /// 画像のURL
+  url        String? /// 画像のURL、アップロードが完了していない時はnull
   uploaderId String    @db.VarChar(255)
   uploader   Member    @relation(fields: [uploaderId], references: [id]) /// アップロードを実行したメンバー
   createdAt  DateTime  @default(now())
