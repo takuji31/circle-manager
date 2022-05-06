@@ -24,7 +24,12 @@
     "pretest:e2e:run": "yarn build",
     "test:e2e:run": "cross-env PORT=8811 start-server-and-test start:mocks http://localhost:8811 \"cypress run\"",
     "typecheck": "tsc -b && tsc -b cypress",
-    "validate": "run-p \"test -- --run\" lint typecheck test:e2e:run"
+    "validate": "run-p \"test -- --run\" lint typecheck test:e2e:run",
+    "db:seed": "prisma db seed",
+    "db:generate": "prisma generate",
+    "db:studio": "prisma studio",
+    "db:format": "prisma format",
+    "db:push": "prisma db push"
   },
   "prettier": {},
   "eslintIgnore": [
