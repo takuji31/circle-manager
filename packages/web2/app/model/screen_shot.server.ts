@@ -1,7 +1,7 @@
 import { bucket } from "~/firebase.server";
 import type { ActiveCircleKey } from "~/schema/member";
 import type { z } from "zod";
-import type { LocalDate } from "@circle-manager/shared/model";
+import { LocalDate } from "@circle-manager/shared/model";
 import { prisma } from "~/db.server";
 import { tmpdir } from "os";
 import { mkdtemp, writeFile } from "fs/promises";
@@ -52,6 +52,23 @@ export async function uploadScreenShot({
     await prisma.screenShot.delete({ where: { id: screenShotId } });
   }
   return await prisma.screenShot.findFirst({ where: { id: screenShotId } })!;
+}
+
+export async function deleteScreenShot({ id }: { id: string }) {
+  const screenShot = await prisma.screenShot.findFirst({ where: { id } });
+  if (!screenShot) {
+    throw new Error(`ScreenShot ${id} not found`);
+  }
+  const file = await bucket.file(
+    createCloudStoragePath(
+      screenShot.circleKey as ActiveCircleKey,
+      LocalDate.fromUTCDate(screenShot.date),
+      screenShot.id
+    )
+  );
+  await file.delete({ ignoreNotFound: true });
+  await prisma.screenShot.delete({ where: { id: screenShot.id } });
+  return { success: true };
 }
 
 function createCloudStoragePath(

@@ -11,8 +11,8 @@ import { Form, useActionData, useLoaderData, useSubmit } from "remix";
 import React, { createRef, useCallback } from "react";
 import { AdminBody } from "~/components/admin/body";
 import Dropzone, { useDropzone } from "react-dropzone";
-import { UploadIcon } from "@heroicons/react/solid";
-import { uploadScreenShot } from "~/model/screen_shot.server";
+import { UploadIcon, XIcon } from "@heroicons/react/solid";
+import { deleteScreenShot, uploadScreenShot } from "~/model/screen_shot.server";
 import {
   createFileUploadHandler,
   parseMultipartFormData,
@@ -21,20 +21,30 @@ import type { DataFunctionArgsWithUser } from "~/auth/loader";
 import { adminOnly, adminOnlyAction } from "~/auth/loader";
 import { prisma } from "~/db.server";
 
+const ActionMode = z.enum([
+  "uploadScreenShot",
+  "deleteScreenShot",
+  "parseImages",
+]);
+
+type LoaderData = Awaited<ReturnType<typeof getLoaderData>>;
+type ActionData = Awaited<ReturnType<typeof getActionData>>;
+
 const paramsSchema = z.intersection(
   z.object({
     circleKey: ActiveCircleKey,
   }),
   YMD
 );
-
-type LoaderData = Awaited<ReturnType<typeof getLoaderData>>;
+const actionQuerySchema = z.object({
+  mode: ActionMode.default(ActionMode.enum.uploadScreenShot),
+});
 
 const getLoaderData = async ({ params }: DataFunctionArgs) => {
   const { year, month, day, circleKey } = paramsSchema.parse(params);
   const circle = Circles.findByCircleKey(circleKey);
   const date = LocalDate.of(year, month, day);
-  const screenShots = await prisma.screenShots.findMany({
+  const screenShots = await prisma.screenShot.findMany({
     where: { date: date.toUTCDate(), circleKey },
     orderBy: {
       updatedAt: "asc",
@@ -51,8 +61,6 @@ export const loader: LoaderFunction = adminOnly(async (args) => {
   return await getLoaderData(args);
 });
 
-type ActionData = Awaited<ReturnType<typeof getActionData>>;
-
 const getActionData = async ({
   request,
   params,
@@ -61,27 +69,43 @@ const getActionData = async ({
   const { year, month, day, circleKey } = paramsSchema.parse(params);
   const circle = Circles.findByCircleKey(circleKey);
   const date = LocalDate.of(year, month, day);
-  const uploadHandler = createFileUploadHandler({
-    maxFileSize: 10_000_000,
-  });
-  const formData = await parseMultipartFormData(request, uploadHandler);
+  const { mode } = actionQuerySchema.parse(
+    Object.fromEntries(new URL(request.url).searchParams)
+  );
 
-  const result = uploadSchema.safeParse(Object.fromEntries(formData));
+  switch (mode) {
+    case ActionMode.enum.uploadScreenShot: {
+      const uploadHandler = createFileUploadHandler({
+        maxFileSize: 10_000_000,
+      });
+      const formData = await parseMultipartFormData(request, uploadHandler);
 
-  if (!result.success) {
-    return {
-      error: result.error.format(),
-    };
-  } else {
-    const { screenShotFile } = result.data;
-    await uploadScreenShot({
-      screenShotFile,
-      circleKey,
-      date,
-      uploaderId: user.id,
-    });
-    return {};
+      const result = uploadSchema.safeParse(Object.fromEntries(formData));
+
+      if (!result.success) {
+        return {
+          error: result.error.format(),
+        };
+      } else {
+        const { screenShotFile } = result.data;
+        await uploadScreenShot({
+          screenShotFile,
+          circleKey,
+          date,
+          uploaderId: user.id,
+        });
+        return {};
+      }
+    }
+    case ActionMode.enum.deleteScreenShot: {
+      const id = z.string().parse((await request.formData()).get("id"));
+      console.log("Deleting screenShot %s", id);
+      await deleteScreenShot({ id });
+    }
+    case ActionMode.enum.parseImages: {
+    }
   }
+  return null;
 };
 
 const uploadSchema = z.object({
@@ -129,35 +153,47 @@ export default function AdminCircleFanCounts() {
         />
       </AdminHeader>
       <AdminBody>
-        <div>
-          <ul>
-            {screenShots
-              .filter((ss) => !!ss.url)
-              .map((ss) => {
-                return (
-                  <li>
-                    <img src={ss.url!} alt="" />
-                  </li>
-                );
-              })}
-          </ul>
+        <div className="grid grid-cols-1 gap-2">
+          {screenShots
+            .filter((ss) => !!ss.url)
+            .map((ss) => {
+              return (
+                <div className="flex flex-row">
+                  <div className="relative h-full w-1/3">
+                    <img src={ss.url!} alt="" className="h-full w-full" />
+                    <Form
+                      method="post"
+                      action={`?mode=${ActionMode.enum.deleteScreenShot}`}
+                    >
+                      <input type="hidden" name="id" value={ss.id} />
+                      <button type="submit">
+                        <XIcon className="absolute top-0 right-0 h-8 w-8 rounded-full bg-black text-white" />
+                      </button>
+                    </Form>
+                  </div>
+                  <div className="flex-1 bg-red-600"></div>
+                </div>
+              );
+            })}
         </div>
-        <div>
-          <FileUploadInput
-            onDrop={(files) => {
-              console.log(files);
-              const [file] = files;
-              const formData = new FormData();
-              formData.set("screenShotFile", file, file.name);
-              submit(formData!, {
-                replace: true,
-                method: "post",
-                encType: "multipart/form-data",
-              });
-            }}
-          />
-          <p>{actionData?.error?.screenShotFile?._errors.join("/")}</p>
-        </div>
+        {screenShots.length < 10 && (
+          <div className="mt-4">
+            <FileUploadInput
+              onDrop={(files) => {
+                console.log(files);
+                const [file] = files;
+                const formData = new FormData();
+                formData.set("screenShotFile", file, file.name);
+                submit(formData!, {
+                  replace: true,
+                  method: "post",
+                  encType: "multipart/form-data",
+                });
+              }}
+            />
+            <p>{actionData?.error?.screenShotFile?._errors.join("/")}</p>
+          </div>
+        )}
       </AdminBody>
     </div>
   );
