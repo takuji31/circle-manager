@@ -16,7 +16,7 @@ import {
 } from "remix";
 import React, { useState } from "react";
 import { AdminBody } from "~/components/admin/body";
-import Dropzone, { useDropzone } from "react-dropzone";
+import { useDropzone } from "react-dropzone";
 import { UploadIcon, XIcon } from "@heroicons/react/solid";
 import {
   deleteScreenShot,
@@ -65,15 +65,36 @@ const getLoaderData = async ({ params }: DataFunctionArgs) => {
   const { year, month, day, circleKey } = paramsSchema.parse(params);
   const circle = Circles.findByCircleKey(circleKey);
   const date = LocalDate.of(year, month, day);
-  const screenShots = await prisma.screenShot.findMany({
-    where: { date: date.toUTCDate(), circleKey },
-    include: {
-      uploader: true,
-    },
-    orderBy: {
-      updatedAt: "asc",
-    },
-  });
+  const screenShots = await prisma.screenShot
+    .findMany({
+      where: { date: date.toUTCDate(), circleKey },
+      include: {
+        parseResult: true,
+        resultMembers: {
+          orderBy: {
+            order: "asc",
+          },
+        },
+      },
+      orderBy: {
+        updatedAt: "asc",
+      },
+    })
+    .then((screenShots) =>
+      screenShots.map((ss) => {
+        const { resultMembers, ...screenShot } = ss;
+        return {
+          ...screenShot,
+          resultMembers: resultMembers.map((m) => {
+            const { count, ...member } = m;
+            return {
+              ...member,
+              count: parseInt(count.toString()),
+            };
+          }),
+        };
+      })
+    );
   return {
     ...dateToYMD(date),
     circle,
@@ -169,6 +190,7 @@ export default function AdminCircleFanCounts() {
   const { year, month, day, circle, screenShots } = useLoaderData<LoaderData>();
   const actionData = useActionData<ActionData>();
   const transition = useTransition();
+  const [tabId, setTabId] = useState(TabId.enum.ScreenShot);
 
   const submit = useSubmit();
   return (
@@ -223,6 +245,12 @@ export default function AdminCircleFanCounts() {
           className={classNames(tabId != TabId.enum.ScreenShot ? "hidden" : "")}
         >
           <CardHeader>
+            <Form
+              id="parseImagesForm"
+              method="post"
+              action={`?mode=${ActionMode.enum.parseImages}`}
+            />
+
             <div className="-ml-4 -mt-2 flex flex-wrap items-center justify-between sm:flex-nowrap">
               <div className="ml-4 mt-2">
                 <h3 className="text-lg font-medium leading-6 text-gray-900">
@@ -233,21 +261,19 @@ export default function AdminCircleFanCounts() {
                 </p>
               </div>
               <div className="ml-4 mt-2 flex-shrink-0">
-                <Form
-                  method="post"
-                  action={`?mode=${ActionMode.enum.parseImages}`}
+                <button
+                  type="submit"
+                  className="relative inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                  form="parseImagesForm"
+                  disabled={
+                    screenShots.length == 0 || transition.state == "submitting"
+                  }
                 >
-                  <button
-                    type="submit"
-                    className="relative inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                    disabled={
-                      screenShots.length == 0 ||
-                      transition.state == "submitting"
-                    }
-                  >
-                    解析する
-                  </button>
-                </Form>
+                  {screenShots.length > 0 &&
+                  screenShots.filter((ss) => !ss.parseResult).length == 0
+                    ? "再度解析する(非推奨)"
+                    : "解析する"}
+                </button>
               </div>
             </div>
           </CardHeader>
@@ -270,7 +296,17 @@ export default function AdminCircleFanCounts() {
                           </button>
                         </Form>
                       </div>
-                      <div className="flex-1 bg-red-600"></div>
+                      <div className="flex-1 border-l px-2">
+                        <ul>
+                          {ss.resultMembers.map((m) => {
+                            return (
+                              <li key={m.order}>
+                                {m.name}: {m.count}
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      </div>
                     </div>
                   );
                 })}
