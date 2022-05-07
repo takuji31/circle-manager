@@ -7,12 +7,22 @@ import type { DataFunctionArgs, LoaderFunction } from "@remix-run/node";
 import { Circles, LocalDate } from "@circle-manager/shared/model";
 import { dateToYMD } from "~/model/date.server";
 import type { ActionFunction } from "remix";
-import { Form, useActionData, useLoaderData, useSubmit } from "remix";
+import {
+  Form,
+  useActionData,
+  useLoaderData,
+  useSubmit,
+  useTransition,
+} from "remix";
 import React, { createRef, useCallback } from "react";
 import { AdminBody } from "~/components/admin/body";
 import Dropzone, { useDropzone } from "react-dropzone";
 import { UploadIcon, XIcon } from "@heroicons/react/solid";
-import { deleteScreenShot, uploadScreenShot } from "~/model/screen_shot.server";
+import {
+  deleteScreenShot,
+  parseScreenShots,
+  uploadScreenShot,
+} from "~/model/screen_shot.server";
 import {
   createFileUploadHandler,
   parseMultipartFormData,
@@ -20,6 +30,8 @@ import {
 import type { DataFunctionArgsWithUser } from "~/auth/loader";
 import { adminOnly, adminOnlyAction } from "~/auth/loader";
 import { prisma } from "~/db.server";
+import Card from "~/components/card";
+import CardHeader from "~/components/card_header";
 
 const ActionMode = z.enum([
   "uploadScreenShot",
@@ -46,6 +58,9 @@ const getLoaderData = async ({ params }: DataFunctionArgs) => {
   const date = LocalDate.of(year, month, day);
   const screenShots = await prisma.screenShot.findMany({
     where: { date: date.toUTCDate(), circleKey },
+    include: {
+      uploader: true,
+    },
     orderBy: {
       updatedAt: "asc",
     },
@@ -103,6 +118,7 @@ const getActionData = async ({
       await deleteScreenShot({ id });
     }
     case ActionMode.enum.parseImages: {
+      await parseScreenShots({ circleKey, date });
     }
   }
   return null;
@@ -143,6 +159,7 @@ export const action: ActionFunction = adminOnlyAction(async (args) => {
 export default function AdminCircleFanCounts() {
   const { year, month, day, circle, screenShots } = useLoaderData<LoaderData>();
   const actionData = useActionData<ActionData>();
+  const transition = useTransition();
 
   const submit = useSubmit();
   return (
@@ -153,47 +170,84 @@ export default function AdminCircleFanCounts() {
         />
       </AdminHeader>
       <AdminBody>
-        <div className="grid grid-cols-1 gap-2">
-          {screenShots
-            .filter((ss) => !!ss.url)
-            .map((ss) => {
-              return (
-                <div className="flex flex-row">
-                  <div className="relative h-full w-1/3">
-                    <img src={ss.url!} alt="" className="h-full w-full" />
-                    <Form
-                      method="post"
-                      action={`?mode=${ActionMode.enum.deleteScreenShot}`}
-                    >
-                      <input type="hidden" name="id" value={ss.id} />
-                      <button type="submit">
-                        <XIcon className="absolute top-0 right-0 h-8 w-8 rounded-full bg-black text-white" />
-                      </button>
-                    </Form>
-                  </div>
-                  <div className="flex-1 bg-red-600"></div>
-                </div>
-              );
-            })}
-        </div>
-        {screenShots.length < 10 && (
-          <div className="mt-4">
-            <FileUploadInput
-              onDrop={(files) => {
-                console.log(files);
-                const [file] = files;
-                const formData = new FormData();
-                formData.set("screenShotFile", file, file.name);
-                submit(formData!, {
-                  replace: true,
-                  method: "post",
-                  encType: "multipart/form-data",
-                });
-              }}
-            />
-            <p>{actionData?.error?.screenShotFile?._errors.join("/")}</p>
-          </div>
-        )}
+        <Card>
+          <CardHeader>
+            <div className="-ml-4 -mt-2 flex flex-wrap items-center justify-between sm:flex-nowrap">
+              <div className="ml-4 mt-2">
+                <h3 className="text-lg font-medium leading-6 text-gray-900">
+                  アップロード済みのスクリーンショット
+                </h3>
+                <p className="mt-2 max-w-4xl text-sm text-gray-500">
+                  10枚までアップロードできます。
+                </p>
+              </div>
+              <div className="ml-4 mt-2 flex-shrink-0">
+                <Form
+                  method="post"
+                  action={`?mode=${ActionMode.enum.parseImages}`}
+                >
+                  <button
+                    type="submit"
+                    className="relative inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                    disabled={
+                      screenShots.length == 0 ||
+                      transition.state == "submitting"
+                    }
+                  >
+                    解析する
+                  </button>
+                </Form>
+              </div>
+            </div>
+          </CardHeader>
+          {screenShots.length ? (
+            <div className="grid grid-cols-1 gap-2">
+              {screenShots
+                .filter((ss) => !!ss.url)
+                .map((ss) => {
+                  return (
+                    <div className="flex flex-row" key={ss.id}>
+                      <div className="relative h-full w-1/3 p-2">
+                        <img src={ss.url!} alt="" className="h-full w-full" />
+                        <Form
+                          method="post"
+                          action={`?mode=${ActionMode.enum.deleteScreenShot}`}
+                        >
+                          <input type="hidden" name="id" value={ss.id} />
+                          <button type="submit">
+                            <XIcon className="absolute top-0 right-0 h-8 w-8 rounded-full bg-black text-white" />
+                          </button>
+                        </Form>
+                      </div>
+                      <div className="flex-1 bg-red-600"></div>
+                    </div>
+                  );
+                })}
+            </div>
+          ) : (
+            <div className="p-4">
+              <p>アップロード済みのスクリーンショットはありません</p>
+            </div>
+          )}
+          {screenShots.length < 10 && (
+            <div>
+              <FileUploadInput
+                onDrop={(files) => {
+                  console.log(files);
+                  const [file] = files;
+                  const formData = new FormData();
+                  formData.set("screenShotFile", file, file.name);
+                  submit(formData!, {
+                    replace: true,
+                    method: "post",
+                    encType: "multipart/form-data",
+                  });
+                }}
+              />
+              <p>{actionData?.error?.screenShotFile?._errors.join("/")}</p>
+            </div>
+          )}
+        </Card>
       </AdminBody>
     </div>
   );

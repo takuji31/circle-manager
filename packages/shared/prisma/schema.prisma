@@ -170,14 +170,40 @@ model PersonalChannel {
 
 /// ファン数記録用のスクリーンショット
 model ScreenShot {
-  id         String    @id @default(cuid()) @db.VarChar(255)
-  circleKey  CircleKey
-  date       DateTime  @db.Date // 対象の日付
-  url        String? /// 画像のURL、アップロードが完了していない時はnull
-  uploaderId String    @db.VarChar(255)
-  uploader   Member    @relation(fields: [uploaderId], references: [id]) /// アップロードを実行したメンバー
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+  id            String                        @id @default(cuid()) @db.VarChar(255)
+  circleKey     CircleKey
+  date          DateTime                      @db.Date // 対象の日付
+  url           String? /// 画像のURL、アップロードが完了していない時はnull
+  uploaderId    String                        @db.VarChar(255)
+  uploader      Member                        @relation(fields: [uploaderId], references: [id]) /// アップロードを実行したメンバー
+  createdAt     DateTime                      @default(now())
+  updatedAt     DateTime                      @updatedAt
+  parseResult   ScreenShotParseResult?
+  resultMembers ScreenShotParseResultMember[]
+}
+
+/// スクリーンショットをCloud Vision APIにぶん投げて解析した結果
+model ScreenShotParseResult {
+  id            String                        @id
+  rawJson       Json
+  createdAt     DateTime                      @default(now())
+  updatedAt     DateTime                      @updatedAt
+  screenShot    ScreenShot                    @relation(fields: [id], references: [id])
+  resultMembers ScreenShotParseResultMember[]
+}
+
+/// スクリーンショットから抽出されたメンバー
+model ScreenShotParseResultMember {
+  id           String                @id @default(cuid())
+  screenShotId String
+  order        Int
+  name         String?
+  role         CircleRole
+  count        BigInt
+  result       ScreenShotParseResult @relation(fields: [screenShotId], references: [id], map: "ScreenShotParseResultMember_screenShotId_fkey_result")
+  screenShot   ScreenShot            @relation(fields: [screenShotId], references: [id])
+
+  @@index([screenShotId])
 }
 
 // for NextAuth
