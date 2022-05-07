@@ -14,7 +14,7 @@ import {
   useSubmit,
   useTransition,
 } from "remix";
-import React, { createRef, useCallback } from "react";
+import React, { useState } from "react";
 import { AdminBody } from "~/components/admin/body";
 import Dropzone, { useDropzone } from "react-dropzone";
 import { UploadIcon, XIcon } from "@heroicons/react/solid";
@@ -32,12 +32,21 @@ import { adminOnly, adminOnlyAction } from "~/auth/loader";
 import { prisma } from "~/db.server";
 import Card from "~/components/card";
 import CardHeader from "~/components/card_header";
+import { classNames } from "~/lib";
 
 const ActionMode = z.enum([
   "uploadScreenShot",
   "deleteScreenShot",
   "parseImages",
 ]);
+
+const TabId = z.enum(["ScreenShot", "Tsv", "Manual"]);
+
+const tabs = [
+  { id: TabId.enum.ScreenShot, name: "スクリーンショット" },
+  { id: TabId.enum.Tsv, name: "まとめて貼り付け" },
+  { id: TabId.enum.Manual, name: "手入力" },
+];
 
 type LoaderData = Awaited<ReturnType<typeof getLoaderData>>;
 type ActionData = Awaited<ReturnType<typeof getActionData>>;
@@ -169,8 +178,50 @@ export default function AdminCircleFanCounts() {
           title={`${circle.name}のファン数 - ${year}/${month}/${day}`}
         />
       </AdminHeader>
+      <div>
+        <div className="sm:hidden">
+          <label htmlFor="tabs" className="sr-only">
+            Select a tab
+          </label>
+          {/* Use an "onChange" listener to redirect the user to the selected tab URL. */}
+          <select
+            id="tabs"
+            name="tabs"
+            className="block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+            defaultValue={TabId.enum.ScreenShot}
+          >
+            {tabs.map((tab) => (
+              <option key={tab.name}>{tab.name}</option>
+            ))}
+          </select>
+        </div>
+        <div className="hidden sm:block">
+          <div className="border-b border-gray-200 px-2 sm:px-4 lg:px-6">
+            <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+              {tabs.map((tab) => (
+                <button
+                  type="button"
+                  key={tab.name}
+                  onClick={() => setTabId(tab.id)}
+                  className={classNames(
+                    tab.id == tabId
+                      ? "border-indigo-500 text-indigo-600"
+                      : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700",
+                    "whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium"
+                  )}
+                  aria-current={tab.id == tabId ? "page" : undefined}
+                >
+                  {tab.name}
+                </button>
+              ))}
+            </nav>
+          </div>
+        </div>
+      </div>
       <AdminBody>
-        <Card>
+        <Card
+          className={classNames(tabId != TabId.enum.ScreenShot ? "hidden" : "")}
+        >
           <CardHeader>
             <div className="-ml-4 -mt-2 flex flex-wrap items-center justify-between sm:flex-nowrap">
               <div className="ml-4 mt-2">
