@@ -111,7 +111,7 @@ type Member = {
 };
 
 const roleRegex = /^((サブ)?リーダー|メンバー)/;
-const memberNameNoiseRegex = /(\(0|O?\(\)?|\(?i\)?|0)$/;
+const memberNameNoiseRegex = /(\(0|O?\(\)?|\(?i\)?|0|①|○|O)$/;
 const fanCountRegex = /^総獲得ファン数([0-9,]+)人/;
 
 const parseScreenShot = async ({ screenShot }: { screenShot: ScreenShot }) => {
@@ -156,7 +156,8 @@ const parseScreenShot = async ({ screenShot }: { screenShot: ScreenShot }) => {
       .join("");
     // console.log("Text %s", text);
 
-    if (memberNotFound && currentMember && text.match(memberNameNoiseRegex)) {
+    // ロールの次のブロックはほぼ間違いなくメンバー名
+    if (memberNotFound && currentMember) {
       const memberName = text.replace(memberNameNoiseRegex, "");
       // console.log("Maybe member name %s", memberName);
       currentMember.name = memberName;
@@ -184,7 +185,7 @@ const parseScreenShot = async ({ screenShot }: { screenShot: ScreenShot }) => {
         memberNotFound = true;
         // console.log("Find role row. but member name not found");
         // } else {
-        //   console.log("maybe member block %s, member: %s", text, currentMember);
+        // console.log("maybe member block %s, member: %s", text, currentMember);
       }
     }
   }
