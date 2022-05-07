@@ -76,10 +76,6 @@ export async function deleteScreenShot({ id }: { id: string }) {
   );
   await file.delete({ ignoreNotFound: true });
   await prisma.screenShot.delete({ where: { id: screenShot.id } });
-  await prisma.screenShotParseResult.delete({ where: { id: screenShot.id } });
-  await prisma.screenShotParseResultMember.deleteMany({
-    where: { screenShotId: screenShot.id },
-  });
   return { success: true };
 }
 
@@ -193,8 +189,8 @@ const parseScreenShot = async ({ screenShot }: { screenShot: ScreenShot }) => {
     }
   }
 
-  await prisma.screenShotParseResultMember.deleteMany({
-    where: { screenShotId: screenShot.id },
+  await prisma.screenShotParseResult.delete({
+    where: { id: screenShot.id },
   });
   await prisma.screenShotParseResult.upsert({
     where: { id: screenShot.id },

@@ -188,7 +188,7 @@ model ScreenShotParseResult {
   rawJson       Json
   createdAt     DateTime                      @default(now())
   updatedAt     DateTime                      @updatedAt
-  screenShot    ScreenShot                    @relation(fields: [id], references: [id])
+  screenShot    ScreenShot                    @relation(fields: [id], references: [id], onDelete: Cascade)
   resultMembers ScreenShotParseResultMember[]
 }
 
@@ -200,8 +200,8 @@ model ScreenShotParseResultMember {
   name         String?
   role         CircleRole
   count        BigInt
-  result       ScreenShotParseResult @relation(fields: [screenShotId], references: [id], map: "ScreenShotParseResultMember_screenShotId_fkey_result")
-  screenShot   ScreenShot            @relation(fields: [screenShotId], references: [id])
+  result       ScreenShotParseResult @relation(fields: [screenShotId], references: [id], map: "ScreenShotParseResultMember_screenShotId_fkey_result", onDelete: Cascade)
+  screenShot   ScreenShot            @relation(fields: [screenShotId], references: [id], onDelete: Cascade)
 
   @@index([screenShotId])
 }
