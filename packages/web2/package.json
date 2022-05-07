@@ -40,6 +40,7 @@
   "dependencies": {
     "@circle-manager/shared": "1.0.0",
     "@discordjs/rest": "^0.4.1",
+    "@google-cloud/vision": "^2.4.2",
     "@headlessui/react": "^1.6.0",
     "@heroicons/react": "^1.0.6",
     "@js-joda/core": "^5.2.0",
