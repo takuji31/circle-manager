@@ -24,7 +24,7 @@ const fixedSuffix = '-fixed-20220315';
 
   console.log('Fix circle fan count');
   // 2/28日の更新は2回あって1回目のデータが不正(2/26日分)なので消す
-  await prisma.circleFanCount.deleteMany({
+  await prisma.umastagramCircleFanCount.deleteMany({
     where: { id: 'cl05exgd300677oo3bbxna92g' },
   });
 
@@ -59,7 +59,7 @@ const fixedSuffix = '-fixed-20220315';
       },
     ],
   };
-  const circleFanCounts = await prisma.circleFanCount.findMany({
+  const circleFanCounts = await prisma.umastagramCircleFanCount.findMany({
     where,
     orderBy: [
       {
@@ -77,7 +77,7 @@ const fixedSuffix = '-fixed-20220315';
       console.log('Skip fixed CircleFanCount ID: %s', fanCount.id);
     } else {
       console.log('Fixed CircleFanCount ID: %s', fanCount.id);
-      const updated = await prisma.circleFanCount.update({
+      const updated = await prisma.umastagramCircleFanCount.update({
         where: { id: fanCount.id },
         data: {
           id: fanCount.id + fixedSuffix,
@@ -88,7 +88,7 @@ const fixedSuffix = '-fixed-20220315';
     }
   }
 
-  const maybeInvalidFanCounts = await prisma.memberFanCount.findMany({
+  const maybeInvalidFanCounts = await prisma.umastagramMemberFanCount.findMany({
     where: {
       circle: CircleKey.Jo,
       date: LocalDate.of(2022, 2, 26).toUTCDate(),
@@ -97,7 +97,7 @@ const fixedSuffix = '-fixed-20220315';
   console.log('Delete invalid fan counts');
   for (const invalidFanCount of maybeInvalidFanCounts) {
     if (!invalidFanCount.id.endsWith(fixedSuffix)) {
-      await prisma.memberFanCount.delete({
+      await prisma.umastagramMemberFanCount.delete({
         where: {
           id: invalidFanCount.id,
         },
@@ -111,7 +111,7 @@ const fixedSuffix = '-fixed-20220315';
     }
   }
 
-  const memberFanCounts = await prisma.memberFanCount.findMany({
+  const memberFanCounts = await prisma.umastagramMemberFanCount.findMany({
     where,
     orderBy: [
       {
@@ -129,7 +129,7 @@ const fixedSuffix = '-fixed-20220315';
       console.log('Skip fixed MemberFanCount ID: %s', fanCount.id);
     } else {
       console.log('Fixed MemberFanCount ID: %s', fanCount.id);
-      const updated = await prisma.memberFanCount.update({
+      const updated = await prisma.umastagramMemberFanCount.update({
         where: { id: fanCount.id },
         data: {
           id: fanCount.id + fixedSuffix,

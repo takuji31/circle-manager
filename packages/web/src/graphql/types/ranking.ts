@@ -11,7 +11,7 @@ export const Ranking = objectType({
     t.nonNull.field('fanCounts', {
       type: nonNull(list(nonNull(MemberFanCount))),
       resolve({ date }, _, { prisma }) {
-        return prisma.memberFanCount.findMany({
+        return prisma.umastagramMemberFanCount.findMany({
           where: {
             date: date.toUTCDate(),
             circle: {

@@ -51,7 +51,7 @@ export const getServerSideProps: GetServerSideProps<Props, Params> = async ({
     } else if (dayOrNull) {
       throw new Error(`Unknown type day ${dayOrNull}`);
     } else {
-      const aggregate = await prisma.memberFanCount.aggregate({
+      const aggregate = await prisma.umastagramMemberFanCount.aggregate({
         _max: {
           date: true,
         },

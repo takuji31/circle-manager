@@ -1,7 +1,7 @@
 import { objectType } from 'nexus';
 import * as Nexus from 'nexus-prisma';
 
-const m = Nexus.MemberFanCount;
+const m = Nexus.UmastagramMemberFanCount;
 
 export const MemberFanCount = objectType({
   name: m.$name,

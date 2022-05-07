@@ -29,7 +29,7 @@ config();
       orderBy: [{ year: 'asc' }, { month: 'asc' }, { memberId: 'asc' }],
     }),
     signUps: await prisma.signUp.findMany({ orderBy: [{ id: 'asc' }] }),
-    memberFanCounts: await prisma.memberFanCount.findMany({
+    umastagramMemberFanCount: await prisma.umastagramMemberFanCount.findMany({
       orderBy: [
         { date: 'asc' },
         { member: { circleKey: 'asc' } },
@@ -37,7 +37,7 @@ config();
         { member: { joinedAt: 'asc' } },
       ],
     }),
-    circleFanCounts: await prisma.circleFanCount.findMany({
+    umastagramCircleFanCount: await prisma.umastagramCircleFanCount.findMany({
       orderBy: [{ date: 'asc' }, { circle: 'asc' }],
     }),
     personalChannels: await prisma.personalChannel.findMany({
