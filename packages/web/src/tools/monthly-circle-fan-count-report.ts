@@ -1,25 +1,8 @@
-import { Circle, Circles } from '@circle-manager/shared/model';
+import { Circles } from '@circle-manager/shared/model';
 import { config } from 'dotenv';
 import { prisma } from '@circle-manager/shared/database';
-import { Guild } from '@circle-manager/shared/model';
-import { stringify } from 'csv-stringify/sync';
-import { createDiscordRestClient } from '@circle-manager/shared/discord';
-import { Routes } from 'discord-api-types/v9';
-import {
-  CircleKey,
-  CircleRole,
-  Member,
-  MemberFanCount,
-  MonthCircle,
-  MonthSurveyAnswerValue,
-} from '@prisma/client';
-import { monthCircleStateLabel } from '@circle-manager/shared/model';
-import {
-  LocalDate,
-  DateFormats,
-  TemporalAdjusters,
-  DateTimeFormatter,
-} from '@circle-manager/shared/model';
+import { CircleKey } from '@prisma/client';
+import { LocalDate, DateTimeFormatter } from '@circle-manager/shared/model';
 
 config();
 
@@ -50,7 +33,7 @@ type CircleFanCount = {
       Jo: BigInt(0),
     };
     for (const circle of Object.values(CircleKey)) {
-      const circleFanCount = await prisma.circleFanCount.findFirst({
+      const circleFanCount = await prisma.umastagramCircleFanCount.findFirst({
         where: {
           circle,
           date: {

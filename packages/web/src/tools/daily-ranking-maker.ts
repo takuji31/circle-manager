@@ -13,7 +13,7 @@ import {
   CircleKey,
   CircleRole,
   Member,
-  MemberFanCount,
+  UmastagramMemberFanCount,
   MonthCircle,
   MonthSurveyAnswerValue,
 } from '@prisma/client';
@@ -39,7 +39,7 @@ config();
     monthSurvey != null &&
     now.isAfter(ZonedDateTime.fromDate(monthSurvey.expiredAt));
 
-  const groupBy = await prisma.memberFanCount.groupBy({
+  const groupBy = await prisma.umastagramMemberFanCount.groupBy({
     _max: {
       date: true,
     },
@@ -53,7 +53,7 @@ config();
   });
 
   let memberFanCounts: Array<
-    MemberFanCount & {
+    UmastagramMemberFanCount & {
       member: (Member & { monthCircles: Array<MonthCircle> }) | null;
     }
   > = [];
@@ -76,7 +76,7 @@ config();
       continue;
     }
 
-    const fanCounts = await prisma.memberFanCount.findMany({
+    const fanCounts = await prisma.umastagramMemberFanCount.findMany({
       where: {
         date,
         circle,

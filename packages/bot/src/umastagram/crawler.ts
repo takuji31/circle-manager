@@ -78,10 +78,10 @@ export async function crawlUmastagram(
       predictedAvg: BigInt(circleResult.predictedAvg.replaceAll(",", "")),
     };
     await prisma.$transaction([
-      prisma.memberFanCount.deleteMany({
+      prisma.umastagramMemberFanCount.deleteMany({
         where: { circle: circleKey, date },
       }),
-      prisma.memberFanCount.createMany({
+      prisma.umastagramMemberFanCount.createMany({
         data: [
           ...members.map((member) => {
             const dbMember = dbMembers.find(
@@ -101,7 +101,7 @@ export async function crawlUmastagram(
         ],
         skipDuplicates: false,
       }),
-      prisma.circleFanCount.upsert({
+      prisma.umastagramCircleFanCount.upsert({
         where: {
           circle_date: {
             circle: circleKey,

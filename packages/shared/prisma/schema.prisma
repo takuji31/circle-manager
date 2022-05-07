@@ -32,9 +32,9 @@ model Member {
   updatedAt         DateTime            @updatedAt
   monthCircles      MonthCircle[]
   signUp            SignUp?
-  fanCounts         MemberFanCount[]
   monthSurveyAnswer MonthSurveyAnswer[]
   PersonalChannel   PersonalChannel[]
+  fanCounts UmastagramMemberFanCount[]
 
   @@unique([pathname])
   @@index([leavedAt])
@@ -123,7 +123,7 @@ model SignUp {
 }
 
 /// Umastagramから取得した各メンバーのファン数
-model MemberFanCount {
+model UmastagramMemberFanCount {
   id        String    @id @default(cuid()) @db.VarChar(255)
   date      DateTime  @db.Date
   circle    CircleKey
@@ -141,7 +141,7 @@ model MemberFanCount {
 }
 
 /// Umastagramから取得したサークルごとのファン数
-model CircleFanCount {
+model UmastagramCircleFanCount {
   id           String    @id @default(cuid()) @db.VarChar(255)
   date         DateTime  @db.Date
   circle       CircleKey
