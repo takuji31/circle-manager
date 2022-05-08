@@ -29,7 +29,6 @@ export async function uploadScreenShot({
   date,
   uploaderId,
 }: UploadScreenShotParams) {
-  tmpdir();
   const screenShot = await prisma.screenShot.create({
     data: {
       date: date.toUTCDate(),
