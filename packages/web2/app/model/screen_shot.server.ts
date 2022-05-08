@@ -4,12 +4,12 @@ import type { z } from "zod";
 import { LocalDate } from "@circle-manager/shared/model";
 import { prisma } from "~/db.server";
 import * as os from "os";
-import { tmpdir } from "os";
 import { mkdtemp, writeFile } from "fs/promises";
 import path from "path";
 import { ImageAnnotatorClient } from "@google-cloud/vision";
-import type { CircleKey, ScreenShot } from "@prisma/client";
+import { CircleKey, MemberFanCountSource, ScreenShot } from "@prisma/client";
 import { CircleRole } from "@prisma/client";
+import { getCircleMembers } from "./member.server";
 
 interface UploadScreenShotParams {
   screenShotFile: File;
@@ -21,6 +21,44 @@ interface UploadScreenShotParams {
 interface ParseScreenShotParams {
   circleKey: z.infer<typeof ActiveCircleKey>;
   date: LocalDate;
+}
+
+export async function getScreenShots({
+  date,
+  circleKey,
+}: {
+  date: LocalDate;
+  circleKey: ActiveCircleKey;
+}) {
+  return await prisma.screenShot
+    .findMany({
+      where: { date: date.toUTCDate(), circleKey },
+      include: {
+        fanCounts: {
+          orderBy: {
+            order: "asc",
+          },
+        },
+      },
+      orderBy: {
+        updatedAt: "asc",
+      },
+    })
+    .then((screenShots) =>
+      screenShots.map((ss) => {
+        const { fanCounts, ...screenShot } = ss;
+        return {
+          ...screenShot,
+          fanCounts: fanCounts.map((c) => {
+            const { total, ...member } = c;
+            return {
+              ...member,
+              total: parseInt(total.toString()),
+            };
+          }),
+        };
+      })
+    );
 }
 
 export async function uploadScreenShot({
@@ -98,8 +136,39 @@ export async function parseScreenShots({
   const screenShots = await prisma.screenShot.findMany({
     where: { date: date.toUTCDate(), circleKey },
   });
+  const members = await getCircleMembers({ circleKey });
+  const memberFanCounts = (
+    await prisma.memberFanCount.findMany({
+      select: {
+        memberId: true,
+        parsedName: true,
+      },
+      where: {
+        memberId: { in: members.map((m) => m.id) },
+        source: MemberFanCountSource.ScreenShot,
+      },
+      distinct: ["memberId"],
+      orderBy: [
+        {
+          date: "desc",
+        },
+      ],
+    })
+  ).filter((m) => m.memberId && m.parsedName);
+
+  const memberNameToMemberId = {
+    ...Object.fromEntries(
+      memberFanCounts.map(({ memberId, parsedName }) => [parsedName, memberId])
+    ),
+    ...Object.fromEntries(members.map((m) => [m.name, m.id])),
+  };
   for (const screenShot of screenShots) {
-    await parseScreenShot({ screenShot });
+    await parseScreenShot({
+      screenShot,
+      circleKey,
+      date,
+      memberNameToMemberId,
+    });
   }
 }
 
@@ -113,7 +182,17 @@ const roleRegex = /^((サブ)?リーダー|メンバー)/;
 const memberNameNoiseRegex = /(\(0|O?\(\)?|\(?i\)?|0|①|○|O)$/;
 const fanCountRegex = /^総獲得ファン数([0-9,]+)人/;
 
-const parseScreenShot = async ({ screenShot }: { screenShot: ScreenShot }) => {
+const parseScreenShot = async ({
+  screenShot,
+  circleKey,
+  date,
+  memberNameToMemberId,
+}: {
+  screenShot: ScreenShot;
+  circleKey: CircleKey;
+  date: LocalDate;
+  memberNameToMemberId: { [key: string]: string };
+}) => {
   const file = await bucket.file(
     createCloudStoragePath(
       screenShot.circleKey,
@@ -125,10 +204,9 @@ const parseScreenShot = async ({ screenShot }: { screenShot: ScreenShot }) => {
     throw new Error(`ScreenShot ${screenShot.id} not uploaded in ${file.name}`);
   }
 
-  // Creates a client
   const client = new ImageAnnotatorClient();
 
-  // Performs label detection on the image file
+  // TODO: ユニット数節約のために一度パースしたスクリーンショットは再度Cloud Vision APIに投げない
   const [result] = await client.documentTextDetection(
     `gs://${file.bucket.name}/${file.name}`
   );
@@ -189,30 +267,26 @@ const parseScreenShot = async ({ screenShot }: { screenShot: ScreenShot }) => {
     }
   }
 
-  await prisma.screenShotParseResult.delete({
+  await prisma.screenShot.update({
     where: { id: screenShot.id },
-  });
-  await prisma.screenShotParseResult.upsert({
-    where: { id: screenShot.id },
-    create: {
-      id: screenShot.id,
+    data: {
       rawJson: result as any,
-      resultMembers: {
+      fanCounts: {
+        deleteMany: { screenShotId: screenShot.id },
         createMany: {
-          data: members.map((member, order) => {
+          data: members.map((m, order) => {
             return {
+              date: date.toUTCDate(),
+              circleKey,
               order,
-              name: member.name ? member.name : null,
-              role: member.role,
-              count: BigInt(member.fanCount),
+              source: MemberFanCountSource.ScreenShot,
+              memberId: memberNameToMemberId[m.name],
+              parsedName: m.name,
+              total: BigInt(m.fanCount),
             };
           }),
         },
       },
-    },
-    update: {
-      id: screenShot.id,
-      rawJson: result as any,
     },
   });
   // console.log(JSON.stringify(members, undefined, 2));

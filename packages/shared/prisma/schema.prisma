@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 datasource db {
   provider             = "mysql"
   url                  = env("DATABASE_URL")
@@ -17,26 +14,27 @@ generator nexusPrisma {
 }
 
 model Member {
-  id                String              @id @db.VarChar(255)
-  pathname          String              @default(cuid()) @db.VarChar(255)
-  circleRole        CircleRole          @default(Member)
-  name              String              @db.VarChar(255)
-  trainerId         String?             @db.VarChar(255)
-  messageChannelId  String?             @db.VarChar(255)
-  setupCompleted    Boolean             @default(false)
-  status            MemberStatus        @default(Joined)
+  id                String                     @id @db.VarChar(255)
+  pathname          String                     @default(cuid()) @db.VarChar(255)
+  circleRole        CircleRole                 @default(Member)
+  name              String                     @db.VarChar(255)
+  trainerId         String?                    @db.VarChar(255)
+  messageChannelId  String?                    @db.VarChar(255)
+  setupCompleted    Boolean                    @default(false)
+  status            MemberStatus               @default(Joined)
   joinedAt          DateTime
   leavedAt          DateTime?
   circleKey         CircleKey?
-  createdAt         DateTime            @default(now())
-  updatedAt         DateTime            @updatedAt
+  createdAt         DateTime                   @default(now())
+  updatedAt         DateTime                   @updatedAt
   monthCircles      MonthCircle[]
   signUp            SignUp?
   monthSurveyAnswer MonthSurveyAnswer[]
   PersonalChannel   PersonalChannel[]
-  fanCounts UmastagramMemberFanCount[]
+  fanCounts         UmastagramMemberFanCount[]
+  ScreenShot        ScreenShot[]
+  MemberFanCount    MemberFanCount[]
 
-  ScreenShot ScreenShot[]
   @@unique([pathname])
   @@index([leavedAt])
   @@index([joinedAt])
@@ -170,40 +168,45 @@ model PersonalChannel {
 
 /// ファン数記録用のスクリーンショット
 model ScreenShot {
-  id            String                        @id @default(cuid()) @db.VarChar(255)
-  circleKey     CircleKey
-  date          DateTime                      @db.Date // 対象の日付
-  url           String? /// 画像のURL、アップロードが完了していない時はnull
-  uploaderId    String                        @db.VarChar(255)
-  uploader      Member                        @relation(fields: [uploaderId], references: [id]) /// アップロードを実行したメンバー
-  createdAt     DateTime                      @default(now())
-  updatedAt     DateTime                      @updatedAt
-  parseResult   ScreenShotParseResult?
-  resultMembers ScreenShotParseResultMember[]
+  id         String           @id @default(cuid()) @db.VarChar(255)
+  circleKey  CircleKey
+  date       DateTime         @db.Date // 対象の日付
+  url        String? /// 画像のURL、アップロードが完了していない時はnull
+  uploaderId String           @db.VarChar(255)
+  uploader   Member           @relation(fields: [uploaderId], references: [id]) /// アップロードを実行したメンバー
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+  rawJson    Json? /// スクリーンショットをCloud Vision APIにぶん投げて解析した結果
+  fanCounts  MemberFanCount[]
 }
 
-/// スクリーンショットをCloud Vision APIにぶん投げて解析した結果
-model ScreenShotParseResult {
-  id            String                        @id
-  rawJson       Json
-  createdAt     DateTime                      @default(now())
-  updatedAt     DateTime                      @updatedAt
-  screenShot    ScreenShot                    @relation(fields: [id], references: [id], onDelete: Cascade)
-  resultMembers ScreenShotParseResultMember[]
+/// メンバーの日毎の累計ファン数の記録
+model MemberFanCount {
+  id           String               @id @default(cuid())
+  memberId     String?
+  member       Member?              @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  date         DateTime             @db.Date
+  circleKey    CircleKey
+  order        Int                  @default(0)
+  source       MemberFanCountSource
+  parsedName   String? /// スクリーンショットやTSVから取得した名前
+  total        BigInt
+  screenShotId String?
+  screenShot   ScreenShot?          @relation(fields: [screenShotId], references: [id], onDelete: SetNull)
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+
+  @@unique([memberId, date])
+  @@unique([screenShotId, order])
+  @@index([circleKey, date, total])
+  @@index([parsedName, memberId])
 }
 
-/// スクリーンショットから抽出されたメンバー
-model ScreenShotParseResultMember {
-  id           String                @id @default(cuid())
-  screenShotId String
-  order        Int
-  name         String?
-  role         CircleRole
-  count        BigInt
-  result       ScreenShotParseResult @relation(fields: [screenShotId], references: [id], map: "ScreenShotParseResultMember_screenShotId_fkey_result", onDelete: Cascade)
-  screenShot   ScreenShot            @relation(fields: [screenShotId], references: [id], onDelete: Cascade)
-
-  @@index([screenShotId])
+/// ファン数をどこから記録したか
+enum MemberFanCountSource {
+  Manual /// 手入力
+  ScreenShot /// スクリーンショット
+  Paste /// まとめて貼り付け
 }
 
 // for NextAuth
