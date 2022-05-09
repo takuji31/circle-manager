@@ -7,7 +7,8 @@ import * as os from "os";
 import { mkdtemp, writeFile } from "fs/promises";
 import path from "path";
 import { ImageAnnotatorClient } from "@google-cloud/vision";
-import { CircleKey, MemberFanCountSource, ScreenShot } from "@prisma/client";
+import type { CircleKey, ScreenShot as PrismaScreenShot } from "@prisma/client";
+import { MemberFanCountSource } from "@prisma/client";
 import { CircleRole } from "@prisma/client";
 import { getCircleMembers } from "./member.server";
 
@@ -23,6 +24,9 @@ interface ParseScreenShotParams {
   date: LocalDate;
 }
 
+export type ScreenShot = Awaited<ReturnType<typeof getScreenShots>>;
+export type ScreenShotMemberFanCount = ScreenShot[0]["fanCounts"][0];
+
 export async function getScreenShots({
   date,
   circleKey,
@@ -35,6 +39,9 @@ export async function getScreenShots({
       where: { date: date.toUTCDate(), circleKey },
       include: {
         fanCounts: {
+          include: {
+            member: true,
+          },
           orderBy: {
             order: "asc",
           },
@@ -116,6 +123,33 @@ export async function deleteScreenShot({ id }: { id: string }) {
   return { success: true };
 }
 
+export async function setMemberIdToMemberFanCount({
+  memberId,
+  memberFanCountId,
+}: {
+  memberId: string;
+  memberFanCountId: string;
+}) {
+  const memberFanCount = await prisma.memberFanCount.findFirst({
+    where: { id: memberFanCountId },
+  });
+
+  if (!memberFanCount) {
+    throw new Error(`Unknown Member Fan Count ID ${memberFanCountId}`);
+  }
+
+  const member = await prisma.member.findFirst({ where: { id: memberId } });
+
+  if (!member) {
+    throw new Error(`Unknown Member ID ${memberId}`);
+  }
+
+  await prisma.memberFanCount.update({
+    where: { id: memberFanCountId },
+    data: { memberId },
+  });
+}
+
 function createCloudStoragePath(
   circleKey: CircleKey,
   date: LocalDate,
@@ -188,7 +222,7 @@ const parseScreenShot = async ({
   date,
   memberNameToMemberId,
 }: {
-  screenShot: ScreenShot;
+  screenShot: PrismaScreenShot;
   circleKey: CircleKey;
   date: LocalDate;
   memberNameToMemberId: { [key: string]: string };

@@ -14,12 +14,17 @@ import {
   useSubmit,
   useTransition,
 } from "remix";
-import React, { useState } from "react";
+import React, { Fragment, useMemo, useState } from "react";
 import { AdminBody } from "~/components/admin/body";
 import { useDropzone } from "react-dropzone";
 import { UploadIcon, XIcon } from "@heroicons/react/solid";
 import {
+  ScreenShotMemberFanCount,
+  setMemberIdToMemberFanCount,
+} from "~/model/screen_shot.server";
+import {
   deleteScreenShot,
+  getScreenShots,
   parseScreenShots,
   uploadScreenShot,
 } from "~/model/screen_shot.server";
@@ -29,15 +34,19 @@ import {
 } from "~/lib/form.server";
 import type { DataFunctionArgsWithUser } from "~/auth/loader";
 import { adminOnly, adminOnlyAction } from "~/auth/loader";
-import { prisma } from "~/db.server";
 import Card from "~/components/card";
 import CardHeader from "~/components/card_header";
 import { classNames } from "~/lib";
+
+import { CheckIcon, SelectorIcon } from "@heroicons/react/solid";
+import { Listbox, Transition } from "@headlessui/react";
+import { getCircleMembers } from "~/model/member.server";
 
 const ActionMode = z.enum([
   "uploadScreenShot",
   "deleteScreenShot",
   "parseImages",
+  "setMemberId",
 ]);
 
 const TabId = z.enum(["ScreenShot", "Tsv", "Manual"]);
@@ -50,6 +59,8 @@ const tabs = [
 
 type LoaderData = Awaited<ReturnType<typeof getLoaderData>>;
 type ActionData = Awaited<ReturnType<typeof getActionData>>;
+type Member = Awaited<ReturnType<typeof getCircleMembers>>[0];
+type ScreenShot = Awaited<ReturnType<typeof getScreenShots>>[0];
 
 const paramsSchema = z.intersection(
   z.object({
@@ -65,45 +76,23 @@ const getLoaderData = async ({ params }: DataFunctionArgs) => {
   const { year, month, day, circleKey } = paramsSchema.parse(params);
   const circle = Circles.findByCircleKey(circleKey);
   const date = LocalDate.of(year, month, day);
-  const screenShots = await prisma.screenShot
-    .findMany({
-      where: { date: date.toUTCDate(), circleKey },
-      include: {
-        parseResult: true,
-        resultMembers: {
-          orderBy: {
-            order: "asc",
-          },
-        },
-      },
-      orderBy: {
-        updatedAt: "asc",
-      },
-    })
-    .then((screenShots) =>
-      screenShots.map((ss) => {
-        const { resultMembers, ...screenShot } = ss;
-        return {
-          ...screenShot,
-          resultMembers: resultMembers.map((m) => {
-            const { count, ...member } = m;
-            return {
-              ...member,
-              count: parseInt(count.toString()),
-            };
-          }),
-        };
-      })
-    );
+  const screenShots = await getScreenShots({ date, circleKey });
+  const members = await getCircleMembers({ circleKey });
   return {
     ...dateToYMD(date),
     circle,
     screenShots,
+    members,
   };
 };
 
 export const loader: LoaderFunction = adminOnly(async (args) => {
   return await getLoaderData(args);
+});
+
+const setMemberIdSchema = z.object({
+  memberId: z.string(),
+  memberFanCountId: z.string(),
 });
 
 const getActionData = async ({
@@ -112,20 +101,19 @@ const getActionData = async ({
   user,
 }: DataFunctionArgsWithUser) => {
   const { year, month, day, circleKey } = paramsSchema.parse(params);
-  const circle = Circles.findByCircleKey(circleKey);
   const date = LocalDate.of(year, month, day);
-  const { mode } = actionQuerySchema.parse(
-    Object.fromEntries(new URL(request.url).searchParams)
+  const uploadHandler = createFileUploadHandler({
+    maxFileSize: 10_000_000,
+  });
+  const formData = Object.fromEntries(
+    await parseMultipartFormData(request, uploadHandler)
   );
+  console.log(formData);
+  const { mode } = actionQuerySchema.parse(formData);
 
   switch (mode) {
     case ActionMode.enum.uploadScreenShot: {
-      const uploadHandler = createFileUploadHandler({
-        maxFileSize: 10_000_000,
-      });
-      const formData = await parseMultipartFormData(request, uploadHandler);
-
-      const result = uploadSchema.safeParse(Object.fromEntries(formData));
+      const result = uploadSchema.safeParse(formData);
 
       if (!result.success) {
         return {
@@ -143,12 +131,16 @@ const getActionData = async ({
       }
     }
     case ActionMode.enum.deleteScreenShot: {
-      const id = z.string().parse((await request.formData()).get("id"));
+      const id = z.string().parse(formData.id);
       console.log("Deleting screenShot %s", id);
       await deleteScreenShot({ id });
     }
     case ActionMode.enum.parseImages: {
       await parseScreenShots({ circleKey, date });
+    }
+    case ActionMode.enum.setMemberId: {
+      const { memberId, memberFanCountId } = setMemberIdSchema.parse(formData);
+      await setMemberIdToMemberFanCount({ memberId, memberFanCountId });
     }
   }
   return null;
@@ -187,7 +179,8 @@ export const action: ActionFunction = adminOnlyAction(async (args) => {
 });
 
 export default function AdminCircleFanCounts() {
-  const { year, month, day, circle, screenShots } = useLoaderData<LoaderData>();
+  const { year, month, day, circle, screenShots, members } =
+    useLoaderData<LoaderData>();
   const actionData = useActionData<ActionData>();
   const transition = useTransition();
   const [tabId, setTabId] = useState(TabId.enum.ScreenShot);
@@ -245,11 +238,13 @@ export default function AdminCircleFanCounts() {
           className={classNames(tabId != TabId.enum.ScreenShot ? "hidden" : "")}
         >
           <CardHeader>
-            <Form
-              id="parseImagesForm"
-              method="post"
-              action={`?mode=${ActionMode.enum.parseImages}`}
-            />
+            <Form id="parseImagesForm" method="post">
+              <input
+                type="hidden"
+                name="mode"
+                value={ActionMode.enum.parseImages}
+              />
+            </Form>
 
             <div className="-ml-4 -mt-2 flex flex-wrap items-center justify-between sm:flex-nowrap">
               <div className="ml-4 mt-2">
@@ -270,7 +265,7 @@ export default function AdminCircleFanCounts() {
                   }
                 >
                   {screenShots.length > 0 &&
-                  screenShots.filter((ss) => !ss.parseResult).length == 0
+                  screenShots.filter((ss) => !ss.fanCounts).length == 0
                     ? "再度解析する(非推奨)"
                     : "解析する"}
                 </button>
@@ -278,36 +273,43 @@ export default function AdminCircleFanCounts() {
             </div>
           </CardHeader>
           {screenShots.length ? (
-            <div className="grid grid-cols-1 gap-2">
+            <div className="grid grid-cols-1 justify-items-stretch md:grid-cols-2">
               {screenShots
                 .filter((ss) => !!ss.url)
                 .map((ss) => {
                   return (
-                    <div className="flex flex-row" key={ss.id}>
-                      <div className="relative h-full w-1/3 p-2">
+                    <>
+                      <div className="relative p-2">
                         <img src={ss.url!} alt="" className="h-full w-full" />
-                        <Form
-                          method="post"
-                          action={`?mode=${ActionMode.enum.deleteScreenShot}`}
-                        >
+                        <Form method="post">
+                          <input
+                            type="hidden"
+                            name="mode"
+                            value={ActionMode.enum.deleteScreenShot}
+                          />
+
                           <input type="hidden" name="id" value={ss.id} />
                           <button type="submit">
                             <XIcon className="absolute top-0 right-0 h-8 w-8 rounded-full bg-black text-white" />
                           </button>
                         </Form>
                       </div>
-                      <div className="flex-1 border-l px-2">
-                        <ul>
-                          {ss.resultMembers.map((m) => {
+                      <div className="flex flex-col justify-end px-2 md:border-l">
+                        <div className="grid basis-full grid-flow-col grid-rows-3 md:basis-1/2">
+                          {ss.fanCounts.map((m) => {
                             return (
-                              <li key={m.order}>
-                                {m.name}: {m.count}
-                              </li>
+                              <div key={m.id}>
+                                <MemberSelectListbox
+                                  members={members}
+                                  memberFanCount={m}
+                                />
+                              </div>
                             );
                           })}
-                        </ul>
+                          <div></div>
+                        </div>
                       </div>
-                    </div>
+                    </>
                   );
                 })}
             </div>
@@ -380,3 +382,119 @@ const FileUploadInput: React.FC<FileUploadInputProps> = ({ onDrop }) => {
     </div>
   );
 };
+
+interface MemberSelectComboBoxProps {
+  members: Array<Member>;
+  memberFanCount: ScreenShotMemberFanCount;
+}
+function MemberSelectListbox({
+  members,
+  memberFanCount,
+}: MemberSelectComboBoxProps) {
+  const transition = useTransition();
+  const submit = useSubmit();
+  const currentMember = useMemo(() => {
+    if (
+      transition.submission &&
+      transition.submission.method == "POST" &&
+      transition.submission.formData.get("mode") ==
+        ActionMode.enum.setMemberId &&
+      transition.submission.formData.get("memberFanCountId") ==
+        memberFanCount.id
+    ) {
+      const memberId = transition.submission.formData.get("memberId");
+      return (
+        (memberId ? members.find((m) => m.id == memberId) : null) ??
+        memberFanCount.member
+      );
+    } else {
+      return memberFanCount.member;
+    }
+  }, [members, memberFanCount, transition]);
+  return (
+    <Listbox
+      value={memberFanCount.member?.id}
+      disabled={transition.state == "submitting"}
+      onChange={(value) => {
+        if (value) {
+          submit(
+            {
+              memberId: value,
+              memberFanCountId: memberFanCount.id,
+              mode: ActionMode.enum.setMemberId,
+            },
+            { method: "post", replace: true }
+          );
+        }
+      }}
+    >
+      {({ open }) => (
+        <>
+          <Listbox.Label className="block text-sm font-medium text-gray-700">
+            {memberFanCount.order + 1}人目 (ファン数：{memberFanCount.total})
+          </Listbox.Label>
+          <div className="relative mt-1">
+            <Listbox.Button className="relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm">
+              <span className="block truncate">
+                {currentMember?.name ?? "不明"}
+              </span>
+              <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                <SelectorIcon
+                  className="h-5 w-5 text-gray-400"
+                  aria-hidden="true"
+                />
+              </span>
+            </Listbox.Button>
+
+            <Transition
+              show={open}
+              as={Fragment}
+              leave="transition ease-in duration-100"
+              leaveFrom="opacity-100"
+              leaveTo="opacity-0"
+            >
+              <Listbox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                {members.map((member) => (
+                  <Listbox.Option
+                    key={member.id}
+                    className={({ active }) =>
+                      classNames(
+                        active ? "bg-indigo-600 text-white" : "text-gray-900",
+                        "relative cursor-default select-none py-2 pl-3 pr-9"
+                      )
+                    }
+                    value={member.id}
+                  >
+                    {({ selected, active }) => (
+                      <>
+                        <span
+                          className={classNames(
+                            selected ? "font-semibold" : "font-normal",
+                            "block truncate"
+                          )}
+                        >
+                          {member.name}
+                        </span>
+
+                        {selected ? (
+                          <span
+                            className={classNames(
+                              active ? "text-white" : "text-indigo-600",
+                              "absolute inset-y-0 right-0 flex items-center pr-4"
+                            )}
+                          >
+                            <CheckIcon className="h-5 w-5" aria-hidden="true" />
+                          </span>
+                        ) : null}
+                      </>
+                    )}
+                  </Listbox.Option>
+                ))}
+              </Listbox.Options>
+            </Transition>
+          </div>
+        </>
+      )}
+    </Listbox>
+  );
+}
