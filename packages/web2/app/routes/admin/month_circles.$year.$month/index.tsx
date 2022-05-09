@@ -5,7 +5,7 @@ import type { MouseEventHandler } from "react";
 import React, { Fragment, useMemo, useRef, useState } from "react";
 import { Dialog, Switch, Transition } from "@headlessui/react";
 import { classNames } from "~/lib";
-import Card from "~/components/card";
+import CardWithDefaultPadding from "~/components/card_with_default_padding";
 import type { getNotJoinedSignUps } from "~/model/signup.server";
 import { useUser } from "~/utils";
 import { ClipboardCopyIcon, ExclamationIcon } from "@heroicons/react/outline";
@@ -108,7 +108,7 @@ export default function AdminMonthCircles() {
         </AdminHeaderActions>
       </AdminHeader>
       <div className="grid grid-cols-1 gap-4 px-2 py-4 sm:gap-8 sm:px-4 md:px-6">
-        <Card
+        <CardWithDefaultPadding
           header={
             <>
               <h3 className="text-lg font-medium leading-6 text-gray-900">
@@ -236,7 +236,7 @@ export default function AdminMonthCircles() {
           ) : (
             <p>勧誘待ちはありません</p>
           )}
-        </Card>
+        </CardWithDefaultPadding>
         {/*<Card*/}
         {/*  header={*/}
         {/*    <>*/}

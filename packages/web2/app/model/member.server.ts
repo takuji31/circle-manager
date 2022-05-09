@@ -2,8 +2,9 @@ import { prisma } from "~/db.server";
 import type { LocalDate } from "@circle-manager/shared/model";
 import { Circles, Guild } from "@circle-manager/shared/model";
 import { createDiscordRestClient } from "@circle-manager/shared/discord";
-import { RESTPatchAPIGuildMemberJSONBody } from "discord-api-types/v9";
+import type { RESTPatchAPIGuildMemberJSONBody } from "discord-api-types/v9";
 import { Routes } from "discord-api-types/rest/v9";
+import type { ActiveCircleKey } from "~/schema/member";
 
 const monthSurveyAnswerInclude = (date?: LocalDate) => {
   if (!date) {
@@ -89,6 +90,17 @@ export const getJoinedMembers = ({
         };
       })
   );
+};
+
+export const getCircleMembers = async ({
+  circleKey,
+}: {
+  circleKey: ActiveCircleKey;
+}) => {
+  return prisma.member.findMany({
+    where: { circleKey },
+    orderBy: [{ circleRole: "asc" }, { joinedAt: "asc" }],
+  });
 };
 
 type GetMemberParams = { id: string } | { pathname: string };
