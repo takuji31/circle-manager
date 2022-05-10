@@ -40,7 +40,9 @@
   "dependencies": {
     "@circle-manager/shared": "1.0.0",
     "@discordjs/rest": "^0.4.1",
+    "@emotion/cache": "^11.7.1",
     "@emotion/react": "^11.9.0",
+    "@emotion/server": "^11.4.0",
     "@emotion/styled": "^11.8.1",
     "@google-cloud/vision": "^2.4.2",
     "@headlessui/react": "^1.6.0",
@@ -56,6 +58,7 @@
     "@remix-run/serve": "^1.4.3",
     "@remix-run/server-runtime": "^1.4.3",
     "bcryptjs": "^2.4.3",
+    "csv-stringify": "^6.0.5",
     "discord-api-types": "^0.32.0",
     "discord.js": "^13.6.0",
     "firebase-admin": "^10.1.0",
