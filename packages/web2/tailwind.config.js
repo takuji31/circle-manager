@@ -5,6 +5,7 @@ module.exports = {
     "./app/**/*.{ts,tsx,jsx,js}",
     "../../node_modules/flowbite/**/*.js",
   ],
+  important: "#root",
   theme: {
     extend: {
       colors: {
