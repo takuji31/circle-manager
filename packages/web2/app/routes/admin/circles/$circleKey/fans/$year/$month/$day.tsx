@@ -265,7 +265,7 @@ export default function AdminCircleFanCounts() {
                   }
                 >
                   {screenShots.length > 0 &&
-                  screenShots.filter((ss) => !ss.fanCounts).length == 0
+                  screenShots.filter((ss) => !ss.fanCounts.length).length == 0
                     ? "再度解析する(非推奨)"
                     : "解析する"}
                 </button>
