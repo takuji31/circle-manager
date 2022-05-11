@@ -8,8 +8,9 @@ import CssBaseline from "@mui/material/CssBaseline";
 
 import ClientStyleContext from "~/components/ClientStyleContext";
 import createEmotionCache from "~/lib/createEmotionCache";
-import theme from "~/lib/theme";
 import "flowbite";
+import { createTheme } from "./mui/theme";
+import { useMediaQuery } from "@mui/material";
 
 interface ClientCacheProviderProps {
   children: React.ReactNode;
@@ -28,13 +29,28 @@ function ClientCacheProvider({ children }: ClientCacheProviderProps) {
   );
 }
 
+function ClientThemeProvider({ children }: { children: React.ReactNode }) {
+  const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
+
+  const theme = React.useMemo(
+    () =>
+      createTheme({
+        mode: prefersDarkMode ? "dark" : "light",
+        direction: "ltr",
+        responsiveFontSizes: true,
+      }),
+    [prefersDarkMode]
+  );
+  return <ThemeProvider theme={theme}>{children}</ThemeProvider>;
+}
+
 hydrate(
   <ClientCacheProvider>
-    <ThemeProvider theme={theme}>
+    <ClientThemeProvider>
       {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
       <CssBaseline />
       <RemixBrowser />
-    </ThemeProvider>
+    </ClientThemeProvider>
   </ClientCacheProvider>,
   document
 );

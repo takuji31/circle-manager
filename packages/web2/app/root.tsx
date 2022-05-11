@@ -19,9 +19,11 @@ import { authenticator } from "./auth.server";
 import type { SessionUser } from "@circle-manager/shared/model";
 import * as React from "react";
 import { withEmotionCache } from "@emotion/react";
-import { unstable_useEnhancedEffect as useEnhancedEffect } from "@mui/material";
+import {
+  unstable_useEnhancedEffect as useEnhancedEffect,
+  useTheme,
+} from "@mui/material";
 import ClientStyleContext from "~/components/ClientStyleContext";
-import theme from "~/lib/theme";
 import Layout from "~/components/Layout";
 
 export const links: LinksFunction = () => {
@@ -52,6 +54,7 @@ interface DocumentProps {
 const Document = withEmotionCache(
   ({ children, title }: DocumentProps, emotionCache) => {
     const clientStyleData = React.useContext(ClientStyleContext);
+    const theme = useTheme();
 
     // Only executed on client
     useEnhancedEffect(() => {
