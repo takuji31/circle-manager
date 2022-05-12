@@ -20,6 +20,7 @@ import type { SessionUser } from "@circle-manager/shared/model";
 import * as React from "react";
 import { withEmotionCache } from "@emotion/react";
 import {
+  Box,
   unstable_useEnhancedEffect as useEnhancedEffect,
   useTheme,
 } from "@mui/material";
@@ -73,7 +74,7 @@ const Document = withEmotionCache(
     }, []);
 
     return (
-      <html lang="ja">
+      <html lang="ja" style={{ height: "100%" }}>
         <head>
           <meta charSet="utf-8" />
           <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -90,11 +91,13 @@ const Document = withEmotionCache(
             content="emotion-insertion-point"
           />
         </head>
-        <body className="h-full" id="root">
-          {children}
-          <ScrollRestoration />
-          <Scripts />
-          <LiveReload />
+        <body id="root">
+          <Box className="h-full min-h-full">
+            {children}
+            <ScrollRestoration />
+            <Scripts />
+            <LiveReload />
+          </Box>
         </body>
       </html>
     );

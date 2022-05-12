@@ -11,6 +11,7 @@ import createEmotionCache from "~/lib/createEmotionCache";
 import "flowbite";
 import { createTheme } from "./mui/theme";
 import { useMediaQuery } from "@mui/material";
+import "~/lib/luxon";
 
 interface ClientCacheProviderProps {
   children: React.ReactNode;

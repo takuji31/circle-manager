@@ -9,6 +9,7 @@ import { ThemeProvider } from "@mui/material/styles";
 import { CacheProvider } from "@emotion/react";
 import createEmotionServer from "@emotion/server/create-instance";
 import { createTheme } from "./mui/theme";
+import "~/lib/luxon";
 
 export default function handleRequest(
   request: Request,
