@@ -1,3 +1,4 @@
+import { Box } from "@mui/material";
 import React from "react";
 
 export interface AdminHeaderActionsProps {
@@ -7,5 +8,9 @@ export interface AdminHeaderActionsProps {
 export default function AdminHeaderActions({
   children,
 }: AdminHeaderActionsProps) {
-  return <div className="ml-4 mt-2 flex-shrink-0">{children}</div>;
+  return (
+    <Box ml={{ xs: 0, sm: 4 }} mt={2} flexShrink={0}>
+      {children}
+    </Box>
+  );
 }

@@ -1,3 +1,4 @@
+import { Typography } from "@mui/material";
 import React from "react";
 
 export interface AdminHeaderTitleProps {
@@ -7,9 +8,7 @@ export interface AdminHeaderTitleProps {
 export default function AdminHeaderTitle({ title }: AdminHeaderTitleProps) {
   return (
     <div className="min-w-0 flex-1">
-      <h1 className="text-xl font-medium leading-6 text-gray-900 sm:truncate">
-        {title}
-      </h1>
+      <Typography variant="h5">{title}</Typography>
     </div>
   );
 }
