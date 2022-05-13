@@ -1,34 +1,31 @@
-import {
-  ActionFunction,
-  Form,
-  LoaderFunction,
-  useLoaderData,
-  useTransition,
-} from "remix";
+import type { ActionFunction, LoaderFunction } from "remix";
+import { useSubmit } from "remix";
+import { Form, useLoaderData, useTransition } from "remix";
 import { adminOnly, adminOnlyAction } from "~/auth/loader";
-import React, {
-  Fragment,
-  MouseEventHandler,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
-import { Dialog, Switch, Transition } from "@headlessui/react";
-import { classNames } from "~/lib";
-import CardWithDefaultPadding from "~/components/card_with_default_padding";
+import React, { useMemo, useRef, useState } from "react";
 import {
   getNotJoinedSignUps,
   inviteMember,
   joinMember,
 } from "~/model/signup.server";
 import { useUser } from "~/utils";
-import { ClipboardCopyIcon, ExclamationIcon } from "@heroicons/react/outline";
 import CopyToClipboard from "react-copy-to-clipboard";
 import invariant from "tiny-invariant";
 import AdminHeader from "~/components/admin/header";
 import AdminHeaderTitle from "~/components/admin/header/title";
 import AdminHeaderActions from "~/components/admin/header/actions";
 import AdminHeaderCircleSwitch from "~/components/admin/header/circle_switch";
+import { Stack } from "@mui/material";
+import { Card } from "@mui/material";
+import { CardHeader } from "@mui/material";
+import { CardContent } from "@mui/material";
+import { Typography } from "@mui/material";
+import { List } from "@mui/material";
+import { ListItem } from "@mui/material";
+import { ListItemText } from "@mui/material";
+import { Button } from "@mui/material";
+import { ContentCopy } from "@mui/icons-material";
+import { useConfirm } from "material-ui-confirm";
 
 type LoaderData = Awaited<ReturnType<typeof getLoaderData>>;
 type SignUp = Awaited<ReturnType<typeof getNotJoinedSignUps>>[0];
@@ -83,7 +80,7 @@ export default function AdminSignUps() {
           (user.circleKey && user.circleKey === signUp.circleKey)
       ),
     ],
-    [signUps, showOnlyMyCircle]
+    [signUps, showOnlyMyCircle, user.circleKey]
   );
   return (
     <div>
@@ -96,200 +93,97 @@ export default function AdminSignUps() {
           />
         </AdminHeaderActions>
       </AdminHeader>
-      <div className="grid grid-cols-1 gap-4 px-2 py-4 sm:gap-8 sm:px-4 md:px-6">
-        <CardWithDefaultPadding
-          header={
-            <>
-              <h3 className="text-lg font-medium leading-6 text-gray-900">
-                勧誘待ち
-              </h3>
-              <p className="mt-2 max-w-4xl text-sm text-gray-500">
-                サークルの「サークルメニュー」→「メンバー勧誘」→「勧誘」の画面でトレーナーIDを貼り付けて勧誘を行ってください。
-              </p>
-            </>
-          }
-        >
+      <Stack spacing={{ xs: 4, sm: 8 }} px={{ xs: 2, sm: 4, md: 6 }} py={4}>
+        <Card>
+          <CardHeader
+            title="勧誘待ち"
+            subheader="サークルの「サークルメニュー」→「メンバー勧誘」→「勧誘」の画面でトレーナーIDを貼り付けて勧誘を行ってください。"
+          />
           {notInvitedSignUps.length ? (
-            <SignUpList
-              children={notInvitedSignUps.map((signUp) => (
+            <List>
+              {notInvitedSignUps.map((signUp) => (
                 <NotInvitedListItem key={signUp.id} signUp={signUp} />
               ))}
-            />
+            </List>
           ) : (
-            <p>勧誘待ちはありません</p>
+            <CardContent>
+              <Typography variant="body1">勧誘待ちはありません</Typography>
+            </CardContent>
           )}
-        </CardWithDefaultPadding>
-        <CardWithDefaultPadding
-          header={
-            <>
-              <h3 className="text-lg font-medium leading-6 text-gray-900">
-                加入待ち
-              </h3>
-            </>
-          }
-        >
+        </Card>
+        <Card>
+          <CardHeader title="加入待ち" />
           {invitedSignUps.length ? (
-            <SignUpList
-              children={invitedSignUps.map((signUp) => (
+            <List>
+              {invitedSignUps.map((signUp) => (
                 <InvitedListItem key={signUp.id} signUp={signUp} />
               ))}
-            />
+            </List>
           ) : (
-            <p>加入待ちはありません</p>
+            <CardContent>
+              <Typography variant="body1">加入待ちはありません</Typography>
+            </CardContent>
           )}
-        </CardWithDefaultPadding>
-      </div>
+        </Card>
+      </Stack>
     </div>
   );
 }
 
-const SignUpList: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  return (
-    <div className="flow-root">
-      <ul role="list" className="-my-5 divide-y divide-gray-200">
-        {children}
-      </ul>
-    </div>
-  );
-};
-
 const InvitedListItem: React.FC<{ signUp: SignUp }> = ({ signUp }) => {
-  const [open, setOpen] = useState(false);
   const transition = useTransition();
-  const cancelButtonRef = useRef(null);
+  const formRef = useRef<HTMLFormElement>(null);
+  const submit = useSubmit();
+  const confirm = useConfirm();
   return (
-    <li className="py-4">
-      <div className="flex items-center space-x-4">
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-medium text-gray-900">
-            {signUp.member.name}
-          </p>
-          <p className="truncate text-sm text-gray-500">
-            {signUp.circle?.name ?? "未選択"}
-          </p>
-        </div>
-        <div className="flex flex-row items-center space-x-2">
-          <Form method="post">
-            <input name="memberId" type="hidden" value={signUp.member.id} />
-            <button
+    <ListItem>
+      <ListItemText
+        primary={signUp.member.name}
+        secondary={signUp.circle?.name ?? "未選択"}
+      />
+      <li className="py-4">
+        <div className="flex items-center space-x-4">
+          <div className="flex flex-row items-center space-x-2">
+            <Button
               disabled={transition.state == "submitting"}
-              className="inline-flex items-center rounded border border-transparent bg-indigo-600 px-2.5 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-              onClick={() => setOpen(true)}
+              variant="contained"
+              size="small"
+              onClick={() =>
+                confirm({
+                  title: "確認",
+                  description:
+                    "加入済みにしてメンバーのロールを更新します、実行するとリストから消えますので必ず加入が済んだことを確認してください。",
+                }).then(() => {
+                  const form = formRef.current;
+                  if (form) {
+                    submit(form);
+                  }
+                })
+              }
             >
               加入済みにする
-            </button>
-          </Form>
+            </Button>
+            <Form method="post" ref={formRef}>
+              <input name="memberId" type="hidden" value={signUp.member.id} />
+              <input name="joined" type="hidden" value="joined" />
+            </Form>
+          </div>
         </div>
-        <Transition.Root show={open} as={Fragment}>
-          <Dialog
-            as="div"
-            className="fixed inset-0 z-10 overflow-y-auto"
-            initialFocus={cancelButtonRef}
-            onClose={() => setOpen(false)}
-          >
-            <div className="flex min-h-screen items-end justify-center px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-              <Transition.Child
-                as={Fragment}
-                enter="ease-out duration-300"
-                enterFrom="opacity-0"
-                enterTo="opacity-100"
-                leave="ease-in duration-200"
-                leaveFrom="opacity-100"
-                leaveTo="opacity-0"
-              >
-                <Dialog.Overlay className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
-              </Transition.Child>
-
-              {/* This element is to trick the browser into centering the modal contents. */}
-              <span
-                className="hidden sm:inline-block sm:h-screen sm:align-middle"
-                aria-hidden="true"
-              >
-                &#8203;
-              </span>
-              <Transition.Child
-                as={Fragment}
-                enter="ease-out duration-300"
-                enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                enterTo="opacity-100 translate-y-0 sm:scale-100"
-                leave="ease-in duration-200"
-                leaveFrom="opacity-100 translate-y-0 sm:scale-100"
-                leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-              >
-                <div className="relative inline-block transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left align-bottom shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6 sm:align-middle">
-                  <div className="sm:flex sm:items-start">
-                    <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
-                      <ExclamationIcon
-                        className="h-6 w-6 text-red-600"
-                        aria-hidden="true"
-                      />
-                    </div>
-                    <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                      <Dialog.Title
-                        as="h3"
-                        className="text-lg font-medium leading-6 text-gray-900"
-                      >
-                        加入済みにします
-                      </Dialog.Title>
-                      <div className="mt-2 text-sm text-gray-500">
-                        <p>
-                          加入済みにしてメンバーのロールを更新します、実行するとリストから消えますので必ず加入が済んだことを確認してください。
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
-                    <Form method="post">
-                      <input
-                        name="memberId"
-                        type="hidden"
-                        value={signUp.member.id}
-                      />
-                      <input name="joined" type="hidden" value="joined" />
-                      <button
-                        type="submit"
-                        className="inline-flex w-full justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm"
-                        onClick={() => setOpen(false)}
-                      >
-                        加入済みにする
-                      </button>
-                    </Form>
-                    <button
-                      type="button"
-                      className="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm"
-                      onClick={() => setOpen(false)}
-                      ref={cancelButtonRef}
-                    >
-                      キャンセル
-                    </button>
-                  </div>
-                </div>
-              </Transition.Child>
-            </div>
-          </Dialog>
-        </Transition.Root>
-      </div>
-    </li>
+      </li>
+    </ListItem>
   );
 };
 
 const NotInvitedListItem: React.FC<{ signUp: SignUp }> = ({ signUp }) => {
-  const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const transition = useTransition();
-  const cancelButtonRef = useRef(null);
+  const formRef = useRef<HTMLFormElement>(null);
+  const submit = useSubmit();
+  const confirm = useConfirm();
   return (
-    <li className="py-4">
-      <div className="flex items-center space-x-4">
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-medium text-gray-900">
-            {signUp.member.name}
-          </p>
-          <p className="truncate text-sm text-gray-500">
-            {signUp.circle?.name ?? "未選択"}
-          </p>
-        </div>
-        <div className="flex flex-row items-center space-x-2">
+    <ListItem
+      secondaryAction={
+        <Stack direction="row" spacing={2} alignItems="center">
           {signUp.member.trainerId ? (
             <CopyToClipboard
               text={signUp.member.trainerId}
@@ -299,223 +193,53 @@ const NotInvitedListItem: React.FC<{ signUp: SignUp }> = ({ signUp }) => {
               }}
             >
               {copied ? (
-                <p className="text-sm">コピーしました</p>
+                <Typography variant="body2" py={4}>
+                  コピーしました
+                </Typography>
               ) : (
-                <button
+                <Button
+                  variant="text"
                   type="button"
-                  className="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-2.5 py-1.5 text-xs font-medium leading-4 text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                  size="small"
+                  startIcon={<ContentCopy />}
                 >
-                  <ClipboardCopyIcon
-                    className="-ml-0.5 mr-2 h-3.5 w-3.5"
-                    aria-hidden="true"
-                  />
                   トレーナーIDをコピー
-                </button>
+                </Button>
               )}
             </CopyToClipboard>
           ) : (
-            <p className="text-sm text-gray-600">トレーナーID未入力</p>
+            <Typography color="text.disabled">トレーナーID未入力</Typography>
           )}
-          <Form method="post">
-            <input name="memberId" type="hidden" value={signUp.member.id} />
-            <button
-              disabled={transition.state == "submitting"}
-              className="inline-flex items-center rounded border border-transparent bg-indigo-600 px-2.5 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-              onClick={() => setOpen(true)}
-            >
-              勧誘済みにする
-            </button>
-          </Form>
-        </div>
-        <Transition.Root show={open} as={Fragment}>
-          <Dialog
-            as="div"
-            className="fixed inset-0 z-10 overflow-y-auto"
-            initialFocus={cancelButtonRef}
-            onClose={() => setOpen(false)}
+          <Button
+            variant="contained"
+            disabled={transition.state == "submitting"}
+            size="small"
+            onClick={() =>
+              confirm({
+                title: "確認",
+                description:
+                  "メンバーに勧誘した旨通知されるので、必ず勧誘を行ったことを確認してください。",
+              }).then(() => {
+                const form = formRef.current;
+                if (form) {
+                  submit(form);
+                }
+              })
+            }
           >
-            <div className="flex min-h-screen items-end justify-center px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-              <Transition.Child
-                as={Fragment}
-                enter="ease-out duration-300"
-                enterFrom="opacity-0"
-                enterTo="opacity-100"
-                leave="ease-in duration-200"
-                leaveFrom="opacity-100"
-                leaveTo="opacity-0"
-              >
-                <Dialog.Overlay className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
-              </Transition.Child>
-
-              {/* This element is to trick the browser into centering the modal contents. */}
-              <span
-                className="hidden sm:inline-block sm:h-screen sm:align-middle"
-                aria-hidden="true"
-              >
-                &#8203;
-              </span>
-              <Transition.Child
-                as={Fragment}
-                enter="ease-out duration-300"
-                enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                enterTo="opacity-100 translate-y-0 sm:scale-100"
-                leave="ease-in duration-200"
-                leaveFrom="opacity-100 translate-y-0 sm:scale-100"
-                leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-              >
-                <div className="relative inline-block transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left align-bottom shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6 sm:align-middle">
-                  <div className="sm:flex sm:items-start">
-                    <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
-                      <ExclamationIcon
-                        className="h-6 w-6 text-red-600"
-                        aria-hidden="true"
-                      />
-                    </div>
-                    <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                      <Dialog.Title
-                        as="h3"
-                        className="text-lg font-medium leading-6 text-gray-900"
-                      >
-                        勧誘済みにします
-                      </Dialog.Title>
-                      <div className="mt-2 text-sm text-gray-500">
-                        <p>
-                          メンバーに勧誘した旨通知されるので、必ず勧誘を行ったことを確認してください。
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
-                    <Form method="post">
-                      <input
-                        name="memberId"
-                        type="hidden"
-                        value={signUp.member.id}
-                      />
-                      <input name="invited" type="hidden" value="invited" />
-                      <button
-                        type="submit"
-                        className="inline-flex w-full justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm"
-                        onClick={() => setOpen(false)}
-                      >
-                        勧誘済みにする
-                      </button>
-                    </Form>
-                    <button
-                      type="button"
-                      className="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm"
-                      onClick={() => setOpen(false)}
-                      ref={cancelButtonRef}
-                    >
-                      キャンセル
-                    </button>
-                  </div>
-                </div>
-              </Transition.Child>
-            </div>
-          </Dialog>
-        </Transition.Root>
-      </div>
-    </li>
+            勧誘済みにする
+          </Button>
+          <Form method="post" ref={formRef}>
+            <input name="memberId" type="hidden" value={signUp.member.id} />
+            <input name="invited" type="hidden" value="invited" />
+          </Form>
+        </Stack>
+      }
+    >
+      <ListItemText
+        primary={signUp.member.name}
+        secondary={signUp.circle?.name ?? "未選択"}
+      />
+    </ListItem>
   );
 };
-
-interface AlertDialogProps {
-  open: boolean;
-  title: React.ReactNode;
-  body: React.ReactNode;
-  positiveButton: React.ReactNode;
-  onClickPositiveButton: MouseEventHandler<HTMLButtonElement>;
-  onClickNegativeButton: MouseEventHandler<HTMLButtonElement>;
-  onClose: (value: boolean) => void;
-}
-
-export function AlertDialog({
-  open,
-  title,
-  body,
-  positiveButton,
-  onClickPositiveButton,
-  onClickNegativeButton,
-  onClose,
-}: AlertDialogProps) {
-  const cancelButtonRef = useRef(null);
-  return (
-    <Transition.Root show={open} as={Fragment}>
-      <Dialog
-        as="div"
-        className="fixed inset-0 z-10 overflow-y-auto"
-        initialFocus={cancelButtonRef}
-        onClose={onClose}
-      >
-        <div className="flex min-h-screen items-end justify-center px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-          <Transition.Child
-            as={Fragment}
-            enter="ease-out duration-300"
-            enterFrom="opacity-0"
-            enterTo="opacity-100"
-            leave="ease-in duration-200"
-            leaveFrom="opacity-100"
-            leaveTo="opacity-0"
-          >
-            <Dialog.Overlay className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
-          </Transition.Child>
-
-          {/* This element is to trick the browser into centering the modal contents. */}
-          <span
-            className="hidden sm:inline-block sm:h-screen sm:align-middle"
-            aria-hidden="true"
-          >
-            &#8203;
-          </span>
-          <Transition.Child
-            as={Fragment}
-            enter="ease-out duration-300"
-            enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-            enterTo="opacity-100 translate-y-0 sm:scale-100"
-            leave="ease-in duration-200"
-            leaveFrom="opacity-100 translate-y-0 sm:scale-100"
-            leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-          >
-            <div className="relative inline-block transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left align-bottom shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6 sm:align-middle">
-              <div className="sm:flex sm:items-start">
-                <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
-                  <ExclamationIcon
-                    className="h-6 w-6 text-red-600"
-                    aria-hidden="true"
-                  />
-                </div>
-                <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                  <Dialog.Title
-                    as="h3"
-                    className="text-lg font-medium leading-6 text-gray-900"
-                  >
-                    {title}
-                  </Dialog.Title>
-                  <div className="mt-2 text-sm text-gray-500">{body}</div>
-                </div>
-              </div>
-              <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
-                <button
-                  type="button"
-                  className="inline-flex w-full justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm"
-                  onClick={onClickPositiveButton}
-                >
-                  {positiveButton}
-                </button>
-                <button
-                  type="button"
-                  className="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm"
-                  onClick={onClickNegativeButton}
-                  ref={cancelButtonRef}
-                >
-                  キャンセル
-                </button>
-              </div>
-            </div>
-          </Transition.Child>
-        </div>
-      </Dialog>
-    </Transition.Root>
-  );
-}
