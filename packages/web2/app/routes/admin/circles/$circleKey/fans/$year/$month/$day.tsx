@@ -127,20 +127,23 @@ const getActionData = async ({
           date,
           uploaderId: user.id,
         });
-        return {};
       }
+      break;
     }
     case ActionMode.enum.deleteScreenShot: {
       const id = z.string().parse(formData.id);
       console.log("Deleting screenShot %s", id);
       await deleteScreenShot({ id });
+      break;
     }
     case ActionMode.enum.parseImages: {
       await parseScreenShots({ circleKey, date });
+      break;
     }
     case ActionMode.enum.setMemberId: {
       const { memberId, memberFanCountId } = setMemberIdSchema.parse(formData);
       await setMemberIdToMemberFanCount({ memberId, memberFanCountId });
+      break;
     }
   }
   return null;
