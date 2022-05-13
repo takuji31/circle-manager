@@ -14,6 +14,7 @@ import { useMediaQuery } from "@mui/material";
 import "~/lib/luxon";
 import { RecoilRoot, useRecoilState, useRecoilValue } from "recoil";
 import { themeModeState } from "./recoil/theme";
+import { ConfirmProvider } from "material-ui-confirm";
 
 interface ClientCacheProviderProps {
   children: React.ReactNode;
@@ -56,9 +57,16 @@ hydrate(
   <RecoilRoot>
     <ClientCacheProvider>
       <ClientThemeProvider>
-        {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
-        <CssBaseline />
-        <RemixBrowser />
+        <ConfirmProvider
+          defaultOptions={{
+            confirmationText: "OK",
+            cancellationText: "キャンセル",
+          }}
+        >
+          {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+          <CssBaseline />
+          <RemixBrowser />
+        </ConfirmProvider>
       </ClientThemeProvider>
     </ClientCacheProvider>
   </RecoilRoot>,
