@@ -158,9 +158,9 @@ function createCloudStoragePath(
   const prefix =
     !process.env.FIREBASE_STORAGE_EMULATOR_HOST &&
     process.env.NODE_ENV == "development"
-      ? "development"
+      ? "development/"
       : "";
-  return `${prefix}/screenShots/${circleKey}/${date.year()}/${date.monthValue()}/${date.dayOfMonth()}/${screenShotId}.png`;
+  return `${prefix}screenShots/${circleKey}/${date.year()}/${date.monthValue()}/${date.dayOfMonth()}/${screenShotId}.png`;
 }
 
 export async function parseScreenShots({
@@ -242,7 +242,7 @@ const parseScreenShot = async ({
 
   // TODO: ユニット数節約のために一度パースしたスクリーンショットは再度Cloud Vision APIに投げない
   const [result] = await client.documentTextDetection(
-    `gs://${file.bucket.name}${file.name}`
+    `gs://${file.bucket.name}/${file.name}`
   );
   const annotations = result.fullTextAnnotation;
 
