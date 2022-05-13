@@ -249,7 +249,7 @@ const parseScreenShot = async ({
   const page = annotations?.pages?.at(0);
 
   if (!page || !page.blocks) {
-    throw new Error(`Page not found for `);
+    throw new Error(`Page not found ${result.error?.message}`);
   }
 
   const members: Array<Member> = [];
