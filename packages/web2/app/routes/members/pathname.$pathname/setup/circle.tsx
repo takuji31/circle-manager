@@ -13,6 +13,7 @@ import { RadioGroup } from "@headlessui/react";
 import { Circles } from "@circle-manager/shared/model";
 import { sendAdminNotificationMessage } from "@circle-manager/shared/discord";
 import { updateMemberSignUpCircle } from "~/model/signup.server";
+import { Grid, Button } from "@mui/material";
 
 type ActionData = Awaited<ReturnType<typeof getActionData>>;
 
@@ -134,22 +135,29 @@ export default function MemberPathnameSetupRoot() {
           </p>
           <p className="text-base leading-6 text-gray-500"></p>
         </div>
-        <div className="mt-4">
-          <div className="flex flex-col-reverse justify-center gap-2 sm:grid-cols-2 sm:flex-row sm:justify-end sm:gap-4">
-            <Link
+        <Grid
+          container
+          direction="row-reverse"
+          justifyItems={{ xs: "center", sm: "end" }}
+          spacing={2}
+        >
+          <Grid item xs={12} sm={6}>
+            <Button variant="contained" type="submit" className="w-full">
+              次へ
+            </Button>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <Button
+              component={Link}
               to={`${basePath}/trainer_id`}
-              className="inline-flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:w-1/2"
+              variant="contained"
+              type="submit"
+              className="w-full"
             >
               戻る
-            </Link>
-            <button
-              type="submit"
-              className="inline-flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:w-1/2"
-            >
-              申請する
-            </button>
-          </div>
-        </div>
+            </Button>
+          </Grid>
+        </Grid>
       </Form>
     </div>
   );

@@ -1,3 +1,6 @@
+import { Divider } from "@mui/material";
+import { Stack } from "@mui/material";
+import { Box } from "@mui/material";
 import React from "react";
 
 export interface AdminHeaderProps {
@@ -6,8 +9,17 @@ export interface AdminHeaderProps {
 
 export default function AdminHeader({ children }: AdminHeaderProps) {
   return (
-    <div className="border-b border-gray-200 px-4 py-4 sm:flex sm:items-center sm:justify-between sm:px-6 lg:px-8">
-      {children}
-    </div>
+    <Stack>
+      <Box
+        px={4}
+        py={2}
+        display={{ xs: "block", sm: "flex" }}
+        alignItems="center"
+        justifyContent={{ xs: "start", sm: "space-between" }}
+      >
+        {children}
+      </Box>
+      <Divider />
+    </Stack>
   );
 }

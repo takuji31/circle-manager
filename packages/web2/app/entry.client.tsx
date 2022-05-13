@@ -8,8 +8,13 @@ import CssBaseline from "@mui/material/CssBaseline";
 
 import ClientStyleContext from "~/components/ClientStyleContext";
 import createEmotionCache from "~/lib/createEmotionCache";
-import theme from "~/lib/theme";
 import "flowbite";
+import { createTheme } from "./mui/theme";
+import { useMediaQuery } from "@mui/material";
+import "~/lib/luxon";
+import { RecoilRoot, useRecoilState, useRecoilValue } from "recoil";
+import { themeModeState } from "./recoil/theme";
+import { ConfirmProvider } from "material-ui-confirm";
 
 interface ClientCacheProviderProps {
   children: React.ReactNode;
@@ -28,13 +33,42 @@ function ClientCacheProvider({ children }: ClientCacheProviderProps) {
   );
 }
 
+function ClientThemeProvider({ children }: { children: React.ReactNode }) {
+  const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
+  const themeMode = useRecoilValue(themeModeState);
+
+  console.log(themeMode);
+  const theme = React.useMemo(
+    () =>
+      createTheme({
+        mode:
+          (themeMode == "system" && prefersDarkMode) || themeMode == "dark"
+            ? "dark"
+            : "light",
+        direction: "ltr",
+        responsiveFontSizes: true,
+      }),
+    [prefersDarkMode, themeMode]
+  );
+  return <ThemeProvider theme={theme}>{children}</ThemeProvider>;
+}
+
 hydrate(
-  <ClientCacheProvider>
-    <ThemeProvider theme={theme}>
-      {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
-      <CssBaseline />
-      <RemixBrowser />
-    </ThemeProvider>
-  </ClientCacheProvider>,
+  <RecoilRoot>
+    <ClientCacheProvider>
+      <ClientThemeProvider>
+        <ConfirmProvider
+          defaultOptions={{
+            confirmationText: "OK",
+            cancellationText: "キャンセル",
+          }}
+        >
+          {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+          <CssBaseline />
+          <RemixBrowser />
+        </ConfirmProvider>
+      </ClientThemeProvider>
+    </ClientCacheProvider>
+  </RecoilRoot>,
   document
 );

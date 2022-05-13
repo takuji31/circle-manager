@@ -1,15 +1,16 @@
-import * as React from "react";
 import { renderToString } from "react-dom/server";
 import { RemixServer } from "remix";
 import type { EntryContext } from "remix";
 
 import createEmotionCache from "~/lib/createEmotionCache";
-import theme from "~/lib/theme";
 
 import CssBaseline from "@mui/material/CssBaseline";
 import { ThemeProvider } from "@mui/material/styles";
 import { CacheProvider } from "@emotion/react";
 import createEmotionServer from "@emotion/server/create-instance";
+import { createTheme } from "./mui/theme";
+import "~/lib/luxon";
+import { RecoilRoot } from "recoil";
 
 export default function handleRequest(
   request: Request,
@@ -19,15 +20,22 @@ export default function handleRequest(
 ) {
   const cache = createEmotionCache();
   const { extractCriticalToChunks } = createEmotionServer(cache);
+  const theme = createTheme({
+    mode: "light",
+    direction: "ltr",
+    responsiveFontSizes: true,
+  });
 
   const MuiRemixServer = () => (
-    <CacheProvider value={cache}>
-      <ThemeProvider theme={theme}>
-        {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
-        <CssBaseline />
-        <RemixServer context={remixContext} url={request.url} />
-      </ThemeProvider>
-    </CacheProvider>
+    <RecoilRoot>
+      <CacheProvider value={cache}>
+        <ThemeProvider theme={theme}>
+          {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+          <CssBaseline />
+          <RemixServer context={remixContext} url={request.url} />
+        </ThemeProvider>
+      </CacheProvider>
+    </RecoilRoot>
   );
 
   // Render the component to a string.

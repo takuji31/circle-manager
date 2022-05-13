@@ -20,9 +20,10 @@ export const ActiveCircleKey = z.enum([
   _CircleKey.Shin,
   _CircleKey.Ha,
 ]);
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export type ActiveCircleKey = z.infer<typeof ActiveCircleKey>;
 
 export const TrainerName = z.preprocess(
   (name) => (name as string).trim(),
-  z.string()
+  z.string().min(1)
 );

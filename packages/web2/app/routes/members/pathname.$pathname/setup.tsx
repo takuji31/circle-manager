@@ -1,29 +1,14 @@
-import { Link, Outlet, useMatches } from "@remix-run/react";
-import { CheckIcon, ExclamationCircleIcon } from "@heroicons/react/solid";
-import { MetaFunction } from "@remix-run/node";
-import {
-  ActionFunction,
-  Form,
-  LoaderFunction,
-  redirect,
-  useActionData,
-  useLoaderData,
-  useLocation,
-} from "remix";
+import { Link, Outlet } from "@remix-run/react";
+import { CheckIcon } from "@heroicons/react/solid";
+import type { MetaFunction } from "@remix-run/node";
+import type { LoaderFunction } from "remix";
+import { useLoaderData, useLocation } from "remix";
 import { prisma } from "~/db.server";
-import {
-  ActiveCircleKey,
-  PathnameParams,
-  TrainerId,
-  TrainerName,
-} from "~/schema/member";
-import { classNames } from "~/lib";
-import { z } from "zod";
-import { Params } from "react-router";
+import { PathnameParams } from "~/schema/member";
 import { notFound } from "~/response.server";
-import { MemberWithSignUp, updateMemberName } from "~/model/member.server";
 import { useMatchesData } from "~/utils";
 import { useMemo } from "react";
+import { Typography } from "@mui/material";
 
 const StepId = {
   name: "name",
@@ -31,6 +16,7 @@ const StepId = {
   circle: "circle",
   completed: "completed",
 } as const;
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 type StepId = typeof StepId[keyof typeof StepId];
 
 const steps = [
@@ -117,14 +103,14 @@ export default function MemberPathnameSetupRoot() {
                 {stepIdx < currentStepIdx ? (
                   <Link to={to} className="group flex w-full items-center">
                     <span className="flex items-center px-6 py-4 text-sm font-medium">
-                      <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-indigo-600 group-hover:bg-indigo-800">
+                      <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-indigo-600 group-hover:bg-indigo-800 dark:bg-indigo-500 dark:group-hover:bg-indigo-600">
                         <CheckIcon
                           className="h-6 w-6 text-white"
                           aria-hidden="true"
                         />
                       </span>
-                      <span className="ml-4 text-sm font-medium text-gray-900">
-                        {step.name}
+                      <span className="ml-4">
+                        <Typography variant="subtitle2">{step.name}</Typography>
                       </span>
                     </span>
                   </Link>
@@ -134,21 +120,29 @@ export default function MemberPathnameSetupRoot() {
                     aria-current="step"
                   >
                     <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border-2 border-indigo-600">
-                      <span className="text-indigo-600">{stepIdx + 1}</span>
+                      <Typography variant="subtitle2" color="primary">
+                        {stepIdx + 1}
+                      </Typography>
                     </span>
-                    <span className="ml-4 text-sm font-medium text-indigo-600">
+                    <Typography variant="subtitle2" color="primary" ml={2}>
                       {step.name}
-                    </span>
+                    </Typography>
                   </div>
                 ) : (
                   <div className="group flex items-center">
                     <span className="flex items-center px-6 py-4 text-sm font-medium">
                       <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border-2 border-gray-300">
-                        <span className="text-gray-500 ">{stepIdx + 1}</span>
+                        <Typography variant="subtitle2" color="text.disabled">
+                          {stepIdx + 1}
+                        </Typography>
                       </span>
-                      <span className="ml-4 text-sm font-medium text-gray-500 ">
+                      <Typography
+                        variant="subtitle2"
+                        color="text.disabled"
+                        ml={2}
+                      >
                         {step.name}
-                      </span>
+                      </Typography>
                     </span>
                   </div>
                 )}

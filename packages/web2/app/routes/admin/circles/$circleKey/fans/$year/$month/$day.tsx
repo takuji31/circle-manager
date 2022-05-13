@@ -34,13 +34,25 @@ import {
 } from "~/lib/form.server";
 import type { DataFunctionArgsWithUser } from "~/auth/loader";
 import { adminOnly, adminOnlyAction } from "~/auth/loader";
-import Card from "~/components/card";
-import CardHeader from "~/components/card_header";
 import { classNames } from "~/lib";
 
 import { CheckIcon, SelectorIcon } from "@heroicons/react/solid";
 import { Listbox, Transition } from "@headlessui/react";
 import { getCircleMembers } from "~/model/member.server";
+import {
+  Autocomplete,
+  Box,
+  FormControl,
+  InputLabel,
+  Select,
+  Tabs,
+  TextField,
+} from "@mui/material";
+import { Tab } from "@mui/material";
+import { Card } from "@mui/material";
+import { CardHeader } from "@mui/material";
+import { Grid } from "@mui/material";
+import { Button } from "@mui/material";
 
 const ActionMode = z.enum([
   "uploadScreenShot",
@@ -127,20 +139,23 @@ const getActionData = async ({
           date,
           uploaderId: user.id,
         });
-        return {};
       }
+      break;
     }
     case ActionMode.enum.deleteScreenShot: {
       const id = z.string().parse(formData.id);
       console.log("Deleting screenShot %s", id);
       await deleteScreenShot({ id });
+      break;
     }
     case ActionMode.enum.parseImages: {
       await parseScreenShots({ circleKey, date });
+      break;
     }
     case ActionMode.enum.setMemberId: {
       const { memberId, memberFanCountId } = setMemberIdSchema.parse(formData);
       await setMemberIdToMemberFanCount({ memberId, memberFanCountId });
+      break;
     }
   }
   return null;
@@ -194,71 +209,35 @@ export default function AdminCircleFanCounts() {
         />
       </AdminHeader>
       <div>
-        <div className="sm:hidden">
-          <label htmlFor="tabs" className="sr-only">
-            Select a tab
-          </label>
-          {/* Use an "onChange" listener to redirect the user to the selected tab URL. */}
-          <select
-            id="tabs"
-            name="tabs"
-            className="block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
-            defaultValue={TabId.enum.ScreenShot}
-          >
-            {tabs.map((tab) => (
-              <option key={tab.name}>{tab.name}</option>
-            ))}
-          </select>
-        </div>
-        <div className="hidden sm:block">
-          <div className="border-b border-gray-200 px-2 sm:px-4 lg:px-6">
-            <nav className="-mb-px flex space-x-8" aria-label="Tabs">
-              {tabs.map((tab) => (
-                <button
-                  type="button"
-                  key={tab.name}
-                  onClick={() => setTabId(tab.id)}
-                  className={classNames(
-                    tab.id == tabId
-                      ? "border-indigo-500 text-indigo-600"
-                      : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700",
-                    "whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium"
-                  )}
-                  aria-current={tab.id == tabId ? "page" : undefined}
-                >
-                  {tab.name}
-                </button>
-              ))}
-            </nav>
-          </div>
-        </div>
+        <Tabs
+          variant="fullWidth"
+          value={tabId}
+          onChange={(_, value) => setTabId(value)}
+        >
+          {tabs.map((tab) => (
+            <Tab key={tab.name} value={tab.id} label={tab.name} />
+          ))}
+        </Tabs>
       </div>
       <AdminBody>
         <Card
           className={classNames(tabId != TabId.enum.ScreenShot ? "hidden" : "")}
         >
-          <CardHeader>
-            <Form id="parseImagesForm" method="post">
-              <input
-                type="hidden"
-                name="mode"
-                value={ActionMode.enum.parseImages}
-              />
-            </Form>
-
-            <div className="-ml-4 -mt-2 flex flex-wrap items-center justify-between sm:flex-nowrap">
-              <div className="ml-4 mt-2">
-                <h3 className="text-lg font-medium leading-6 text-gray-900">
-                  アップロード済みのスクリーンショット
-                </h3>
-                <p className="mt-2 max-w-4xl text-sm text-gray-500">
-                  10枚までアップロードできます。
-                </p>
-              </div>
-              <div className="ml-4 mt-2 flex-shrink-0">
-                <button
+          <CardHeader
+            title="アップロード済みのスクリーンショット"
+            subheader="10枚までアップロードできます。"
+            action={
+              <>
+                <Form id="parseImagesForm" method="post">
+                  <input
+                    type="hidden"
+                    name="mode"
+                    value={ActionMode.enum.parseImages}
+                  />
+                </Form>
+                <Button
+                  variant="contained"
                   type="submit"
-                  className="relative inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                   form="parseImagesForm"
                   disabled={
                     screenShots.length == 0 || transition.state == "submitting"
@@ -268,51 +247,67 @@ export default function AdminCircleFanCounts() {
                   screenShots.filter((ss) => !ss.fanCounts.length).length == 0
                     ? "再度解析する(非推奨)"
                     : "解析する"}
-                </button>
-              </div>
-            </div>
-          </CardHeader>
+                </Button>
+              </>
+            }
+          />
           {screenShots.length ? (
-            <div className="grid grid-cols-1 justify-items-stretch md:grid-cols-2">
+            <Grid container>
               {screenShots
                 .filter((ss) => !!ss.url)
                 .map((ss) => {
                   return (
                     <>
-                      <div className="relative p-2">
-                        <img src={ss.url!} alt="" className="h-full w-full" />
-                        <Form method="post">
-                          <input
-                            type="hidden"
-                            name="mode"
-                            value={ActionMode.enum.deleteScreenShot}
-                          />
+                      <Grid item xs={12} md={6} p={2}>
+                        <Box position="relative">
+                          <img src={ss.url!} alt="" className="h-full w-full" />
+                          <Form method="post">
+                            <input
+                              type="hidden"
+                              name="mode"
+                              value={ActionMode.enum.deleteScreenShot}
+                            />
 
-                          <input type="hidden" name="id" value={ss.id} />
-                          <button type="submit">
-                            <XIcon className="absolute top-0 right-0 h-8 w-8 rounded-full bg-black text-white" />
-                          </button>
-                        </Form>
-                      </div>
-                      <div className="flex flex-col justify-end px-2 md:border-l">
-                        <div className="grid basis-full grid-flow-col grid-rows-3 md:basis-1/2">
+                            <input type="hidden" name="id" value={ss.id} />
+                            <button type="submit">
+                              <XIcon className="absolute top-0 right-0 h-8 w-8 rounded-full bg-black text-white" />
+                            </button>
+                          </Form>
+                        </Box>
+                      </Grid>
+                      <Grid
+                        item
+                        xs={12}
+                        md={6}
+                        p={2}
+                        container
+                        direction="column-reverse"
+                      >
+                        <Grid
+                          item
+                          xs={12}
+                          md={6}
+                          spacing={4}
+                          container
+                          direction="column"
+                        >
                           {ss.fanCounts.map((m) => {
                             return (
-                              <div key={m.id}>
+                              <Grid item xs={4} key={m.id}>
                                 <MemberSelectListbox
                                   members={members}
                                   memberFanCount={m}
                                 />
-                              </div>
+                              </Grid>
                             );
                           })}
                           <div></div>
-                        </div>
-                      </div>
+                        </Grid>
+                      </Grid>
                     </>
                   );
                 })}
-            </div>
+            </Grid>
           ) : (
             <div className="p-4">
               <p>アップロード済みのスクリーンショットはありません</p>
@@ -412,14 +407,19 @@ function MemberSelectListbox({
     }
   }, [members, memberFanCount, transition]);
   return (
-    <Listbox
-      value={memberFanCount.member?.id}
+    <Autocomplete
+      disablePortal
+      id={`combo-box-${memberFanCount.id}`}
       disabled={transition.state == "submitting"}
-      onChange={(value) => {
-        if (value) {
+      options={members}
+      getOptionLabel={(m) => m.name}
+      value={members.find((m) => m.id == memberFanCount.memberId) ?? null}
+      sx={{ width: 300 }}
+      onChange={(_, member) => {
+        if (member) {
           submit(
             {
-              memberId: value,
+              memberId: member.id,
               memberFanCountId: memberFanCount.id,
               mode: ActionMode.enum.setMemberId,
             },
@@ -427,74 +427,14 @@ function MemberSelectListbox({
           );
         }
       }}
-    >
-      {({ open }) => (
-        <>
-          <Listbox.Label className="block text-sm font-medium text-gray-700">
-            {memberFanCount.order + 1}人目 (ファン数：{memberFanCount.total})
-          </Listbox.Label>
-          <div className="relative mt-1">
-            <Listbox.Button className="relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm">
-              <span className="block truncate">
-                {currentMember?.name ?? "不明"}
-              </span>
-              <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                <SelectorIcon
-                  className="h-5 w-5 text-gray-400"
-                  aria-hidden="true"
-                />
-              </span>
-            </Listbox.Button>
-
-            <Transition
-              show={open}
-              as={Fragment}
-              leave="transition ease-in duration-100"
-              leaveFrom="opacity-100"
-              leaveTo="opacity-0"
-            >
-              <Listbox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-                {members.map((member) => (
-                  <Listbox.Option
-                    key={member.id}
-                    className={({ active }) =>
-                      classNames(
-                        active ? "bg-indigo-600 text-white" : "text-gray-900",
-                        "relative cursor-default select-none py-2 pl-3 pr-9"
-                      )
-                    }
-                    value={member.id}
-                  >
-                    {({ selected, active }) => (
-                      <>
-                        <span
-                          className={classNames(
-                            selected ? "font-semibold" : "font-normal",
-                            "block truncate"
-                          )}
-                        >
-                          {member.name}
-                        </span>
-
-                        {selected ? (
-                          <span
-                            className={classNames(
-                              active ? "text-white" : "text-indigo-600",
-                              "absolute inset-y-0 right-0 flex items-center pr-4"
-                            )}
-                          >
-                            <CheckIcon className="h-5 w-5" aria-hidden="true" />
-                          </span>
-                        ) : null}
-                      </>
-                    )}
-                  </Listbox.Option>
-                ))}
-              </Listbox.Options>
-            </Transition>
-          </div>
-        </>
+      renderInput={(params) => (
+        <TextField
+          {...params}
+          label={`${memberFanCount.order + 1}人目 (ファン数：${
+            memberFanCount.total
+          })`}
+        />
       )}
-    </Listbox>
+    />
   );
 }

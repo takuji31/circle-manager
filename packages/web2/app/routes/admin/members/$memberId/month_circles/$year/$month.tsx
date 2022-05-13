@@ -1,9 +1,7 @@
 import { monthCircleStateLabel } from "@circle-manager/shared/model";
-import { RadioGroup, Switch } from "@headlessui/react";
 import { MonthCircleState } from "@prisma/client";
-import { useState } from "react";
-import { Params } from "react-router";
-import { ActionFunction, LoaderFunction, useActionData } from "remix";
+import type { Params } from "react-router";
+import type { ActionFunction, LoaderFunction } from "remix";
 import { Form, useLoaderData, useSubmit, useTransition } from "remix";
 import { json } from "remix";
 import invariant from "tiny-invariant";
@@ -12,6 +10,14 @@ import { prisma } from "~/db.server";
 import { classNames } from "~/lib";
 import AdminHeader from "~/components/admin/header";
 import AdminHeaderTitle from "~/components/admin/header/title";
+import {
+  FormControlLabel,
+  Switch,
+  ToggleButton,
+  ToggleButtonGroup,
+  Typography,
+} from "@mui/material";
+import { AdminBody } from "~/components/admin/body";
 
 type LoaderData = Awaited<ReturnType<typeof getLoaderData>>;
 
@@ -61,8 +67,6 @@ export const loader: LoaderFunction = adminOnly(async ({ params }) => {
   );
 });
 
-type ActionData = {};
-
 export const action: ActionFunction = async ({ request, params }) => {
   const { memberId, year, month } = getParams(params);
   const formData = await request.formData();
@@ -103,7 +107,6 @@ export const action: ActionFunction = async ({ request, params }) => {
 export default function AdminMemberMonthCircle() {
   const { member, monthCircle, year, month } = useLoaderData() as LoaderData;
   const submit = useSubmit();
-  const transition = useTransition();
 
   const handleSubmit = ({
     state,
@@ -131,82 +134,38 @@ export default function AdminMemberMonthCircle() {
         <AdminHeaderTitle
           title={`${member.name}さんの${year}年${month}月サークル`}
         />
-      </AdminHeader>
-      <Form
-        method="post"
-        onChange={(event) => submit(event.currentTarget, { replace: true })}
-        className="mx-4 space-y-2 sm:mx-6 md:mx-8"
-      >
-        <p className="mt-1 max-w-2xl text-sm text-gray-600 dark:text-gray-400">
+        <Typography color="text.disabled" variant="caption">
           サークルを変更します。
-        </p>
-        <div className="flex flex-col justify-start space-y-4">
-          <RadioGroup
+        </Typography>
+      </AdminHeader>
+      <AdminBody>
+        <Form method="post" className="mx-4 space-y-2 sm:mx-6 md:mx-8">
+          <ToggleButtonGroup
             value={monthCircle?.state}
-            onChange={(state) => {
+            exclusive
+            onChange={(_, state) => {
               handleSubmit({ state });
             }}
-            className="mt-2"
-            name="state"
           >
-            <RadioGroup.Label className="sr-only">
-              サークルを選択
-            </RadioGroup.Label>
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-              {Object.values(MonthCircleState).map((state) => (
-                <RadioGroup.Option
-                  key={state}
-                  value={state}
-                  className={({ active, checked }) =>
-                    classNames(
-                      "cursor-pointer focus:outline-none",
-                      active ? "ring-2 ring-indigo-500 ring-offset-2" : "",
-                      checked
-                        ? "border-transparent bg-indigo-600 text-white hover:bg-indigo-700"
-                        : "border-gray-200 bg-white text-gray-900 hover:bg-gray-50",
-                      "flex items-center justify-center rounded-md border py-3 px-3 text-sm font-medium uppercase sm:flex-1"
-                    )
-                  }
-                  disabled={!state}
-                >
-                  <RadioGroup.Label as="p">
-                    {monthCircleStateLabel(state)}
-                  </RadioGroup.Label>
-                </RadioGroup.Option>
-              ))}
-            </div>
-          </RadioGroup>
-          <div className="flex space-x-4">
-            <Switch.Group as="div" className="flex items-center">
+            {Object.values(MonthCircleState).map((state) => (
+              <ToggleButton key={state} value={state}>
+                {monthCircleStateLabel(state)}
+              </ToggleButton>
+            ))}
+          </ToggleButtonGroup>
+          <FormControlLabel
+            control={
               <Switch
-                disabled={
-                  transition.state == "submitting" || monthCircle == null
-                }
-                checked={monthCircle?.locked ?? false}
-                onChange={(locked) => {
+                checked={monthCircle?.locked}
+                onChange={(_, locked) => {
                   handleSubmit({ locked });
                 }}
-                className={classNames(
-                  monthCircle?.locked ? "bg-indigo-600" : "bg-gray-200",
-                  "relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                )}
-              >
-                <span className="sr-only">Use setting</span>
-                <span
-                  aria-hidden="true"
-                  className={classNames(
-                    monthCircle?.locked ? "translate-x-5" : "translate-x-0",
-                    "pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
-                  )}
-                />
-              </Switch>
-              <Switch.Label as="span" className="ml-3 cursor-pointer">
-                変更をロックする(ランキング作成時に上書きされなくなります)
-              </Switch.Label>
-            </Switch.Group>
-          </div>
-        </div>
-      </Form>
+              />
+            }
+            label="変更をロックする(ランキング作成時に上書きされなくなります)"
+          />
+        </Form>
+      </AdminBody>
     </div>
   );
 }
