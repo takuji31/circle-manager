@@ -242,7 +242,7 @@ const parseScreenShot = async ({
 
   // TODO: ユニット数節約のために一度パースしたスクリーンショットは再度Cloud Vision APIに投げない
   const [result] = await client.documentTextDetection(
-    `gs://${file.bucket.name}/${file.name}`
+    `gs://${file.bucket.name}${file.name}`
   );
   const annotations = result.fullTextAnnotation;
 
