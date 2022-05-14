@@ -1,4 +1,4 @@
-import type { LocalDate } from "@circle-manager/shared/model";
+import { LocalDate, TemporalAdjusters } from "@circle-manager/shared/model";
 import type { CircleKey } from "@prisma/client";
 import { MemberFanCountSource } from "@prisma/client";
 import { prisma } from "~/db.server";
@@ -78,6 +78,9 @@ export async function parseMemberNameAndFanCount({
   memberAndFanCounts,
   source,
 }: ParseMemberNameAndFanCountParams) {
+  const lastDayOfPreviousMonth = date
+    .with(TemporalAdjusters.firstDayOfMonth())
+    .minusDays(1);
   const members = await getCircleMembers({ circleKey });
   const memberFanCounts = (
     await prisma.memberFanCount.findMany({
@@ -98,15 +101,47 @@ export async function parseMemberNameAndFanCount({
     })
   ).filter((m) => m.memberId && m.parsedName);
 
-  const memberNameToMemberId = {
+  const memberNameToMemberId: Record<string, string> = {
     ...Object.fromEntries(
       memberFanCounts.map(({ memberId, parsedName }) => [parsedName, memberId])
     ),
     ...Object.fromEntries(members.map((m) => [m.name, m.id])),
   };
 
+  const groupBy = await prisma.memberFanCount.groupBy({
+    by: ["memberId"],
+    _min: {
+      date: true,
+      // totalが減ることは基本的にありえないので一番小さいtotalが一番古い日付のtotalということにしている
+      total: true,
+    },
+    where: {
+      date: {
+        gte: lastDayOfPreviousMonth.toUTCDate(),
+        lt: date.toUTCDate(),
+      },
+      circleKey,
+    },
+  });
+  const memberIdToFirstFanCount: Record<
+    string,
+    { count: number | null; date: LocalDate }
+  > = Object.fromEntries(
+    groupBy.map((g) => {
+      return [
+        g.memberId,
+        {
+          count: g._min.total ? parseInt(g._min.total.toString()) : null,
+          date: g._min.date ? LocalDate.fromUTCDate(g._min.date) : date,
+        },
+      ];
+    })
+  );
+
   return await prisma.$transaction(
     memberAndFanCounts.map(([parsedName, total], order) => {
+      const memberId = memberNameToMemberId[parsedName];
+      const firstFanCount = memberId ? memberIdToFirstFanCount[memberId] : null;
       return prisma.memberFanCount.create({
         data: {
           date: date.toUTCDate(),
@@ -115,8 +150,9 @@ export async function parseMemberNameAndFanCount({
           source: source.type,
           screenShotId:
             source.type == "ScreenShot" ? source.screenShotId : undefined,
-          memberId: memberNameToMemberId[parsedName],
+          memberId,
           parsedName,
+          monthlyTotal: firstFanCount?.count ? total - firstFanCount?.count : 0,
           total,
         },
       });
