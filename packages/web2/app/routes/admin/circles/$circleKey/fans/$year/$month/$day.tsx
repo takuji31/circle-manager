@@ -4,7 +4,7 @@ import { z } from "zod";
 import { ActiveCircleKey } from "~/schema/member";
 import { YMD } from "~/schema/date";
 import type { DataFunctionArgs, LoaderFunction } from "@remix-run/node";
-import { Circles, LocalDate } from "@circle-manager/shared/model";
+import { Circles, LocalDate, SessionUser } from "@circle-manager/shared/model";
 import { dateToYMD } from "~/model/date.server";
 import type { ActionFunction } from "remix";
 import {
@@ -14,14 +14,12 @@ import {
   useSubmit,
   useTransition,
 } from "remix";
-import React, { Fragment, useMemo, useState } from "react";
+import React, { useState } from "react";
 import { AdminBody } from "~/components/admin/body";
 import { useDropzone } from "react-dropzone";
 import { UploadIcon, XIcon } from "@heroicons/react/solid";
-import {
-  ScreenShotMemberFanCount,
-  setMemberIdToMemberFanCount,
-} from "~/model/screen_shot.server";
+import type { ScreenShotMemberFanCount } from "~/model/screen_shot.server";
+import { setMemberIdToMemberFanCount } from "~/model/screen_shot.server";
 import {
   deleteScreenShot,
   getScreenShots,
@@ -36,32 +34,28 @@ import type { DataFunctionArgsWithUser } from "~/auth/loader";
 import { adminOnly, adminOnlyAction } from "~/auth/loader";
 import { classNames } from "~/lib";
 
-import { CheckIcon, SelectorIcon } from "@heroicons/react/solid";
-import { Listbox, Transition } from "@headlessui/react";
 import { getCircleMembers } from "~/model/member.server";
-import {
-  Autocomplete,
-  Box,
-  FormControl,
-  InputLabel,
-  Select,
-  Tabs,
-  TextField,
-} from "@mui/material";
+import { Autocomplete, Box, Tabs, TextField } from "@mui/material";
 import { Tab } from "@mui/material";
 import { Card } from "@mui/material";
 import { CardHeader } from "@mui/material";
 import { Grid } from "@mui/material";
 import { Button } from "@mui/material";
+import { Stack } from "@mui/material";
+import { CardContent } from "@mui/material";
+import { parseTsv } from "~/model/member_fan_count.server";
 
 const ActionMode = z.enum([
   "uploadScreenShot",
   "deleteScreenShot",
   "parseImages",
   "setMemberId",
+  "pasteTsv",
 ]);
 
 const TabId = z.enum(["ScreenShot", "Tsv", "Manual"]);
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+type TabId = z.infer<typeof TabId>;
 
 const tabs = [
   { id: TabId.enum.ScreenShot, name: "スクリーンショット" },
@@ -70,9 +64,11 @@ const tabs = [
 ];
 
 type LoaderData = Awaited<ReturnType<typeof getLoaderData>>;
-type ActionData = Awaited<ReturnType<typeof getActionData>>;
+type ActionData = {
+  uploadScreenShot?: Awaited<ReturnType<typeof uploadScreenShotAction>>;
+  pasteTsv: Awaited<ReturnType<typeof pasteTsvAction>>;
+};
 type Member = Awaited<ReturnType<typeof getCircleMembers>>[0];
-type ScreenShot = Awaited<ReturnType<typeof getScreenShots>>[0];
 
 const paramsSchema = z.intersection(
   z.object({
@@ -83,6 +79,19 @@ const paramsSchema = z.intersection(
 const actionQuerySchema = z.object({
   mode: ActionMode.default(ActionMode.enum.uploadScreenShot),
 });
+const setMemberIdSchema = z.object({
+  memberId: z.string(),
+  memberFanCountId: z.string(),
+});
+
+const schema = {
+  pasteTsv: z.object({
+    tsv: z.preprocess(
+      (s) => (s as string).trim(),
+      z.string().min(1, "テキストが貼り付けられていません")
+    ),
+  }),
+};
 
 const getLoaderData = async ({ params }: DataFunctionArgs) => {
   const { year, month, day, circleKey } = paramsSchema.parse(params);
@@ -100,11 +109,6 @@ const getLoaderData = async ({ params }: DataFunctionArgs) => {
 
 export const loader: LoaderFunction = adminOnly(async (args) => {
   return await getLoaderData(args);
-});
-
-const setMemberIdSchema = z.object({
-  memberId: z.string(),
-  memberFanCountId: z.string(),
 });
 
 const getActionData = async ({
@@ -125,26 +129,17 @@ const getActionData = async ({
 
   switch (mode) {
     case ActionMode.enum.uploadScreenShot: {
-      const result = uploadSchema.safeParse(formData);
-
-      if (!result.success) {
-        return {
-          error: result.error.format(),
-        };
-      } else {
-        const { screenShotFile } = result.data;
-        await uploadScreenShot({
-          screenShotFile,
+      return {
+        uploadScreenShot: await uploadScreenShotAction({
+          formData,
           circleKey,
           date,
-          uploaderId: user.id,
-        });
-      }
-      break;
+          user,
+        }),
+      };
     }
     case ActionMode.enum.deleteScreenShot: {
       const id = z.string().parse(formData.id);
-      console.log("Deleting screenShot %s", id);
       await deleteScreenShot({ id });
       break;
     }
@@ -157,8 +152,70 @@ const getActionData = async ({
       await setMemberIdToMemberFanCount({ memberId, memberFanCountId });
       break;
     }
+    case ActionMode.enum.pasteTsv: {
+      return {
+        pasteTsv: await pasteTsvAction({
+          formData,
+          circleKey,
+          date,
+          user,
+        }),
+      };
+    }
   }
   return null;
+};
+
+const uploadScreenShotAction = async ({
+  formData,
+  circleKey,
+  date,
+  user,
+}: {
+  formData: Record<string, any>;
+  circleKey: ActiveCircleKey;
+  date: LocalDate;
+  user: SessionUser;
+}) => {
+  const result = uploadSchema.safeParse(formData);
+
+  if (!result.success) {
+    return {
+      error: result.error.format()?.screenShotFile?._errors?.join("/"),
+    };
+  } else {
+    const { screenShotFile } = result.data;
+    await uploadScreenShot({
+      screenShotFile,
+      circleKey,
+      date,
+      uploaderId: user.id,
+    });
+    return {};
+  }
+};
+
+const pasteTsvAction = async ({
+  formData,
+  circleKey,
+  date,
+  user,
+}: {
+  formData: Record<string, any>;
+  circleKey: ActiveCircleKey;
+  date: LocalDate;
+  user: SessionUser;
+}) => {
+  const result = schema.pasteTsv.safeParse(formData);
+  if (!result.success) {
+    return {
+      error: result.error.format().tsv?._errors?.join("/"),
+    };
+  } else {
+    const { tsv } = result.data;
+    await parseTsv({ circleKey, date, tsv });
+    return {};
+  }
 };
 
 const uploadSchema = z.object({
@@ -194,13 +251,9 @@ export const action: ActionFunction = adminOnlyAction(async (args) => {
 });
 
 export default function AdminCircleFanCounts() {
-  const { year, month, day, circle, screenShots, members } =
-    useLoaderData<LoaderData>();
-  const actionData = useActionData<ActionData>();
-  const transition = useTransition();
-  const [tabId, setTabId] = useState(TabId.enum.ScreenShot);
+  const { year, month, day, circle } = useLoaderData<LoaderData>();
+  const [tabId, setTabId] = useState<TabId>(TabId.enum.ScreenShot);
 
-  const submit = useSubmit();
   return (
     <div>
       <AdminHeader>
@@ -220,128 +273,182 @@ export default function AdminCircleFanCounts() {
         </Tabs>
       </div>
       <AdminBody>
-        <Card
-          className={classNames(tabId != TabId.enum.ScreenShot ? "hidden" : "")}
-        >
-          <CardHeader
-            title="アップロード済みのスクリーンショット"
-            subheader="10枚までアップロードできます。"
-            action={
-              <>
-                <Form id="parseImagesForm" method="post">
-                  <input
-                    type="hidden"
-                    name="mode"
-                    value={ActionMode.enum.parseImages}
-                  />
-                </Form>
-                <Button
-                  variant="contained"
-                  type="submit"
-                  form="parseImagesForm"
-                  disabled={
-                    screenShots.length == 0 || transition.state == "submitting"
-                  }
-                >
-                  {screenShots.length > 0 &&
-                  screenShots.filter((ss) => !ss.fanCounts.length).length == 0
-                    ? "再度解析する(非推奨)"
-                    : "解析する"}
-                </Button>
-              </>
-            }
-          />
-          {screenShots.length ? (
-            <Grid container>
-              {screenShots
-                .filter((ss) => !!ss.url)
-                .map((ss) => {
-                  return (
-                    <>
-                      <Grid item xs={12} md={6} p={2}>
-                        <Box position="relative">
-                          <img src={ss.url!} alt="" className="h-full w-full" />
-                          <Form method="post">
-                            <input
-                              type="hidden"
-                              name="mode"
-                              value={ActionMode.enum.deleteScreenShot}
-                            />
-
-                            <input type="hidden" name="id" value={ss.id} />
-                            <button type="submit">
-                              <XIcon className="absolute top-0 right-0 h-8 w-8 rounded-full bg-black text-white" />
-                            </button>
-                          </Form>
-                        </Box>
-                      </Grid>
-                      <Grid
-                        item
-                        xs={12}
-                        md={6}
-                        p={2}
-                        container
-                        direction="column-reverse"
-                      >
-                        <Grid
-                          item
-                          xs={12}
-                          md={6}
-                          spacing={4}
-                          container
-                          direction="column"
-                        >
-                          {ss.fanCounts.map((m) => {
-                            return (
-                              <Grid item xs={4} key={m.id}>
-                                <MemberSelectListbox
-                                  members={members}
-                                  memberFanCount={m}
-                                />
-                              </Grid>
-                            );
-                          })}
-                          <div></div>
-                        </Grid>
-                      </Grid>
-                    </>
-                  );
-                })}
-            </Grid>
-          ) : (
-            <div className="p-4">
-              <p>アップロード済みのスクリーンショットはありません</p>
-            </div>
-          )}
-          {screenShots.length < 10 && (
-            <div>
-              <FileUploadInput
-                onDrop={(files) => {
-                  console.log(files);
-                  const [file] = files;
-                  const formData = new FormData();
-                  formData.set("screenShotFile", file, file.name);
-                  submit(formData!, {
-                    replace: true,
-                    method: "post",
-                    encType: "multipart/form-data",
-                  });
-                }}
-              />
-              <p>{actionData?.error?.screenShotFile?._errors.join("/")}</p>
-            </div>
-          )}
-        </Card>
+        <AdminCircleFanCountsContent tabId={tabId} />
       </AdminBody>
     </div>
   );
 }
 
+const AdminCircleFanCountsContent = ({ tabId }: { tabId: TabId }) => {
+  return (
+    <Stack spacing={4}>
+      <ScreenShotCard tabId={tabId} />
+      <PasteCard tabId={tabId} />
+    </Stack>
+  );
+};
+
+const ScreenShotCard = ({ tabId }: { tabId: TabId }) => {
+  const { screenShots, members } = useLoaderData<LoaderData>();
+  const actionData = useActionData<ActionData>();
+  const transition = useTransition();
+
+  const submit = useSubmit();
+  return (
+    <Card
+      className={classNames(tabId != TabId.enum.ScreenShot ? "hidden" : "")}
+    >
+      <CardHeader
+        title="アップロード済みのスクリーンショット"
+        subheader="10枚までアップロードできます。"
+        action={
+          <>
+            <Form id="parseImagesForm" method="post">
+              <input
+                type="hidden"
+                name="mode"
+                value={ActionMode.enum.parseImages}
+              />
+            </Form>
+            <Button
+              variant="contained"
+              type="submit"
+              form="parseImagesForm"
+              disabled={
+                screenShots.length == 0 || transition.state == "submitting"
+              }
+            >
+              {screenShots.length > 0 &&
+              screenShots.filter((ss) => !ss.fanCounts.length).length == 0
+                ? "再度解析する(非推奨)"
+                : "解析する"}
+            </Button>
+          </>
+        }
+      />
+      {screenShots.length ? (
+        <Grid container>
+          {screenShots
+            .filter((ss) => !!ss.url)
+            .map((ss) => {
+              return (
+                <>
+                  <Grid item xs={12} md={6} p={2}>
+                    <Box position="relative">
+                      <img src={ss.url!} alt="" className="h-full w-full" />
+                      <Form method="post">
+                        <input
+                          type="hidden"
+                          name="mode"
+                          value={ActionMode.enum.deleteScreenShot}
+                        />
+
+                        <input type="hidden" name="id" value={ss.id} />
+                        <button type="submit">
+                          <XIcon className="absolute top-0 right-0 h-8 w-8 rounded-full bg-black text-white" />
+                        </button>
+                      </Form>
+                    </Box>
+                  </Grid>
+                  <Grid
+                    item
+                    xs={12}
+                    md={6}
+                    p={2}
+                    container
+                    direction="column-reverse"
+                  >
+                    <Grid
+                      item
+                      xs={12}
+                      md={6}
+                      spacing={4}
+                      container
+                      direction="column"
+                    >
+                      {ss.fanCounts.map((m) => {
+                        return (
+                          <Grid item xs={4} key={m.id}>
+                            <MemberSelectListbox
+                              members={members}
+                              memberFanCount={m}
+                            />
+                          </Grid>
+                        );
+                      })}
+                      <div></div>
+                    </Grid>
+                  </Grid>
+                </>
+              );
+            })}
+        </Grid>
+      ) : (
+        <div className="p-4">
+          <p>アップロード済みのスクリーンショットはありません</p>
+        </div>
+      )}
+      {screenShots.length < 10 && (
+        <div>
+          <FileUploadInput
+            onDrop={(files) => {
+              console.log(files);
+              const [file] = files;
+              const formData = new FormData();
+              formData.set("screenShotFile", file, file.name);
+              submit(formData!, {
+                replace: true,
+                method: "post",
+                encType: "multipart/form-data",
+              });
+            }}
+          />
+          <p>{actionData?.uploadScreenShot?.error}</p>
+        </div>
+      )}
+    </Card>
+  );
+};
+
+const PasteCard = ({ tabId }: { tabId: TabId }) => {
+  const [tsv, setTsv] = useState("");
+  const actionData = useActionData<ActionData>();
+  return (
+    <Form method="post" replace>
+      <input type="hidden" name="mode" value={ActionMode.enum.pasteTsv} />
+      <Card className={tabId != TabId.enum.Tsv ? "hidden" : ""}>
+        <CardHeader
+          title="まとめて貼り付け"
+          subheader="この形式で記録すると当日のサークルファン数が全て上書きされます。スクリーンショットによる記録の一部修正には手入力を使ってください。"
+          action={
+            <Button type="submit" variant="contained">
+              記録
+            </Button>
+          }
+        />
+        <CardContent>
+          <TextField
+            name="tsv"
+            multiline
+            fullWidth
+            maxRows={30}
+            value={tsv}
+            onChange={(e) => setTsv(e.currentTarget.value)}
+            error={!!actionData?.pasteTsv?.error}
+            helperText={actionData?.pasteTsv?.error ?? null}
+            placeholder={"例)\ntakuji31    1234567890\ntakuji32    2345678901"}
+          />
+        </CardContent>
+      </Card>
+    </Form>
+  );
+};
+
 interface FileUploadInputProps {
   onDrop: (files: File[]) => void;
 }
 const FileUploadInput: React.FC<FileUploadInputProps> = ({ onDrop }) => {
-  const { acceptedFiles, getRootProps, getInputProps } = useDropzone({
+  const { getRootProps, getInputProps } = useDropzone({
     accept: {
       "image/*": [".png"],
     },
@@ -388,24 +495,6 @@ function MemberSelectListbox({
 }: MemberSelectComboBoxProps) {
   const transition = useTransition();
   const submit = useSubmit();
-  const currentMember = useMemo(() => {
-    if (
-      transition.submission &&
-      transition.submission.method == "POST" &&
-      transition.submission.formData.get("mode") ==
-        ActionMode.enum.setMemberId &&
-      transition.submission.formData.get("memberFanCountId") ==
-        memberFanCount.id
-    ) {
-      const memberId = transition.submission.formData.get("memberId");
-      return (
-        (memberId ? members.find((m) => m.id == memberId) : null) ??
-        memberFanCount.member
-      );
-    } else {
-      return memberFanCount.member;
-    }
-  }, [members, memberFanCount, transition]);
   return (
     <Autocomplete
       disablePortal
