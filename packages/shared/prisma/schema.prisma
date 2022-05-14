@@ -190,7 +190,8 @@ model MemberFanCount {
   order        Int                  @default(0)
   source       MemberFanCountSource
   parsedName   String? /// スクリーンショットやTSVから取得した名前
-  total        BigInt
+  total        BigInt /// 総獲得ファン数
+  monthlyTotal BigInt               @default(0) /// 該当する月の獲得ファン数、memberIdをセットした時に再計算する
   screenShotId String?
   screenShot   ScreenShot?          @relation(fields: [screenShotId], references: [id], onDelete: SetNull)
   createdAt    DateTime             @default(now())
