@@ -10,9 +10,9 @@
     "@js-joda/core": "^5.2.0",
     "@js-joda/locale_ja": "^4.7.0",
     "@js-joda/timezone": "^2.12.0",
-    "@prisma/client": "^3.13.0"
+    "@prisma/client": "^3.14.0"
   },
   "devDependencies": {
-    "prisma": "^3.13.0"
+    "prisma": "^3.14.0"
   }
 }
