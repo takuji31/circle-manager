@@ -10,7 +10,7 @@ import { ImageAnnotatorClient } from "@google-cloud/vision";
 import type { CircleKey, ScreenShot as PrismaScreenShot } from "@prisma/client";
 import { MemberFanCountSource } from "@prisma/client";
 import { CircleRole } from "@prisma/client";
-import { getCircleMembers } from "./member.server";
+import { parseMemberNameAndFanCount } from "./member_fan_count.server";
 
 interface UploadScreenShotParams {
   screenShotFile: File;
@@ -57,10 +57,11 @@ export async function getScreenShots({
         return {
           ...screenShot,
           fanCounts: fanCounts.map((c) => {
-            const { total, ...member } = c;
+            const { total, monthlyTotal, ...member } = c;
             return {
               ...member,
               total: parseInt(total.toString()),
+              monthlyTotal: parseInt(monthlyTotal.toString()),
             };
           }),
         };
@@ -170,38 +171,11 @@ export async function parseScreenShots({
   const screenShots = await prisma.screenShot.findMany({
     where: { date: date.toUTCDate(), circleKey },
   });
-  const members = await getCircleMembers({ circleKey });
-  const memberFanCounts = (
-    await prisma.memberFanCount.findMany({
-      select: {
-        memberId: true,
-        parsedName: true,
-      },
-      where: {
-        memberId: { in: members.map((m) => m.id) },
-        source: MemberFanCountSource.ScreenShot,
-      },
-      distinct: ["memberId"],
-      orderBy: [
-        {
-          date: "desc",
-        },
-      ],
-    })
-  ).filter((m) => m.memberId && m.parsedName);
-
-  const memberNameToMemberId = {
-    ...Object.fromEntries(
-      memberFanCounts.map(({ memberId, parsedName }) => [parsedName, memberId])
-    ),
-    ...Object.fromEntries(members.map((m) => [m.name, m.id])),
-  };
   for (const screenShot of screenShots) {
     await parseScreenShot({
       screenShot,
       circleKey,
       date,
-      memberNameToMemberId,
     });
   }
 }
@@ -220,12 +194,10 @@ const parseScreenShot = async ({
   screenShot,
   circleKey,
   date,
-  memberNameToMemberId,
 }: {
   screenShot: PrismaScreenShot;
-  circleKey: CircleKey;
+  circleKey: ActiveCircleKey;
   date: LocalDate;
-  memberNameToMemberId: { [key: string]: string };
 }) => {
   const file = await bucket.file(
     createCloudStoragePath(
@@ -307,21 +279,17 @@ const parseScreenShot = async ({
       rawJson: result as any,
       fanCounts: {
         deleteMany: { screenShotId: screenShot.id },
-        createMany: {
-          data: members.map((m, order) => {
-            return {
-              date: date.toUTCDate(),
-              circleKey,
-              order,
-              source: MemberFanCountSource.ScreenShot,
-              memberId: memberNameToMemberId[m.name],
-              parsedName: m.name,
-              total: BigInt(m.fanCount),
-            };
-          }),
-        },
       },
     },
   });
-  // console.log(JSON.stringify(members, undefined, 2));
+
+  await parseMemberNameAndFanCount({
+    circleKey,
+    date,
+    memberAndFanCounts: members.map((m, order) => [m.name, m.fanCount]),
+    source: {
+      type: MemberFanCountSource.ScreenShot,
+      screenShotId: screenShot.id,
+    },
+  });
 };
