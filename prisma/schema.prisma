@@ -176,13 +176,29 @@ model ScreenShot {
   fanCounts  MemberFanCount[]
 }
 
+/// サークルごとのファン数集計
+model CircleFanCount {
+  id           String    @id @default(cuid())
+  circleKey    CircleKey
+  date         DateTime  @db.Date
+  total        BigInt /// サークル全体のファン数
+  avg          BigInt /// サークル全体のファン数平均
+  predicted    BigInt /// サークル全体の予測ファン数
+  predictedAvg BigInt /// サークル全体の予測ファン数平均
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@unique([circleKey, date])
+  @@index([date])
+}
+
 /// メンバーの日毎の累計ファン数の記録
 model MemberFanCount {
   id           String               @id @default(cuid())
   memberId     String?
   member       Member?              @relation(fields: [memberId], references: [id], onDelete: Cascade)
-  date         DateTime             @db.Date
   circleKey    CircleKey
+  date         DateTime             @db.Date
   order        Int                  @default(0)
   source       MemberFanCountSource
   parsedName   String? /// スクリーンショットやTSVから取得した名前
