@@ -43,7 +43,18 @@ import { Grid } from "@mui/material";
 import { Button } from "@mui/material";
 import { Stack } from "@mui/material";
 import { CardContent } from "@mui/material";
-import { parseTsv } from "~/model/member_fan_count.server";
+import {
+  getCircleMemberFanCounts,
+  parseTsv,
+} from "~/model/member_fan_count.server";
+import { Table } from "@mui/material";
+import { TableHead } from "@mui/material";
+import { TableRow } from "@mui/material";
+import { TableCell } from "@mui/material";
+import { TableBody } from "@mui/material";
+import { IconButton } from "@mui/material";
+import { Edit } from "@mui/icons-material";
+import numeral from "numeral";
 import { atom, useRecoilState } from "recoil";
 import { localStorageEffect } from "~/recoil";
 
@@ -106,11 +117,13 @@ const getLoaderData = async ({ params }: DataFunctionArgs) => {
   const date = LocalDate.of(year, month, day);
   const screenShots = await getScreenShots({ date, circleKey });
   const members = await getCircleMembers({ circleKey });
+  const memberFanCounts = await getCircleMemberFanCounts({ date, circleKey });
   return {
     ...dateToYMD(date),
     circle,
     screenShots,
     members,
+    memberFanCounts,
   };
 };
 
@@ -291,6 +304,8 @@ const AdminCircleFanCountsContent = ({ tabId }: { tabId: TabId }) => {
     <Stack spacing={4}>
       <ScreenShotCard tabId={tabId} />
       <PasteCard tabId={tabId} />
+      <ManualFormCard tabId={tabId} />
+      <EditCard />
     </Stack>
   );
 };
@@ -302,9 +317,7 @@ const ScreenShotCard = ({ tabId }: { tabId: TabId }) => {
 
   const submit = useSubmit();
   return (
-    <Card
-      className={classNames(tabId != TabId.enum.ScreenShot ? "hidden" : "")}
-    >
+    <Card className={tabId != TabId.enum.ScreenShot ? "hidden" : ""}>
       <CardHeader
         title="アップロード済みのスクリーンショット"
         subheader="10枚までアップロードできます。"
@@ -426,7 +439,7 @@ const PasteCard = ({ tabId }: { tabId: TabId }) => {
       <Card className={tabId != TabId.enum.Tsv ? "hidden" : ""}>
         <CardHeader
           title="まとめて貼り付け"
-          subheader="この形式で記録すると当日のサークルファン数が全て上書きされます。スクリーンショットによる記録の一部修正には手入力を使ってください。"
+          subheader="この形式で記録すると当日のサークルファン数が全て上書きされます。一部修正には手入力を使ってください。"
           action={
             <Button type="submit" variant="contained">
               記録
@@ -448,6 +461,66 @@ const PasteCard = ({ tabId }: { tabId: TabId }) => {
         </CardContent>
       </Card>
     </Form>
+  );
+};
+
+const ManualFormCard = ({ tabId }: { tabId: TabId }) => {
+  return (
+    <Card className={tabId != TabId.enum.Manual ? "hidden" : ""}>
+      <CardHeader
+        title="手入力"
+        subheader="手動でファン数を入力できます。入力したら必ず「保存」を押してください。押さないと記録されません。"
+      />
+    </Card>
+  );
+};
+
+const EditCard = () => {
+  const { memberFanCounts } = useLoaderData<LoaderData>();
+  return (
+    <Card>
+      <CardHeader
+        title="編集"
+        subheader="他の記録方法で記録したファン数を編集できます。"
+      />
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>トレーナー名</TableCell>
+            <TableCell>当月ファン数 (総獲得ファン数)</TableCell>
+            <TableCell>記録元</TableCell>
+            <TableCell>記録時の名前</TableCell>
+            <TableCell>アクション</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {memberFanCounts.map((m) => {
+            return (
+              <TableRow key={m.id}>
+                <TableCell>{m.member?.name ?? "(不明なメンバー)"}</TableCell>
+                <TableCell>
+                  {numeral(m.monthlyTotal).format("0,0")} (
+                  {numeral(m.total).format("0,0")})
+                </TableCell>
+                <TableCell>
+                  {m.source == "ScreenShot"
+                    ? "スクリーンショット"
+                    : m.source == "Paste"
+                    ? "まとめて貼り付け"
+                    : "手入力"}
+                </TableCell>
+                <TableCell>{m.parsedName ?? "(なし)"}</TableCell>
+                <TableCell>
+                  <IconButton>
+                    <Edit />
+                  </IconButton>
+                </TableCell>
+              </TableRow>
+            );
+          })}
+        </TableBody>
+      </Table>
+    </Card>
   );
 };
 

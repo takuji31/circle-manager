@@ -1,8 +1,33 @@
 import type { LocalDate } from "@circle-manager/shared/model";
+import type { CircleKey } from "@prisma/client";
 import { MemberFanCountSource } from "@prisma/client";
 import { prisma } from "~/db.server";
 import type { ActiveCircleKey } from "~/schema/member";
 import { getCircleMembers } from "./member.server";
+
+export async function getCircleMemberFanCounts({
+  date,
+  circleKey,
+}: {
+  date: LocalDate;
+  circleKey: CircleKey;
+}) {
+  return await prisma.memberFanCount
+    .findMany({
+      where: { date: date.toUTCDate(), circleKey },
+      include: { member: true },
+      orderBy: [{ monthlyTotal: "desc" }],
+    })
+    .then((list) =>
+      list.map(({ total, monthlyTotal, ...m }) => {
+        return {
+          ...m,
+          total: parseInt(total.toString()),
+          monthlyTotal: parseInt(monthlyTotal.toString()),
+        };
+      })
+    );
+}
 
 interface ParseTsvParams {
   circleKey: ActiveCircleKey;
