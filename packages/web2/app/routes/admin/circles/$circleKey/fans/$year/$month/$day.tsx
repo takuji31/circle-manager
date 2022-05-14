@@ -44,6 +44,8 @@ import { Button } from "@mui/material";
 import { Stack } from "@mui/material";
 import { CardContent } from "@mui/material";
 import { parseTsv } from "~/model/member_fan_count.server";
+import { atom, useRecoilState } from "recoil";
+import { localStorageEffect } from "~/recoil";
 
 const ActionMode = z.enum([
   "uploadScreenShot",
@@ -57,6 +59,11 @@ const TabId = z.enum(["ScreenShot", "Tsv", "Manual"]);
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 type TabId = z.infer<typeof TabId>;
 
+export const tabIdState = atom<TabId>({
+  key: "memberFanCount_tabId",
+  default: TabId.enum.ScreenShot,
+  effects: [localStorageEffect<TabId>("memberFanCount_tabId")],
+});
 const tabs = [
   { id: TabId.enum.ScreenShot, name: "スクリーンショット" },
   { id: TabId.enum.Tsv, name: "まとめて貼り付け" },
@@ -252,7 +259,7 @@ export const action: ActionFunction = adminOnlyAction(async (args) => {
 
 export default function AdminCircleFanCounts() {
   const { year, month, day, circle } = useLoaderData<LoaderData>();
-  const [tabId, setTabId] = useState<TabId>(TabId.enum.ScreenShot);
+  const [tabId, setTabId] = useRecoilState(tabIdState);
 
   return (
     <div>
