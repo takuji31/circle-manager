@@ -1,9 +1,43 @@
-import { LocalDate, TemporalAdjusters } from "@/model";
+import { sendMessageToChannel } from "@/discord";
+import {
+  Circles,
+  DateFormats,
+  LocalDate,
+  Period,
+  TemporalAdjusters,
+} from "@/model";
 import type { CircleKey } from "@prisma/client";
 import { MemberFanCountSource } from "@prisma/client";
 import { prisma } from "~/db.server";
 import type { ActiveCircleKey } from "~/schema/member";
 import { getCircleMembers } from "./member.server";
+
+export async function getCircleFanCount({
+  date,
+  circleKey,
+}: {
+  date: LocalDate;
+  circleKey: CircleKey;
+}) {
+  return await prisma.circleFanCount
+    .findFirst({
+      where: { date: date.toUTCDate(), circleKey },
+    })
+    .then((circleFanCount) => {
+      if (!circleFanCount) {
+        return null;
+      } else {
+        const { total, avg, predicted, predictedAvg, ...c } = circleFanCount;
+        return {
+          ...c,
+          total: parseInt(total.toString()),
+          avg: parseInt(avg.toString()),
+          predicted: parseInt(predicted.toString()),
+          predictedAvg: parseInt(predictedAvg.toString()),
+        };
+      }
+    });
+}
 
 export async function getCircleMemberFanCounts({
   date,
@@ -19,11 +53,12 @@ export async function getCircleMemberFanCounts({
       orderBy: [{ monthlyTotal: "desc" }],
     })
     .then((list) =>
-      list.map(({ total, monthlyTotal, ...m }) => {
+      list.map(({ total, monthlyTotal, monthlyAvg, ...m }) => {
         return {
           ...m,
           total: parseInt(total.toString()),
           monthlyTotal: monthlyTotal ? parseInt(monthlyTotal.toString()) : null,
+          monthlyAvg: monthlyAvg ? parseInt(monthlyAvg.toString()) : null,
         };
       })
     );
@@ -78,9 +113,6 @@ export async function parseMemberNameAndFanCount({
   memberAndFanCounts,
   source,
 }: ParseMemberNameAndFanCountParams) {
-  const lastDayOfPreviousMonth = date
-    .with(TemporalAdjusters.firstDayOfMonth())
-    .minusDays(1);
   const members = await getCircleMembers({ circleKey });
   const memberFanCounts = (
     await prisma.memberFanCount.findMany({
@@ -108,40 +140,9 @@ export async function parseMemberNameAndFanCount({
     ...Object.fromEntries(members.map((m) => [m.name, m.id])),
   };
 
-  const groupBy = await prisma.memberFanCount.groupBy({
-    by: ["memberId"],
-    _min: {
-      date: true,
-      // totalが減ることは基本的にありえないので一番小さいtotalが一番古い日付のtotalということにしている
-      total: true,
-    },
-    where: {
-      date: {
-        gte: lastDayOfPreviousMonth.toUTCDate(),
-        lt: date.toUTCDate(),
-      },
-      circleKey,
-    },
-  });
-  const memberIdToFirstFanCount: Record<
-    string,
-    { count: number | null; date: LocalDate }
-  > = Object.fromEntries(
-    groupBy.map((g) => {
-      return [
-        g.memberId,
-        {
-          count: g._min.total ? parseInt(g._min.total.toString()) : null,
-          date: g._min.date ? LocalDate.fromUTCDate(g._min.date) : date,
-        },
-      ];
-    })
-  );
-
   return await prisma.$transaction(
     memberAndFanCounts.map(([parsedName, total], order) => {
       const memberId = memberNameToMemberId[parsedName];
-      const firstFanCount = memberId ? memberIdToFirstFanCount[memberId] : null;
       return prisma.memberFanCount.create({
         data: {
           date: date.toUTCDate(),
@@ -152,10 +153,163 @@ export async function parseMemberNameAndFanCount({
             source.type == "ScreenShot" ? source.screenShotId : undefined,
           memberId,
           parsedName,
-          monthlyTotal: firstFanCount?.count ? total - firstFanCount?.count : 0,
           total,
         },
       });
     })
   );
+}
+
+interface PublishCircleFanCountParams {
+  circleKey: CircleKey;
+  date: LocalDate;
+}
+export async function calculateMonthlyTotalFanCounts({
+  circleKey,
+  date,
+}: PublishCircleFanCountParams) {
+  const lastDayOfPreviousMonth = date
+    .with(TemporalAdjusters.firstDayOfMonth())
+    .minusDays(1);
+  const members = await prisma.member.findMany({
+    where: { circleKey },
+    include: {
+      memberFanCounts: {
+        where: {
+          date: {
+            gte: lastDayOfPreviousMonth.toUTCDate(),
+            lte: date.toUTCDate(),
+          },
+        },
+        orderBy: [
+          {
+            date: "asc",
+          },
+        ],
+        take: 1,
+      },
+    },
+  });
+
+  const memberIdToFirstFanCount: Record<
+    string,
+    { count: number | null; date: LocalDate } | null
+  > = Object.fromEntries(
+    members.map((member) => {
+      const fanCount = member.memberFanCounts[0];
+      return [
+        member.id,
+        !fanCount
+          ? null
+          : {
+              count: parseInt(fanCount.total.toString()),
+              date: LocalDate.fromUTCDate(fanCount.date),
+            },
+      ];
+    })
+  );
+
+  console.log(memberIdToFirstFanCount);
+
+  const memberFanCounts = await prisma.memberFanCount.findMany({
+    where: { circleKey, date: date.toUTCDate() },
+  });
+
+  const transactions = [];
+
+  for (const { memberId, total } of memberFanCounts) {
+    if (memberId) {
+      const firstFanCount = memberIdToFirstFanCount[memberId];
+      const monthlyTotal =
+        firstFanCount?.count != null && firstFanCount?.count != undefined
+          ? total - BigInt(firstFanCount.count)
+          : 0n;
+      const days = firstFanCount?.date
+        ? Period.between(firstFanCount.date, date).days() + 1
+        : 1;
+      const monthlyAvg = monthlyTotal / BigInt(days);
+      console.log(`memberId: ${memberId} ${monthlyTotal} ${monthlyAvg}`);
+      transactions.push(
+        prisma.memberFanCount.update({
+          where: {
+            memberId_circleKey_date: {
+              memberId,
+              circleKey,
+              date: date.toUTCDate(),
+            },
+          },
+          data: {
+            monthlyTotal,
+            monthlyAvg,
+          },
+        })
+      );
+    }
+  }
+
+  await prisma.$transaction(transactions);
+}
+
+export async function publishCircleFanCount({
+  circleKey,
+  date,
+}: PublishCircleFanCountParams) {
+  await calculateMonthlyTotalFanCounts({ circleKey, date });
+
+  const memberFanCounts = await prisma.memberFanCount.findMany({
+    where: { circleKey, date: date.toUTCDate() },
+  });
+
+  if (!memberFanCounts.length) {
+    throw new Error("ファン数が1件も記録されていません。");
+  }
+
+  if (
+    memberFanCounts.filter(
+      (m) => !m.memberId || m.monthlyTotal == null || m.monthlyAvg == null
+    ).length
+  ) {
+    throw new Error(
+      "不明なメンバーのファン数記録があります。全ての記録にメンバーを紐付けなければ公開できません。"
+    );
+  }
+
+  const daysLeftInMonth = BigInt(
+    Period.between(date, date.with(TemporalAdjusters.lastDayOfMonth())).days()
+  );
+  const memberCount = BigInt(memberFanCounts.length);
+
+  const total = memberFanCounts.reduce((v, m) => {
+    return v + m.monthlyTotal!;
+  }, 0n);
+  const avg = total / memberCount;
+  const predicted = memberFanCounts.reduce((v, m) => {
+    return v + m.monthlyTotal! + m.monthlyAvg! * daysLeftInMonth;
+  }, 0n);
+  const predictedAvg = predicted / memberCount;
+
+  const circleFanCount = await prisma.circleFanCount.upsert({
+    where: { circleKey_date: { circleKey, date: date.toUTCDate() } },
+    create: {
+      circleKey,
+      date: date.toUTCDate(),
+      total,
+      avg,
+      predicted,
+      predictedAvg,
+    },
+    update: { total, avg, predicted, predictedAvg },
+  });
+
+  const circle = Circles.findByCircleKey(circleKey);
+  await sendMessageToChannel({
+    channelId: circle.notificationChannelId,
+    message: `${date.format(
+      DateFormats.ymd
+    )}のファン数を更新しました。以下のURLから確認できます。 ${
+      process.env.BASE_URL
+    }/circles/${circleKey}/fans/${date.year()}/${date.monthValue()}/${date.dayOfMonth()}`,
+  });
+
+  return circleFanCount;
 }

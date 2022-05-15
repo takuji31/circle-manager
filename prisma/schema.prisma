@@ -29,7 +29,7 @@ model Member {
   PersonalChannel   PersonalChannel[]
   fanCounts         UmastagramMemberFanCount[]
   ScreenShot        ScreenShot[]
-  MemberFanCount    MemberFanCount[]
+  memberFanCounts   MemberFanCount[]
 
   @@unique([pathname])
   @@index([leavedAt])
@@ -201,18 +201,25 @@ model MemberFanCount {
   date         DateTime             @db.Date
   order        Int                  @default(0)
   source       MemberFanCountSource
-  parsedName   String? /// スクリーンショットやTSVから取得した名前
-  total        BigInt /// 総獲得ファン数
-  monthlyTotal BigInt               @default(0) /// 該当する月の獲得ファン数、memberIdをセットした時に再計算する
+  /// スクリーンショットやTSVから取得した名前
+  parsedName   String?
+  /// 総獲得ファン数
+  total        BigInt
+  /// 該当する月の獲得ファン数、公開時に計算する
+  monthlyTotal BigInt?
+  /// 該当する月の日平均獲得ファン数、公開時に計算する
+  monthlyAvg   BigInt?
   screenShotId String?
   screenShot   ScreenShot?          @relation(fields: [screenShotId], references: [id], onDelete: SetNull)
   createdAt    DateTime             @default(now())
   updatedAt    DateTime             @updatedAt
 
-  @@unique([memberId, date])
+  // 本来メンバー1人辺り1日のファン数記録は1件のはずだが、サークルを移籍した場合のことを考慮してcircleKeyが違うレコードがあってもよいことにしている
+  @@unique([memberId, circleKey, date])
   @@unique([screenShotId, order])
-  @@index([circleKey, date, total])
+  @@index([circleKey, date, monthlyTotal])
   @@index([parsedName, memberId])
+  @@index([total])
 }
 
 /// ファン数をどこから記録したか

@@ -1,28 +1,9 @@
-import AdminHeader from "~/components/admin/header";
-import AdminHeaderTitle from "~/components/admin/header/title";
-import { z } from "zod";
-import { ActiveCircleKey } from "~/schema/member";
-import { YMD } from "~/schema/date";
-import type { ActionFunction, DataFunctionArgs, LoaderFunction } from "@remix-run/node";
-import { Circles, LocalDate, SessionUser } from "@/model";
-import { dateToYMD } from "~/model/date.server";
-import { Form, useActionData, useLoaderData, useSubmit, useTransition } from "@remix-run/react";
-import React, { useState } from "react";
-import { AdminBody } from "~/components/admin/body";
-import { useDropzone } from "react-dropzone";
+import type { SessionUser } from "@/model";
+import { Circles, LocalDate } from "@/model";
 import { UploadIcon, XIcon } from "@heroicons/react/solid";
-import type { ScreenShotMemberFanCount } from "~/model/screen_shot.server";
+import { Edit } from "@mui/icons-material";
 import {
-  deleteScreenShot,
-  getScreenShots,
-  parseScreenShots,
-  setMemberIdToMemberFanCount,
-  uploadScreenShot
-} from "~/model/screen_shot.server";
-import { createFileUploadHandler, parseMultipartFormData } from "~/lib/form.server";
-
-import { getCircleMembers } from "~/model/member.server";
-import {
+  Alert,
   Autocomplete,
   Box,
   Button,
@@ -39,21 +20,49 @@ import {
   TableHead,
   TableRow,
   Tabs,
-  TextField
+  TextField,
 } from "@mui/material";
-import { getCircleMemberFanCounts, parseTsv } from "~/model/member_fan_count.server";
-import { Edit } from "@mui/icons-material";
+import type { ActionFunction, DataFunctionArgs, LoaderFunction } from "@remix-run/node";
+import { Form, useActionData, useLoaderData, useSubmit, useTransition } from "@remix-run/react";
 import numeral from "numeral";
+import React, { useMemo, useState } from "react";
+import { useDropzone } from "react-dropzone";
 import { atom, useRecoilState } from "recoil";
-import { localStorageEffect } from "~/recoil";
+import { z } from "zod";
 import { requireAdminUser } from "~/auth/loader.server";
+import { AdminBody } from "~/components/admin/body";
+import AdminHeader from "~/components/admin/header";
+import AdminHeaderActions from "~/components/admin/header/actions";
+import AdminHeaderTitle from "~/components/admin/header/title";
+import { createFileUploadHandler, parseMultipartFormData } from "~/lib/form.server";
+import { dateToYMD } from "~/model/date.server";
+
+import { getCircleMembers } from "~/model/member.server";
+import {
+  getCircleFanCount,
+  getCircleMemberFanCounts,
+  parseTsv,
+  publishCircleFanCount,
+} from "~/model/member_fan_count.server";
+import type { ScreenShotMemberFanCount } from "~/model/screen_shot.server";
+import {
+  deleteScreenShot,
+  getScreenShots,
+  parseScreenShots,
+  setMemberIdToMemberFanCount,
+  uploadScreenShot,
+} from "~/model/screen_shot.server";
+import { localStorageEffect } from "~/recoil";
+import { YMD } from "~/schema/date";
+import { ActiveCircleKey } from "~/schema/member";
 
 const ActionMode = z.enum([
   "uploadScreenShot",
   "deleteScreenShot",
   "parseImages",
   "setMemberId",
-  "pasteTsv"
+  "pasteTsv",
+  "publish",
 ]);
 
 const TabId = z.enum(["ScreenShot", "Tsv", "Manual"]);
@@ -63,12 +72,12 @@ type TabId = z.infer<typeof TabId>;
 export const tabIdState = atom<TabId>({
   key: "memberFanCount_tabId",
   default: TabId.enum.ScreenShot,
-  effects: [localStorageEffect<TabId>("memberFanCount_tabId")]
+  effects: [localStorageEffect<TabId>("memberFanCount_tabId")],
 });
 const tabs = [
   { id: TabId.enum.ScreenShot, name: "スクリーンショット" },
   { id: TabId.enum.Tsv, name: "まとめて貼り付け" },
-  { id: TabId.enum.Manual, name: "手入力" }
+  { id: TabId.enum.Manual, name: "手入力" },
 ];
 
 type LoaderData = Awaited<ReturnType<typeof getLoaderData>>;
@@ -80,25 +89,25 @@ type Member = Awaited<ReturnType<typeof getCircleMembers>>[0];
 
 const paramsSchema = z.intersection(
   z.object({
-    circleKey: ActiveCircleKey
+    circleKey: ActiveCircleKey,
   }),
-  YMD
+  YMD,
 );
 const actionQuerySchema = z.object({
-  mode: ActionMode.default(ActionMode.enum.uploadScreenShot)
+  mode: ActionMode.default(ActionMode.enum.uploadScreenShot),
 });
 const setMemberIdSchema = z.object({
   memberId: z.string(),
-  memberFanCountId: z.string()
+  memberFanCountId: z.string(),
 });
 
 const schema = {
   pasteTsv: z.object({
     tsv: z.preprocess(
       (s) => (s as string).trim(),
-      z.string().min(1, "テキストが貼り付けられていません")
-    )
-  })
+      z.string().min(1, "テキストが貼り付けられていません"),
+    ),
+  }),
 };
 
 const getLoaderData = async ({ params }: DataFunctionArgs) => {
@@ -108,28 +117,30 @@ const getLoaderData = async ({ params }: DataFunctionArgs) => {
   const screenShots = await getScreenShots({ date, circleKey });
   const members = await getCircleMembers({ circleKey });
   const memberFanCounts = await getCircleMemberFanCounts({ date, circleKey });
+  const circleFanCount = await getCircleFanCount({ date, circleKey });
   return {
     ...dateToYMD(date),
     circle,
     screenShots,
     members,
-    memberFanCounts
+    memberFanCounts,
+    circleFanCount,
   };
 };
 
 export const loader: LoaderFunction = async (args) => {
   return await getLoaderData(args);
-}
+};
 
 const getActionData = async ({ request, params }: DataFunctionArgs) => {
   const user = await requireAdminUser(request);
   const { year, month, day, circleKey } = paramsSchema.parse(params);
   const date = LocalDate.of(year, month, day);
   const uploadHandler = createFileUploadHandler({
-    maxPartSize: 10_000_000
+    maxPartSize: 10_000_000,
   });
   const formData = Object.fromEntries(
-    await parseMultipartFormData(request, uploadHandler)
+    await parseMultipartFormData(request, uploadHandler),
   );
   console.log(formData);
   const { mode } = actionQuerySchema.parse(formData);
@@ -141,8 +152,8 @@ const getActionData = async ({ request, params }: DataFunctionArgs) => {
           formData,
           circleKey,
           date,
-          user
-        })
+          user,
+        }),
       };
     }
     case ActionMode.enum.deleteScreenShot: {
@@ -165,9 +176,13 @@ const getActionData = async ({ request, params }: DataFunctionArgs) => {
           formData,
           circleKey,
           date,
-          user
-        })
+          user,
+        }),
       };
+    }
+    case ActionMode.enum.publish: {
+      await publishCircleFanCount({ circleKey, date });
+      break;
     }
   }
   return null;
@@ -183,7 +198,7 @@ const uploadScreenShotAction = async ({ formData, circleKey, date, user }: {
 
   if (!result.success) {
     return {
-      error: result.error.format()?.screenShotFile?._errors?.join("/")
+      error: result.error.format()?.screenShotFile?._errors?.join("/"),
     };
   } else {
     const { screenShotFile } = result.data;
@@ -191,13 +206,13 @@ const uploadScreenShotAction = async ({ formData, circleKey, date, user }: {
       screenShotFile,
       circleKey,
       date,
-      uploaderId: user.id
+      uploaderId: user.id,
     });
     return {};
   }
 };
 
-const pasteTsvAction = async ({ formData, circleKey, date}: {
+const pasteTsvAction = async ({ formData, circleKey, date }: {
   formData: Record<string, any>;
   circleKey: ActiveCircleKey;
   date: LocalDate;
@@ -206,7 +221,7 @@ const pasteTsvAction = async ({ formData, circleKey, date}: {
   const result = schema.pasteTsv.safeParse(formData);
   if (!result.success) {
     return {
-      error: result.error.format().tsv?._errors?.join("/")
+      error: result.error.format().tsv?._errors?.join("/"),
     };
   } else {
     const { tsv } = result.data;
@@ -226,7 +241,7 @@ const uploadSchema = z.object({
           expected: "object",
           received: "undefined",
           fatal: true,
-          message: "スクリーンショットがアップロードされていません"
+          message: "スクリーンショットがアップロードされていません",
         });
         return;
       }
@@ -237,10 +252,10 @@ const uploadSchema = z.object({
           expected: "object",
           received: "undefined",
           fatal: true,
-          message: "スクリーンショットはPNG形式のみサポートしています。"
+          message: "スクリーンショットはPNG形式のみサポートしています。",
         });
       }
-    })
+    }),
 });
 
 export const action: ActionFunction = async (args) => {
@@ -248,8 +263,11 @@ export const action: ActionFunction = async (args) => {
 };
 
 export default function AdminCircleFanCounts() {
-  const { year, month, day, circle } = useLoaderData<LoaderData>();
+  const { year, month, day, circle, memberFanCounts } =
+    useLoaderData<LoaderData>();
   const [tabId, setTabId] = useRecoilState(tabIdState);
+
+  const transition = useTransition();
 
   return (
     <div>
@@ -257,6 +275,22 @@ export default function AdminCircleFanCounts() {
         <AdminHeaderTitle
           title={`${circle.name}のファン数 - ${year}/${month}/${day}`}
         />
+        <AdminHeaderActions>
+          <Form method="post" replace>
+            <input type="hidden" name="mode" value={ActionMode.enum.publish} />
+            <Button
+              type="submit"
+              variant="contained"
+              disabled={
+                !!transition.submission ||
+                !memberFanCounts.length ||
+                !!memberFanCounts.filter((m) => m.memberId == null).length
+              }
+            >
+              公開して通知
+            </Button>
+          </Form>
+        </AdminHeaderActions>
       </AdminHeader>
       <div>
         <Tabs
@@ -279,11 +313,48 @@ export default function AdminCircleFanCounts() {
 const AdminCircleFanCountsContent = ({ tabId }: { tabId: TabId }) => {
   return (
     <Stack spacing={4}>
+      <StatusCard />
       <ScreenShotCard tabId={tabId} />
       <PasteCard tabId={tabId} />
       <ManualFormCard tabId={tabId} />
       <EditCard />
     </Stack>
+  );
+};
+
+const StatusCard = () => {
+  const { memberFanCounts, circleFanCount } = useLoaderData<LoaderData>();
+  const unknownMemberFanCounts = useMemo(
+    () => memberFanCounts.filter((m) => !m.memberId).length,
+    [memberFanCounts],
+  );
+  return (
+    <Card>
+      <CardHeader
+        title="公開状態"
+        subheader="公開すると連絡チャンネルにURLが通知されます。"
+      />
+      <CardContent>
+        <Stack spacing={2}>
+          {circleFanCount ? (
+            <>公開済み</>
+          ) : memberFanCounts.length ? (
+            <Alert variant="filled" severity="error">
+              ファン数が1件も入力されていません。最低1件は入力がないと公開できません。
+            </Alert>
+          ) : unknownMemberFanCounts ? (
+            <Alert variant="filled" severity="error">
+              不明なメンバーのファン数記録が{unknownMemberFanCounts}
+              件あります。全ての記録にメンバーを紐付けなければ公開できません。
+            </Alert>
+          ) : (
+            <Alert variant="filled" severity="info">
+              公開できます。
+            </Alert>
+          )}
+        </Stack>
+      </CardContent>
+    </Card>
   );
 };
 
@@ -396,7 +467,7 @@ const ScreenShotCard = ({ tabId }: { tabId: TabId }) => {
               submit(formData!, {
                 replace: true,
                 method: "post",
-                encType: "multipart/form-data"
+                encType: "multipart/form-data",
               });
             }}
           />
@@ -508,9 +579,9 @@ interface FileUploadInputProps {
 const FileUploadInput: React.FC<FileUploadInputProps> = ({ onDrop }) => {
   const { getRootProps, getInputProps } = useDropzone({
     accept: {
-      "image/*": [".png"]
+      "image/*": [".png"],
     },
-    onDrop
+    onDrop,
   });
   return (
     <div
@@ -549,9 +620,9 @@ interface MemberSelectComboBoxProps {
 }
 
 function MemberSelectListbox({
-                               members,
-                               memberFanCount
-                             }: MemberSelectComboBoxProps) {
+  members,
+  memberFanCount,
+}: MemberSelectComboBoxProps) {
   const transition = useTransition();
   const submit = useSubmit();
   return (
@@ -569,9 +640,9 @@ function MemberSelectListbox({
             {
               memberId: member.id,
               memberFanCountId: memberFanCount.id,
-              mode: ActionMode.enum.setMemberId
+              mode: ActionMode.enum.setMemberId,
             },
-            { method: "post", replace: true }
+            { method: "post", replace: true },
           );
         }
       }}
