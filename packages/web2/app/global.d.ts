@@ -6,5 +6,6 @@ declare namespace NodeJS {
     readonly DISCORD_BOT_TOKEN: string;
     readonly BASE_URL: string;
     readonly REDIS_URL: string;
+    readonly ADMIN_API_SECRET: string;
   }
 }
