@@ -81,6 +81,7 @@ export const action: ActionFunction = async ({ request }) => {
       : CircleRole.Member;
 
     await prisma.member.upsert({
+      select: null,
       where: {
         id: user.id,
       },
