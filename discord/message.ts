@@ -8,6 +8,7 @@ import {
 } from "discord-api-types/rest/v9";
 import { createDiscordRestClient } from ".";
 import { prisma } from "../database";
+import { RawFile } from "@discordjs/rest";
 
 export interface DirectMessageRecipient {
   id: string;
@@ -160,5 +161,24 @@ export async function sendDirectMessagesIfPossible<
         data: Buffer.from(csv, "utf-8"),
       },
     ],
+  });
+}
+
+export async function sendMessageToChannel({
+  channelId,
+  message,
+  files = [],
+}: {
+  channelId: string;
+  message: string;
+  files?: Array<RawFile>;
+}) {
+  const rest = createDiscordRestClient();
+  const body: RESTPostAPIChannelMessageJSONBody = {
+    content: message,
+  };
+  await rest.post(Routes.channelMessages(channelId), {
+    body: body,
+    files,
   });
 }
