@@ -24,81 +24,83 @@ export const action: ActionFunction = async ({ request }) => {
       `${Routes.guildMembers(Guild.id)}?limit=1000`
     )) as RESTGetAPIGuildMembersResult
   ).filter((member) => !member.user?.bot && member.user);
-  await prisma.$transaction([
-    // 既に脱退しているが状態が更新されていないメンバーを脱退したことにする
-    prisma.member.updateMany({
+
+  // 既に脱退しているが状態が更新されていないメンバーを脱退したことにする
+  await prisma.member.updateMany({
+    where: {
+      id: {
+        notIn: [...members.map((member) => member.user?.id!)],
+      },
+      status: MemberStatus.Joined,
+    },
+    data: {
+      status: MemberStatus.Leaved,
+      circleKey: null,
+      circleRole: CircleRole.Member,
+    },
+  });
+
+  // 既に脱退しているがjoinedAtが記録されていないメンバーは今離脱したことにする
+  await prisma.member.updateMany({
+    where: {
+      id: {
+        notIn: [...members.map((member) => member.user?.id!)],
+      },
+      status: MemberStatus.Leaved,
+      leavedAt: null,
+    },
+    data: {
+      leavedAt: new Date(),
+      circleKey: null,
+      circleRole: CircleRole.Member,
+    },
+  });
+
+  for (const member of members) {
+    const user = member.user!;
+    const circleIdOrNull = member.roles.filter(
+      (role) => circleIds.indexOf(role) != -1
+    )[0];
+    const isOb = member.roles.includes(Guild.roleIds.ob);
+    const isNotJoined = member.roles.includes(Guild.roleIds.notJoined);
+    const circle =
+      !isOb && !isNotJoined && circleIdOrNull
+        ? Circles.findByRawId(circleIdOrNull)
+        : null;
+    const status = isOb
+      ? MemberStatus.OB
+      : isNotJoined
+      ? MemberStatus.NotJoined
+      : circle != null
+      ? MemberStatus.Joined
+      : MemberStatus.NotJoined;
+    const circleRole = member.roles.includes(Guild.roleIds.leader)
+      ? CircleRole.Leader
+      : member.roles.includes(Guild.roleIds.subLeader)
+      ? CircleRole.SubLeader
+      : CircleRole.Member;
+
+    await prisma.member.upsert({
       where: {
-        id: {
-          notIn: [...members.map((member) => member.user?.id!)],
-        },
-        status: MemberStatus.Joined,
+        id: user.id,
       },
-      data: {
-        status: MemberStatus.Leaved,
-        circleKey: null,
-        circleRole: CircleRole.Member,
+      create: {
+        id: user.id,
+        name: member.nick ?? user.username,
+        circleKey: circle?.key ?? null,
+        circleRole: circleRole,
+        joinedAt: member.joined_at,
+        status,
       },
-    }),
-    // 既に脱退しているがjoinedAtが記録されていないメンバーは今離脱したことにする
-    prisma.member.updateMany({
-      where: {
-        id: {
-          notIn: [...members.map((member) => member.user?.id!)],
-        },
-        status: MemberStatus.Leaved,
-        leavedAt: null,
+      update: {
+        name: member.nick ?? user.username,
+        circleKey: circle?.key ?? null,
+        circleRole: circleRole,
+        joinedAt: member.joined_at,
+        status,
       },
-      data: {
-        leavedAt: new Date(),
-        circleKey: null,
-        circleRole: CircleRole.Member,
-      },
-    }),
-    ...members.map((member) => {
-      const user = member.user!;
-      const circleIdOrNull = member.roles.filter(
-        (role) => circleIds.indexOf(role) != -1
-      )[0];
-      const isOb = member.roles.includes(Guild.roleIds.ob);
-      const isNotJoined = member.roles.includes(Guild.roleIds.notJoined);
-      const circle =
-        !isOb && !isNotJoined && circleIdOrNull
-          ? Circles.findByRawId(circleIdOrNull)
-          : null;
-      const status = isOb
-        ? MemberStatus.OB
-        : isNotJoined
-        ? MemberStatus.NotJoined
-        : circle != null
-        ? MemberStatus.Joined
-        : MemberStatus.NotJoined;
-      const circleRole = member.roles.includes(Guild.roleIds.leader)
-        ? CircleRole.Leader
-        : member.roles.includes(Guild.roleIds.subLeader)
-        ? CircleRole.SubLeader
-        : CircleRole.Member;
-      return prisma.member.upsert({
-        where: {
-          id: user.id,
-        },
-        create: {
-          id: user.id,
-          name: member.nick ?? user.username,
-          circleKey: circle?.key ?? null,
-          circleRole: circleRole,
-          joinedAt: member.joined_at,
-          status,
-        },
-        update: {
-          name: member.nick ?? user.username,
-          circleKey: circle?.key ?? null,
-          circleRole: circleRole,
-          joinedAt: member.joined_at,
-          status,
-        },
-      });
-    }),
-  ]);
+    });
+  }
 
   await prisma.member.updateMany({
     where: {
