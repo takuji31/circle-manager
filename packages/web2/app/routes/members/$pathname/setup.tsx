@@ -58,7 +58,7 @@ const getLoaderData = async (pathname: string) => {
   return {
     member: member,
     signUp: signUp,
-    basePath: `/members/pathname/${member.pathname}/setup`,
+    basePath: `/members/${member.pathname}/setup`,
   };
 };
 
@@ -181,6 +181,6 @@ export default function MemberPathnameSetupRoot() {
 }
 
 export const useSingUpData = () => {
-  const data = useMatchesData(`routes/members/pathname.$pathname/setup`);
+  const data = useMatchesData(`routes/members/$pathname/setup`);
   return data as LoaderData;
 };

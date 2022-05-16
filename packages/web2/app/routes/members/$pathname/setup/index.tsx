@@ -1,19 +1,21 @@
 import type { ActionFunction } from "remix";
 import { Form, redirect, useActionData } from "remix";
 import { prisma } from "~/db.server";
-import { PathnameParams, TrainerId } from "~/schema/member";
+import { PathnameParams, TrainerName } from "~/schema/member";
 import { z } from "zod";
 import type { Params } from "react-router";
 import { notFound } from "~/response.server";
-import { useSingUpData } from "~/routes/members/pathname.$pathname/setup";
-import { Link } from "@remix-run/react";
-import { Button, Grid, TextField } from "@mui/material";
+import { updateMemberName } from "~/model/member.server";
+import { useSingUpData } from "~/routes/members/$pathname/setup";
+import { TextField } from "@mui/material";
 import { useState } from "react";
+import { Grid } from "@mui/material";
+import { Button } from "@mui/material";
 
 type ActionData = Awaited<ReturnType<typeof getActionData>>;
 
-const trainerIdSchema = z.object({
-  trainerId: TrainerId,
+const schema = z.object({
+  name: TrainerName,
 });
 
 const getActionData = async (request: Request, params: Params<string>) => {
@@ -29,15 +31,20 @@ const getActionData = async (request: Request, params: Params<string>) => {
     throw notFound();
   }
 
-  const result = trainerIdSchema.safeParse(data);
+  const result = schema.safeParse(data);
   if (!result.success) {
     return {
       error: result.error.format(),
     };
   }
-  const { trainerId } = result.data;
-  await prisma.member.update({ where: { id: member.id }, data: { trainerId } });
-  throw redirect(`/members/pathname/${pathname}/setup/circle`);
+  if (
+    result.success &&
+    member.name != result.data.name &&
+    process.env.NODE_ENV == "production"
+  ) {
+    await updateMemberName({ memberId: member.id, name: result.data.name });
+  }
+  throw redirect(`/members/${pathname}/setup/trainer_id`);
 };
 
 export const action: ActionFunction = async ({ request, params }) => {
@@ -45,56 +52,43 @@ export const action: ActionFunction = async ({ request, params }) => {
 };
 
 export default function MemberPathnameSetupRoot() {
-  const { member, basePath } = useSingUpData();
+  const { member, signUp, basePath } = useSingUpData();
   const actionData = useActionData<ActionData>();
-  const error = actionData?.error?.trainerId?._errors?.join("/");
-
-  const [trainerId, setTrainerId] = useState(member.trainerId);
+  const error = actionData?.error?.name?._errors?.join("/");
+  const [name, setName] = useState(member.name);
 
   return (
     <div className="max-w-full">
       <div>
         <p className="mt-4 text-sm">
-          加入手続きやグループ内移籍のためにトレーナーID登録が必要です。勧誘時にメンバーにトレーナーIDを共有している場合も必ずここで入力してください。
+          ファン数記録、連絡、移籍といった各種手続きやDiscordサーバー内での円滑なコミュニケーションのためにトレーナー名をDiscordサーバーニックネームとして登録します。
         </p>
         <p className="text-base leading-6 text-gray-500"></p>
       </div>
       <div className="mt-4">
         <Form method="post" className="space-y-6">
           <TextField
-            id="trainerId"
-            label="トレーナーID"
+            id="name"
+            label="トレーナー名"
             fullWidth
-            value={trainerId}
-            onChange={(event) => setTrainerId(event.currentTarget.value)}
+            value={name}
+            onChange={(event) => setName(event.currentTarget.value)}
             error={!!error}
             helperText={
               error
                 ? error
-                : "ゲームの「メニュー」→「プロフィール/トレーナー名刺」→「IDコピー」でコピーされた値を貼り付けてください。"
+                : "ゲーム内のトレーナー名とは必ず「完全一致」にしてください。"
             }
-            name="trainerId"
+            name="name"
           />
           <Grid
             container
             direction="row-reverse"
             justifyItems={{ xs: "center", sm: "end" }}
-            spacing={2}
           >
             <Grid item xs={12} sm={6}>
               <Button variant="contained" type="submit" className="w-full">
                 次へ
-              </Button>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Button
-                component={Link}
-                to={`${basePath}/`}
-                variant="contained"
-                type="submit"
-                className="w-full"
-              >
-                戻る
               </Button>
             </Grid>
           </Grid>

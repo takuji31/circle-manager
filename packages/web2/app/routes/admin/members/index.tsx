@@ -152,14 +152,14 @@ export default function AdminMemberList() {
                             </IconButton>
                             <Menu {...bindMenu(popupState)}>
                               <RemixLink
-                                to={`/members/pathname/${member.pathname}/setup`}
+                                to={`/members/${member.pathname}/setup`}
                               >
                                 <MenuItem onClick={popupState.close}>
                                   加入申請URLを開く
                                 </MenuItem>
                               </RemixLink>
                               <RemixLink
-                                to={`/members/pathname/${member.pathname}/edit`}
+                                to={`/members/${member.pathname}/edit`}
                               >
                                 <MenuItem onClick={popupState.close}>
                                   トレーナーID登録URLを開く
