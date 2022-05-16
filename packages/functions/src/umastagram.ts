@@ -192,7 +192,7 @@ const findTab = async (page: puppeteer.Page, tabName: string) => {
 
 export const getUmastagramFanCounts = functions
   .runWith({
-    memory: '512MB',
+    memory: '1GB',
   })
   .https.onRequest(async (request, response) => {
     const { url } = request.query;
