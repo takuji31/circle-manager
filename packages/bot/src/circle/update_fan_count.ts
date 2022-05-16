@@ -94,7 +94,7 @@ export const updateFanCountFromChannel = async ({
   month: number | null;
   day: number | null;
 }) => {
-  const today = LocalDate.today();
+  const today = LocalDate.yesterday();
   const date = LocalDate.of(
     year ?? today.year(),
     month ?? today.monthValue(),
