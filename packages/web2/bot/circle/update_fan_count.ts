@@ -5,7 +5,7 @@ import {
   LocalDate,
 } from "@circle-manager/shared/model";
 import { Message, TextChannel } from "discord.js";
-import { crawlUmastagram } from "umastagram/crawler";
+import { crawlUmastagram } from "../umastagram/crawler";
 
 const urlPattern =
   /https:\/\/umastagram.com\/circle\/grade\/graph\/share\/[a-zA-Z0-9]+/;
