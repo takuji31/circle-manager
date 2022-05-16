@@ -1,15 +1,13 @@
 import { sendMessageToChannel } from "@/discord";
-import {
-  Circles,
-  DateFormats,
-  LocalDate,
-  Period,
-  TemporalAdjusters,
-} from "@/model";
+import { Circles, DateFormats, LocalDate, Period, TemporalAdjusters } from "@/model";
 import type { CircleKey } from "@prisma/client";
 import { MemberFanCountSource } from "@prisma/client";
+import { ChartDataset, DefaultDataPoint } from "chart.js";
+import type { ChartData } from "chart.js";
+import _ from "lodash";
 import { prisma } from "~/db.server";
 import type { ActiveCircleKey } from "~/schema/member";
+import { getDatesFrom } from "./date.server";
 import { getCircleMembers } from "./member.server";
 
 export async function getCircleFanCount({
@@ -39,6 +37,96 @@ export async function getCircleFanCount({
     });
 }
 
+export async function getCircleFanCountGraph({
+  date,
+  circleKey,
+}: {
+  date: LocalDate;
+  circleKey: CircleKey;
+}) {
+  const firstDayOfMonth = date.firstDayOfMonth();
+  const lastDayOfPreviousMonth = firstDayOfMonth.minusDays(1);
+  const circleFanCount = await getCircleFanCount({
+    date,
+    circleKey,
+  });
+  if (!circleFanCount) {
+    return null;
+  }
+
+  const thisMonthMemberFanCounts = _.chain(
+    await prisma.memberFanCount.findMany({
+      where: {
+        circleKey,
+        date: {
+          gte: lastDayOfPreviousMonth.toUTCDate(),
+          lte: date.toUTCDate(),
+        },
+      },
+      include: {
+        member: true,
+      },
+    }),
+  )
+    .groupBy((m) => m.memberId)
+    .mapValues((l) =>
+      _.orderBy(l, (m) => m.date.getTime(), 'desc').map(
+        ({ total, monthlyAvg, monthlyTotal, ...m }, idx, list) => {
+
+          const beforeFanCount = list[idx + 1];
+          const diffFromBefore = beforeFanCount && beforeFanCount.monthlyTotal != null ?  parseInt((monthlyTotal! - beforeFanCount?.monthlyTotal!).toString()) : null;
+          return {
+            ...m,
+            total: parseInt(total.toString()),
+            monthlyTotal:
+              monthlyTotal != null ? parseInt(monthlyTotal.toString()) : null,
+            monthlyAvg:
+              monthlyAvg != null ? parseInt(monthlyAvg.toString()) : null,
+            diffFromBefore,
+            beforeRecordedAt: beforeFanCount?.date ? LocalDate.fromUTCDate(beforeFanCount.date).format(DateFormats.ymd) : null,
+          };
+        },
+      ),
+    )
+    .values()
+    .orderBy((l) => l[0].monthlyTotal, "desc")
+    .value();
+
+  const memberFanCounts = thisMonthMemberFanCounts.map((l) => l[0]);
+
+  const labels = getDatesFrom({
+    start: date,
+    period: Period.between(date, date.firstDayOfMonth()).minusDays(2),
+  })
+    .map((d) => {
+      return `${d.month}/${d.day}`;
+    })
+    .reverse();
+  const totalGraphData: ChartData<"line"> = {
+    datasets: thisMonthMemberFanCounts.map((fans, idx) => {
+      const first = fans[0];
+      return {
+        label: first.member?.name,
+        data: fans.map((m) => m.monthlyTotal).reverse(),
+      };
+    }),
+    labels,
+  };
+
+  const diffGraphData: ChartData<"line"> = {
+    datasets: thisMonthMemberFanCounts.map((fans ) => {
+      const first = fans[0];
+      return {
+        label: first.member?.name,
+        data: fans.map((m) => m.diffFromBefore ?? 0).reverse(),
+      };
+    }),
+    labels,
+  };
+
+  return { circleFanCount, memberFanCounts, thisMonthMemberFanCounts, totalGraphData, diffGraphData };
+}
+
 export async function getCircleMemberFanCounts({
   date,
   circleKey,
@@ -60,7 +148,7 @@ export async function getCircleMemberFanCounts({
           monthlyTotal: monthlyTotal ? parseInt(monthlyTotal.toString()) : null,
           monthlyAvg: monthlyAvg ? parseInt(monthlyAvg.toString()) : null,
         };
-      })
+      }),
     );
 }
 
@@ -69,6 +157,7 @@ interface ParseTsvParams {
   date: LocalDate;
   tsv: string;
 }
+
 export async function parseTsv({ circleKey, date, tsv }: ParseTsvParams) {
   const parsedTsv: Array<ParsedMemberNameAndFanCount> = tsv
     .split(/\r?\n/)
@@ -94,19 +183,21 @@ export async function parseTsv({ circleKey, date, tsv }: ParseTsvParams) {
 }
 
 export type ParsedMemberNameAndFanCount = [string, number];
+
 export interface ParseMemberNameAndFanCountParams {
   circleKey: ActiveCircleKey;
   date: LocalDate;
   source:
     | {
-        type: "Paste";
-      }
+    type: "Paste";
+  }
     | {
-        type: "ScreenShot";
-        screenShotId: string;
-      };
+    type: "ScreenShot";
+    screenShotId: string;
+  };
   memberAndFanCounts: Array<ParsedMemberNameAndFanCount>;
 }
+
 export async function parseMemberNameAndFanCount({
   circleKey,
   date,
@@ -135,7 +226,7 @@ export async function parseMemberNameAndFanCount({
 
   const memberNameToMemberId: Record<string, string> = {
     ...Object.fromEntries(
-      memberFanCounts.map(({ memberId, parsedName }) => [parsedName, memberId])
+      memberFanCounts.map(({ memberId, parsedName }) => [parsedName, memberId]),
     ),
     ...Object.fromEntries(members.map((m) => [m.name, m.id])),
   };
@@ -156,7 +247,7 @@ export async function parseMemberNameAndFanCount({
           total,
         },
       });
-    })
+    }),
   );
 }
 
@@ -164,6 +255,7 @@ interface PublishCircleFanCountParams {
   circleKey: CircleKey;
   date: LocalDate;
 }
+
 export async function calculateMonthlyTotalFanCounts({
   circleKey,
   date,
@@ -191,10 +283,8 @@ export async function calculateMonthlyTotalFanCounts({
     },
   });
 
-  const memberIdToFirstFanCount: Record<
-    string,
-    { count: number | null; date: LocalDate } | null
-  > = Object.fromEntries(
+  const memberIdToFirstFanCount: Record<string,
+    { count: number | null; date: LocalDate } | null> = Object.fromEntries(
     members.map((member) => {
       const fanCount = member.memberFanCounts[0];
       return [
@@ -202,11 +292,11 @@ export async function calculateMonthlyTotalFanCounts({
         !fanCount
           ? null
           : {
-              count: parseInt(fanCount.total.toString()),
-              date: LocalDate.fromUTCDate(fanCount.date),
-            },
+            count: parseInt(fanCount.total.toString()),
+            date: LocalDate.fromUTCDate(fanCount.date),
+          },
       ];
-    })
+    }),
   );
 
   console.log(memberIdToFirstFanCount);
@@ -242,7 +332,7 @@ export async function calculateMonthlyTotalFanCounts({
             monthlyTotal,
             monthlyAvg,
           },
-        })
+        }),
       );
     }
   }
@@ -266,16 +356,16 @@ export async function publishCircleFanCount({
 
   if (
     memberFanCounts.filter(
-      (m) => !m.memberId || m.monthlyTotal == null || m.monthlyAvg == null
+      (m) => !m.memberId || m.monthlyTotal == null || m.monthlyAvg == null,
     ).length
   ) {
     throw new Error(
-      "不明なメンバーのファン数記録があります。全ての記録にメンバーを紐付けなければ公開できません。"
+      "不明なメンバーのファン数記録があります。全ての記録にメンバーを紐付けなければ公開できません。",
     );
   }
 
   const daysLeftInMonth = BigInt(
-    Period.between(date, date.with(TemporalAdjusters.lastDayOfMonth())).days()
+    Period.between(date, date.with(TemporalAdjusters.lastDayOfMonth())).days(),
   );
   const memberCount = BigInt(memberFanCounts.length);
 
@@ -305,7 +395,7 @@ export async function publishCircleFanCount({
   await sendMessageToChannel({
     channelId: circle.notificationChannelId,
     message: `${date.format(
-      DateFormats.ymd
+      DateFormats.ymd,
     )}のファン数を更新しました。以下のURLから確認できます。 ${
       process.env.BASE_URL
     }/circles/${circleKey}/fans/${date.year()}/${date.monthValue()}/${date.dayOfMonth()}`,

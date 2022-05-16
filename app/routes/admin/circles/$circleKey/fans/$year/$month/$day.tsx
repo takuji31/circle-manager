@@ -117,7 +117,10 @@ const getLoaderData = async ({ params }: DataFunctionArgs) => {
   const screenShots = await getScreenShots({ date, circleKey });
   const members = await getCircleMembers({ circleKey });
   const memberFanCounts = await getCircleMemberFanCounts({ date, circleKey });
-  const circleFanCount = await getCircleFanCount({ date, circleKey });
+  const circleFanCount = await getCircleFanCount({
+    date,
+    circleKey,
+  });
   return {
     ...dateToYMD(date),
     circle,
