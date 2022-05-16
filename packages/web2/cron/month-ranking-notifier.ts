@@ -5,23 +5,44 @@ import {
   MonthCircleState,
   NextMonthCirclesDocument,
 } from "../../web/src/graphql/generated/type";
-import { Circles, isCircleKey } from "@circle-manager/shared/model";
+import {
+  Circles,
+  isCircleKey,
+  nextMonthInt,
+} from "@circle-manager/shared/model";
+import { prisma } from "@circle-manager/shared/database";
 
 config();
 
 (async () => {
   const isProduction = process.env.NODE_ENV == "production";
 
-  const urql = createUrqlClient();
+  const { year, month } = nextMonthInt();
 
-  const response = await urql.query(NextMonthCirclesDocument).toPromise();
-  const monthCircles = response.data?.nextMonth.monthCircles;
-
-  if (!monthCircles) {
-    throw new Error(
-      "Cannot create month circle. error" + response.error?.message
+  const monthCircles = await prisma.monthCircle
+    .findMany({
+      where: {
+        year,
+        month,
+        member: {
+          leavedAt: null,
+        },
+      },
+      include: {
+        member: true,
+      },
+    })
+    .then((monthCircles) =>
+      monthCircles.map((m) => {
+        const circle = isCircleKey(m.state)
+          ? Circles.findByCircleKey(m.state)
+          : null;
+        return {
+          ...m,
+          circle,
+        };
+      })
     );
-  }
 
   await sendDirectMessagesIfPossible(
     monthCircles.map(({ circle, member, state }) => ({
