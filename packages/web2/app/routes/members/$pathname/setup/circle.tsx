@@ -7,7 +7,7 @@ import { classNames } from "~/lib";
 import { z } from "zod";
 import { Params } from "react-router";
 import { notFound } from "~/response.server";
-import { useSingUpData } from "~/routes/members/pathname.$pathname/setup";
+import { useSingUpData } from "~/routes/members/$pathname/setup";
 import { useState } from "react";
 import { RadioGroup } from "@headlessui/react";
 import { Circles } from "@circle-manager/shared/model";
@@ -46,7 +46,7 @@ const getActionData = async (request: Request, params: Params<string>) => {
 
   await updateMemberSignUpCircle({ memberId: member.id, circleKey: circle });
 
-  throw redirect(`/members/pathname/${pathname}/setup/completed`);
+  throw redirect(`/members/${pathname}/setup/completed`);
 };
 
 export const action: ActionFunction = async ({ request, params }) => {
