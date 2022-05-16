@@ -29,7 +29,18 @@
     "db:generate": "prisma generate",
     "db:studio": "prisma studio",
     "db:format": "prisma format",
-    "db:push": "prisma db push"
+    "db:push": "prisma db push",
+    "send-select-circle-message": "yarn ts-node tools/send-select-circle-message",
+    "cron:month-survey-reminder": "curl https://cronitor.link/p/2028ed5e5f8544a5adfc7de3d7dd2455/month-survey-reminder?state=run ; yarn ts-node cron/month-survey-reminder && curl https://cronitor.link/p/2028ed5e5f8544a5adfc7de3d7dd2455/month-survey-reminder?state=complete || curl https://cronitor.link/p/2028ed5e5f8544a5adfc7de3d7dd2455/month-survey-reminder?state=fail",
+    "cron:month-circle-notifier": "curl https://cronitor.link/p/2028ed5e5f8544a5adfc7de3d7dd2455/month-circle-notifier?state=run ; yarn ts-node cron/month-circle-notifier && curl https://cronitor.link/p/2028ed5e5f8544a5adfc7de3d7dd2455/month-circle-notifier?state=complete || curl https://cronitor.link/p/2028ed5e5f8544a5adfc7de3d7dd2455/month-circle-notifier?state=fail",
+    "cron:start-month-survey": "curl https://cronitor.link/p/2028ed5e5f8544a5adfc7de3d7dd2455/start-month-survey?state=run ; yarn ts-node cron/start-month-survey && curl https://cronitor.link/p/2028ed5e5f8544a5adfc7de3d7dd2455/start-month-survey?state=complete || curl https://cronitor.link/p/2028ed5e5f8544a5adfc7de3d7dd2455/start-month-survey?state=fail",
+    "cron:month-ranking-maker": "yarn ts-node cron/month-ranking-maker",
+    "cron:month-ranking-notifier": "yarn ts-node cron/month-ranking-notifier",
+    "cron:legend-race-reminder": "yarn ts-node cron/legend-race-reminder",
+    "cron:team-race-reminder": "yarn ts-node cron/team-race-reminder",
+    "cron:daily-legend-race-reminder": "yarn ts-node cron/daily-legend-race-reminder",
+    "tools:daily-ranking-maker": "yarn ts-node tools/daily-ranking-maker",
+    "ts-node": "ts-node -r tsconfig-paths/register --compiler-options '{\"module\":\"commonjs\"}' "
   },
   "prettier": {},
   "eslintIgnore": [
@@ -82,6 +93,8 @@
     "simplebar": "^5.3.6",
     "simplebar-react": "^2.3.7",
     "tiny-invariant": "^1.2.0",
+    "ts-node": "^10.7.0",
+    "tsconfig-paths": "^4.0.0",
     "zod": "^3.14.4"
   },
   "devDependencies": {

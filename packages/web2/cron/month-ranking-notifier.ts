@@ -1,16 +1,16 @@
-import { config } from 'dotenv';
-import { sendDirectMessagesIfPossible } from '@circle-manager/shared/discord';
-import { createUrqlClient } from '../graphql/client/serverside';
+import { config } from "dotenv";
+import { sendDirectMessagesIfPossible } from "@circle-manager/shared/discord";
+import { createUrqlClient } from "../../web/src/graphql/client/serverside";
 import {
   MonthCircleState,
   NextMonthCirclesDocument,
-} from '../graphql/generated/type';
-import { Circles, isCircleKey } from '@circle-manager/shared/model';
+} from "../../web/src/graphql/generated/type";
+import { Circles, isCircleKey } from "@circle-manager/shared/model";
 
 config();
 
 (async () => {
-  const isProduction = process.env.NODE_ENV == 'production';
+  const isProduction = process.env.NODE_ENV == "production";
 
   const urql = createUrqlClient();
 
@@ -19,7 +19,7 @@ config();
 
   if (!monthCircles) {
     throw new Error(
-      'Cannot create month circle. error' + response.error?.message
+      "Cannot create month circle. error" + response.error?.message
     );
   }
 
@@ -72,6 +72,6 @@ Discordからは3日後くらいを目処に削除しますので、挨拶等あ
       }
       throw new Error(`Unknown state ${state}`);
     },
-    `来月のサークル通知の送信結果 ${!isProduction ? '(テスト)' : ''}\n`
+    `来月のサークル通知の送信結果 ${!isProduction ? "(テスト)" : ""}\n`
   );
 })();
