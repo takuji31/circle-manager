@@ -148,10 +148,10 @@ client.on("interactionCreate", async (interaction) => {
       }
 
       const year = interaction.options.getInteger("year", false);
-      const month = interaction.options.getInteger("year", false);
-      const day = interaction.options.getInteger("year", false);
+      const month = interaction.options.getInteger("month", false);
+      const day = interaction.options.getInteger("day", false);
 
-      interaction.reply({
+      await interaction.reply({
         content: "ファン数取得を開始します",
         ephemeral: true,
       });
@@ -164,7 +164,7 @@ client.on("interactionCreate", async (interaction) => {
         day,
       });
 
-      interaction.editReply({ content: "ファン数取得完了しました" });
+      await interaction.editReply({ content: "ファン数取得完了しました" });
     }
   } catch (e) {
     console.log("Error when interactionCreate %s", e);
