@@ -13,7 +13,7 @@
     "build:remix": "remix build",
     "dev": "run-p dev:*",
     "dev:css": "yarn generate:css --watch",
-    "dev:remix": "cross-env NODE_ENV=development binode --require ./mocks -- @remix-run/dev:remix dev",
+    "dev:remix": "cross-env NODE_ENV=development remix dev",
     "format": "prettier --write .",
     "generate": "run-p generate:*",
     "generate:css": "tailwindcss -i ./app/styles/app.css -o ./app/styles/tailwind.css",
