@@ -13,7 +13,7 @@ import {
 import LogoutIcon from "@mui/icons-material/Logout";
 import { Form } from "remix";
 import { useUser } from "~/utils";
-import { Circles } from "@circle-manager/shared/model";
+import { Circles } from "@/model";
 import { Person } from "@mui/icons-material";
 
 interface AccountPopoverProps {

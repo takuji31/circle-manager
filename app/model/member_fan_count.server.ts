@@ -1,4 +1,4 @@
-import { LocalDate, TemporalAdjusters } from "@circle-manager/shared/model";
+import { LocalDate, TemporalAdjusters } from "@/model";
 import type { CircleKey } from "@prisma/client";
 import { MemberFanCountSource } from "@prisma/client";
 import { prisma } from "~/db.server";

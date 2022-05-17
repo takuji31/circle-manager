@@ -1,5 +1,5 @@
-import { createDiscordRestClient } from "@circle-manager/shared/discord";
-import { Circles, Guild } from "@circle-manager/shared/model";
+import { createDiscordRestClient } from "@/discord";
+import { Circles, Guild } from "@/model";
 import { CircleRole, MemberStatus } from "@prisma/client";
 import type { RESTGetAPIGuildMembersResult } from "discord-api-types/v9";
 import { Routes } from "discord-api-types/v9";

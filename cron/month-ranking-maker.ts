@@ -1,5 +1,5 @@
 import { config } from "dotenv";
-import { sendAdminNotificationMessage } from "@circle-manager/shared/discord";
+import { sendAdminNotificationMessage } from "@/discord";
 import { stringify } from "csv-stringify/sync";
 import {
   Circles,
@@ -7,8 +7,8 @@ import {
   monthCircleStateLabel,
   nextMonthInt,
   ZonedDateTime,
-} from "@circle-manager/shared/model";
-import { prisma } from "@circle-manager/shared/database";
+} from "@/model";
+import { prisma } from "@/database";
 import {
   CircleKey,
   CircleRole,

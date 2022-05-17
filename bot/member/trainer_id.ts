@@ -1,5 +1,5 @@
 import { CommandInteraction } from "discord.js";
-import { prisma } from "@circle-manager/shared/database";
+import { prisma } from "@/database";
 export const trainerIdCommand = async (interaction: CommandInteraction) => {
   // ignore when develop
   if (process.env.NODE_ENV != "production") return;

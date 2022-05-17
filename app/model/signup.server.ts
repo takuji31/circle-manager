@@ -1,10 +1,10 @@
 import { prisma } from "~/db.server";
-import { Circles } from "@circle-manager/shared/model";
+import { Circles } from "@/model";
 import {
   sendAdminNotificationMessage,
   sendInvitedMessage,
   setMemberCircleRole,
-} from "@circle-manager/shared/discord";
+} from "@/discord";
 import { ActiveCircleKey } from "~/schema/member";
 
 export const getNotJoinedSignUps = ({ invited }: { invited?: boolean }) => {

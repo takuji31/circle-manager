@@ -4,7 +4,7 @@ import type { Params } from "react-router";
 import { z } from "zod";
 import { ActiveCircleKey } from "~/schema/member";
 import { notFound } from "~/response.server";
-import { Circles, LocalDate, Period } from "@circle-manager/shared/model";
+import { Circles, LocalDate, Period } from "@/model";
 import { getDatesFrom } from "~/model/date.server";
 import { Card, CardHeader } from "@mui/material";
 import { Grid } from "@mui/material";

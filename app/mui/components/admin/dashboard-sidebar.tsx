@@ -21,7 +21,7 @@ import { useLocation } from "remix";
 import { Group, Home, PersonAdd, UnfoldMore } from "@mui/icons-material";
 import { SelectorIcon } from "@heroicons/react/outline";
 import { DateTime } from "luxon";
-import { Circles } from "@circle-manager/shared/model";
+import { Circles } from "@/model";
 
 interface DashboardSidebarProps {
   onClose?: () => void;

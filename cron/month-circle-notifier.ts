@@ -3,10 +3,10 @@ import {
   monthSurveyAnswerLabel,
   DateFormats,
   ZonedDateTime,
-} from '@circle-manager/shared/model';
-import { prisma } from '@circle-manager/shared/database';
+} from '@/model';
+import { prisma } from '@/database';
 import { config } from 'dotenv';
-import { sendDirectMessagesIfPossible } from '@circle-manager/shared/discord';
+import { sendDirectMessagesIfPossible } from '@/discord';
 
 config();
 

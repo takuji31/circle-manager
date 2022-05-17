@@ -1,4 +1,4 @@
-import { prisma } from "@circle-manager/shared/database";
+import { prisma } from "@/database";
 import { config } from "dotenv";
 import {
   Guild,
@@ -7,9 +7,9 @@ import {
   MonthSurveyEmoji,
   DateFormats,
   LocalDate,
-} from "@circle-manager/shared/model";
+} from "@/model";
 import { Member, MemberStatus } from "@prisma/client";
-import { createDiscordRestClient } from "@circle-manager/shared/discord";
+import { createDiscordRestClient } from "@/discord";
 import { MessageEmbed } from "discord.js";
 import {
   RESTPostAPIWebhookWithTokenWaitResult,

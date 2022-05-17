@@ -1,4 +1,4 @@
-import type { LocalDate, Period } from "@circle-manager/shared/model";
+import type { LocalDate, Period } from "@/model";
 
 export interface YMD {
   year: number;

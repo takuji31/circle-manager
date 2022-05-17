@@ -3,7 +3,7 @@ import {
   Circle,
   DateFormats,
   LocalDate,
-} from "@circle-manager/shared/model";
+} from "@/model";
 import { Message, TextChannel } from "discord.js";
 import { crawlUmastagram } from "../umastagram/crawler";
 

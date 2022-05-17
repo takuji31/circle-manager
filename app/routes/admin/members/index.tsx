@@ -4,7 +4,7 @@ import {
   memberStatusLabel,
   monthCircleStateLabel,
   monthSurveyAnswerLabel,
-} from "@circle-manager/shared/model";
+} from "@/model";
 import React, { useState } from "react";
 import type { LoaderFunction } from "remix";
 import { json, useLoaderData } from "remix";

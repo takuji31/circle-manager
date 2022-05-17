@@ -1,8 +1,8 @@
-import { Circles } from '@circle-manager/shared/model';
+import { Circles } from '@/model';
 import { config } from 'dotenv';
-import { prisma } from '@circle-manager/shared/database';
+import { prisma } from '@/database';
 import { CircleKey } from '@prisma/client';
-import { LocalDate, DateTimeFormatter } from '@circle-manager/shared/model';
+import { LocalDate, DateTimeFormatter } from '@/model';
 
 config();
 

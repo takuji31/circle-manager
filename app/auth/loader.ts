@@ -3,7 +3,7 @@ import { redirect } from "remix";
 import { authenticator } from "~/auth.server";
 import type { AppData } from "@remix-run/server-runtime/data";
 import type { DataFunctionArgs } from "@remix-run/server-runtime/routeModules";
-import type { SessionUser } from "@circle-manager/shared/model";
+import type { SessionUser } from "@/model";
 
 export const adminOnly: (fun?: LoaderFunctionWithUser) => LoaderFunction = (
   fun = () => null

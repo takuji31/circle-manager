@@ -1,5 +1,5 @@
 import { ReactionHandlerWithData } from "./types";
-import { prisma } from "@circle-manager/shared/database";
+import { prisma } from "@/database";
 import {
   CircleKey,
   MemberStatus,
@@ -10,7 +10,7 @@ import {
   isValidMonthSurveyEmoji,
   MonthSurveyEmoji,
   monthSurveyAnswerLabel,
-} from "@circle-manager/shared/model";
+} from "@/model";
 
 export const monthSurveyReaction: ReactionHandlerWithData<MonthSurvey> = async (
   reaction,

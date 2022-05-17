@@ -1,6 +1,6 @@
 import { config } from 'dotenv';
-import { DbTableData } from '@circle-manager/shared/model';
-import { prisma } from '@circle-manager/shared/database';
+import { DbTableData } from '@/model';
+import { prisma } from '@/database';
 import * as fs from 'fs/promises';
 
 config();

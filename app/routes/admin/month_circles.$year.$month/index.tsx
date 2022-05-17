@@ -14,7 +14,7 @@ import { YearAndMonth } from "~/schema/date";
 import type { Params } from "react-router";
 import type { MonthCircle } from "~/model/month_circle.server";
 import { getMonthCircles } from "~/model/month_circle.server";
-import { monthCircleStateLabel } from "@circle-manager/shared/model";
+import { monthCircleStateLabel } from "@/model";
 import AdminHeader from "~/components/admin/header";
 import AdminHeaderTitle from "~/components/admin/header/title";
 import AdminHeaderActions from "~/components/admin/header/actions";

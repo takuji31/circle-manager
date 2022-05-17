@@ -1,4 +1,4 @@
-import { monthCircleStateLabel } from "@circle-manager/shared/model";
+import { monthCircleStateLabel } from "@/model";
 import { MonthCircleState } from "@prisma/client";
 import type { Params } from "react-router";
 import type { ActionFunction, LoaderFunction } from "remix";

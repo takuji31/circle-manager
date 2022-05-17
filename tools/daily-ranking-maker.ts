@@ -1,13 +1,13 @@
-import { Circles } from '@circle-manager/shared/model';
+import { Circles } from '@/model';
 import { config } from 'dotenv';
-import { prisma } from '@circle-manager/shared/database';
+import { prisma } from '@/database';
 import {
   Guild,
   nextMonthInt,
   thisMonthInt,
-} from '@circle-manager/shared/model';
+} from '@/model';
 import { stringify } from 'csv-stringify/sync';
-import { createDiscordRestClient } from '@circle-manager/shared/discord';
+import { createDiscordRestClient } from '@/discord';
 import { Routes } from 'discord-api-types/v9';
 import {
   CircleKey,
@@ -17,12 +17,12 @@ import {
   MonthCircle,
   MonthSurveyAnswerValue,
 } from '@prisma/client';
-import { monthCircleStateLabel } from '@circle-manager/shared/model';
+import { monthCircleStateLabel } from '@/model';
 import {
   LocalDate,
   ZonedDateTime,
   DateFormats,
-} from '@circle-manager/shared/model';
+} from '@/model';
 
 config();
 

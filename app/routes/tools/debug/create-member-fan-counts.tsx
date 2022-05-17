@@ -1,4 +1,4 @@
-import { Circles, LocalDate, Period } from "@circle-manager/shared/model";
+import { Circles, LocalDate, Period } from "@/model";
 import { MemberFanCountSource } from "@prisma/client";
 import type { ActionFunction } from "remix";
 import { json } from "remix";

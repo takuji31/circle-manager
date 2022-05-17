@@ -9,7 +9,7 @@ import {
   Circles,
   nextMonthInt,
   thisMonthInt,
-} from "@circle-manager/shared/model";
+} from "@/model";
 import { classNames } from "~/lib";
 import { Link } from "@remix-run/react";
 import {

@@ -1,6 +1,6 @@
 import { useMatches } from "@remix-run/react";
 import { useMemo } from "react";
-import type { SessionUser } from "@circle-manager/shared/model";
+import type { SessionUser } from "@/model";
 
 const DEFAULT_REDIRECT = "/";
 

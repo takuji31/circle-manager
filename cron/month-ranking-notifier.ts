@@ -1,16 +1,8 @@
 import { config } from "dotenv";
-import { sendDirectMessagesIfPossible } from "@circle-manager/shared/discord";
-import { createUrqlClient } from "../../web/src/graphql/client/serverside";
-import {
-  MonthCircleState,
-  NextMonthCirclesDocument,
-} from "../../web/src/graphql/generated/type";
-import {
-  Circles,
-  isCircleKey,
-  nextMonthInt,
-} from "@circle-manager/shared/model";
-import { prisma } from "@circle-manager/shared/database";
+import { sendDirectMessagesIfPossible } from "@/discord";
+import { Circles, isCircleKey, nextMonthInt } from "@/model";
+import { prisma } from "@/database";
+import { MonthCircleState } from "@prisma/client";
 
 config();
 
@@ -74,7 +66,7 @@ Discordからは3日後くらいを目処に削除しますので、挨拶等あ
 もし再び当サークルに所属したくなった場合はお知らせください、状況次第ですが対応させていだたきます。
 
 当サークルを選んでいただき、ありがとうございました。新天地での活躍をお祈りします。`;
-      } else if (state == MonthCircleState.Ob) {
+      } else if (state == MonthCircleState.OB) {
         return `※このメッセージは自動送信です。
 
 サークル脱退について承りました。

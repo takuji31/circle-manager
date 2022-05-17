@@ -1,7 +1,7 @@
 import { bucket } from "~/firebase.server";
 import type { ActiveCircleKey } from "~/schema/member";
 import type { z } from "zod";
-import { LocalDate } from "@circle-manager/shared/model";
+import { LocalDate } from "@/model";
 import { prisma } from "~/db.server";
 import * as os from "os";
 import { mkdtemp, writeFile } from "fs/promises";

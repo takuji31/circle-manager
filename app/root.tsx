@@ -16,7 +16,7 @@ import {
 
 import tailwindStylesheetUrl from "./styles/tailwind.css";
 import { authenticator } from "./auth.server";
-import type { SessionUser } from "@circle-manager/shared/model";
+import type { SessionUser } from "@/model";
 import * as React from "react";
 import { withEmotionCache } from "@emotion/react";
 import {

@@ -4,7 +4,7 @@ import { z } from "zod";
 import { ActiveCircleKey } from "~/schema/member";
 import { YMD } from "~/schema/date";
 import type { DataFunctionArgs, LoaderFunction } from "@remix-run/node";
-import { Circles, LocalDate, SessionUser } from "@circle-manager/shared/model";
+import { Circles, LocalDate, SessionUser } from "@/model";
 import { dateToYMD } from "~/model/date.server";
 import type { ActionFunction } from "remix";
 import {

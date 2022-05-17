@@ -1,8 +1,8 @@
 import { Authenticator } from "remix-auth";
 import { sessionStorage } from "~/session.server";
 import { DiscordStrategy } from "remix-auth-discord";
-import { Guild, SessionUser } from "@circle-manager/shared/model";
-import { createDiscordRestClient } from "@circle-manager/shared/discord";
+import { Guild, SessionUser } from "@/model";
+import { createDiscordRestClient } from "@/discord";
 import invariant from "tiny-invariant";
 import { prisma } from "./db.server";
 import {

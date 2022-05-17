@@ -1,12 +1,12 @@
-import { prisma } from "@circle-manager/shared/database";
+import { prisma } from "@/database";
 import {
   Guild,
   Circle,
   DateFormats,
   LocalDate,
-} from "@circle-manager/shared/model";
+} from "@/model";
 import { Routes } from "discord-api-types/v9";
-import { createDiscordRestClient } from "@circle-manager/shared/discord";
+import { createDiscordRestClient } from "@/discord";
 import fetch from "node-fetch";
 export interface UmastagramPage {
   members: Array<UmastagramMember>;

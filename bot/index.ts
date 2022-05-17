@@ -1,4 +1,4 @@
-import { sendSetupMessage } from "@circle-manager/shared/discord";
+import { sendSetupMessage } from "@/discord";
 import { trainerIdCommand } from "./member/trainer_id";
 import { updateMemberNicknameEvent } from "./member/update_member_nickname";
 import { monthSurveyReaction, monthSurveyShowReaction } from "./month_survey";
@@ -11,7 +11,7 @@ import {
   MonthSurveyEmoji,
   Circles,
   isCircleKey,
-} from "@circle-manager/shared/model";
+} from "@/model";
 import {
   updateFanCountEvent,
   updateFanCountFromChannel,
@@ -20,7 +20,7 @@ import {
   createRedisClient,
   RedisClient,
   RedisKeys,
-} from "@circle-manager/shared/redis";
+} from "@/redis";
 import { createPersonalChannel } from "./member/create_personal_channes";
 
 config();

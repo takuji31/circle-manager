@@ -1,15 +1,15 @@
 import { config } from 'dotenv';
-import { prisma } from '@circle-manager/shared/database';
-import { Circles, Guild } from '@circle-manager/shared/model';
+import { prisma } from '@/database';
+import { Circles, Guild } from '@/model';
 import { stringify } from 'csv-stringify/sync';
-import { createDiscordRestClient } from '@circle-manager/shared/discord';
+import { createDiscordRestClient } from '@/discord';
 import { Routes } from 'discord-api-types/v9';
 import {
   CircleKey,
   MemberStatus,
   MonthSurveyAnswerValue,
 } from '@prisma/client';
-import { LocalDate } from '@circle-manager/shared/model';
+import { LocalDate } from '@/model';
 
 config();
 

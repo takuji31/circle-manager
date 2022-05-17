@@ -1,7 +1,7 @@
-import type { LocalDate } from "@circle-manager/shared/model/date";
+import type { LocalDate } from "@/model/date";
 import { prisma } from "~/db.server";
 import { MonthCircleState } from "@prisma/client";
-import { Circles, isCircleKey } from "@circle-manager/shared/model";
+import { Circles, isCircleKey } from "@/model";
 
 export type MonthCircle = Awaited<ReturnType<typeof fetchMonthCircles>>[0];
 

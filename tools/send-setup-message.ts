@@ -1,8 +1,8 @@
-import { prisma } from '@circle-manager/shared/database';
+import { prisma } from '@/database';
 import {
   sendSetupMessage,
   createDiscordRestClient,
-} from '@circle-manager/shared/discord';
+} from '@/discord';
 import { config } from 'dotenv';
 
 config();

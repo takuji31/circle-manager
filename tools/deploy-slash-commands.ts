@@ -1,21 +1,18 @@
-import { Guild } from '@circle-manager/shared/model';
+import { Guild } from "@/model";
 import {
   SlashCommandBuilder,
-  SlashCommandChannelOption,
   SlashCommandIntegerOption,
   SlashCommandStringOption,
-} from '@discordjs/builders';
-import { Routes } from 'discord-api-types/v9';
-import { createDiscordRestClient } from '@circle-manager/shared/discord';
-import { config } from 'dotenv';
-import { Circles } from '@circle-manager/shared/model';
-import { RESTPutAPIApplicationGuildCommandsResult } from 'discord-api-types';
-import { RESTPutAPIChannelPermissionJSONBody } from 'discord-api-types';
-import { OverwriteType } from 'discord-api-types';
-import { RESTPutAPIApplicationGuildCommandsJSONBody } from 'discord-api-types';
-import { RESTPutAPIApplicationCommandPermissionsResult } from 'discord-api-types';
-import { RESTPutAPIApplicationCommandPermissionsJSONBody } from 'discord-api-types';
-import { ApplicationCommandPermissionType } from 'discord-api-types';
+} from "@discordjs/builders";
+import { Routes } from "discord-api-types/v9";
+import { createDiscordRestClient } from "@/discord";
+import { config } from "dotenv";
+import { Circles } from "@/model";
+import type {
+  RESTPutAPIApplicationGuildCommandsResult,
+  RESTPutAPIApplicationCommandPermissionsJSONBody,
+  ApplicationCommandPermissionType,
+} from "discord-api-types/v9";
 
 config();
 
@@ -23,53 +20,50 @@ config();
   try {
     const commands = [
       new SlashCommandBuilder()
-        .setName('register-trainer-id')
-        .setDescription('トレーナーIDを登録します。')
+        .setName("register-trainer-id")
+        .setDescription("トレーナーIDを登録します。")
         .addStringOption(
           new SlashCommandStringOption()
-            .setName('id')
+            .setName("id")
             .setRequired(true)
-            .setDescription('トレーナーID')
+            .setDescription("トレーナーID")
         ),
       new SlashCommandBuilder()
-        .setName('trainer-id')
-        .setDescription('登録されているあなたのトレーナーIDを表示します。'),
+        .setName("trainer-id")
+        .setDescription("登録されているあなたのトレーナーIDを表示します。"),
       new SlashCommandBuilder()
-        .setName('update-fan-count')
+        .setName("update-fan-count")
         .addStringOption(
           new SlashCommandStringOption()
             .addChoices(
-              ...Circles.activeCircles.map((circle) => {
-                return {
-                  name: circle.name,
-                  value: circle.key,
-                };
+              Circles.activeCircles.map((circle) => {
+                return [circle.name, circle.key];
               })
             )
-            .setName('circle')
+            .setName("circle")
             .setRequired(true)
-            .setDescription('対象のサークル')
+            .setDescription("対象のサークル")
         )
         .addIntegerOption(
           new SlashCommandIntegerOption()
-            .setName('year')
+            .setName("year")
             .setRequired(false)
-            .setDescription('年、指定しない場合は今年')
+            .setDescription("年、指定しない場合は今年")
         )
         .addIntegerOption(
           new SlashCommandIntegerOption()
-            .setName('month')
+            .setName("month")
             .setRequired(false)
-            .setDescription('月、指定しない場合は今月')
+            .setDescription("月、指定しない場合は今月")
         )
         .addIntegerOption(
           new SlashCommandIntegerOption()
-            .setName('day')
+            .setName("day")
             .setRequired(false)
-            .setDescription('日、指定しない場合は昨日')
+            .setDescription("日、指定しない場合は昨日")
         )
         .setDefaultPermission(false)
-        .setDescription('(運営メンバー専用)ファン数更新をトリガーします。'),
+        .setDescription("(運営メンバー専用)ファン数更新をトリガーします。"),
     ].map((command) => command.toJSON());
 
     const rest = createDiscordRestClient();
@@ -85,7 +79,7 @@ config();
     )) as RESTPutAPIApplicationGuildCommandsResult;
 
     const adminCommands = createResponse.filter(
-      (command) => command.name == 'update-fan-count'
+      (command) => command.name == "update-fan-count"
     );
 
     for (const adminCommand of adminCommands) {
@@ -110,7 +104,7 @@ config();
       );
     }
 
-    console.log('Successfully registered application commands.');
+    console.log("Successfully registered application commands.");
   } catch (error) {
     console.error(error);
   }

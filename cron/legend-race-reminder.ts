@@ -1,6 +1,6 @@
 import { config } from 'dotenv';
-import { Guild } from '@circle-manager/shared/model';
-import { createDiscordRestClient } from '@circle-manager/shared/discord';
+import { Guild } from '@/model';
+import { createDiscordRestClient } from '@/discord';
 import {
   AllowedMentionsTypes,
   RESTPostAPIChannelMessageJSONBody,

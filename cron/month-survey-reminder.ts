@@ -1,6 +1,6 @@
-import { prisma } from '@circle-manager/shared/database';
+import { prisma } from '@/database';
 import { config } from 'dotenv';
-import { sendDirectMessagesIfPossible } from '@circle-manager/shared/discord';
+import { sendDirectMessagesIfPossible } from '@/discord';
 import { MonthSurveyAnswerValue } from '@prisma/client';
 import {
   DateFormats,
@@ -8,7 +8,7 @@ import {
   ZonedDateTime,
   ZoneId,
   nextMonthInt,
-} from '@circle-manager/shared/model';
+} from '@/model';
 
 config();
 

@@ -10,8 +10,8 @@ import { notFound } from "~/response.server";
 import { useSingUpData } from "~/routes/members/$pathname/setup";
 import { useState } from "react";
 import { RadioGroup } from "@headlessui/react";
-import { Circles } from "@circle-manager/shared/model";
-import { sendAdminNotificationMessage } from "@circle-manager/shared/discord";
+import { Circles } from "@/model";
+import { sendAdminNotificationMessage } from "@/discord";
 import { updateMemberSignUpCircle } from "~/model/signup.server";
 import { Grid, Button } from "@mui/material";
 
