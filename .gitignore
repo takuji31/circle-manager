@@ -77,3 +77,11 @@ node_modules/
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+
+/build
+/public/build
+
+/cypress/screenshots
+/cypress/videos
+
+/app/styles/tailwind.css

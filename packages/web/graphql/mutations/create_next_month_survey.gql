@@ -1,7 +1,0 @@
-mutation CreateNextMonthSurvey {
-  createNextMonthSurvey {
-    nextMonth {
-      ...MonthAndSurvey
-    }
-  }
-}
