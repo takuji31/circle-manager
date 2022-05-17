@@ -1,7 +1,0 @@
-mutation UpdateSignUp($memberId: String!, $invited: Boolean, $joined: Boolean) {
-  updateSignUp(
-    input: { memberId: $memberId, invited: $invited, joined: $joined }
-  ) {
-    ...ListedSignUp
-  }
-}

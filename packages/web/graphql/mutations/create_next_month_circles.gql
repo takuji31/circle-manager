@@ -1,9 +1,0 @@
-mutation CreateNextMonthCircles {
-  createNextMonthCircles(withoutNewMembers: true) {
-    year
-    month
-    monthCircles {
-      ...FullMonthCircle
-    }
-  }
-}

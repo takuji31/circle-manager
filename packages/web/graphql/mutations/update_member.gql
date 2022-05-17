@@ -1,5 +1,0 @@
-mutation UpdateMember($input: UpdateMemberMutationInput!) {
-  updateMember(input: $input) {
-    ...FullMember
-  }
-}

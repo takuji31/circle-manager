@@ -1,9 +1,0 @@
-query AdminMemberMonthCircle($memberId: String!, $year: Int!, $month: Int!) {
-  member(id: $memberId) {
-    ...ListedMember
-    monthCircle(year: $year, month: $month) {
-      ...MemberMonthCircle
-      locked
-    }
-  }
-}
