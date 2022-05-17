@@ -23,7 +23,7 @@ export async function getCircleMemberFanCounts({
         return {
           ...m,
           total: parseInt(total.toString()),
-          monthlyTotal: parseInt(monthlyTotal.toString()),
+          monthlyTotal: monthlyTotal ? parseInt(monthlyTotal.toString()) : null,
         };
       })
     );

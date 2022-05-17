@@ -61,7 +61,9 @@ export async function getScreenShots({
             return {
               ...member,
               total: parseInt(total.toString()),
-              monthlyTotal: parseInt(monthlyTotal.toString()),
+              monthlyTotal: monthlyTotal
+                ? parseInt(monthlyTotal.toString())
+                : null,
             };
           }),
         };
