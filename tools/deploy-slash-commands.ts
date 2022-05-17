@@ -36,8 +36,11 @@ config();
         .addStringOption(
           new SlashCommandStringOption()
             .addChoices(
-              Circles.activeCircles.map((circle) => {
-                return [circle.name, circle.key];
+              ...Circles.activeCircles.map((circle) => {
+                return {
+                  name: circle.name,
+                  value: circle.key,
+                };
               })
             )
             .setName("circle")
