@@ -19,6 +19,7 @@
     "setup": "prisma migrate dev && prisma db seed",
     "start": "remix-serve build",
     "start:mocks": "binode --require ./mocks -- @remix-run/serve:remix-serve build",
+    "start:bot": "yarn ts-node bot",
     "test": "vitest",
     "test:e2e:dev": "start-server-and-test dev http://localhost:3000 \"cypress open\"",
     "pretest:e2e:run": "yarn build",
@@ -29,7 +30,18 @@
     "db:generate": "prisma generate",
     "db:studio": "prisma studio",
     "db:format": "prisma format",
-    "db:push": "prisma db push"
+    "db:push": "prisma db push",
+    "send-select-circle-message": "yarn ts-node tools/send-select-circle-message",
+    "cron:month-survey-reminder": "curl https://cronitor.link/p/2028ed5e5f8544a5adfc7de3d7dd2455/month-survey-reminder?state=run ; yarn ts-node cron/month-survey-reminder && curl https://cronitor.link/p/2028ed5e5f8544a5adfc7de3d7dd2455/month-survey-reminder?state=complete || curl https://cronitor.link/p/2028ed5e5f8544a5adfc7de3d7dd2455/month-survey-reminder?state=fail",
+    "cron:month-circle-notifier": "curl https://cronitor.link/p/2028ed5e5f8544a5adfc7de3d7dd2455/month-circle-notifier?state=run ; yarn ts-node cron/month-circle-notifier && curl https://cronitor.link/p/2028ed5e5f8544a5adfc7de3d7dd2455/month-circle-notifier?state=complete || curl https://cronitor.link/p/2028ed5e5f8544a5adfc7de3d7dd2455/month-circle-notifier?state=fail",
+    "cron:start-month-survey": "curl https://cronitor.link/p/2028ed5e5f8544a5adfc7de3d7dd2455/start-month-survey?state=run ; yarn ts-node cron/start-month-survey && curl https://cronitor.link/p/2028ed5e5f8544a5adfc7de3d7dd2455/start-month-survey?state=complete || curl https://cronitor.link/p/2028ed5e5f8544a5adfc7de3d7dd2455/start-month-survey?state=fail",
+    "cron:month-ranking-maker": "yarn ts-node cron/month-ranking-maker",
+    "cron:month-ranking-notifier": "yarn ts-node cron/month-ranking-notifier",
+    "cron:legend-race-reminder": "yarn ts-node cron/legend-race-reminder",
+    "cron:team-race-reminder": "yarn ts-node cron/team-race-reminder",
+    "cron:daily-legend-race-reminder": "yarn ts-node cron/daily-legend-race-reminder",
+    "tools:daily-ranking-maker": "yarn ts-node tools/daily-ranking-maker",
+    "ts-node": "ts-node -r tsconfig-paths/register --compiler-options '{\"module\":\"commonjs\"}' "
   },
   "prettier": {},
   "eslintIgnore": [
@@ -62,6 +74,7 @@
     "date-fns": "^2.28.0",
     "discord-api-types": "^0.32.0",
     "discord.js": "^13.6.0",
+    "dotenv": "^16.0.1",
     "firebase-admin": "^10.1.0",
     "flowbite": "^1.4.5",
     "luxon": "^2.4.0",
@@ -82,6 +95,8 @@
     "simplebar": "^5.3.6",
     "simplebar-react": "^2.3.7",
     "tiny-invariant": "^1.2.0",
+    "ts-node": "^10.7.0",
+    "tsconfig-paths": "^4.0.0",
     "zod": "^3.14.4"
   },
   "devDependencies": {
@@ -120,8 +135,6 @@
     "prisma": "^3.14.0",
     "start-server-and-test": "^1.14.0",
     "tailwindcss": "^3.0.24",
-    "ts-node": "^10.7.0",
-    "tsconfig-paths": "^3.14.1",
     "typescript": "^4.6.3",
     "vite": "^2.9.1",
     "vite-tsconfig-paths": "^3.4.1",
