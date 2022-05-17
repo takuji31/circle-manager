@@ -6,21 +6,13 @@ import { registerTrainerIdCommand } from "./register_trainer_id";
 import { PrismaClient } from "@prisma/client";
 import { Client, Intents, Options } from "discord.js";
 import { config } from "dotenv";
-import {
-  Emoji,
-  MonthSurveyEmoji,
-  Circles,
-  isCircleKey,
-} from "@/model";
+import { Emoji, MonthSurveyEmoji, Circles, isCircleKey } from "@/model";
 import {
   updateFanCountEvent,
   updateFanCountFromChannel,
 } from "./circle/update_fan_count";
-import {
-  createRedisClient,
-  RedisClient,
-  RedisKeys,
-} from "@/redis";
+import type { RedisClient } from "@/lib/redis";
+import { createRedisClient, RedisKeys } from "@/lib/redis";
 import { createPersonalChannel } from "./member/create_personal_channes";
 
 config();

@@ -15,7 +15,6 @@
     "strict": true,
     "baseUrl": ".",
     "paths": {
-      "*": ["node_modules/*"],
       "~/*": ["./app/*"],
       "@/*": ["./*"]
     },
