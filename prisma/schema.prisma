@@ -9,10 +9,6 @@ generator client {
   previewFeatures = ["referentialIntegrity"]
 }
 
-generator nexusPrisma {
-  provider = "nexus-prisma"
-}
-
 model Member {
   id                String                     @id @db.VarChar(255)
   pathname          String                     @default(cuid()) @db.VarChar(255)
