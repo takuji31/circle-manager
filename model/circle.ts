@@ -37,6 +37,7 @@ export const CircleId = {
   ha: "870950796479594556", // 破
   jo: "863398725920227339", // 序
 } as const;
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export type CircleId = typeof CircleId[keyof typeof CircleId];
 
 export const NotificationChannelId = {
@@ -45,6 +46,7 @@ export const NotificationChannelId = {
   ha: isProduction ? "871221691496431727" : "927518539106103348",
   jo: isProduction ? "860387101417406474" : "927518571318378496",
 } as const;
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export type NotificationChannelId =
   typeof NotificationChannelId[keyof typeof NotificationChannelId];
 
@@ -89,6 +91,7 @@ export const Circle = {
   ha: Ha, // 破
   jo: Jo, // 序
 } as const;
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export type Circle = typeof Circle[keyof typeof Circle];
 
 const specialName: { [key: string]: string } = {
