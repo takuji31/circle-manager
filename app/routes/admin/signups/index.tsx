@@ -11,6 +11,7 @@ import AdminHeader from "~/components/admin/header";
 import AdminHeaderActions from "~/components/admin/header/actions";
 import AdminHeaderCircleSwitch from "~/components/admin/header/circle_switch";
 import AdminHeaderTitle from "~/components/admin/header/title";
+import CopyTrainerIdButton from "~/components/copy-trainer-id-button";
 import { getNotJoinedSignUps, inviteMember, joinMember } from "~/model/signup.server";
 import { useUser } from "~/utils";
 
@@ -171,28 +172,7 @@ const NotInvitedListItem: React.FC<{ signUp: SignUp }> = ({ signUp }) => {
       secondaryAction={
         <Stack direction="row" spacing={2} alignItems="center">
           {signUp.member.trainerId ? (
-            <CopyToClipboard
-              text={signUp.member.trainerId}
-              onCopy={() => {
-                setCopied(true);
-                setTimeout(() => setCopied(false), 1000);
-              }}
-            >
-              {copied ? (
-                <Typography variant="body2" py={4}>
-                  コピーしました
-                </Typography>
-              ) : (
-                <Button
-                  variant="text"
-                  type="button"
-                  size="small"
-                  startIcon={<ContentCopy />}
-                >
-                  トレーナーIDをコピー
-                </Button>
-              )}
-            </CopyToClipboard>
+            <CopyTrainerIdButton trainerId={signUp.member.trainerId} />
           ) : (
             <Typography color="text.disabled">トレーナーID未入力</Typography>
           )}
