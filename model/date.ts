@@ -6,25 +6,25 @@ import {
   TemporalAdjusters,
   ZonedDateTime,
   ZoneId,
-} from '@js-joda/core';
-import '@js-joda/timezone';
-import { Locale } from '@js-joda/locale_ja';
+} from "@js-joda/core";
+import "@js-joda/timezone";
+import { Locale } from "@js-joda/locale_ja";
 
 export const DateFormats = {
-  ymd: DateTimeFormatter.ofPattern('yyyy/MM/dd').withLocale(Locale.JAPAN),
-  dateWithHour: DateTimeFormatter.ofPattern('yyyy/MM/dd (E) H時').withLocale(
+  ymd: DateTimeFormatter.ofPattern("yyyy/MM/dd").withLocale(Locale.JAPAN),
+  dateWithHour: DateTimeFormatter.ofPattern("yyyy/MM/dd (E) H時").withLocale(
     Locale.JAPAN
   ),
-  dateTime: DateTimeFormatter.ofPattern('yyyy/MM/dd (E) HH:mm:ss').withLocale(
+  dateTime: DateTimeFormatter.ofPattern("yyyy/MM/dd (E) HH:mm:ss").withLocale(
     Locale.JAPAN
   ),
 };
 
-const JST = ZoneId.of('Asia/Tokyo');
+const JST = ZoneId.of("Asia/Tokyo");
 
-export * from '@js-joda/core';
+export * from "@js-joda/core";
 
-declare module '@js-joda/core' {
+declare module "@js-joda/core" {
   namespace LocalDate {
     function today(): LocalDate;
     function yesterday(): LocalDate;
@@ -37,6 +37,7 @@ declare module '@js-joda/core' {
     isSameMonth(other: LocalDate): boolean;
     toUTCDate(): Date;
     atStartOfDayJST(): ZonedDateTime;
+    firstDayOfMonth(): LocalDate;
   }
   namespace ZonedDateTime {
     function nowJST(): ZonedDateTime;
@@ -65,6 +66,9 @@ LocalDate.prototype.toUTCDate = function () {
 };
 LocalDate.prototype.atStartOfDayJST = function () {
   return this.atStartOfDay(JST);
+};
+LocalDate.prototype.firstDayOfMonth = function () {
+  return this.with(TemporalAdjusters.firstDayOfMonth());
 };
 
 ZonedDateTime.prototype.toDate = function () {
