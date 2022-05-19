@@ -1,5 +1,12 @@
 {
   "extends": [
     "github>hatena/renovate-config"
+  ],
+  "packageRules": [
+    {
+      "groupName": "Remix",
+      "matchPackagePrefixes": ["@remix-run"],
+      "rangeStrategy": "replace"
+    }
   ]
 }
