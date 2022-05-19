@@ -1,5 +1,5 @@
 {
   "extends": [
-    "local>hatena/renovate-config"
+    "github>hatena/renovate-config"
   ]
 }
