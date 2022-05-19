@@ -1,24 +1,22 @@
+import { monthCircleStateLabel } from "@/model";
+import { Dialog, Transition } from "@headlessui/react";
+import { ClipboardCopyIcon, ExclamationIcon } from "@heroicons/react/outline";
 import type { ActionFunction, LoaderFunction } from "@remix-run/node";
 import { Form, useLoaderData, useTransition } from "@remix-run/react";
-import { adminOnly, adminOnlyAction } from "~/auth/loader";
 import type { MouseEventHandler } from "react";
 import React, { Fragment, useMemo, useRef, useState } from "react";
-import { Dialog, Switch, Transition } from "@headlessui/react";
-import { classNames } from "~/lib";
-import CardWithDefaultPadding from "~/components/card_with_default_padding";
-import type { getNotJoinedSignUps } from "~/model/signup.server";
-import { useUser } from "~/utils";
-import { ClipboardCopyIcon, ExclamationIcon } from "@heroicons/react/outline";
 import CopyToClipboard from "react-copy-to-clipboard";
-import { YearAndMonth } from "~/schema/date";
 import type { Params } from "react-router";
-import type { MonthCircle } from "~/model/month_circle.server";
-import { getMonthCircles } from "~/model/month_circle.server";
-import { monthCircleStateLabel } from "@/model";
 import AdminHeader from "~/components/admin/header";
-import AdminHeaderTitle from "~/components/admin/header/title";
 import AdminHeaderActions from "~/components/admin/header/actions";
 import AdminHeaderCircleSwitch from "~/components/admin/header/circle_switch";
+import AdminHeaderTitle from "~/components/admin/header/title";
+import CardWithDefaultPadding from "~/components/card_with_default_padding";
+import type { MonthCircle } from "~/model/month_circle.server";
+import { getMonthCircles } from "~/model/month_circle.server";
+import type { getNotJoinedSignUps } from "~/model/signup.server";
+import { YearAndMonth } from "~/schema/date";
+import { useUser } from "~/utils";
 
 type LoaderData = Awaited<ReturnType<typeof getLoaderData>>;
 type SignUp = Awaited<ReturnType<typeof getNotJoinedSignUps>>[0];
@@ -32,19 +30,14 @@ const getLoaderData = async ({ params }: { params: Params<string> }) => {
   };
 };
 
-export const loader: LoaderFunction = adminOnly(
-  async ({ request, params }) => await getLoaderData({ params })
+export const loader: LoaderFunction = async ({ request, params }) => await getLoaderData({ params },
 );
 
-export const action: ActionFunction = adminOnlyAction(async ({ request }) => {
+export const action: ActionFunction = async ({ request }) => {
   return null;
-});
+};
 
-function MonthCircleListItemHeader({
-  monthCircle,
-}: {
-  monthCircle: MonthCircle;
-}) {
+function MonthCircleListItemHeader({ monthCircle }: { monthCircle: MonthCircle }) {
   return (
     <div className="min-w-0 flex-1">
       <p className="truncate text-sm font-medium text-gray-900">
@@ -60,9 +53,7 @@ function MonthCircleListItemHeader({
   );
 }
 
-const MonthCircleListItemActions: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+const MonthCircleListItemActions: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const transition = useTransition();
   return <div className="flex flex-row items-center space-x-2">{children}</div>;
 };
@@ -144,7 +135,8 @@ export default function AdminMonthCircles() {
                           /*setOpen(false)*/
                         }}
                       >
-                        <div className="flex min-h-screen items-end justify-center px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+                        <div
+                          className="flex min-h-screen items-end justify-center px-4 pt-4 pb-20 text-center sm:block sm:p-0">
                           <Transition.Child
                             as={Fragment}
                             enter="ease-out duration-300"
@@ -173,9 +165,11 @@ export default function AdminMonthCircles() {
                             leaveFrom="opacity-100 translate-y-0 sm:scale-100"
                             leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                           >
-                            <div className="relative inline-block transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left align-bottom shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6 sm:align-middle">
+                            <div
+                              className="relative inline-block transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left align-bottom shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6 sm:align-middle">
                               <div className="sm:flex sm:items-start">
-                                <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                                <div
+                                  className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
                                   <ExclamationIcon
                                     className="h-6 w-6 text-red-600"
                                     aria-hidden="true"
@@ -503,9 +497,11 @@ const NotInvitedListItem: React.FC<{ signUp: SignUp }> = ({ signUp }) => {
                 leaveFrom="opacity-100 translate-y-0 sm:scale-100"
                 leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
               >
-                <div className="relative inline-block transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left align-bottom shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6 sm:align-middle">
+                <div
+                  className="relative inline-block transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left align-bottom shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6 sm:align-middle">
                   <div className="sm:flex sm:items-start">
-                    <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                    <div
+                      className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
                       <ExclamationIcon
                         className="h-6 w-6 text-red-600"
                         aria-hidden="true"
@@ -617,9 +613,11 @@ export function AlertDialog({
             leaveFrom="opacity-100 translate-y-0 sm:scale-100"
             leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
           >
-            <div className="relative inline-block transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left align-bottom shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6 sm:align-middle">
+            <div
+              className="relative inline-block transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left align-bottom shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6 sm:align-middle">
               <div className="sm:flex sm:items-start">
-                <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                <div
+                  className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
                   <ExclamationIcon
                     className="h-6 w-6 text-red-600"
                     aria-hidden="true"

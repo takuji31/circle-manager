@@ -9,7 +9,6 @@ import React, { useState } from "react";
 import type { LoaderFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useLoaderData, Link as RemixLink } from "@remix-run/react";
-import { adminOnly } from "~/auth/loader";
 import { getJoinedMembers } from "~/model/member.server";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import {
@@ -50,14 +49,14 @@ const getLoaderData = async () => {
   });
 };
 
-export const loader: LoaderFunction = adminOnly(async () => {
+export const loader: LoaderFunction = async () => {
   const firstDayOfNextMonth = LocalDate.firstDayOfNextMonth();
   return json<LoaderData>({
     members: await getLoaderData(),
     year: firstDayOfNextMonth.year(),
     month: firstDayOfNextMonth.monthValue(),
   });
-});
+};
 
 export default function AdminMemberList() {
   const { members, year, month } = useLoaderData() as LoaderData;

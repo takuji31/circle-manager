@@ -1,22 +1,16 @@
 import { monthCircleStateLabel } from "@/model";
+import { FormControlLabel, Switch, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
 import { MonthCircleState } from "@prisma/client";
-import type { Params } from "react-router";
 import type { ActionFunction, LoaderFunction } from "@remix-run/node";
-import { Form, useLoaderData, useSubmit } from "@remix-run/react";
 import { json } from "@remix-run/node";
+import { Form, useLoaderData, useSubmit } from "@remix-run/react";
+import type { Params } from "react-router";
 import invariant from "tiny-invariant";
-import { adminOnly } from "~/auth/loader";
-import { prisma } from "~/db.server";
+import { requireAdminUser } from "~/auth/loader.server";
+import { AdminBody } from "~/components/admin/body";
 import AdminHeader from "~/components/admin/header";
 import AdminHeaderTitle from "~/components/admin/header/title";
-import {
-  FormControlLabel,
-  Switch,
-  ToggleButton,
-  ToggleButtonGroup,
-  Typography,
-} from "@mui/material";
-import { AdminBody } from "~/components/admin/body";
+import { prisma } from "~/db.server";
 
 type LoaderData = Awaited<ReturnType<typeof getLoaderData>>;
 
@@ -55,18 +49,19 @@ const getParams = (params: Params<string>) => {
   return { memberId, year: parseInt(year), month: parseInt(month) };
 };
 
-export const loader: LoaderFunction = adminOnly(async ({ params }) => {
+export const loader: LoaderFunction = async ({ params }) => {
   const { memberId, year, month } = getParams(params);
   return json(
     await getLoaderData({
       memberId,
       year,
       month,
-    })
+    }),
   );
-});
+};
 
 export const action: ActionFunction = async ({ request, params }) => {
+  await requireAdminUser(request);
   const { memberId, year, month } = getParams(params);
   const formData = await request.formData();
   const locked =
@@ -123,7 +118,7 @@ export default function AdminMemberMonthCircle() {
         replace: true,
         method: "post",
         encType: "application/x-www-form-urlencoded",
-      }
+      },
     );
   };
 

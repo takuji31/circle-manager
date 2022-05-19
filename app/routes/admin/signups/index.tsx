@@ -1,35 +1,18 @@
+import { ContentCopy } from "@mui/icons-material";
+import { Button, Card, CardContent, CardHeader, List, ListItem, ListItemText, Stack, Typography } from "@mui/material";
 import type { ActionFunction, LoaderFunction } from "@remix-run/node";
-import {
-  useSubmit,
-  Form,
-  useLoaderData,
-  useTransition,
-} from "@remix-run/react";
-import { adminOnly, adminOnlyAction } from "~/auth/loader";
+import { Form, useLoaderData, useSubmit, useTransition } from "@remix-run/react";
+import { useConfirm } from "material-ui-confirm";
 import React, { useMemo, useRef, useState } from "react";
-import {
-  getNotJoinedSignUps,
-  inviteMember,
-  joinMember,
-} from "~/model/signup.server";
-import { useUser } from "~/utils";
 import CopyToClipboard from "react-copy-to-clipboard";
 import invariant from "tiny-invariant";
+import { requireAdminUser } from "~/auth/loader.server";
 import AdminHeader from "~/components/admin/header";
-import AdminHeaderTitle from "~/components/admin/header/title";
 import AdminHeaderActions from "~/components/admin/header/actions";
 import AdminHeaderCircleSwitch from "~/components/admin/header/circle_switch";
-import { Stack } from "@mui/material";
-import { Card } from "@mui/material";
-import { CardHeader } from "@mui/material";
-import { CardContent } from "@mui/material";
-import { Typography } from "@mui/material";
-import { List } from "@mui/material";
-import { ListItem } from "@mui/material";
-import { ListItemText } from "@mui/material";
-import { Button } from "@mui/material";
-import { ContentCopy } from "@mui/icons-material";
-import { useConfirm } from "material-ui-confirm";
+import AdminHeaderTitle from "~/components/admin/header/title";
+import { getNotJoinedSignUps, inviteMember, joinMember } from "~/model/signup.server";
+import { useUser } from "~/utils";
 
 type LoaderData = Awaited<ReturnType<typeof getLoaderData>>;
 type SignUp = Awaited<ReturnType<typeof getNotJoinedSignUps>>[0];
@@ -43,11 +26,10 @@ const getLoaderData = async () => {
   };
 };
 
-export const loader: LoaderFunction = adminOnly(
-  async () => await getLoaderData()
-);
+export const loader: LoaderFunction = async () => await getLoaderData();
 
-export const action: ActionFunction = adminOnlyAction(async ({ request }) => {
+export const action: ActionFunction = async ({ request }) => {
+  await requireAdminUser(request);
   const formData = await request.formData();
   const memberId = formData.get("memberId") as string;
   const invited = !!formData.get("invited");
@@ -63,7 +45,7 @@ export const action: ActionFunction = adminOnlyAction(async ({ request }) => {
     await joinMember({ memberId });
   }
   return null;
-});
+};
 
 export default function AdminSignUps() {
   const { signUps } = useLoaderData<LoaderData>();
@@ -76,15 +58,15 @@ export default function AdminSignUps() {
       signUps.invited.filter(
         (signUp) =>
           !showOnlyMyCircle ||
-          (user.circleKey && user.circleKey === signUp.circleKey)
+          (user.circleKey && user.circleKey === signUp.circleKey),
       ),
       signUps.notInvited.filter(
         (signUp) =>
           !showOnlyMyCircle ||
-          (user.circleKey && user.circleKey === signUp.circleKey)
+          (user.circleKey && user.circleKey === signUp.circleKey),
       ),
     ],
-    [signUps, showOnlyMyCircle, user.circleKey]
+    [signUps, showOnlyMyCircle, user.circleKey],
   );
   return (
     <div>

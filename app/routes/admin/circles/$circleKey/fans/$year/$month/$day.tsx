@@ -3,67 +3,57 @@ import AdminHeaderTitle from "~/components/admin/header/title";
 import { z } from "zod";
 import { ActiveCircleKey } from "~/schema/member";
 import { YMD } from "~/schema/date";
-import type { DataFunctionArgs, LoaderFunction } from "@remix-run/node";
+import type { ActionFunction, DataFunctionArgs, LoaderFunction } from "@remix-run/node";
 import { Circles, LocalDate, SessionUser } from "@/model";
 import { dateToYMD } from "~/model/date.server";
-import type { ActionFunction } from "@remix-run/node";
-import {
-  Form,
-  useActionData,
-  useLoaderData,
-  useSubmit,
-  useTransition,
-} from "@remix-run/react";
+import { Form, useActionData, useLoaderData, useSubmit, useTransition } from "@remix-run/react";
 import React, { useState } from "react";
 import { AdminBody } from "~/components/admin/body";
 import { useDropzone } from "react-dropzone";
 import { UploadIcon, XIcon } from "@heroicons/react/solid";
 import type { ScreenShotMemberFanCount } from "~/model/screen_shot.server";
-import { setMemberIdToMemberFanCount } from "~/model/screen_shot.server";
 import {
   deleteScreenShot,
   getScreenShots,
   parseScreenShots,
-  uploadScreenShot,
+  setMemberIdToMemberFanCount,
+  uploadScreenShot
 } from "~/model/screen_shot.server";
-import {
-  createFileUploadHandler,
-  parseMultipartFormData,
-} from "~/lib/form.server";
-import type { DataFunctionArgsWithUser } from "~/auth/loader";
-import { adminOnly, adminOnlyAction } from "~/auth/loader";
-import { classNames } from "~/lib";
+import { createFileUploadHandler, parseMultipartFormData } from "~/lib/form.server";
 
 import { getCircleMembers } from "~/model/member.server";
-import { Autocomplete, Box, Tabs, TextField } from "@mui/material";
-import { Tab } from "@mui/material";
-import { Card } from "@mui/material";
-import { CardHeader } from "@mui/material";
-import { Grid } from "@mui/material";
-import { Button } from "@mui/material";
-import { Stack } from "@mui/material";
-import { CardContent } from "@mui/material";
 import {
-  getCircleMemberFanCounts,
-  parseTsv,
-} from "~/model/member_fan_count.server";
-import { Table } from "@mui/material";
-import { TableHead } from "@mui/material";
-import { TableRow } from "@mui/material";
-import { TableCell } from "@mui/material";
-import { TableBody } from "@mui/material";
-import { IconButton } from "@mui/material";
+  Autocomplete,
+  Box,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  Grid,
+  IconButton,
+  Stack,
+  Tab,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Tabs,
+  TextField
+} from "@mui/material";
+import { getCircleMemberFanCounts, parseTsv } from "~/model/member_fan_count.server";
 import { Edit } from "@mui/icons-material";
 import numeral from "numeral";
 import { atom, useRecoilState } from "recoil";
 import { localStorageEffect } from "~/recoil";
+import { requireAdminUser } from "~/auth/loader.server";
 
 const ActionMode = z.enum([
   "uploadScreenShot",
   "deleteScreenShot",
   "parseImages",
   "setMemberId",
-  "pasteTsv",
+  "pasteTsv"
 ]);
 
 const TabId = z.enum(["ScreenShot", "Tsv", "Manual"]);
@@ -73,12 +63,12 @@ type TabId = z.infer<typeof TabId>;
 export const tabIdState = atom<TabId>({
   key: "memberFanCount_tabId",
   default: TabId.enum.ScreenShot,
-  effects: [localStorageEffect<TabId>("memberFanCount_tabId")],
+  effects: [localStorageEffect<TabId>("memberFanCount_tabId")]
 });
 const tabs = [
   { id: TabId.enum.ScreenShot, name: "スクリーンショット" },
   { id: TabId.enum.Tsv, name: "まとめて貼り付け" },
-  { id: TabId.enum.Manual, name: "手入力" },
+  { id: TabId.enum.Manual, name: "手入力" }
 ];
 
 type LoaderData = Awaited<ReturnType<typeof getLoaderData>>;
@@ -90,16 +80,16 @@ type Member = Awaited<ReturnType<typeof getCircleMembers>>[0];
 
 const paramsSchema = z.intersection(
   z.object({
-    circleKey: ActiveCircleKey,
+    circleKey: ActiveCircleKey
   }),
   YMD
 );
 const actionQuerySchema = z.object({
-  mode: ActionMode.default(ActionMode.enum.uploadScreenShot),
+  mode: ActionMode.default(ActionMode.enum.uploadScreenShot)
 });
 const setMemberIdSchema = z.object({
   memberId: z.string(),
-  memberFanCountId: z.string(),
+  memberFanCountId: z.string()
 });
 
 const schema = {
@@ -107,8 +97,8 @@ const schema = {
     tsv: z.preprocess(
       (s) => (s as string).trim(),
       z.string().min(1, "テキストが貼り付けられていません")
-    ),
-  }),
+    )
+  })
 };
 
 const getLoaderData = async ({ params }: DataFunctionArgs) => {
@@ -123,23 +113,20 @@ const getLoaderData = async ({ params }: DataFunctionArgs) => {
     circle,
     screenShots,
     members,
-    memberFanCounts,
+    memberFanCounts
   };
 };
 
-export const loader: LoaderFunction = adminOnly(async (args) => {
+export const loader: LoaderFunction = async (args) => {
   return await getLoaderData(args);
-});
+}
 
-const getActionData = async ({
-  request,
-  params,
-  user,
-}: DataFunctionArgsWithUser) => {
+const getActionData = async ({ request, params }: DataFunctionArgs) => {
+  const user = await requireAdminUser(request);
   const { year, month, day, circleKey } = paramsSchema.parse(params);
   const date = LocalDate.of(year, month, day);
   const uploadHandler = createFileUploadHandler({
-    maxPartSize: 10_000_000,
+    maxPartSize: 10_000_000
   });
   const formData = Object.fromEntries(
     await parseMultipartFormData(request, uploadHandler)
@@ -154,8 +141,8 @@ const getActionData = async ({
           formData,
           circleKey,
           date,
-          user,
-        }),
+          user
+        })
       };
     }
     case ActionMode.enum.deleteScreenShot: {
@@ -178,20 +165,15 @@ const getActionData = async ({
           formData,
           circleKey,
           date,
-          user,
-        }),
+          user
+        })
       };
     }
   }
   return null;
 };
 
-const uploadScreenShotAction = async ({
-  formData,
-  circleKey,
-  date,
-  user,
-}: {
+const uploadScreenShotAction = async ({ formData, circleKey, date, user }: {
   formData: Record<string, any>;
   circleKey: ActiveCircleKey;
   date: LocalDate;
@@ -201,7 +183,7 @@ const uploadScreenShotAction = async ({
 
   if (!result.success) {
     return {
-      error: result.error.format()?.screenShotFile?._errors?.join("/"),
+      error: result.error.format()?.screenShotFile?._errors?.join("/")
     };
   } else {
     const { screenShotFile } = result.data;
@@ -209,18 +191,13 @@ const uploadScreenShotAction = async ({
       screenShotFile,
       circleKey,
       date,
-      uploaderId: user.id,
+      uploaderId: user.id
     });
     return {};
   }
 };
 
-const pasteTsvAction = async ({
-  formData,
-  circleKey,
-  date,
-  user,
-}: {
+const pasteTsvAction = async ({ formData, circleKey, date}: {
   formData: Record<string, any>;
   circleKey: ActiveCircleKey;
   date: LocalDate;
@@ -229,7 +206,7 @@ const pasteTsvAction = async ({
   const result = schema.pasteTsv.safeParse(formData);
   if (!result.success) {
     return {
-      error: result.error.format().tsv?._errors?.join("/"),
+      error: result.error.format().tsv?._errors?.join("/")
     };
   } else {
     const { tsv } = result.data;
@@ -249,7 +226,7 @@ const uploadSchema = z.object({
           expected: "object",
           received: "undefined",
           fatal: true,
-          message: "スクリーンショットがアップロードされていません",
+          message: "スクリーンショットがアップロードされていません"
         });
         return;
       }
@@ -260,15 +237,15 @@ const uploadSchema = z.object({
           expected: "object",
           received: "undefined",
           fatal: true,
-          message: "スクリーンショットはPNG形式のみサポートしています。",
+          message: "スクリーンショットはPNG形式のみサポートしています。"
         });
       }
-    }),
+    })
 });
 
-export const action: ActionFunction = adminOnlyAction(async (args) => {
+export const action: ActionFunction = async (args) => {
   return await getActionData(args);
-});
+};
 
 export default function AdminCircleFanCounts() {
   const { year, month, day, circle } = useLoaderData<LoaderData>();
@@ -419,7 +396,7 @@ const ScreenShotCard = ({ tabId }: { tabId: TabId }) => {
               submit(formData!, {
                 replace: true,
                 method: "post",
-                encType: "multipart/form-data",
+                encType: "multipart/form-data"
               });
             }}
           />
@@ -506,8 +483,8 @@ const EditCard = () => {
                   {m.source == "ScreenShot"
                     ? "スクリーンショット"
                     : m.source == "Paste"
-                    ? "まとめて貼り付け"
-                    : "手入力"}
+                      ? "まとめて貼り付け"
+                      : "手入力"}
                 </TableCell>
                 <TableCell>{m.parsedName ?? "(なし)"}</TableCell>
                 <TableCell>
@@ -527,12 +504,13 @@ const EditCard = () => {
 interface FileUploadInputProps {
   onDrop: (files: File[]) => void;
 }
+
 const FileUploadInput: React.FC<FileUploadInputProps> = ({ onDrop }) => {
   const { getRootProps, getInputProps } = useDropzone({
     accept: {
-      "image/*": [".png"],
+      "image/*": [".png"]
     },
-    onDrop,
+    onDrop
   });
   return (
     <div
@@ -569,10 +547,11 @@ interface MemberSelectComboBoxProps {
   members: Array<Member>;
   memberFanCount: ScreenShotMemberFanCount;
 }
+
 function MemberSelectListbox({
-  members,
-  memberFanCount,
-}: MemberSelectComboBoxProps) {
+                               members,
+                               memberFanCount
+                             }: MemberSelectComboBoxProps) {
   const transition = useTransition();
   const submit = useSubmit();
   return (
@@ -590,7 +569,7 @@ function MemberSelectListbox({
             {
               memberId: member.id,
               memberFanCountId: memberFanCount.id,
-              mode: ActionMode.enum.setMemberId,
+              mode: ActionMode.enum.setMemberId
             },
             { method: "post", replace: true }
           );

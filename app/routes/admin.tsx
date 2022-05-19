@@ -1,20 +1,13 @@
 import React, { Fragment, useMemo, useState } from "react";
 import { Dialog, Menu, Transition } from "@headlessui/react";
-import type { LinksFunction } from "@remix-run/node";
-import { Form, Outlet, useLoaderData, useLocation } from "@remix-run/react";
+import type { LinksFunction, LoaderFunction } from "@remix-run/node";
+import { Form, Link, Outlet, useLoaderData, useLocation } from "@remix-run/react";
 import { useUser } from "~/utils";
-import { adminOnly } from "~/auth/loader";
+import { requireAdminUser } from "~/auth/loader.server";
 
 import { Circles, nextMonthInt, thisMonthInt } from "@/model";
 import { classNames } from "~/lib";
-import { Link } from "@remix-run/react";
-import {
-  HomeIcon,
-  MenuIcon,
-  UserAddIcon,
-  UsersIcon,
-  XIcon,
-} from "@heroicons/react/outline";
+import { HomeIcon, MenuIcon, UserAddIcon, UsersIcon, XIcon } from "@heroicons/react/outline";
 import { SearchIcon, SelectorIcon } from "@heroicons/react/solid";
 import { DashboardLayout } from "~/mui/components/admin/dashboard-layout";
 import simpleBarStylesheetUrl from "simplebar-react/dist/simplebar.min.css";
@@ -33,10 +26,10 @@ interface NavItem {
 const navigation: Array<NavItem> = [
   { name: "ホーム", href: "/admin/", icon: HomeIcon },
   { name: "メンバー一覧", href: "/admin/members", icon: UsersIcon },
-  { name: "加入申請", href: "/admin/signups", icon: UserAddIcon },
+  { name: "加入申請", href: "/admin/signups", icon: UserAddIcon }
 ];
 const userNavigation: Array<Omit<NavItem, "icon">> = [
-  { name: "ログアウト", href: "/auth/logout", post: true },
+  { name: "ログアウト", href: "/auth/logout", post: true }
 ];
 
 type LoaderData = Awaited<ReturnType<typeof getLoaderData>>;
@@ -46,13 +39,14 @@ const getLoaderData = async () => {
   const nextMonth = nextMonthInt();
   return {
     thisMonth,
-    nextMonth,
+    nextMonth
   };
 };
 
-export const loader = adminOnly(async () => {
+export const loader: LoaderFunction = async ({ request }) => {
+  await requireAdminUser(request);
   return await getLoaderData();
-});
+};
 
 export default function AdminIndex() {
   const { thisMonth, nextMonth } = useLoaderData<LoaderData>();
@@ -228,7 +222,8 @@ const Hoge = () => {
       </Transition.Root>
 
       {/* Static sidebar for desktop */}
-      <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col lg:border-r lg:border-gray-200 lg:bg-gray-100 lg:pt-5 lg:pb-4">
+      <div
+        className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col lg:border-r lg:border-gray-200 lg:bg-gray-100 lg:pt-5 lg:pb-4">
         <div className="flex flex-shrink-0 items-center px-6">
           <h1 className="text-2xl">ウマ娘愛好会</h1>
         </div>
@@ -237,7 +232,8 @@ const Hoge = () => {
           {/* User account dropdown */}
           <Menu as="div" className="relative inline-block px-3 py-1 text-left">
             <div>
-              <Menu.Button className="group w-full rounded-md bg-gray-100 px-3.5 py-2 text-left text-sm font-medium text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-gray-100">
+              <Menu.Button
+                className="group w-full rounded-md bg-gray-100 px-3.5 py-2 text-left text-sm font-medium text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-gray-100">
                 <span className="flex w-full items-center justify-between">
                   <span className="flex min-w-0 items-center justify-between space-x-3">
                     <img
@@ -270,7 +266,8 @@ const Hoge = () => {
               leaveFrom="transform opacity-100 scale-100"
               leaveTo="transform opacity-0 scale-95"
             >
-              <Menu.Items className="absolute right-0 left-0 z-10 mx-3 mt-1 origin-top divide-y divide-gray-200 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+              <Menu.Items
+                className="absolute right-0 left-0 z-10 mx-3 mt-1 origin-top divide-y divide-gray-200 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                 <div className="py-1">
                   <Menu.Item>
                     {({ active }) => (
@@ -436,7 +433,8 @@ const Hoge = () => {
               {/* Profile dropdown */}
               <Menu as="div" className="relative ml-3">
                 <div>
-                  <Menu.Button className="flex max-w-xs items-center rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2">
+                  <Menu.Button
+                    className="flex max-w-xs items-center rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2">
                     <span className="sr-only">Open user menu</span>
                     <img
                       className="h-8 w-8 rounded-full"
@@ -454,7 +452,8 @@ const Hoge = () => {
                   leaveFrom="transform opacity-100 scale-100"
                   leaveTo="transform opacity-0 scale-95"
                 >
-                  <Menu.Items className="absolute right-0 mt-2 w-48 origin-top-right divide-y divide-gray-200 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                  <Menu.Items
+                    className="absolute right-0 mt-2 w-48 origin-top-right divide-y divide-gray-200 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                     <div className="py-1">
                       <Menu.Item>
                         {({ active }) => (
