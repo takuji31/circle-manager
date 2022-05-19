@@ -65,6 +65,7 @@
     "@js-joda/timezone": "^2.12.0",
     "@mui/icons-material": "^5.8.0",
     "@mui/material": "^5.8.0",
+    "@mui/system": "^5.8.0",
     "@prisma/client": "^3.14.0",
     "@remix-run/node": "^1.5.1",
     "@remix-run/react": "^1.5.1",
