@@ -8466,10 +8466,10 @@ remix-auth@^3.0.0, remix-auth@^3.2.2:
   dependencies:
     uuid "^8.3.2"
 
-remix@^1.4.3:
-  version "1.4.3"
-  resolved "https://registry.yarnpkg.com/remix/-/remix-1.4.3.tgz#5c671ce4876989d579ff8738accb0a01ef688407"
-  integrity sha512-2MG6y6IrfE9//mm41urKFYZNKfMOnrglSBCmMB1XyvcSQiXrHpOmuMITm7H5LujHwNlqU8REOWpKe/LQABUVHg==
+remix@^1.5.1:
+  version "1.5.1"
+  resolved "https://registry.yarnpkg.com/remix/-/remix-1.5.1.tgz#296effdb26f08860d86daf6319cdb6104c5ba897"
+  integrity sha512-95+4LlrUUJuIVOjSTjHMnvEDJcYNEhb60zd4tT1bRSDW11jXDAiYGimCoDAFPWv4DbpVcmtnujjQ+ym/YlP2nA==
 
 remove@^0.1.5:
   version "0.1.5"
