@@ -139,7 +139,7 @@ const getActionData = async ({
   const { year, month, day, circleKey } = paramsSchema.parse(params);
   const date = LocalDate.of(year, month, day);
   const uploadHandler = createFileUploadHandler({
-    maxFileSize: 10_000_000,
+    maxPartSize: 10_000_000,
   });
   const formData = Object.fromEntries(
     await parseMultipartFormData(request, uploadHandler)
