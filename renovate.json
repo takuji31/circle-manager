@@ -6,7 +6,6 @@
     {
       "groupName": "Remix",
       "matchPackagePrefixes": ["@remix-run"],
-      "rangeStrategy": "replace"
     }
   ]
 }
