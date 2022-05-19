@@ -5,7 +5,7 @@
   "packageRules": [
     {
       "groupName": "Remix",
-      "matchPackagePrefixes": ["@remix-run"],
+      "matchPackagePrefixes": ["@remix-run"]
     }
   ]
 }
