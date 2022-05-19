@@ -1,5 +1,5 @@
-import type { ActionFunction, LoaderFunction } from "remix";
-import { Form, useLoaderData, useTransition } from "remix";
+import type { ActionFunction, LoaderFunction } from "@remix-run/node";
+import { Form, useLoaderData, useTransition } from "@remix-run/react";
 import { adminOnly, adminOnlyAction } from "~/auth/loader";
 import type { MouseEventHandler } from "react";
 import React, { Fragment, useMemo, useRef, useState } from "react";

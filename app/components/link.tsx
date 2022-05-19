@@ -1,5 +1,5 @@
 import type { RemixLinkProps } from "@remix-run/react/components";
-import { Link as RemixLink } from "remix";
+import { Link as RemixLink } from "@remix-run/react";
 import { classNames } from "~/lib";
 
 const Link: React.FC<

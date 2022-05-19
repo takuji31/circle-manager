@@ -6,8 +6,9 @@ import {
   monthSurveyAnswerLabel,
 } from "@/model";
 import React, { useState } from "react";
-import type { LoaderFunction } from "remix";
-import { json, useLoaderData } from "remix";
+import type { LoaderFunction } from "@remix-run/node";
+import { json } from "@remix-run/node";
+import { useLoaderData, Link as RemixLink } from "@remix-run/react";
 import { adminOnly } from "~/auth/loader";
 import { getJoinedMembers } from "~/model/member.server";
 import { CopyToClipboard } from "react-copy-to-clipboard";
@@ -15,7 +16,6 @@ import {
   ClipboardCheckIcon,
   ClipboardCopyIcon,
 } from "@heroicons/react/outline";
-import { Link as RemixLink } from "remix";
 import {
   Box,
   Card,
@@ -32,7 +32,7 @@ import {
   Menu,
 } from "@mui/material";
 import { Scrollbar } from "~/mui/components/scrollbar";
-import { MoreHoriz, MoreVert } from "@mui/icons-material";
+import { MoreVert } from "@mui/icons-material";
 import PopupState, { bindTrigger, bindMenu } from "material-ui-popup-state";
 import { Typography } from "@mui/material";
 

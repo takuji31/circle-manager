@@ -1,15 +1,11 @@
 import React, { Fragment, useMemo, useState } from "react";
 import { Dialog, Menu, Transition } from "@headlessui/react";
-import type { LinksFunction } from "remix";
-import { Form, Outlet, useLoaderData, useLocation } from "remix";
+import type { LinksFunction } from "@remix-run/node";
+import { Form, Outlet, useLoaderData, useLocation } from "@remix-run/react";
 import { useUser } from "~/utils";
 import { adminOnly } from "~/auth/loader";
 
-import {
-  Circles,
-  nextMonthInt,
-  thisMonthInt,
-} from "@/model";
+import { Circles, nextMonthInt, thisMonthInt } from "@/model";
 import { classNames } from "~/lib";
 import { Link } from "@remix-run/react";
 import {

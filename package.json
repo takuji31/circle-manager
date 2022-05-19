@@ -92,7 +92,6 @@
     "react-hot-toast": "^2.2.0",
     "recoil": "^0.7.3-alpha.2",
     "redis": "^4.1.0",
-    "remix": "^1.4.3",
     "remix-auth": "^3.2.2",
     "remix-auth-discord": "^1.0.0",
     "remove": "^0.1.5",

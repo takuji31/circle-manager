@@ -1,6 +1,10 @@
-import type { ActionFunction, LoaderFunction } from "remix";
-import { useSubmit } from "remix";
-import { Form, useLoaderData, useTransition } from "remix";
+import type { ActionFunction, LoaderFunction } from "@remix-run/node";
+import {
+  useSubmit,
+  Form,
+  useLoaderData,
+  useTransition,
+} from "@remix-run/react";
 import { adminOnly, adminOnlyAction } from "~/auth/loader";
 import React, { useMemo, useRef, useState } from "react";
 import {

@@ -1,7 +1,7 @@
 import { Circles, LocalDate, Period } from "@/model";
 import { MemberFanCountSource } from "@prisma/client";
-import type { ActionFunction } from "remix";
-import { json } from "remix";
+import type { ActionFunction } from "@remix-run/node";
+import { json } from "@remix-run/node";
 import { prisma } from "~/db.server";
 
 export const action: ActionFunction = async () => {

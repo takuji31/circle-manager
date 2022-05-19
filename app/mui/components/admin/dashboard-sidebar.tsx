@@ -17,7 +17,7 @@ import { Logo } from "../logo";
 import { Scrollbar } from "../scrollbar";
 import { DashboardSidebarSection } from "./dashboard-sidebar-section";
 import { OrganizationPopover } from "./organization-popover";
-import { useLocation } from "remix";
+import { useLocation } from "@remix-run/react";
 import { Group, Home, PersonAdd, UnfoldMore } from "@mui/icons-material";
 import { SelectorIcon } from "@heroicons/react/outline";
 import { DateTime } from "luxon";

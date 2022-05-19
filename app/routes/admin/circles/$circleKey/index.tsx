@@ -1,5 +1,5 @@
 import type { LoaderFunction } from "@remix-run/node";
-import { Link, useLoaderData } from "remix";
+import { Link, useLoaderData } from "@remix-run/react";
 import type { Params } from "react-router";
 import { z } from "zod";
 import { ActiveCircleKey } from "~/schema/member";

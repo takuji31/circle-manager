@@ -1,8 +1,8 @@
 import { Link, Outlet } from "@remix-run/react";
 import { CheckIcon } from "@heroicons/react/solid";
 import type { MetaFunction } from "@remix-run/node";
-import type { LoaderFunction } from "remix";
-import { useLoaderData, useLocation } from "remix";
+import type { LoaderFunction } from "@remix-run/node";
+import { useLoaderData, useLocation } from "@remix-run/react";
 import { prisma } from "~/db.server";
 import { PathnameParams } from "~/schema/member";
 import { notFound } from "~/response.server";

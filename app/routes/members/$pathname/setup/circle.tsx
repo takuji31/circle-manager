@@ -1,17 +1,18 @@
 import { Link } from "@remix-run/react";
 import { CheckCircleIcon } from "@heroicons/react/solid";
-import { ActionFunction, Form, redirect, useActionData } from "remix";
+import type { ActionFunction } from "@remix-run/node";
+import { redirect } from "@remix-run/node";
+import { Form, useActionData } from "@remix-run/react";
 import { prisma } from "~/db.server";
 import { ActiveCircleKey, PathnameParams } from "~/schema/member";
 import { classNames } from "~/lib";
 import { z } from "zod";
-import { Params } from "react-router";
+import type { Params } from "react-router";
 import { notFound } from "~/response.server";
 import { useSingUpData } from "~/routes/members/$pathname/setup";
 import { useState } from "react";
 import { RadioGroup } from "@headlessui/react";
 import { Circles } from "@/model";
-import { sendAdminNotificationMessage } from "@/discord";
 import { updateMemberSignUpCircle } from "~/model/signup.server";
 import { Grid, Button } from "@mui/material";
 

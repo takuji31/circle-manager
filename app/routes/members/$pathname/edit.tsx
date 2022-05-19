@@ -1,20 +1,17 @@
-import { classNames } from "~/lib";
-import type { ActionFunction, LoaderFunction } from "remix";
-import { Form, useActionData, useLoaderData } from "remix";
-import { CheckCircleIcon, ExclamationCircleIcon } from "@heroicons/react/solid";
+import type { ActionFunction, LoaderFunction } from "@remix-run/node";
+import { Form, useActionData, useLoaderData } from "@remix-run/react";
+import { CheckCircleIcon } from "@heroicons/react/solid";
 import invariant from "tiny-invariant";
 import { z } from "zod";
 import { prisma } from "~/db.server";
 import { PathnameParams, TrainerId } from "~/schema/member";
 import { notFound } from "~/response.server";
 import { Box, Stack } from "@mui/material";
-import { Typography } from "@mui/material";
 import { Card } from "@mui/material";
 import { CardHeader } from "@mui/material";
 import { Container } from "@mui/material";
 import { CardContent } from "@mui/material";
 import { TextField } from "@mui/material";
-import { error } from "console";
 import { useState } from "react";
 import { Button } from "@mui/material";
 

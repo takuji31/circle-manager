@@ -3,7 +3,7 @@ import { Circles, Guild } from "@/model";
 import { CircleRole, MemberStatus } from "@prisma/client";
 import type { RESTGetAPIGuildMembersResult } from "discord-api-types/v9";
 import { Routes } from "discord-api-types/v9";
-import type { ActionFunction } from "remix";
+import type { ActionFunction } from "@remix-run/node";
 import invariant from "tiny-invariant";
 import { prisma } from "~/db.server";
 

@@ -11,7 +11,7 @@ import {
   Typography,
 } from "@mui/material";
 import LogoutIcon from "@mui/icons-material/Logout";
-import { Form } from "remix";
+import { Form } from "@remix-run/react";
 import { useUser } from "~/utils";
 import { Circles } from "@/model";
 import { Person } from "@mui/icons-material";

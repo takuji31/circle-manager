@@ -1,7 +1,8 @@
 import { Box, Button, Typography } from "@mui/material";
 import React from "react";
-import { Form, Link, LoaderFunction } from "remix";
-import { redirect } from "remix";
+import { Form, Link } from "@remix-run/react";
+import type { LoaderFunction } from "@remix-run/node";
+import { redirect } from "@remix-run/node";
 import { authenticator } from "~/auth.server";
 import { useOptionalUser } from "~/utils";
 

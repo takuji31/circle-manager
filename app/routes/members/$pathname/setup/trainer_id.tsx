@@ -1,5 +1,6 @@
-import type { ActionFunction } from "remix";
-import { Form, redirect, useActionData } from "remix";
+import type { ActionFunction } from "@remix-run/node";
+import { redirect } from "@remix-run/node";
+import { Form, useActionData } from "@remix-run/react";
 import { prisma } from "~/db.server";
 import { PathnameParams, TrainerId } from "~/schema/member";
 import { z } from "zod";

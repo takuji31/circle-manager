@@ -3,7 +3,7 @@ import type { FC, ReactNode } from "react";
 import PropTypes from "prop-types";
 import { Box, Button, Collapse, ListItem } from "@mui/material";
 import type { ListItemProps } from "@mui/material";
-import { Link } from "remix";
+import { Link } from "@remix-run/react";
 import { ChevronLeft, ExpandMore } from "@mui/icons-material";
 
 interface DashboardSidebarItemProps extends ListItemProps {

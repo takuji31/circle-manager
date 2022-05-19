@@ -1,9 +1,12 @@
-import type { ActionFunction, LoaderFunction } from "remix";
-import { redirect } from "remix";
 import { authenticator } from "~/auth.server";
 import type { AppData } from "@remix-run/server-runtime/data";
-import type { DataFunctionArgs } from "@remix-run/server-runtime/routeModules";
+import type {
+  ActionFunction,
+  DataFunctionArgs,
+  LoaderFunction,
+} from "@remix-run/server-runtime";
 import type { SessionUser } from "@/model";
+import { redirect } from "@remix-run/node";
 
 export const adminOnly: (fun?: LoaderFunctionWithUser) => LoaderFunction = (
   fun = () => null
