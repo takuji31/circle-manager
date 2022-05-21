@@ -8,7 +8,6 @@ import CssBaseline from "@mui/material/CssBaseline";
 
 import ClientStyleContext from "~/components/ClientStyleContext";
 import createEmotionCache from "~/lib/createEmotionCache";
-import "flowbite";
 import { createTheme } from "./mui/theme";
 import { useMediaQuery } from "@mui/material";
 import "~/lib/luxon";
