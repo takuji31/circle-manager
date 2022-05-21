@@ -1,10 +1,7 @@
+import { sendAdminNotificationMessage, sendInvitedMessage, setMemberCircleRole } from "@/discord";
+import { Circles, DateFormats } from "@/model";
+import { ZonedDateTime } from "@js-joda/core";
 import { prisma } from "~/db.server";
-import { Circles } from "@/model";
-import {
-  sendAdminNotificationMessage,
-  sendInvitedMessage,
-  setMemberCircleRole,
-} from "@/discord";
 import { ActiveCircleKey } from "~/schema/member";
 
 export const getNotJoinedSignUps = ({ invited }: { invited?: boolean }) => {
@@ -22,7 +19,7 @@ export const getNotJoinedSignUps = ({ invited }: { invited?: boolean }) => {
           ? Circles.findByCircleKey(signUp.circleKey)
           : null,
         ...signUp,
-      }))
+      })),
     );
 };
 
@@ -92,7 +89,7 @@ export const updateMemberSignUpCircle = async ({
     // TODO: setup
     const circle = Circles.findByCircleKey(circleKey);
     await sendAdminNotificationMessage(
-      `<@&${circle.id}> <@!${memberId}>さんから加入申請が送られました。 ${process.env.BASE_URL}/admin/signups`
+      `<@&${circle.id}> <@!${memberId}>さんから加入申請が送られました。 ${process.env.BASE_URL}/admin/signups`,
     );
   }
   await prisma.member.update({
@@ -100,3 +97,33 @@ export const updateMemberSignUpCircle = async ({
     data: { setupCompleted: true },
   });
 };
+
+export async function createSignUpUrl({
+  circleKey,
+  memo,
+  creatorId,
+}: { circleKey: ActiveCircleKey, memo: string, creatorId: string }) {
+  return await prisma.signUpUrl.create({
+    data: {
+      circleKey,
+      memo,
+      creatorId,
+    },
+  });
+}
+
+export async function getSignUpUrls() {
+  return await prisma.signUpUrl.findMany({
+    include: { creator: true },
+    orderBy: [{ createdAt: "desc" }],
+  }).then(list => list.map(({ circleKey, createdAt, ...s }) => {
+    return {
+      ...s,
+      circleKey,
+      circle: Circles.findByCircleKey(circleKey),
+      createdAt,
+      createdAtString: ZonedDateTime.fromDate(createdAt).format(DateFormats.dateTime),
+      permalink: `${process.env.BASE_URL}/sign_up_urls/${s.id}/`,
+    };
+  }));
+}

@@ -30,6 +30,8 @@ model Member {
   fanCounts         UmastagramMemberFanCount[]
   ScreenShot        ScreenShot[]
   memberFanCounts   MemberFanCount[]
+  createdSignUpUrl  SignUpUrl[]                @relation(name: "creator")
+  signUpUrl         SignUpUrl?                 @relation(name: "member")
 
   @@unique([pathname])
   @@index([leavedAt])
@@ -227,6 +229,23 @@ enum MemberFanCountSource {
   Manual /// 手入力
   ScreenShot /// スクリーンショット
   Paste /// まとめて貼り付け
+}
+
+/// 加入申請URL
+model SignUpUrl {
+  id        String    @id @default(cuid())
+  circleKey CircleKey
+  creatorId String
+  creator   Member    @relation(fields: [creatorId], references: [id], name: "creator")
+  name      String?
+  trainerId String?
+  memo      String
+  memberId  String?   @unique
+  member    Member?   @relation(fields: [memberId], references: [id], name: "member")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([createdAt])
 }
 
 // for NextAuth
