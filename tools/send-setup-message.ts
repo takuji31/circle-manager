@@ -1,9 +1,6 @@
-import { prisma } from '@/database';
-import {
-  sendSetupMessage,
-  createDiscordRestClient,
-} from '@/discord';
-import { config } from 'dotenv';
+import { prisma } from "@/database";
+import { createDiscordRestClient, sendWelcomeMessage } from "@/discord";
+import { config } from "dotenv";
 
 config();
 
@@ -13,7 +10,7 @@ const rest = createDiscordRestClient();
   try {
     const memberId = process.argv[2];
     if (!memberId) {
-      throw new Error('Usage: send-setup-message.ts [memberId]');
+      throw new Error("Usage: send-setup-message.ts [memberId]");
     }
 
     const member = await prisma.member.findUnique({ where: { id: memberId } });
@@ -21,7 +18,7 @@ const rest = createDiscordRestClient();
       throw new Error(`Member id:${memberId} not found.`);
     }
 
-    await sendSetupMessage(member);
+    await sendWelcomeMessage(member);
   } catch (error) {
     console.error(error);
   }
