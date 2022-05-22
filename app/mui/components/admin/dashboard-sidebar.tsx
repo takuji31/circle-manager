@@ -59,6 +59,11 @@ const getSections = (): Section[] => {
           icon: <Group fontSize="small" />,
         },
         {
+          title: "加入申請URL",
+          path: "/admin/signup_urls",
+          icon: <PersonAdd fontSize="small" />,
+        },
+        {
           title: "加入申請",
           path: "/admin/signups/",
           icon: <PersonAdd fontSize="small" />,

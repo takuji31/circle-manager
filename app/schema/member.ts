@@ -1,5 +1,5 @@
-import { z } from "zod";
 import { CircleKey as _CircleKey } from "@prisma/client";
+import { z } from "zod";
 
 export const PathnameParams = z.object({
   pathname: z.string(),
@@ -25,5 +25,7 @@ export type ActiveCircleKey = z.infer<typeof ActiveCircleKey>;
 
 export const TrainerName = z.preprocess(
   (name) => (name as string).trim(),
-  z.string().min(1)
+  z
+    .string({ required_error: "トレーナー名を入力してください" })
+    .min(1, "トレーナー名は1文字以上で入力してください")
 );

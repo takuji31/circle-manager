@@ -1,5 +1,5 @@
 /**
- * @type {import('@types/eslint').Linter.BaseConfig}
+ * @type {import("@types/eslint").Linter.BaseConfig}
  */
 module.exports = {
   extends: [
@@ -15,5 +15,11 @@ module.exports = {
     jest: {
       version: 27,
     },
+  },
+  rules: {
+    "react/jsx-curly-brace-presence": [
+      "error",
+      { props: "never", children: "never", propElementValues: "always" },
+    ],
   },
 };
