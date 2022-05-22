@@ -1,4 +1,4 @@
-import { CircleKey, CircleRole } from "@prisma/client";
+import type { CircleKey, CircleRole } from "@prisma/client";
 
 export interface User {
   id: string;
@@ -12,4 +12,7 @@ export type UserWithSession = User & {
   circleKey: CircleKey | null;
 };
 
-export type SessionUser = UserWithSession & { profileImageUrl: string | null };
+export type SessionUser = UserWithSession & {
+  profileImageUrl: string | null;
+  accessToken: string;
+};

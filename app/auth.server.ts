@@ -1,15 +1,14 @@
-import { Authenticator } from "remix-auth";
-import { sessionStorage } from "~/session.server";
-import { DiscordStrategy } from "remix-auth-discord";
-import { Guild, SessionUser } from "@/model";
 import { createDiscordRestClient } from "@/discord";
-import invariant from "tiny-invariant";
-import { prisma } from "./db.server";
-import {
-  RESTGetAPICurrentUserGuildsResult,
-  Routes,
-} from "discord-api-types/rest/v9";
+import type { SessionUser } from "@/model";
+import { Guild } from "@/model";
+import type { RESTGetAPICurrentUserGuildsResult } from "discord-api-types/rest/v9";
+import { Routes } from "discord-api-types/rest/v9";
 import { Permissions } from "discord.js";
+import { Authenticator } from "remix-auth";
+import { DiscordStrategy } from "remix-auth-discord";
+import invariant from "tiny-invariant";
+import { sessionStorage } from "~/session.server";
+import { prisma } from "./db.server";
 
 invariant(process.env.BASE_URL, "BASE_URL must be set");
 invariant(process.env.DISCORD_CLIENT_ID, "DISCORD_CLIENT_ID must be set");
@@ -28,7 +27,7 @@ authenticator.use(
       clientID: process.env.DISCORD_CLIENT_ID,
       clientSecret: process.env.DISCORD_CLIENT_SECRET,
       callbackURL: process.env.BASE_URL + "/api/auth/callback/discord",
-      scope: ["identify", "email", "guilds"],
+      scope: ["identify", "email", "guilds", "guilds.join"],
     },
     async ({ accessToken, refreshToken, extraParams, profile, context }) => {
       console.log(profile);
@@ -58,6 +57,7 @@ authenticator.use(
         id: profile.id,
         name: profile.displayName,
         role: member?.circleRole ?? null,
+        accessToken,
         isAdmin,
         isMember,
         circleKey: member?.circleKey ?? null,
