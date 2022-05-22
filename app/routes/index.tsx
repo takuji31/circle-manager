@@ -1,8 +1,8 @@
 import { Box, Button, Typography } from "@mui/material";
-import React from "react";
-import { Form, Link } from "@remix-run/react";
 import type { LoaderFunction } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
+import { Form, Link } from "@remix-run/react";
+import React from "react";
 import { authenticator } from "~/auth.server";
 import { useOptionalUser } from "~/utils";
 
@@ -16,11 +16,7 @@ export default function Index() {
   if (!user) {
     return <NoLoginTop />;
   } else if (!user.isMember) {
-    return (
-      <Typography variant="body1">
-        サークルに加入されていません、加入については運営メンバーへお問い合わせください。
-      </Typography>
-    );
+    return <NoMemberTop />;
   }
   return <LoggedInTop />;
 }
@@ -49,6 +45,43 @@ const NoLoginTop: React.FC = () => {
                     className="inline-flex items-center "
                   >
                     Discordでログイン
+                  </Button>
+                </Form>
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
+    </Box>
+  );
+};
+
+const NoMemberTop: React.FC = () => {
+  return (
+    <Box p={4}>
+      <div className="h-full min-h-full px-4 py-16 sm:px-6 sm:py-24 md:grid md:place-items-center lg:px-8">
+        <div className="mx-auto max-w-max">
+          <main className="sm:flex">
+            <Typography variant="h1" color="primary">
+              403
+            </Typography>
+            <div className="sm:ml-6">
+              <div className="sm:border-l sm:border-gray-200 sm:pl-6">
+                <Typography variant="h1">
+                  サークルに加入されていません
+                </Typography>
+                <Typography variant="caption" className="mt-1">
+                  加入については運営メンバーへお問い合わせください。
+                </Typography>
+              </div>
+              <div className="mt-10 flex space-x-3 sm:border-l sm:border-transparent sm:pl-6">
+                <Form method="post" action="/auth/logout">
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    className="inline-flex items-center "
+                  >
+                    ログアウト
                   </Button>
                 </Form>
               </div>
