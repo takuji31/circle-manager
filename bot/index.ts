@@ -1,19 +1,19 @@
-import { sendSetupMessage } from "@/discord";
-import { trainerIdCommand } from "./member/trainer_id";
-import { updateMemberNicknameEvent } from "./member/update_member_nickname";
-import { monthSurveyReaction, monthSurveyShowReaction } from "./month_survey";
-import { registerTrainerIdCommand } from "./register_trainer_id";
+import { sendWelcomeMessage } from "@/discord";
+import type { RedisClient } from "@/lib/redis";
+import { createRedisClient, RedisKeys } from "@/lib/redis";
+import { Circles, Emoji, isCircleKey, MonthSurveyEmoji } from "@/model";
 import { PrismaClient } from "@prisma/client";
 import { Client, Intents, Options } from "discord.js";
 import { config } from "dotenv";
-import { Emoji, MonthSurveyEmoji, Circles, isCircleKey } from "@/model";
 import {
   updateFanCountEvent,
   updateFanCountFromChannel,
 } from "./circle/update_fan_count";
-import type { RedisClient } from "@/lib/redis";
-import { createRedisClient, RedisKeys } from "@/lib/redis";
 import { createPersonalChannel } from "./member/create_personal_channes";
+import { trainerIdCommand } from "./member/trainer_id";
+import { updateMemberNicknameEvent } from "./member/update_member_nickname";
+import { monthSurveyReaction, monthSurveyShowReaction } from "./month_survey";
+import { registerTrainerIdCommand } from "./register_trainer_id";
 
 config();
 
@@ -88,7 +88,7 @@ client.on("guildMemberAdd", async (member) => {
       },
     });
     if (process.env.NODE_ENV != "production") return;
-    await sendSetupMessage(createdMember);
+    await sendWelcomeMessage(createdMember);
   } catch (e) {
     console.log("Error when guildMemberRemove %s", e);
   }
