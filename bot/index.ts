@@ -1,8 +1,9 @@
+import { updateMemberRoleEvent } from "@/bot/member/update_member_role";
 import { sendWelcomeMessage } from "@/discord";
 import type { RedisClient } from "@/lib/redis";
 import { createRedisClient, RedisKeys } from "@/lib/redis";
 import { Circles, Emoji, isCircleKey, MonthSurveyEmoji } from "@/model";
-import { PrismaClient } from "@prisma/client";
+import { CircleRole, PrismaClient } from "@prisma/client";
 import { Client, Intents, Options } from "discord.js";
 import { config } from "dotenv";
 import {
@@ -49,6 +50,8 @@ client.on("guildMemberRemove", async (member) => {
       where: { id: member.id },
       data: {
         circleKey: null,
+        // 本来はメンバーではないが、一番下位のロールがメンバーなのでメンバーということにしている。
+        circleRole: CircleRole.Member,
         leavedAt: new Date(),
       },
     });
@@ -63,6 +66,7 @@ client.on("guildMemberAdd", async (member) => {
     return;
   }
   try {
+    // 加入申請の登録時に必須の情報は入力されているはずなので、最低限の情報だけ更新する
     const createdMember = await prisma.member.upsert({
       where: { id: member.id },
       create: {
@@ -74,19 +78,6 @@ client.on("guildMemberAdd", async (member) => {
         leavedAt: null,
       },
     });
-    await prisma.signUp.upsert({
-      where: { id: member.id },
-      create: {
-        id: member.id,
-      },
-      // renew si
-      update: {
-        circleKey: null,
-        createdAt: new Date(),
-        invited: false,
-        joined: false,
-      },
-    });
     if (process.env.NODE_ENV != "production") return;
     await sendWelcomeMessage(createdMember);
   } catch (e) {
@@ -96,6 +87,7 @@ client.on("guildMemberAdd", async (member) => {
 
 client.on("guildMemberUpdate", async (oldMember, newMember) => {
   await updateMemberNicknameEvent(oldMember, newMember);
+  await updateMemberRoleEvent(oldMember, newMember);
 });
 
 client.on("messageCreate", async (message) => {
