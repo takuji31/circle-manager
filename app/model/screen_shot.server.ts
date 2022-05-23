@@ -1,15 +1,14 @@
-import { bucket } from "~/firebase.server";
-import type { ActiveCircleKey } from "~/schema/member";
-import type { z } from "zod";
 import { LocalDate } from "@/model";
-import { prisma } from "~/db.server";
-import * as os from "os";
-import { mkdtemp, writeFile } from "fs/promises";
-import path from "path";
 import { ImageAnnotatorClient } from "@google-cloud/vision";
 import type { CircleKey, ScreenShot as PrismaScreenShot } from "@prisma/client";
-import { MemberFanCountSource } from "@prisma/client";
-import { CircleRole } from "@prisma/client";
+import { CircleRole, MemberFanCountSource } from "@prisma/client";
+import { mkdtemp, writeFile } from "fs/promises";
+import * as os from "os";
+import path from "path";
+import type { z } from "zod";
+import { prisma } from "~/db.server";
+import { bucket } from "~/firebase.server";
+import type { ActiveCircleKey } from "~/schema/member";
 import { parseMemberNameAndFanCount } from "./member_fan_count.server";
 
 interface UploadScreenShotParams {
@@ -48,7 +47,7 @@ export async function getScreenShots({
         },
       },
       orderBy: {
-        updatedAt: "asc",
+        createdAt: "asc",
       },
     })
     .then((screenShots) =>

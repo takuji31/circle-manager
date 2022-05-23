@@ -176,6 +176,9 @@ model ScreenShot {
   updatedAt  DateTime         @updatedAt
   rawJson    Json? /// スクリーンショットをCloud Vision APIにぶん投げて解析した結果
   fanCounts  MemberFanCount[]
+
+  @@index([circleKey, date])
+  @@index([createdAt])
 }
 
 /// サークルごとのファン数集計
