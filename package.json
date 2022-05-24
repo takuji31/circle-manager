@@ -99,7 +99,7 @@
     "remix-auth": "^3.2.2",
     "remix-auth-discord": "^1.0.0",
     "remove": "^0.1.5",
-    "simplebar": "^5.3.6",
+    "simplebar": "^5.3.8",
     "simplebar-react": "^2.3.7",
     "tiny-invariant": "^1.2.0",
     "zod": "^3.16.0"
