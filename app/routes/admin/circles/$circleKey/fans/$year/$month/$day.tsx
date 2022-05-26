@@ -341,7 +341,7 @@ const StatusCard = () => {
         <Stack spacing={2}>
           {circleFanCount ? (
             <>公開済み</>
-          ) : memberFanCounts.length ? (
+          ) : !memberFanCounts.length ? (
             <Alert variant="filled" severity="error">
               ファン数が1件も入力されていません。最低1件は入力がないと公開できません。
             </Alert>
