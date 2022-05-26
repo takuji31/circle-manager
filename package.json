@@ -102,7 +102,7 @@
     "simplebar": "^5.3.6",
     "simplebar-react": "^2.3.7",
     "tiny-invariant": "^1.2.0",
-    "zod": "^3.16.0"
+    "zod": "^3.17.3"
   },
   "devDependencies": {
     "@faker-js/faker": "^6.3.1",
