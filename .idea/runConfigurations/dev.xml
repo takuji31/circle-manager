@@ -6,7 +6,9 @@
       <script value="dev" />
     </scripts>
     <node-interpreter value="project" />
-    <envs />
+    <envs>
+      <env name="GOOGLE_APPLICATION_CREDENTIALS" value="$USER_HOME$/google-cloud-keys/shin-umamusume-336911-5c0f1e6b4c7f.json" />
+    </envs>
     <method v="2" />
   </configuration>
 </component>
