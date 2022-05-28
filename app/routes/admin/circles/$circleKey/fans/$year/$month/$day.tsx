@@ -23,6 +23,7 @@ import {
   TableRow,
   Tabs,
   TextField,
+  Typography,
 } from "@mui/material";
 import type { ActionFunction, DataFunctionArgs, LoaderFunction } from "@remix-run/node";
 import { Form, useActionData, useLoaderData, useSubmit, useTransition } from "@remix-run/react";
@@ -277,7 +278,7 @@ export default function AdminCircleFanCounts() {
               disabled={
                 !!transition.submission ||
                 !memberFanCounts.length ||
-                !!memberFanCounts.filter((m) => m.memberId == null).length
+                !memberFanCounts.filter((m) => m.memberId).length
               }
             >
               公開して通知
@@ -321,6 +322,10 @@ const StatusCard = () => {
     () => memberFanCounts.filter((m) => !m.memberId).length,
     [memberFanCounts],
   );
+  const knownMemberFanCounts = useMemo(
+    () => memberFanCounts.filter((m) => m.memberId).length,
+    [memberFanCounts],
+  );
   return (
     <Card>
       <CardHeader
@@ -330,19 +335,25 @@ const StatusCard = () => {
       <CardContent>
         <Stack spacing={2}>
           {circleFanCount ? (
-            <>公開済み</>
+            <Typography variant="body1">公開済み</Typography>
           ) : !memberFanCounts.length ? (
             <Alert variant="filled" severity="error">
               ファン数が1件も入力されていません。最低1件は入力がないと公開できません。
             </Alert>
-          ) : unknownMemberFanCounts ? (
-            <Alert variant="filled" severity="error">
-              不明なメンバーのファン数記録が{unknownMemberFanCounts}
-              件あります。全ての記録にメンバーを紐付けなければ公開できません。
-            </Alert>
           ) : (
             <Alert variant="filled" severity="info">
               公開できます。
+            </Alert>
+          )}
+          {!!unknownMemberFanCounts && (
+            <Alert variant="filled" severity="warning">
+              不明なメンバーのファン数記録が{unknownMemberFanCounts}
+              件あります。紐付けていないファン数は公開されずサークルごとの集計にも含まれません。
+            </Alert>
+          )}
+          {knownMemberFanCounts != 30 && (
+            <Alert variant="filled" severity="warning">
+              ファン数記録が{knownMemberFanCounts}件あります。メンバー数に対してファン数が不足している場合は追加、超過している場合は不要な記録を削除してください。
             </Alert>
           )}
         </Stack>

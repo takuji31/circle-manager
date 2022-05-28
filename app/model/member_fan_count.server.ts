@@ -53,10 +53,16 @@ export async function getCircleFanCountGraph({
     return null;
   }
 
+  const graphMemberIds = await prisma.memberFanCount.findMany({
+    where: { circleKey, date: date.toUTCDate(), memberId: { not: null } },
+    select: { memberId: true },
+  }).then(list => list.map(m => m.memberId).filter(id => id != null) as string[]);
+
   const thisMonthMemberFanCounts = _.chain(
     await prisma.memberFanCount.findMany({
       where: {
         circleKey,
+        memberId: { in: graphMemberIds },
         date: {
           gte: lastDayOfPreviousMonth.toUTCDate(),
           lte: date.toUTCDate(),
@@ -302,7 +308,7 @@ export async function calculateMonthlyTotalFanCounts({
   console.log(memberIdToFirstFanCount);
 
   const memberFanCounts = await prisma.memberFanCount.findMany({
-    where: { circleKey, date: date.toUTCDate() },
+    where: { circleKey, date: date.toUTCDate(), memberId: { not: null } },
   });
 
   const transactions = [];
@@ -311,7 +317,7 @@ export async function calculateMonthlyTotalFanCounts({
     if (memberId) {
       const firstFanCount = memberIdToFirstFanCount[memberId];
       const monthlyTotal =
-        firstFanCount?.count != null && firstFanCount?.count != undefined
+        firstFanCount?.count != null
           ? total - BigInt(firstFanCount.count)
           : 0n;
       const days = firstFanCount?.date
@@ -347,23 +353,23 @@ export async function publishCircleFanCount({
   await calculateMonthlyTotalFanCounts({ circleKey, date });
 
   const memberFanCounts = await prisma.memberFanCount.findMany({
-    where: { circleKey, date: date.toUTCDate() },
+    where: { circleKey, date: date.toUTCDate(), memberId: { not: null } },
   });
 
   if (!memberFanCounts.length) {
     throw new Error("ファン数が1件も記録されていません。");
   }
 
-  if (
-    memberFanCounts.filter(
-      (m) => !m.memberId || m.monthlyTotal == null || m.monthlyAvg == null,
-    ).length
-  ) {
-    throw new Error(
-      "不明なメンバーのファン数記録があります。全ての記録にメンバーを紐付けなければ公開できません。",
-    );
-  }
-
+  // if (
+  //   memberFanCounts.filter(
+  //     (m) => !m.memberId || m.monthlyTotal == null || m.monthlyAvg == null,
+  //   ).length
+  // ) {
+  //   throw new Error(
+  //     "不明なメンバーのファン数記録があります。全ての記録にメンバーを紐付けなければ公開できません。",
+  //   );
+  // }
+  //
   const daysLeftInMonth = BigInt(
     Period.between(date, date.with(TemporalAdjusters.lastDayOfMonth())).days(),
   );
