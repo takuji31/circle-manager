@@ -2,7 +2,6 @@ import { sendMessageToChannel } from "@/discord";
 import { Circles, DateFormats, LocalDate, Period, TemporalAdjusters } from "@/model";
 import type { CircleKey } from "@prisma/client";
 import { MemberFanCountSource } from "@prisma/client";
-import { ChartDataset, DefaultDataPoint } from "chart.js";
 import type { ChartData } from "chart.js";
 import _ from "lodash";
 import { prisma } from "~/db.server";
@@ -70,11 +69,11 @@ export async function getCircleFanCountGraph({
   )
     .groupBy((m) => m.memberId)
     .mapValues((l) =>
-      _.orderBy(l, (m) => m.date.getTime(), 'desc').map(
+      _.orderBy(l, (m) => m.date.getTime(), "desc").map(
         ({ total, monthlyAvg, monthlyTotal, ...m }, idx, list) => {
 
           const beforeFanCount = list[idx + 1];
-          const diffFromBefore = beforeFanCount && beforeFanCount.monthlyTotal != null ?  parseInt((monthlyTotal! - beforeFanCount?.monthlyTotal!).toString()) : null;
+          const diffFromBefore = beforeFanCount && beforeFanCount.monthlyTotal != null ? parseInt((monthlyTotal! - beforeFanCount?.monthlyTotal!).toString()) : null;
           return {
             ...m,
             total: parseInt(total.toString()),
@@ -114,7 +113,7 @@ export async function getCircleFanCountGraph({
   };
 
   const diffGraphData: ChartData<"line"> = {
-    datasets: thisMonthMemberFanCounts.map((fans ) => {
+    datasets: thisMonthMemberFanCounts.map((fans) => {
       const first = fans[0];
       return {
         label: first.member?.name,
@@ -204,6 +203,7 @@ export async function parseMemberNameAndFanCount({
   memberAndFanCounts,
   source,
 }: ParseMemberNameAndFanCountParams) {
+  console.log(memberAndFanCounts);
   const members = await getCircleMembers({ circleKey });
   const memberFanCounts = (
     await prisma.memberFanCount.findMany({

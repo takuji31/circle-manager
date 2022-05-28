@@ -1,5 +1,6 @@
 import type { SessionUser } from "@/model";
 import { Circles, LocalDate } from "@/model";
+import { ref, uploadBytes } from "@firebase/storage";
 import { UploadIcon, XIcon } from "@heroicons/react/solid";
 import { Edit } from "@mui/icons-material";
 import {
@@ -10,6 +11,7 @@ import {
   Card,
   CardContent,
   CardHeader,
+  CircularProgress,
   Grid,
   IconButton,
   Stack,
@@ -34,7 +36,7 @@ import { AdminBody } from "~/components/admin/body";
 import AdminHeader from "~/components/admin/header";
 import AdminHeaderActions from "~/components/admin/header/actions";
 import AdminHeaderTitle from "~/components/admin/header/title";
-import { createFileUploadHandler, parseMultipartFormData } from "~/lib/form.server";
+import { storage } from "~/lib/firebase.client";
 import { dateToYMD } from "~/model/date.server";
 
 import { getCircleMembers } from "~/model/member.server";
@@ -46,11 +48,12 @@ import {
 } from "~/model/member_fan_count.server";
 import type { ScreenShotMemberFanCount } from "~/model/screen_shot.server";
 import {
+  cloudStoragePathPrefix,
   deleteScreenShot,
   getScreenShots,
   parseScreenShots,
   setMemberIdToMemberFanCount,
-  uploadScreenShot,
+  uploadScreenShots,
 } from "~/model/screen_shot.server";
 import { localStorageEffect } from "~/recoil";
 import { YMD } from "~/schema/date";
@@ -84,6 +87,7 @@ type LoaderData = Awaited<ReturnType<typeof getLoaderData>>;
 type ActionData = {
   uploadScreenShot?: Awaited<ReturnType<typeof uploadScreenShotAction>>;
   pasteTsv: Awaited<ReturnType<typeof pasteTsvAction>>;
+  parseScreenShots: Awaited<ReturnType<typeof parseScreenShots>>;
 };
 type Member = Awaited<ReturnType<typeof getCircleMembers>>[0];
 
@@ -121,6 +125,8 @@ const getLoaderData = async ({ params }: DataFunctionArgs) => {
     date,
     circleKey,
   });
+  const pathPrefix = cloudStoragePathPrefix(circleKey, date);
+
   return {
     ...dateToYMD(date),
     circle,
@@ -128,6 +134,7 @@ const getLoaderData = async ({ params }: DataFunctionArgs) => {
     members,
     memberFanCounts,
     circleFanCount,
+    cloudStoragePathPrefix: pathPrefix,
   };
 };
 
@@ -139,20 +146,17 @@ const getActionData = async ({ request, params }: DataFunctionArgs) => {
   const user = await requireAdminUser(request);
   const { year, month, day, circleKey } = paramsSchema.parse(params);
   const date = LocalDate.of(year, month, day);
-  const uploadHandler = createFileUploadHandler({
-    maxPartSize: 10_000_000,
-  });
-  const formData = Object.fromEntries(
-    await parseMultipartFormData(request, uploadHandler),
-  );
+  const rawFormData = await request.formData();
+  const formData = Object.fromEntries(rawFormData);
   console.log(formData);
   const { mode } = actionQuerySchema.parse(formData);
 
   switch (mode) {
     case ActionMode.enum.uploadScreenShot: {
+      const paths = rawFormData.getAll("paths") as Array<string>;
       return {
         uploadScreenShot: await uploadScreenShotAction({
-          formData,
+          paths,
           circleKey,
           date,
           user,
@@ -165,8 +169,9 @@ const getActionData = async ({ request, params }: DataFunctionArgs) => {
       break;
     }
     case ActionMode.enum.parseImages: {
-      await parseScreenShots({ circleKey, date });
-      break;
+      return {
+        parseScreenShots: await parseScreenShots({ circleKey, date }),
+      };
     }
     case ActionMode.enum.setMemberId: {
       const { memberId, memberFanCountId } = setMemberIdSchema.parse(formData);
@@ -191,22 +196,27 @@ const getActionData = async ({ request, params }: DataFunctionArgs) => {
   return null;
 };
 
-const uploadScreenShotAction = async ({ formData, circleKey, date, user }: {
-  formData: Record<string, any>;
+const uploadScreenShotAction = async ({
+  paths,
+  circleKey,
+  date,
+  user,
+}: {
+  paths: Array<string>;
   circleKey: ActiveCircleKey;
   date: LocalDate;
   user: SessionUser;
 }) => {
-  const result = uploadSchema.safeParse(formData);
+  const result = uploadSchema.safeParse({ paths });
 
   if (!result.success) {
     return {
-      error: result.error.format()?.screenShotFile?._errors?.join("/"),
+      error: result.error.format()?.paths?._errors?.join("/"),
     };
   } else {
-    const { screenShotFile } = result.data;
-    await uploadScreenShot({
-      screenShotFile,
+    const { paths } = result.data;
+    await uploadScreenShots({
+      paths,
       circleKey,
       date,
       uploaderId: user.id,
@@ -215,7 +225,11 @@ const uploadScreenShotAction = async ({ formData, circleKey, date, user }: {
   }
 };
 
-const pasteTsvAction = async ({ formData, circleKey, date }: {
+const pasteTsvAction = async ({
+  formData,
+  circleKey,
+  date,
+}: {
   formData: Record<string, any>;
   circleKey: ActiveCircleKey;
   date: LocalDate;
@@ -234,31 +248,7 @@ const pasteTsvAction = async ({ formData, circleKey, date }: {
 };
 
 const uploadSchema = z.object({
-  screenShotFile: z
-    .any()
-    .transform((file) => file as File)
-    .superRefine((val, ctx) => {
-      if (!val) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.invalid_type,
-          expected: "object",
-          received: "undefined",
-          fatal: true,
-          message: "スクリーンショットがアップロードされていません",
-        });
-        return;
-      }
-      console.log(val);
-      if (val.type != "image/png") {
-        ctx.addIssue({
-          code: z.ZodIssueCode.invalid_type,
-          expected: "object",
-          received: "undefined",
-          fatal: true,
-          message: "スクリーンショットはPNG形式のみサポートしています。",
-        });
-      }
-    }),
+  paths: z.array(z.string()).max(10).min(1, "スクリーンショットが1枚もアップロードされていません"),
 });
 
 export const action: ActionFunction = async (args) => {
@@ -341,7 +331,7 @@ const StatusCard = () => {
         <Stack spacing={2}>
           {circleFanCount ? (
             <>公開済み</>
-          ) : memberFanCounts.length ? (
+          ) : !memberFanCounts.length ? (
             <Alert variant="filled" severity="error">
               ファン数が1件も入力されていません。最低1件は入力がないと公開できません。
             </Alert>
@@ -362,9 +352,10 @@ const StatusCard = () => {
 };
 
 const ScreenShotCard = ({ tabId }: { tabId: TabId }) => {
-  const { screenShots, members } = useLoaderData<LoaderData>();
+  const { screenShots, members, cloudStoragePathPrefix } = useLoaderData<LoaderData>();
   const actionData = useActionData<ActionData>();
   const transition = useTransition();
+  const [uploading, setUploading] = useState(false);
 
   const submit = useSubmit();
   return (
@@ -403,7 +394,7 @@ const ScreenShotCard = ({ tabId }: { tabId: TabId }) => {
             .filter((ss) => !!ss.url)
             .map((ss) => {
               return (
-                <>
+                <React.Fragment key={ss.id}>
                   <Grid item xs={12} md={6} p={2}>
                     <Box position="relative">
                       <img src={ss.url!} alt="" className="h-full w-full" />
@@ -450,7 +441,7 @@ const ScreenShotCard = ({ tabId }: { tabId: TabId }) => {
                       <div></div>
                     </Grid>
                   </Grid>
-                </>
+                </React.Fragment>
               );
             })}
         </Grid>
@@ -459,24 +450,37 @@ const ScreenShotCard = ({ tabId }: { tabId: TabId }) => {
           <p>アップロード済みのスクリーンショットはありません</p>
         </div>
       )}
-      {screenShots.length < 10 && (
+      {uploading ? (<Box p={4} alignItems="center" flexDirection="column" display="flex">
+        <CircularProgress variant="indeterminate" />
+      </Box>) : screenShots.length < 10 ? (
         <div>
           <FileUploadInput
             onDrop={(files) => {
-              console.log(files);
-              const [file] = files;
-              const formData = new FormData();
-              formData.set("screenShotFile", file, file.name);
-              submit(formData!, {
-                replace: true,
-                method: "post",
-                encType: "multipart/form-data",
-              });
+              setUploading(true);
+              const time = new Date().getTime();
+              Promise.allSettled(
+                files.map((file, idx) => {
+                  const fileName = `${time}_${idx}.png`;
+                  const fileRef = ref(storage, `${cloudStoragePathPrefix}${fileName}`);
+                  return uploadBytes(fileRef, file);
+                }),
+              ).then((results) => {
+                const formData = new FormData();
+                formData.set("mode", ActionMode.enum.uploadScreenShot);
+                for (const result of results) {
+                  if (result.status == "rejected") {
+                    console.log(result.reason);
+                  } else {
+                    formData.append("paths", result.value.ref.fullPath);
+                  }
+                }
+                submit(formData, { method: "post", replace: true });
+              }).finally(() => setUploading(false));
             }}
           />
           <p>{actionData?.uploadScreenShot?.error}</p>
         </div>
-      )}
+      ) : null}
     </Card>
   );
 };
@@ -499,6 +503,7 @@ const PasteCard = ({ tabId }: { tabId: TabId }) => {
         />
         <CardContent>
           <TextField
+            id="tsv"
             name="tsv"
             multiline
             fullWidth
@@ -580,11 +585,13 @@ interface FileUploadInputProps {
 }
 
 const FileUploadInput: React.FC<FileUploadInputProps> = ({ onDrop }) => {
+  const transition = useTransition();
   const { getRootProps, getInputProps } = useDropzone({
     accept: {
       "image/*": [".png"],
     },
     onDrop,
+    disabled: transition.submission != null,
   });
   return (
     <div
@@ -652,7 +659,7 @@ function MemberSelectListbox({
       renderInput={(params) => (
         <TextField
           {...params}
-          label={`${memberFanCount.order + 1}人目 (ファン数：${
+          label={`${memberFanCount.order + 1}人目 (名: ${memberFanCount.parsedName}, ファン数：${
             memberFanCount.total
           })`}
         />

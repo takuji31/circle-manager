@@ -170,6 +170,7 @@ model ScreenShot {
   circleKey  CircleKey
   date       DateTime         @db.Date // 対象の日付
   url        String? /// 画像のURL、アップロードが完了していない時はnull
+  storagePath String? /// 画像のCloud Storage For Firebase上のpath、アップロードが完了していない時はnull
   uploaderId String           @db.VarChar(255)
   uploader   Member           @relation(fields: [uploaderId], references: [id]) /// アップロードを実行したメンバー
   createdAt  DateTime         @default(now())
