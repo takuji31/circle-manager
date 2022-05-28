@@ -74,13 +74,14 @@ export async function getScreenShots({
         return {
           ...screenShot,
           fanCounts: fanCounts.map((c) => {
-            const { total, monthlyTotal, ...member } = c;
+            const { total, monthlyTotal, monthlyAvg, ...member } = c;
             return {
               ...member,
               total: parseInt(total.toString()),
               monthlyTotal: monthlyTotal
                 ? parseInt(monthlyTotal.toString())
                 : null,
+              monthlyAvg: monthlyAvg ? parseInt(monthlyAvg.toString()) : null,
             };
           }),
         };
