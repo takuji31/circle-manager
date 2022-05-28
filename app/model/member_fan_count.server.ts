@@ -1,5 +1,6 @@
 import { sendMessageToChannel } from "@/discord";
 import { Circles, DateFormats, LocalDate, Period, TemporalAdjusters } from "@/model";
+import { DateTimeFormatter } from "@js-joda/core";
 import type { CircleKey } from "@prisma/client";
 import { MemberFanCountSource } from "@prisma/client";
 import type { ChartData } from "chart.js";
@@ -107,23 +108,33 @@ export async function getCircleFanCountGraph({
       return `${d.month}/${d.day}`;
     })
     .reverse();
-  const totalGraphData: ChartData<"line"> = {
+  const totalGraphData: ChartData<"line", { x: string; y: number; }[]> = {
     datasets: thisMonthMemberFanCounts.map((fans, idx) => {
       const first = fans[0];
       return {
         label: first.member?.name,
-        data: fans.map((m) => m.monthlyTotal).reverse(),
+        data: fans.map((m) => {
+          return {
+            x: LocalDate.fromUTCDate(m.date).format(DateTimeFormatter.ofPattern("M/d")),
+            y: m.monthlyTotal!,
+          };
+        }).reverse(),
       };
     }),
     labels,
   };
 
-  const diffGraphData: ChartData<"line"> = {
+  const diffGraphData: ChartData<"line", { x: string; y: number; }[]> = {
     datasets: thisMonthMemberFanCounts.map((fans) => {
       const first = fans[0];
       return {
         label: first.member?.name,
-        data: fans.map((m) => m.diffFromBefore ?? 0).reverse(),
+        data: fans.map((m) => {
+          return {
+            x: LocalDate.fromUTCDate(m.date).format(DateTimeFormatter.ofPattern("M/d")),
+            y: m.monthlyTotal!,
+          };
+        }).reverse(),
       };
     }),
     labels,
