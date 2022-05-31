@@ -1,5 +1,6 @@
 import { LocalDate } from "@/model";
 import { ImageAnnotatorClient } from "@google-cloud/vision";
+import { google } from "@google-cloud/vision/build/protos/protos";
 import type { CircleKey, ScreenShot as PrismaScreenShot } from "@prisma/client";
 import { CircleRole, MemberFanCountSource } from "@prisma/client";
 import _, { isEqual } from "lodash";
@@ -8,6 +9,7 @@ import { prisma } from "~/db.server";
 import { bucket } from "~/firebase.server";
 import type { ActiveCircleKey } from "~/schema/member";
 import { parseMemberNameAndFanCount } from "./member_fan_count.server";
+import IAnnotateImageResponse = google.cloud.vision.v1.IAnnotateImageResponse;
 
 interface UploadScreenShotParams {
   paths: Array<string>;
@@ -323,8 +325,8 @@ const parseScreenShot = async ({
 
   const client = new ImageAnnotatorClient({});
 
-  // TODO: ユニット数節約のために一度パースしたスクリーンショットは再度Cloud Vision APIに投げない
-  const [result] = await client.annotateImage(
+  // ユニット数節約のために一度パースしたスクリーンショットは再度Cloud Vision APIに投げない
+  const result: IAnnotateImageResponse = screenShot.rawJson as IAnnotateImageResponse | null ?? (await client.annotateImage(
     {
       image: {
         source: {
@@ -340,7 +342,7 @@ const parseScreenShot = async ({
         "languageHints": ["ja"],
       },
     } as any,
-  );
+  ))[0];
   const annotations = result.fullTextAnnotation;
   const page = annotations?.pages?.at(0);
 
