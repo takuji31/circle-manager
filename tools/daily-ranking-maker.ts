@@ -1,28 +1,20 @@
-import { Circles } from '@/model';
-import { config } from 'dotenv';
-import { prisma } from '@/database';
+import { prisma } from "@/database";
+import { createDiscordRestClient } from "@/discord";
 import {
+  Circles,
+  DateFormats,
   Guild,
+  LocalDate,
+  monthCircleStateLabel,
   nextMonthInt,
   thisMonthInt,
-} from '@/model';
-import { stringify } from 'csv-stringify/sync';
-import { createDiscordRestClient } from '@/discord';
-import { Routes } from 'discord-api-types/v9';
-import {
-  CircleKey,
-  CircleRole,
-  Member,
-  UmastagramMemberFanCount,
-  MonthCircle,
-  MonthSurveyAnswerValue,
-} from '@prisma/client';
-import { monthCircleStateLabel } from '@/model';
-import {
-  LocalDate,
   ZonedDateTime,
-  DateFormats,
-} from '@/model';
+} from "@/model";
+import type { Member, MonthCircle, UmastagramMemberFanCount } from "@prisma/client";
+import { CircleKey, CircleRole } from "@prisma/client";
+import { stringify } from "csv-stringify/sync";
+import { Routes } from "discord-api-types/v9";
+import { config } from "dotenv";
 
 config();
 
@@ -43,7 +35,7 @@ config();
     _max: {
       date: true,
     },
-    by: ['circle'],
+    by: ["circle"],
     where: {
       date: {
         gte: LocalDate.firstDayOfThisMonth().toUTCDate(),
@@ -52,11 +44,9 @@ config();
     },
   });
 
-  let memberFanCounts: Array<
-    UmastagramMemberFanCount & {
-      member: (Member & { monthCircles: Array<MonthCircle> }) | null;
-    }
-  > = [];
+  let memberFanCounts: Array<UmastagramMemberFanCount & {
+    member: (Member & { monthCircles: Array<MonthCircle> }) | null;
+  }> = [];
   const circleToUpdatedAt: Record<CircleKey, LocalDate | null> = {
     Saikyo: null,
     Shin: null,
@@ -80,18 +70,6 @@ config();
       where: {
         date,
         circle,
-        ...(useMonthSurveyAnswer
-          ? {
-              member: {
-                monthSurveyAnswer: {
-                  some: {
-                    ...nextMonth,
-                    value: MonthSurveyAnswerValue.Umamusume,
-                  },
-                },
-              },
-            }
-          : {}),
       },
       include: {
         member: {
@@ -104,7 +82,10 @@ config();
         },
       },
     });
-    memberFanCounts.push(...fanCounts);
+    memberFanCounts.push(...fanCounts.filter(fanCount => {
+      const state = fanCount.member?.monthCircles.at(0)?.state;
+      return !useMonthSurveyAnswer || state == "Shin" || state == "Ha";
+    }));
   }
 
   const rest = createDiscordRestClient();
@@ -119,24 +100,24 @@ config();
           .map((entry) => {
             const [key, updatedAt] = entry;
             return `${Circles.findByCircleKey(key as CircleKey).name} : ${
-              updatedAt ? updatedAt.format(DateFormats.ymd) : '更新なし'
+              updatedAt ? updatedAt.format(DateFormats.ymd) : "更新なし"
             }`;
           })
-          .join('\n'),
+          .join("\n"),
     },
     files: [
       {
-        name: 'ranking.csv',
+        name: "ranking.csv",
         data: Buffer.from(
           stringify([
             [
-              '順位',
-              'ランキング制対象内順位',
-              'トレーナー名',
-              'メンバー情報不明',
-              '現在のサークル',
-              '予測ファン数',
-              '来月のサークル(確定)',
+              "順位",
+              "ランキング制対象内順位",
+              "トレーナー名",
+              "メンバー情報不明",
+              "現在のサークル",
+              "予測ファン数",
+              "来月のサークル(確定)",
             ],
             ...memberFanCounts
               //TODO: int
@@ -159,11 +140,11 @@ config();
                   fanCount.predicted.toString(),
                   monthCircleState
                     ? monthCircleStateLabel(monthCircleState)
-                    : '未確定',
+                    : "未確定",
                 ];
               }),
           ]),
-          'utf-8'
+          "utf-8",
         ),
       },
     ],
