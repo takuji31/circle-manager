@@ -1,12 +1,15 @@
-import {
-  UmastagramCircleFanCount,
+import type {
+  CircleFanCount,
   Member,
-  UmastagramMemberFanCount,
+  MemberFanCount,
   MonthCircle,
   MonthSurvey,
   MonthSurveyAnswer,
   PersonalChannel,
+  ScreenShot,
   SignUp,
+  UmastagramCircleFanCount,
+  UmastagramMemberFanCount,
 } from "@prisma/client";
 
 export interface DbTableData {
@@ -17,5 +20,8 @@ export interface DbTableData {
   signUps: Array<SignUp>;
   umastagramMemberFanCount: Array<UmastagramMemberFanCount>;
   umastagramCircleFanCount: Array<UmastagramCircleFanCount>;
+  circleFanCounts: CircleFanCount[];
+  memberFanCounts: MemberFanCount[];
+  screenShots: ScreenShot[];
   personalChannels: Array<PersonalChannel>;
 }

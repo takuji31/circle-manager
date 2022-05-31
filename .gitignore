@@ -85,3 +85,5 @@ node_modules/
 /cypress/videos
 
 /app/styles/tailwind.css
+
+data.json
