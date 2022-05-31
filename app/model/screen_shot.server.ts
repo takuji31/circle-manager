@@ -1,5 +1,6 @@
 import { LocalDate } from "@/model";
 import { ImageAnnotatorClient } from "@google-cloud/vision";
+import { google } from "@google-cloud/vision/build/protos/protos";
 import type { CircleKey, ScreenShot as PrismaScreenShot } from "@prisma/client";
 import { CircleRole, MemberFanCountSource } from "@prisma/client";
 import _, { isEqual } from "lodash";
@@ -8,6 +9,7 @@ import { prisma } from "~/db.server";
 import { bucket } from "~/firebase.server";
 import type { ActiveCircleKey } from "~/schema/member";
 import { parseMemberNameAndFanCount } from "./member_fan_count.server";
+import IAnnotateImageResponse = google.cloud.vision.v1.IAnnotateImageResponse;
 
 interface UploadScreenShotParams {
   paths: Array<string>;
@@ -216,21 +218,32 @@ type Member = {
 const memberNameNoiseRegex = /(\(0|O?\(\)?|\(?i\)?|0|[①ⓘ]+i?|○|O)$/;
 const fanCountValueRegex = /[0-9,]+/;
 
-function findMemberRoles(paragraphs: Array<Paragraph>): Array<ParsedParagraph<CircleRole>> {
-  const memberRoles: Array<ParsedParagraph<CircleRole>> = [];
-  for (const { words, boundingBox } of paragraphs) {
-    const firstWord = words[0];
-    if ((
-        words.length >= 1 && (firstWord == "リーダー" || firstWord == "メンバー")) ||
-      (words.length >= 2 && isEqual(words.slice(0, 2), ["サブ", "リーダー"]))
-    ) {
-      memberRoles.push({
-        value: firstWord == "リーダー" ? CircleRole.Leader : firstWord == "メンバー" ? CircleRole.Member : CircleRole.SubLeader,
-        boundingBox: boundingBox,
-      });
-    }
-  }
-  return memberRoles;
+function findMemberRoles(paragraphs: Array<Paragraph>, memberFanCounts: ParsedParagraph<number>[]): Array<ParsedParagraph<CircleRole>> {
+  const sortedParagraphs = _.chain(paragraphs).sortBy(m => -m.boundingBox.top).value();
+  return _.chain(memberFanCounts)
+    .sortBy(m => m.boundingBox.top)
+    .value()
+    .map((memberFanCount, index, array) => {
+      const candidateParagraphs = _.chain(index == 0 ? sortedParagraphs.filter(p => p.boundingBox.bottom < memberFanCount.boundingBox.top) : (() => {
+        const previousMemberFanCount = array[index - 1];
+        return sortedParagraphs.filter(p => !p.boundingBox.maybeSameLine(previousMemberFanCount.boundingBox) && p.boundingBox.top > previousMemberFanCount.boundingBox.bottom && p.boundingBox.bottom < memberFanCount.boundingBox.top);
+      })())
+        .sortBy(p => -p.boundingBox.top)
+        .value();
+      for (const { words, boundingBox } of candidateParagraphs) {
+        const firstWord = words[0];
+        if ((
+            words.length >= 1 && (firstWord == "リーダー" || firstWord == "メンバー")) ||
+          (words.length >= 2 && isEqual(words.slice(0, 2), ["サブ", "リーダー"]))
+        ) {
+          return {
+            value: firstWord == "リーダー" ? CircleRole.Leader : firstWord == "メンバー" ? CircleRole.Member : CircleRole.SubLeader,
+            boundingBox: boundingBox,
+          };
+        }
+      }
+      throw new Error(`総獲得ファン数 ${memberFanCount.value} のメンバー名を発見できませんでした。`);
+    });
 }
 
 function findMemberNames(paragraphs: Array<Paragraph>, roles: Array<ParsedParagraph<CircleRole>>): Array<ParsedParagraph<string>> {
@@ -282,9 +295,9 @@ function findMemberFanCounts(paragraphs: Array<Paragraph>): Array<ParsedParagrap
 
 function parseAnnotateImageResult(paragraphs: Array<Paragraph>) {
   console.log("paragraphs: %o", paragraphs);
-  const memberRoles: Array<ParsedParagraph<CircleRole>> = findMemberRoles(paragraphs);
-  const memberNames: Array<ParsedParagraph<string>> = findMemberNames(paragraphs, memberRoles);
   const memberFanCounts: Array<ParsedParagraph<number>> = findMemberFanCounts(paragraphs);
+  const memberRoles: Array<ParsedParagraph<CircleRole>> = findMemberRoles(paragraphs, memberFanCounts);
+  const memberNames: Array<ParsedParagraph<string>> = findMemberNames(paragraphs, memberRoles);
 
   console.log("memberRoles: %o, memberNames: %o, memberFanCounts: %o", memberRoles, memberNames, memberFanCounts);
 
@@ -323,8 +336,8 @@ const parseScreenShot = async ({
 
   const client = new ImageAnnotatorClient({});
 
-  // TODO: ユニット数節約のために一度パースしたスクリーンショットは再度Cloud Vision APIに投げない
-  const [result] = await client.annotateImage(
+  // ユニット数節約のために一度パースしたスクリーンショットは再度Cloud Vision APIに投げない
+  const result: IAnnotateImageResponse = screenShot.rawJson as IAnnotateImageResponse | null ?? (await client.annotateImage(
     {
       image: {
         source: {
@@ -340,7 +353,7 @@ const parseScreenShot = async ({
         "languageHints": ["ja"],
       },
     } as any,
-  );
+  ))[0];
   const annotations = result.fullTextAnnotation;
   const page = annotations?.pages?.at(0);
 
@@ -348,7 +361,7 @@ const parseScreenShot = async ({
     throw new Error(`Page not found ${result.error?.message}`);
   }
 
-  const allParagraphs =
+  const paragraphs =
     _.chain(page.blocks)
       .orderBy(block => block.boundingBox?.vertices?.[0]?.y, "asc")
       .flatMap(block => {
@@ -377,20 +390,6 @@ const parseScreenShot = async ({
           return { words, boundingBox };
         },
       );
-
-  const memberCountParagraph = _.chain(allParagraphs).filter(p => !!p.words.join("").match(/^メンバー数/)).last().value();
-
-  if (!memberCountParagraph) {
-    throw new Error("「メンバー数」を見つけることができませんでした。「メンバー数」はサークル情報画面の左下にあるためメンバー一覧の位置を検出するのに必要です。");
-  }
-
-  // だいたい上半分くらい(DMM版でウィンドウタイトルを含めた場合だいたい9/20、iPadフルスクリーンで5/12)がメタデータの範囲なのでその辺を削って解析する
-  const heightThreshold = page.height! * 0.45;
-  const paragraphs = allParagraphs
-    .filter(p => p.boundingBox.bottom > heightThreshold &&
-      !memberCountParagraph.boundingBox.maybeSameLine(p.boundingBox) &&
-      p.boundingBox.top < memberCountParagraph.boundingBox.top,
-    );
 
   const members = parseAnnotateImageResult(paragraphs);
 
