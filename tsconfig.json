@@ -1,9 +1,23 @@
 {
-  "exclude": ["./cypress", "./packages"],
-  "include": ["remix.env.d.ts", "**/*.ts", "**/*.tsx"],
+  "exclude": [
+    "./cypress",
+    "./packages"
+  ],
+  "include": [
+    "remix.env.d.ts",
+    "global.d.ts",
+    "**/*.ts",
+    "**/*.tsx"
+  ],
   "compilerOptions": {
-    "lib": ["DOM", "DOM.Iterable", "ESNext"],
-    "types": ["vitest/globals"],
+    "lib": [
+      "DOM",
+      "DOM.Iterable",
+      "ESNext"
+    ],
+    "types": [
+      "vitest/globals"
+    ],
     "allowSyntheticDefaultImports": true,
     "isolatedModules": true,
     "esModuleInterop": true,
@@ -15,8 +29,12 @@
     "strict": true,
     "baseUrl": ".",
     "paths": {
-      "~/*": ["./app/*"],
-      "@/*": ["./*"]
+      "~/*": [
+        "./app/*"
+      ],
+      "@/*": [
+        "./*"
+      ]
     },
     "skipLibCheck": true,
     "noEmit": true,
