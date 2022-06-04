@@ -113,9 +113,10 @@ export async function getCircleFanCountGraph({
       return {
         label: first.member?.name,
         data: fans.map((m) => {
+          const localDate = LocalDate.fromUTCDate(m.date);
           return {
-            x: LocalDate.fromUTCDate(m.date).format(DateTimeFormatter.ofPattern("M/d")),
-            y: m.monthlyTotal!,
+            x: localDate.format(DateTimeFormatter.ofPattern("M/d")),
+            y: localDate.isSameMonth(date) ? m.monthlyTotal ?? 0 : 0,
           };
         }).reverse(),
       };
@@ -129,9 +130,10 @@ export async function getCircleFanCountGraph({
       return {
         label: first.member?.name,
         data: fans.map((m) => {
+          const localDate = LocalDate.fromUTCDate(m.date);
           return {
-            x: LocalDate.fromUTCDate(m.date).format(DateTimeFormatter.ofPattern("M/d")),
-            y: m.monthlyTotal!,
+            x: localDate.format(DateTimeFormatter.ofPattern("M/d")),
+            y: localDate.isSameMonth(date) ? m.monthlyTotal ?? 0 : 0,
           };
         }).reverse(),
       };
