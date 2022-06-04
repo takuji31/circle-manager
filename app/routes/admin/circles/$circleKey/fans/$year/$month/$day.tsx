@@ -191,7 +191,8 @@ const getActionData = async ({ request, params }: DataFunctionArgs) => {
       };
     }
     case ActionMode.enum.publish: {
-      await publishCircleFanCount({ circleKey, date });
+      const notify = formData.notify != undefined;
+      await publishCircleFanCount({ circleKey, date, notify });
       break;
     }
   }
@@ -258,7 +259,7 @@ export const action: ActionFunction = async (args) => {
 };
 
 export default function AdminCircleFanCounts() {
-  const { year, month, day, circle, memberFanCounts } =
+  const { year, month, day, circle, memberFanCounts, circleFanCount } =
     useLoaderData<LoaderData>();
   const [tabId, setTabId] = useRecoilState(tabIdState);
 
@@ -273,17 +274,33 @@ export default function AdminCircleFanCounts() {
         <AdminHeaderActions>
           <Form method="post" replace>
             <input type="hidden" name="mode" value={ActionMode.enum.publish} />
-            <Button
-              type="submit"
-              variant="contained"
-              disabled={
-                !!transition.submission ||
-                !memberFanCounts.length ||
-                !memberFanCounts.filter((m) => m.memberId).length
-              }
-            >
-              公開して通知
-            </Button>
+            <Stack direction="row" spacing={2}>
+              <Button
+                type="submit"
+                variant="contained"
+                disabled={
+                  !!transition.submission ||
+                  !memberFanCounts.length ||
+                  !memberFanCounts.filter((m) => m.memberId).length ||
+                  !circleFanCount
+                }
+              >
+                更新(通知されません)
+              </Button>
+              <Button
+                type="submit"
+                variant="contained"
+                name="notify"
+                value="notify"
+                disabled={
+                  !!transition.submission ||
+                  !memberFanCounts.length ||
+                  !memberFanCounts.filter((m) => m.memberId).length
+                }
+              >
+                公開して通知
+              </Button>
+            </Stack>
           </Form>
         </AdminHeaderActions>
       </AdminHeader>
