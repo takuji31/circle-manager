@@ -62,7 +62,6 @@ export async function getCircleFanCountGraph({
   const thisMonthMemberFanCounts = _.chain(
     await prisma.memberFanCount.findMany({
       where: {
-        circleKey,
         memberId: { in: graphMemberIds },
         date: {
           gte: lastDayOfPreviousMonth.toUTCDate(),
