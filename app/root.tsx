@@ -1,31 +1,16 @@
-import type {
-  LinksFunction,
-  LoaderFunction,
-  MetaFunction,
-} from "@remix-run/node";
-import { json } from "@remix-run/node";
-import {
-  Links,
-  LiveReload,
-  Meta,
-  Outlet,
-  Scripts,
-  ScrollRestoration,
-  useCatch,
-} from "@remix-run/react";
-
-import tailwindStylesheetUrl from "./styles/tailwind.css";
-import { authenticator } from "./auth.server";
 import type { SessionUser } from "@/model";
-import * as React from "react";
 import { withEmotionCache } from "@emotion/react";
-import {
-  Box,
-  unstable_useEnhancedEffect as useEnhancedEffect,
-  useTheme,
-} from "@mui/material";
+import { Box, unstable_useEnhancedEffect as useEnhancedEffect, useTheme } from "@mui/material";
+import type { LinksFunction, LoaderFunction, MetaFunction } from "@remix-run/node";
+import { json } from "@remix-run/node";
+import { Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration, useCatch, useLoaderData } from "@remix-run/react";
+import * as React from "react";
 import ClientStyleContext from "~/components/ClientStyleContext";
 import Layout from "~/components/Layout";
+import { logger } from "~/lib/logger";
+import { authenticator } from "./auth.server";
+
+import tailwindStylesheetUrl from "./styles/tailwind.css";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: tailwindStylesheetUrl }];
@@ -39,11 +24,17 @@ export const meta: MetaFunction = () => ({
 
 type LoaderData = {
   user: SessionUser | null;
+  ENV: {
+    NODE_ENV: "development" | "production" | "test"
+  }
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
   return json<LoaderData>({
     user: await authenticator.isAuthenticated(request),
+    ENV: {
+      NODE_ENV: process.env.NODE_ENV,
+    },
   });
 };
 
@@ -73,35 +64,44 @@ const Document = withEmotionCache(
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    const data = useLoaderData();
+
     return (
       <html lang="ja" style={{ height: "100%" }}>
-        <head>
-          <meta charSet="utf-8" />
-          <meta name="viewport" content="width=device-width,initial-scale=1" />
-          <meta name="theme-color" content={theme.palette.primary.main} />
-          {title ? <title>{title}</title> : null}
-          <Meta />
-          <Links />
-          <link
-            rel="stylesheet"
-            href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
-          />
-          <meta
-            name="emotion-insertion-point"
-            content="emotion-insertion-point"
-          />
-        </head>
-        <body id="root">
-          <Box className="h-full min-h-full">
-            {children}
-            <ScrollRestoration />
-            <Scripts />
-            <LiveReload />
-          </Box>
-        </body>
+      <head>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <meta name="theme-color" content={theme.palette.primary.main} />
+        {title ? <title>{title}</title> : null}
+        <Meta />
+        <Links />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+        />
+        <meta
+          name="emotion-insertion-point"
+          content="emotion-insertion-point"
+        />
+      </head>
+      <body id="root">
+      <Box className="h-full min-h-full">
+        {children}
+        <ScrollRestoration />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.ENV = ${JSON.stringify(
+              data.ENV,
+            )}`,
+          }}
+        />
+        <Scripts />
+        <LiveReload />
+      </Box>
+      </body>
       </html>
     );
-  }
+  },
 );
 
 // https://remix.run/api/conventions#default-export
@@ -116,7 +116,7 @@ export default function App() {
 
 // https://remix.run/docs/en/v1/api/conventions#errorboundary
 export function ErrorBoundary({ error }: { error: Error }) {
-  console.error(error);
+  logger.error(error);
 
   return (
     <Document title="Error!">

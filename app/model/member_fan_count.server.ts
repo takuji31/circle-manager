@@ -6,6 +6,7 @@ import { MemberFanCountSource } from "@prisma/client";
 import type { ChartData } from "chart.js";
 import _ from "lodash";
 import { prisma } from "~/db.server";
+import { logger } from "~/lib/logger";
 import type { ActiveCircleKey } from "~/schema/member";
 import { getDatesFrom } from "./date.server";
 import { getCircleMembers } from "./member.server";
@@ -221,7 +222,7 @@ export async function parseMemberNameAndFanCount({
   memberAndFanCounts,
   source,
 }: ParseMemberNameAndFanCountParams) {
-  console.log(memberAndFanCounts);
+  logger.debug(memberAndFanCounts);
   const members = await getCircleMembers({ circleKey });
   const memberFanCounts = (
     await prisma.memberFanCount.findMany({
@@ -318,7 +319,7 @@ export async function calculateMonthlyTotalFanCounts({
     }),
   );
 
-  console.log(memberIdToFirstFanCount);
+  logger.debug(memberIdToFirstFanCount);
 
   const memberFanCounts = await prisma.memberFanCount.findMany({
     where: { circleKey, date: date.toUTCDate(), memberId: { not: null } },
@@ -337,7 +338,7 @@ export async function calculateMonthlyTotalFanCounts({
         ? Period.between(firstFanCount.date, date).days() + 1
         : 1;
       const monthlyAvg = monthlyTotal / BigInt(days);
-      console.log(`memberId: ${memberId} ${monthlyTotal} ${monthlyAvg}`);
+      logger.debug(`memberId: ${memberId} ${monthlyTotal} ${monthlyAvg}`);
       transactions.push(
         prisma.memberFanCount.update({
           where: {

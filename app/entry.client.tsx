@@ -1,23 +1,25 @@
+import { CacheProvider } from "@emotion/react";
+import { useMediaQuery } from "@mui/material";
+import CssBaseline from "@mui/material/CssBaseline";
+import { ThemeProvider } from "@mui/material/styles";
+import { RemixBrowser } from "@remix-run/react";
+import { ConfirmProvider } from "material-ui-confirm";
 import * as React from "react";
 import { useState } from "react";
 import { hydrate } from "react-dom";
-import { RemixBrowser } from "@remix-run/react";
-import { CacheProvider } from "@emotion/react";
-import { ThemeProvider } from "@mui/material/styles";
-import CssBaseline from "@mui/material/CssBaseline";
+import { RecoilRoot, useRecoilValue } from "recoil";
 
 import ClientStyleContext from "~/components/ClientStyleContext";
 import createEmotionCache from "~/lib/createEmotionCache";
-import { createTheme } from "./mui/theme";
-import { useMediaQuery } from "@mui/material";
+import { logger } from "~/lib/logger";
 import "~/lib/luxon";
-import { RecoilRoot, useRecoilState, useRecoilValue } from "recoil";
+import { createTheme } from "./mui/theme";
 import { themeModeState } from "./recoil/theme";
-import { ConfirmProvider } from "material-ui-confirm";
 
 interface ClientCacheProviderProps {
   children: React.ReactNode;
 }
+
 function ClientCacheProvider({ children }: ClientCacheProviderProps) {
   const [cache, setCache] = useState(createEmotionCache());
 
@@ -36,7 +38,7 @@ function ClientThemeProvider({ children }: { children: React.ReactNode }) {
   const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
   const themeMode = useRecoilValue(themeModeState);
 
-  console.log(themeMode);
+  logger.debug({ themeMode });
   const theme = React.useMemo(
     () =>
       createTheme({
@@ -47,7 +49,7 @@ function ClientThemeProvider({ children }: { children: React.ReactNode }) {
         direction: "ltr",
         responsiveFontSizes: true,
       }),
-    [prefersDarkMode, themeMode]
+    [prefersDarkMode, themeMode],
   );
   return <ThemeProvider theme={theme}>{children}</ThemeProvider>;
 }
@@ -69,5 +71,5 @@ hydrate(
       </ClientThemeProvider>
     </ClientCacheProvider>
   </RecoilRoot>,
-  document
+  document,
 );

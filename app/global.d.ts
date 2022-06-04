@@ -9,3 +9,11 @@ declare namespace NodeJS {
     readonly ADMIN_API_SECRET: string;
   }
 }
+
+interface BrowserEnv {
+  NODE_ENV: "development" | "production" | "test";
+}
+
+interface Window {
+  readonly ENV: BrowserEnv;
+}

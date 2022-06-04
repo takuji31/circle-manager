@@ -1,14 +1,15 @@
 import { createDiscordRestClient, sendInvitedMessage, sendKickedMessage, setMemberCircleRole } from "@/discord";
 import { Circles, DateFormats, Guild, isCircleKey } from "@/model";
 import { ZonedDateTime } from "@js-joda/core";
-import { CircleRole, Member, MonthCircleState } from "@prisma/client";
+import type { Member, MonthCircle as PrismaMonthCircle} from "@prisma/client";
+import { CircleRole, MonthCircleState } from "@prisma/client";
 import { Routes } from "discord-api-types/v9";
 import { prisma } from "~/db.server";
-import { MonthCircle as PrismaMonthCircle } from '@prisma/client'
+import { logger } from "~/lib/logger";
 
 export type MonthCircle = Awaited<ReturnType<typeof convertToMonthCircle>>;
 
-function convertToMonthCircle(item: PrismaMonthCircle & {member: Member}) {
+function convertToMonthCircle(item: PrismaMonthCircle & { member: Member }) {
   const { member, currentCircleKey, ...monthCircle } = item;
   return {
     ...monthCircle,
@@ -94,7 +95,11 @@ export const getMonthCircles = async ({
 };
 
 async function findMonthCircleById(id: string) {
-  return await prisma.monthCircle.findFirst(({ where: { id }, include: { member: true }, rejectOnNotFound: true })).then(convertToMonthCircle);
+  return await prisma.monthCircle.findFirst(({
+    where: { id },
+    include: { member: true },
+    rejectOnNotFound: true,
+  })).then(convertToMonthCircle);
 }
 
 export const kickMember = async ({ monthCircleId }: { monthCircleId: string }) => {
@@ -103,13 +108,13 @@ export const kickMember = async ({ monthCircleId }: { monthCircleId: string }) =
     throw new Error("OBはキック不要です、このエラーが出る時は開発者まで連絡ください。");
   }
   try {
-    if (monthCircle.state == 'Leaved' || monthCircle.state == 'Kicked') {
-      await setMemberCircleRole(monthCircle.member.id, null)
-    } else if (monthCircle.state == 'OB') {
-      await setMemberCircleRole(monthCircle.member.id, Guild.roleIds.ob)
+    if (monthCircle.state == "Leaved" || monthCircle.state == "Kicked") {
+      await setMemberCircleRole(monthCircle.member.id, null);
+    } else if (monthCircle.state == "OB") {
+      await setMemberCircleRole(monthCircle.member.id, Guild.roleIds.ob);
     }
   } catch (e) {
-    console.log(e)
+    logger.warn(e);
   }
   try {
     const circle = Circles.findByCircleKey(monthCircle.currentCircleKey);
@@ -121,19 +126,19 @@ export const kickMember = async ({ monthCircleId }: { monthCircleId: string }) =
         monthCircle.state == MonthCircleState.Kicked ? "kick" : "leave",
     );
   } catch (e) {
-    console.log(e);
+    logger.warn(e);
   }
 
-  if (monthCircle.state == 'Kicked' && process.env.NODE_ENV == 'production') {
+  if (monthCircle.state == "Kicked" && process.env.NODE_ENV == "production") {
     const rest = createDiscordRestClient();
     try {
       await rest.put(Routes.guildBan(Guild.id, monthCircle.member.id), {
         headers: {
-          'X-Audit-Log-Reason': encodeURI(`サークル除名による自動BAN`),
+          "X-Audit-Log-Reason": encodeURI(`サークル除名による自動BAN`),
         },
       });
     } catch (e) {
-      console.log(e);
+      logger.warn(e);
     }
   }
 
@@ -146,12 +151,12 @@ export const kickMember = async ({ monthCircleId }: { monthCircleId: string }) =
 export const inviteMember = async ({ monthCircleId }: { monthCircleId: string }) => {
   const monthCircle = await findMonthCircleById(monthCircleId);
   if (!monthCircle || !monthCircle.circle) {
-    throw new Error('脱退者は勧誘できません。このエラーが出る時は開発者まで連絡ください。')
+    throw new Error("脱退者は勧誘できません。このエラーが出る時は開発者まで連絡ください。");
   }
   try {
     await sendInvitedMessage(monthCircle.member, monthCircle.circle, "move");
   } catch (e) {
-    console.log(e);
+    logger.warn(e);
   }
   return await prisma.monthCircle.update({
     where: { id: monthCircleId },
@@ -162,12 +167,12 @@ export const inviteMember = async ({ monthCircleId }: { monthCircleId: string })
 export const joinMember = async ({ monthCircleId }: { monthCircleId: string }) => {
   const monthCircle = await findMonthCircleById(monthCircleId);
   if (!monthCircle || !monthCircle.circle) {
-    throw new Error('脱退者は加入済みにできません。このエラーが出る時は開発者まで連絡ください。')
+    throw new Error("脱退者は加入済みにできません。このエラーが出る時は開発者まで連絡ください。");
   }
   try {
     await setMemberCircleRole(monthCircle.member.id, monthCircle.circle.id);
   } catch (e) {
-    console.log(e);
+    logger.warn(e);
   }
 
   await prisma.member.update({
@@ -180,21 +185,21 @@ export const joinMember = async ({ monthCircleId }: { monthCircleId: string }) =
   });
 };
 
-export async function kickDiscordMember({monthCircleId} : {monthCircleId: string}) {
+export async function kickDiscordMember({ monthCircleId }: { monthCircleId: string }) {
   const monthCircle = await findMonthCircleById(monthCircleId);
-  if (monthCircle.state != 'Leaved') {
+  if (monthCircle.state != "Leaved") {
     throw new Error("脱退者以外はキック不要です、このエラーが出る時は開発者まで連絡ください。");
   }
-  if (process.env.NODE_ENV == 'production') {
+  if (process.env.NODE_ENV == "production") {
     const rest = createDiscordRestClient();
     try {
       await rest.delete(Routes.guildMember(Guild.id, monthCircle.member.id), {
         headers: {
-          'X-Audit-Log-Reason': encodeURI(`サークル脱退のため自動追放`),
+          "X-Audit-Log-Reason": encodeURI(`サークル脱退のため自動追放`),
         },
       });
     } catch (e) {
-      console.log(e);
+      logger.warn(e);
     }
   }
 

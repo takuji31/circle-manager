@@ -2,6 +2,7 @@
 import type { LoaderFunction } from "@remix-run/node";
 
 import { prisma } from "~/db.server";
+import { logger } from "~/lib/logger";
 
 export const loader: LoaderFunction = async ({ request }) => {
   const host =
@@ -19,7 +20,7 @@ export const loader: LoaderFunction = async ({ request }) => {
     ]);
     return new Response("OK");
   } catch (error: unknown) {
-    console.log("healthcheck ❌", { error });
+    logger.warn("healthcheck ❌", { error });
     return new Response("ERROR", { status: 500 });
   }
 };

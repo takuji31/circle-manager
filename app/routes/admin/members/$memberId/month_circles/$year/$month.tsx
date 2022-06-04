@@ -11,6 +11,7 @@ import { AdminBody } from "~/components/admin/body";
 import AdminHeader from "~/components/admin/header";
 import AdminHeaderTitle from "~/components/admin/header/title";
 import { prisma } from "~/db.server";
+import { logger } from "~/lib/logger";
 
 type LoaderData = Awaited<ReturnType<typeof getLoaderData>>;
 
@@ -67,7 +68,7 @@ export const action: ActionFunction = async ({ request, params }) => {
   const locked =
     formData.get("locked") != undefined ? !!formData.get("locked") : undefined;
   const state = formData.get("state") as MonthCircleState;
-  console.log("%s", { memberId, year, month, locked, state });
+  logger.debug("%s", { memberId, year, month, locked, state });
   const member = await prisma.member.findFirst({ where: { id: memberId } });
   if (!member) throw new Error("Not Found");
   if (!state) throw new Error("State cannot null");

@@ -7,6 +7,7 @@ import _, { isEqual } from "lodash";
 import type { z } from "zod";
 import { prisma } from "~/db.server";
 import { bucket } from "~/firebase.server";
+import { logger } from "~/lib/logger";
 import type { ActiveCircleKey } from "~/schema/member";
 import { parseMemberNameAndFanCount } from "./member_fan_count.server";
 import IAnnotateImageResponse = google.cloud.vision.v1.IAnnotateImageResponse;
@@ -267,7 +268,7 @@ function findMemberNames(paragraphs: Array<Paragraph>, roles: Array<ParsedParagr
     if (!sameLineParagraphs.length) {
       throw new Error(`役職からメンバー名を発見できませんでした。位置： ${role.boundingBox}`);
     }
-    console.log(`Trainer name candidate paragraphs %o`, sameLineParagraphs);
+    logger.debug(`Trainer name candidate paragraphs %o`, sameLineParagraphs);
     const { boundingBox, words } = sameLineParagraphs[0];
     return {
       value: words.join("").replace(memberNameNoiseRegex, ""),
@@ -281,11 +282,11 @@ function findMemberFanCounts(paragraphs: Array<Paragraph>): Array<ParsedParagrap
   for (const { words, boundingBox } of paragraphs) {
     const paragraphText = words.join("");
     if (words.length >= 2 && words[0].match(fanCountValueRegex) && words[1] == "人") {
-      console.log("Maybe fanCounts %o", words);
+      logger.debug("Maybe fanCounts %o", words);
       const value = parseInt(words[0].replaceAll(",", ""));
       memberFanCounts.push({ value, boundingBox });
     } else if (words.length >= 6 && paragraphText.startsWith("総獲得ファン数") && words[4].match(fanCountValueRegex) && words[5] == "人" && !paragraphText.match(memberNameNoiseRegex)) {
-      console.log("Maybe fanCounts with label %o", words);
+      logger.debug("Maybe fanCounts with label %o", words);
       const value = parseInt(words[4].replaceAll(",", ""));
       memberFanCounts.push({ value, boundingBox });
     }
@@ -294,12 +295,12 @@ function findMemberFanCounts(paragraphs: Array<Paragraph>): Array<ParsedParagrap
 }
 
 function parseAnnotateImageResult(paragraphs: Array<Paragraph>) {
-  console.log("paragraphs: %o", paragraphs);
+  logger.debug("paragraphs: %o", paragraphs);
   const memberFanCounts: Array<ParsedParagraph<number>> = findMemberFanCounts(paragraphs);
   const memberRoles: Array<ParsedParagraph<CircleRole>> = findMemberRoles(paragraphs, memberFanCounts);
   const memberNames: Array<ParsedParagraph<string>> = findMemberNames(paragraphs, memberRoles);
 
-  console.log("memberRoles: %o, memberNames: %o, memberFanCounts: %o", memberRoles, memberNames, memberFanCounts);
+  logger.debug("memberRoles: %o, memberNames: %o, memberFanCounts: %o", memberRoles, memberNames, memberFanCounts);
 
   if (memberRoles.length != memberNames.length || memberRoles.length != memberFanCounts.length) {
     throw new Error(`抽出できたテキストの数が一致しません(ロール:${memberRoles.length} / トレーナー名:${memberNames.length} / 総獲得ファン数:${memberFanCounts.length})`);

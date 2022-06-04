@@ -1,13 +1,11 @@
 import { prisma } from "@/database";
-import {
-  Guild,
-  Circle,
-  DateFormats,
-  LocalDate,
-} from "@/model";
-import { Routes } from "discord-api-types/v9";
 import { createDiscordRestClient } from "@/discord";
+import type { Circle } from "@/model";
+import { DateFormats, Guild, LocalDate } from "@/model";
+import { Routes } from "discord-api-types/v9";
 import fetch from "node-fetch";
+import { logger } from "~/lib/logger";
+
 export interface UmastagramPage {
   members: Array<UmastagramMember>;
   circle: UmastagramCircle;
@@ -40,7 +38,7 @@ const toHalfWidthString = (str: string) => {
 export async function crawlUmastagram(
   url: string,
   circle: Circle,
-  day: LocalDate = LocalDate.yesterday()
+  day: LocalDate = LocalDate.yesterday(),
 ): Promise<UmastagramPage> {
   const rest = createDiscordRestClient();
   const date = day.toUTCDate();
@@ -50,7 +48,7 @@ export async function crawlUmastagram(
       `https://us-central1-shin-umamusume-336911.cloudfunctions.net/getUmastagramFanCounts?url=${url}`,
       {
         method: "GET",
-      }
+      },
     );
 
     if (!response.ok) {
@@ -85,7 +83,7 @@ export async function crawlUmastagram(
         data: [
           ...members.map((member) => {
             const dbMember = dbMembers.find(
-              (m) => toHalfWidthString(m.name) == toHalfWidthString(member.name)
+              (m) => toHalfWidthString(m.name) == toHalfWidthString(member.name),
             );
             const memberId = dbMember?.id ?? null;
             return {
@@ -116,7 +114,7 @@ export async function crawlUmastagram(
     await rest.post(Routes.channelMessages(Guild.channelIds.admin), {
       body: {
         content: `${circle.name}の ${day.format(
-          DateFormats.ymd
+          DateFormats.ymd,
         )}のファン数を取得しました。`,
       },
       files: [
@@ -129,12 +127,12 @@ export async function crawlUmastagram(
 
     return result;
   } catch (e) {
-    console.log(e);
+    logger.warn(e);
     await rest.post(Routes.channelMessages(Guild.channelIds.admin), {
       body: {
         content:
           `${circle.name}の ${day.format(
-            DateFormats.ymd
+            DateFormats.ymd,
           )}のファン数を取得できませんでした。\n` +
           "```\n" +
           `${e}`.substring(0, 1800) +

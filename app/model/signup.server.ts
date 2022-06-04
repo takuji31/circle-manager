@@ -11,6 +11,7 @@ import { CircleRole, MemberStatus } from "@prisma/client";
 import type { RESTPutAPIGuildMemberJSONBody } from "discord-api-types/rest/v9";
 import { Routes } from "discord-api-types/rest/v9";
 import { prisma } from "~/db.server";
+import { logger } from "~/lib/logger";
 import type { ActiveCircleKey } from "~/schema/member";
 
 export const getNotJoinedSignUps = ({ invited }: { invited?: boolean }) => {
@@ -28,7 +29,7 @@ export const getNotJoinedSignUps = ({ invited }: { invited?: boolean }) => {
           ? Circles.findByCircleKey(signUp.circleKey)
           : null,
         ...signUp,
-      }))
+      })),
     );
 };
 
@@ -52,7 +53,7 @@ export const inviteMember = async ({ memberId }: { memberId: string }) => {
   try {
     await sendInvitedMessage(signUp.member, signUp.circle, "signUp");
   } catch (e) {
-    console.log(e);
+    logger.warn(e);
   }
   return prisma.signUp.update({
     where: { id: memberId },
@@ -65,7 +66,7 @@ export const joinMember = async ({ memberId }: { memberId: string }) => {
   try {
     await setMemberCircleRole(memberId, circle.id);
   } catch (e) {
-    console.log(e);
+    logger.warn(e);
   }
 
   await prisma.member.update({
@@ -98,7 +99,7 @@ export const updateMemberSignUpCircle = async ({
     // TODO: setup
     const circle = Circles.findByCircleKey(circleKey);
     await sendAdminNotificationMessage(
-      `<@&${circle.id}> <@!${memberId}>さんから加入申請が送られました。 ${process.env.BASE_URL}/admin/signups`
+      `<@&${circle.id}> <@!${memberId}>さんから加入申請が送られました。 ${process.env.BASE_URL}/admin/signups`,
     );
   }
   await prisma.member.update({
@@ -139,11 +140,11 @@ export async function getSignUpUrls() {
           circle: Circles.findByCircleKey(circleKey),
           createdAt,
           createdAtString: ZonedDateTime.fromDate(createdAt).format(
-            DateFormats.dateTime
+            DateFormats.dateTime,
           ),
           permalink: `${process.env.BASE_URL}/sign_up_urls/${s.id}/`,
         };
-      })
+      }),
     );
 }
 
@@ -189,7 +190,7 @@ export async function completeSignUp({
     nick: signUpUrl.name ?? user.name,
     access_token: user.accessToken,
   };
-  console.log(body);
+  logger.debug(body);
   await rest.put(Routes.guildMember(Guild.id, user.id), { body });
 
   await prisma.member.upsert({
@@ -218,5 +219,5 @@ export async function completeSignUp({
     },
   });
 
-  await prisma.signUpUrl.update({ where: { id: signUpUrlId }, data: { member: { connect: { id: user.id } } } })
+  await prisma.signUpUrl.update({ where: { id: signUpUrlId }, data: { member: { connect: { id: user.id } } } });
 }

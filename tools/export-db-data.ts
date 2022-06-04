@@ -2,6 +2,7 @@ import { prisma } from "@/database";
 import type { DbTableData } from "@/model";
 import { config } from "dotenv";
 import * as fs from "fs/promises";
+import { logger } from "~/lib/logger";
 
 config();
 
@@ -79,4 +80,4 @@ config();
       2,
     ),
   );
-})().catch((e) => console.error(e));
+})().catch((e) => logger.error(e));

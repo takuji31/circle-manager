@@ -1,14 +1,15 @@
-import { Guild } from "../model";
-import { PrismaPromise } from "@prisma/client";
+import type { RawFile } from "@discordjs/rest";
+import type { PrismaPromise } from "@prisma/client";
 import { stringify } from "csv-stringify/sync";
-import {
+import type {
   RESTPostAPIChannelMessageJSONBody,
   RESTPostAPICurrentUserCreateDMChannelResult,
-  Routes,
 } from "discord-api-types/rest/v9";
+import { Routes } from "discord-api-types/rest/v9";
+import { logger } from "~/lib/logger";
 import { createDiscordRestClient } from ".";
 import { prisma } from "../database";
-import { RawFile } from "@discordjs/rest";
+import { Guild } from "../model";
 
 export interface DirectMessageRecipient {
   id: string;
@@ -19,17 +20,20 @@ export interface DirectMessageRecipient {
 class DMSendResult {
   succeed: boolean = true;
   content: string = "";
+
+  constructor(private recipient: string) {
+  }
+
   private _error: any | null = null;
 
   public get error(): any | null {
     return this._error;
   }
+
   public set error(v: any) {
     this._error = v;
     this.succeed = false;
   }
-
-  constructor(private recipient: string) {}
 
   toCsvArray(): Array<string> {
     return [
@@ -41,12 +45,10 @@ class DMSendResult {
   }
 }
 
-export async function sendDirectMessageIfPossible<
-  T extends DirectMessageRecipient = DirectMessageRecipient
->(
+export async function sendDirectMessageIfPossible<T extends DirectMessageRecipient = DirectMessageRecipient>(
   recipent: T,
   content: string,
-  force: boolean = process.env.NODE_ENV == "production"
+  force: boolean = process.env.NODE_ENV == "production",
 ) {
   const rest = createDiscordRestClient();
   try {
@@ -85,7 +87,7 @@ export async function sendDirectMessageIfPossible<
       });
     }
   } catch (e) {
-    console.log(e);
+    logger.error(e);
     const body: RESTPostAPIChannelMessageJSONBody = {
       content:
         recipent.name +
@@ -99,13 +101,11 @@ export async function sendDirectMessageIfPossible<
   }
 }
 
-export async function sendDirectMessagesIfPossible<
-  T extends DirectMessageRecipient = DirectMessageRecipient
->(
+export async function sendDirectMessagesIfPossible<T extends DirectMessageRecipient = DirectMessageRecipient>(
   recipents: Array<T>,
   contentProducer: (recipient: T) => string,
   reportMessage: string,
-  force: boolean = process.env.NODE_ENV == "production"
+  force: boolean = process.env.NODE_ENV == "production",
 ) {
   const rest = createDiscordRestClient();
   const result: Array<Array<string>> = [
@@ -126,7 +126,7 @@ export async function sendDirectMessagesIfPossible<
           prisma.member.update({
             where: { id: recipent.id },
             data: { messageChannelId: messsageChannel.id },
-          })
+          }),
         );
         channelId = messsageChannel.id;
       }
@@ -141,7 +141,7 @@ export async function sendDirectMessagesIfPossible<
         });
       }
     } catch (e) {
-      console.log(e);
+      logger.error(e);
       sendResult.error = e;
     }
     result.push(sendResult.toCsvArray());

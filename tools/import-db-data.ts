@@ -2,6 +2,7 @@ import { prisma } from "@/database";
 import type { DbTableData } from "@/model";
 import { config } from "dotenv";
 import * as fs from "fs/promises";
+import { logger } from "~/lib/logger";
 
 config();
 
@@ -80,4 +81,4 @@ config();
     data: data.screenShots.map(({ rawJson, ...s }) => ({ rawJson: rawJson ?? undefined, ...s })),
     skipDuplicates: true,
   });
-})().catch((e) => console.error(e));
+})().catch((e) => logger.error(e));
