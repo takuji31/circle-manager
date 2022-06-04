@@ -272,12 +272,13 @@ export async function parseMemberNameAndFanCount({
 interface PublishCircleFanCountParams {
   circleKey: CircleKey;
   date: LocalDate;
+  notify: boolean;
 }
 
 export async function calculateMonthlyTotalFanCounts({
   circleKey,
   date,
-}: PublishCircleFanCountParams) {
+}: Omit<PublishCircleFanCountParams, "notify">) {
   const lastDayOfPreviousMonth = date
     .with(TemporalAdjusters.firstDayOfMonth())
     .minusDays(1);
@@ -361,6 +362,7 @@ export async function calculateMonthlyTotalFanCounts({
 export async function publishCircleFanCount({
   circleKey,
   date,
+  notify,
 }: PublishCircleFanCountParams) {
   await calculateMonthlyTotalFanCounts({ circleKey, date });
 
@@ -372,16 +374,6 @@ export async function publishCircleFanCount({
     throw new Error("ファン数が1件も記録されていません。");
   }
 
-  // if (
-  //   memberFanCounts.filter(
-  //     (m) => !m.memberId || m.monthlyTotal == null || m.monthlyAvg == null,
-  //   ).length
-  // ) {
-  //   throw new Error(
-  //     "不明なメンバーのファン数記録があります。全ての記録にメンバーを紐付けなければ公開できません。",
-  //   );
-  // }
-  //
   const daysLeftInMonth = BigInt(
     Period.between(date, date.with(TemporalAdjusters.lastDayOfMonth())).days(),
   );
@@ -409,15 +401,17 @@ export async function publishCircleFanCount({
     update: { total, avg, predicted, predictedAvg },
   });
 
-  const circle = Circles.findByCircleKey(circleKey);
-  await sendMessageToChannel({
-    channelId: circle.notificationChannelId,
-    message: `${date.format(
-      DateFormats.ymd,
-    )}のファン数を更新しました。以下のURLから確認できます。 ${
-      process.env.BASE_URL
-    }/circles/${circleKey}/fans/${date.year()}/${date.monthValue()}/${date.dayOfMonth()}`,
-  });
+  if (notify) {
+    const circle = Circles.findByCircleKey(circleKey);
+    await sendMessageToChannel({
+      channelId: circle.notificationChannelId,
+      message: `${date.format(
+        DateFormats.ymd,
+      )}のファン数を更新しました。以下のURLから確認できます。 ${
+        process.env.BASE_URL
+      }/circles/${circleKey}/fans/${date.year()}/${date.monthValue()}/${date.dayOfMonth()}`,
+    });
+  }
 
   return circleFanCount;
 }
