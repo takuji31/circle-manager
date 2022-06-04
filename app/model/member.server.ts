@@ -1,9 +1,9 @@
-import { prisma } from "~/db.server";
+import { createDiscordRestClient } from "@/discord";
 import type { LocalDate } from "@/model";
 import { Circles, Guild } from "@/model";
-import { createDiscordRestClient } from "@/discord";
-import type { RESTPatchAPIGuildMemberJSONBody } from "discord-api-types/v9";
 import { Routes } from "discord-api-types/rest/v9";
+import type { RESTPatchAPIGuildMemberJSONBody } from "discord-api-types/v9";
+import { prisma } from "~/db.server";
 import type { ActiveCircleKey } from "~/schema/member";
 
 const monthSurveyAnswerInclude = (date?: LocalDate) => {
@@ -88,7 +88,7 @@ export const getJoinedMembers = ({
             ? Circles.findByCircleKey(member.circleKey)
             : null,
         };
-      })
+      }),
   );
 };
 
@@ -103,10 +103,15 @@ export const getCircleMembers = async ({
   });
 };
 
+export const getActiveMembers = async () => {
+  return prisma.member.findMany({
+    where: { circleKey: { in: Circles.activeCircles.map(c => c.key) } },
+    orderBy: [{ circleKey: "asc" }, { circleRole: "asc" }, { joinedAt: "asc" }],
+  });
+};
+
 type GetMemberParams = { id: string } | { pathname: string };
-export type MemberWithSignUp = NonNullable<
-  Awaited<ReturnType<typeof getMemberWithSignUp>>
->;
+export type MemberWithSignUp = NonNullable<Awaited<ReturnType<typeof getMemberWithSignUp>>>;
 export const getMemberWithSignUp = async (params: GetMemberParams) => {
   return await prisma.member.findFirst({
     where: params,

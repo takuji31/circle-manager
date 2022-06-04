@@ -40,7 +40,8 @@ import AdminHeaderTitle from "~/components/admin/header/title";
 import { storage } from "~/lib/firebase.client";
 import { dateToYMD } from "~/model/date.server";
 
-import { getCircleMembers } from "~/model/member.server";
+import type { getCircleMembers } from "~/model/member.server";
+import { getActiveMembers } from "~/model/member.server";
 import {
   getCircleFanCount,
   getCircleMemberFanCounts,
@@ -120,7 +121,7 @@ const getLoaderData = async ({ params }: DataFunctionArgs) => {
   const circle = Circles.findByCircleKey(circleKey);
   const date = LocalDate.of(year, month, day);
   const screenShots = await getScreenShots({ date, circleKey });
-  const members = await getCircleMembers({ circleKey });
+  const members = await getActiveMembers();
   const memberFanCounts = await getCircleMemberFanCounts({ date, circleKey });
   const circleFanCount = await getCircleFanCount({
     date,
@@ -652,6 +653,7 @@ function MemberSelectListbox({
       id={`combo-box-${memberFanCount.id}`}
       disabled={transition.state == "submitting"}
       options={members}
+      groupBy={m => m.circleKey ? Circles.findByCircleKey(m.circleKey).name : ""}
       getOptionLabel={(m) => m.name}
       value={members.find((m) => m.id == memberFanCount.memberId) ?? null}
       sx={{ width: 300 }}
