@@ -1,18 +1,14 @@
-import { Guild } from "@/model";
-import {
-  SlashCommandBuilder,
-  SlashCommandIntegerOption,
-  SlashCommandStringOption,
-} from "@discordjs/builders";
-import { Routes } from "discord-api-types/v9";
 import { createDiscordRestClient } from "@/discord";
-import { config } from "dotenv";
-import { Circles } from "@/model";
+import { Circles, Guild } from "@/model";
+import { SlashCommandBuilder, SlashCommandIntegerOption, SlashCommandStringOption } from "@discordjs/builders";
 import type {
-  RESTPutAPIApplicationGuildCommandsResult,
-  RESTPutAPIApplicationCommandPermissionsJSONBody,
   ApplicationCommandPermissionType,
+  RESTPutAPIApplicationCommandPermissionsJSONBody,
+  RESTPutAPIApplicationGuildCommandsResult,
 } from "discord-api-types/v9";
+import { Routes } from "discord-api-types/v9";
+import { config } from "dotenv";
+import { logger } from "~/lib/logger";
 
 config();
 
@@ -26,7 +22,7 @@ config();
           new SlashCommandStringOption()
             .setName("id")
             .setRequired(true)
-            .setDescription("トレーナーID")
+            .setDescription("トレーナーID"),
         ),
       new SlashCommandBuilder()
         .setName("trainer-id")
@@ -41,29 +37,29 @@ config();
                   name: circle.name,
                   value: circle.key,
                 };
-              })
+              }),
             )
             .setName("circle")
             .setRequired(true)
-            .setDescription("対象のサークル")
+            .setDescription("対象のサークル"),
         )
         .addIntegerOption(
           new SlashCommandIntegerOption()
             .setName("year")
             .setRequired(false)
-            .setDescription("年、指定しない場合は今年")
+            .setDescription("年、指定しない場合は今年"),
         )
         .addIntegerOption(
           new SlashCommandIntegerOption()
             .setName("month")
             .setRequired(false)
-            .setDescription("月、指定しない場合は今月")
+            .setDescription("月、指定しない場合は今月"),
         )
         .addIntegerOption(
           new SlashCommandIntegerOption()
             .setName("day")
             .setRequired(false)
-            .setDescription("日、指定しない場合は昨日")
+            .setDescription("日、指定しない場合は昨日"),
         )
         .setDefaultPermission(false)
         .setDescription("(運営メンバー専用)ファン数更新をトリガーします。"),
@@ -74,15 +70,15 @@ config();
     const createResponse = (await rest.put(
       Routes.applicationGuildCommands(
         process.env.DISCORD_CLIENT_ID as string,
-        Guild.id
+        Guild.id,
       ),
       {
         body: commands,
-      }
+      },
     )) as RESTPutAPIApplicationGuildCommandsResult;
 
     const adminCommands = createResponse.filter(
-      (command) => command.name == "update-fan-count"
+      (command) => command.name == "update-fan-count",
     );
 
     for (const adminCommand of adminCommands) {
@@ -99,16 +95,16 @@ config();
         Routes.applicationCommandPermissions(
           process.env.DISCORD_CLIENT_ID as string,
           Guild.id,
-          adminCommand.id
+          adminCommand.id,
         ),
         {
           body,
-        }
+        },
       );
     }
 
-    console.log("Successfully registered application commands.");
+    logger.info("Successfully registered application commands.");
   } catch (error) {
-    console.error(error);
+    logger.error(error);
   }
 })();

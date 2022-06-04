@@ -1,20 +1,10 @@
-import { config } from "dotenv";
-import { sendAdminNotificationMessage } from "@/discord";
-import { stringify } from "csv-stringify/sync";
-import {
-  Circles,
-  LocalDate,
-  monthCircleStateLabel,
-  nextMonthInt,
-  ZonedDateTime,
-} from "@/model";
 import { prisma } from "@/database";
-import {
-  CircleKey,
-  CircleRole,
-  MonthCircleState,
-  MonthSurveyAnswerValue,
-} from "@prisma/client";
+import { sendAdminNotificationMessage } from "@/discord";
+import { Circles, LocalDate, monthCircleStateLabel, nextMonthInt, ZonedDateTime } from "@/model";
+import { CircleKey, CircleRole, MonthCircleState, MonthSurveyAnswerValue } from "@prisma/client";
+import { stringify } from "csv-stringify/sync";
+import { config } from "dotenv";
+import { logger } from "~/lib/logger";
 
 config();
 
@@ -121,7 +111,7 @@ config();
       30 -
       leaders.filter((m) => m.circleKey == CircleKey.Shin).length -
       lockedMembers.filter(
-        (m) => m.monthCircles[0].state == MonthCircleState.Shin
+        (m) => m.monthCircles[0].state == MonthCircleState.Shin,
       ).length -
       newMembersPerCircle,
 
@@ -129,13 +119,13 @@ config();
       30 -
       leaders.filter((m) => m.circleKey == CircleKey.Ha).length -
       lockedMembers.filter(
-        (m) => m.monthCircles[0].state == MonthCircleState.Ha
+        (m) => m.monthCircles[0].state == MonthCircleState.Ha,
       ).length -
       newMembersPerCircle -
       (remainderNewMembers > 0 ? 1 : 0),
   };
 
-  console.log("Max member count %s", maxMemberCount);
+  logger.debug("Max member count %s", maxMemberCount);
 
   const rankingMembers = (
     await prisma.member.findMany({
@@ -174,11 +164,11 @@ config();
       },
     })
   ).sort((a, b) => {
-    console.log("%s %s", a, b);
+    logger.debug("%s %s", a, b);
     return parseInt(
       (
         (b.fanCounts[0]?.avg ?? BigInt(0)) - (a.fanCounts[0]?.avg ?? BigInt(0))
-      ).toString()
+      ).toString(),
     );
   });
 
@@ -201,12 +191,12 @@ config();
             value == "Saikyo"
               ? MonthCircleState.Saikyo
               : value == "Leave"
-              ? MonthCircleState.Leaved
-              : value == "None"
-              ? MonthCircleState.Kicked
-              : MonthCircleState.OB,
+                ? MonthCircleState.Leaved
+                : value == "None"
+                  ? MonthCircleState.Kicked
+                  : MonthCircleState.OB,
           currentCircleKey: circleKey,
-        })
+        }),
       ),
       skipDuplicates: true,
     }),
@@ -232,8 +222,8 @@ config();
           idx < maxMemberCount.Shin
             ? MonthCircleState.Shin
             : idx < maxMemberCount.Shin + maxMemberCount.Ha
-            ? MonthCircleState.Ha
-            : MonthCircleState.OB,
+              ? MonthCircleState.Ha
+              : MonthCircleState.OB,
         currentCircleKey: circleKey,
       })),
       skipDuplicates: true,
@@ -289,7 +279,7 @@ config();
           ? Circles.findByCircleKey(currentCircleKey).name
           : "OB",
         monthCircleStateLabel(state),
-      ]
+      ],
     ),
   ]);
 
@@ -300,6 +290,6 @@ config();
         name: "members.csv",
         data: Buffer.from(csv, "utf-8"),
       },
-    ]
+    ],
   );
 })();

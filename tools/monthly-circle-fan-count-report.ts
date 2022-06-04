@@ -1,8 +1,8 @@
-import { Circles } from '@/model';
-import { config } from 'dotenv';
-import { prisma } from '@/database';
-import { CircleKey } from '@prisma/client';
-import { LocalDate, DateTimeFormatter } from '@/model';
+import { prisma } from "@/database";
+import { Circles, DateTimeFormatter, LocalDate } from "@/model";
+import { CircleKey } from "@prisma/client";
+import { config } from "dotenv";
+import { logger } from "~/lib/logger";
 
 config();
 
@@ -43,10 +43,10 @@ type CircleFanCount = {
         },
         orderBy: [
           {
-            total: 'desc',
+            total: "desc",
           },
           {
-            date: 'desc',
+            date: "desc",
           },
         ],
       });
@@ -56,17 +56,17 @@ type CircleFanCount = {
   }
 
   for (const circleFanCount of circleFanCounts) {
-    console.log(
+    logger.info(
       circleFanCount.month.format(
-        DateTimeFormatter.ofPattern('yyyy年MMのファン数平均')
-      )
+        DateTimeFormatter.ofPattern("yyyy年MMのファン数平均"),
+      ),
     );
     for (const key of Object.values(CircleKey)) {
       const count = circleFanCount[key];
-      console.log(
-        '%s: %d',
+      console.info(
+        "%s: %d",
         Circles.findByCircleKey(key).name,
-        count.toString()
+        count.toString(),
       );
     }
   }

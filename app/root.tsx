@@ -7,6 +7,7 @@ import { Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration, useCatch, 
 import * as React from "react";
 import ClientStyleContext from "~/components/ClientStyleContext";
 import Layout from "~/components/Layout";
+import { logger } from "~/lib/logger";
 import { authenticator } from "./auth.server";
 
 import tailwindStylesheetUrl from "./styles/tailwind.css";
@@ -115,7 +116,7 @@ export default function App() {
 
 // https://remix.run/docs/en/v1/api/conventions#errorboundary
 export function ErrorBoundary({ error }: { error: Error }) {
-  console.error(error);
+  logger.error(error);
 
   return (
     <Document title="Error!">

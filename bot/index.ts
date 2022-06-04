@@ -6,10 +6,8 @@ import { Circles, Emoji, isCircleKey, MonthSurveyEmoji } from "@/model";
 import { CircleRole, PrismaClient } from "@prisma/client";
 import { Client, Intents, Options } from "discord.js";
 import { config } from "dotenv";
-import {
-  updateFanCountEvent,
-  updateFanCountFromChannel,
-} from "./circle/update_fan_count";
+import { logger } from "~/lib/logger";
+import { updateFanCountEvent, updateFanCountFromChannel } from "./circle/update_fan_count";
 import { createPersonalChannel } from "./member/create_personal_channes";
 import { trainerIdCommand } from "./member/trainer_id";
 import { updateMemberNicknameEvent } from "./member/update_member_nickname";
@@ -35,16 +33,16 @@ const prisma = new PrismaClient();
 let redis: RedisClient;
 
 client.on("guildUpdate", async (guild) => {
-  console.log("guildUpdate %s", guild);
+  logger.debug("guildUpdate %s", guild);
 });
 
 client.on("ready", async () => {
   redis = await createRedisClient();
-  console.log("ready");
+  logger.info("ready");
 });
 
 client.on("guildMemberRemove", async (member) => {
-  console.log("Member removed %s", member);
+  logger.debug("Member removed %s", member);
   try {
     await prisma.member.update({
       where: { id: member.id },
@@ -56,12 +54,12 @@ client.on("guildMemberRemove", async (member) => {
       },
     });
   } catch (e) {
-    console.log("Error when guildMemberRemove %s", e);
+    logger.warn("Error when guildMemberRemove %s", e);
   }
 });
 
 client.on("guildMemberAdd", async (member) => {
-  console.log("Member added %s", member);
+  logger.debug("Member added %s", member);
   if (member.user.bot) {
     return;
   }
@@ -81,7 +79,7 @@ client.on("guildMemberAdd", async (member) => {
     if (process.env.NODE_ENV != "production") return;
     await sendWelcomeMessage(createdMember);
   } catch (e) {
-    console.log("Error when guildMemberRemove %s", e);
+    logger.warn("Error when guildMemberRemove %s", e);
   }
 });
 
@@ -91,9 +89,9 @@ client.on("guildMemberUpdate", async (oldMember, newMember) => {
 });
 
 client.on("messageCreate", async (message) => {
-  console.log("messageCreated");
+  logger.trace("messageCreated");
   const notificationCircle = Circles.findByRawNotificationChannelId(
-    message.channel.id
+    message.channel.id,
   );
   if (notificationCircle) {
     updateFanCountEvent(message, notificationCircle);
@@ -118,7 +116,7 @@ client.on("interactionCreate", async (interaction) => {
 
       const circle = Circles.findByCircleKey(circleKey);
       const notificationChannel = interaction.guild?.channels.resolve(
-        circle.notificationChannelId
+        circle.notificationChannelId,
       );
       if (
         !notificationChannel ||
@@ -151,7 +149,7 @@ client.on("interactionCreate", async (interaction) => {
       await interaction.editReply({ content: "ファン数取得完了しました" });
     }
   } catch (e) {
-    console.log("Error when interactionCreate %s", e);
+    logger.warn("Error when interactionCreate %s", e);
   }
 });
 
@@ -190,12 +188,12 @@ client.on("messageReactionAdd", async (reaction, user) => {
           reaction,
           user,
           emoji,
-          reaction.message.guild!
+          reaction.message.guild!,
         );
       }
     }
   } catch (e) {
-    console.log("Error when messageReactionAdd %s", e);
+    logger.warn("Error when messageReactionAdd %s", e);
   }
 });
 

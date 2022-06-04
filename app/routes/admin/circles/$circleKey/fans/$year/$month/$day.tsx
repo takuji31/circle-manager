@@ -38,6 +38,7 @@ import AdminHeader from "~/components/admin/header";
 import AdminHeaderActions from "~/components/admin/header/actions";
 import AdminHeaderTitle from "~/components/admin/header/title";
 import { storage } from "~/lib/firebase.client";
+import { logger } from "~/lib/logger";
 import { dateToYMD } from "~/model/date.server";
 
 import type { getCircleMembers } from "~/model/member.server";
@@ -129,6 +130,8 @@ const getLoaderData = async ({ params }: DataFunctionArgs) => {
   });
   const pathPrefix = cloudStoragePathPrefix(circleKey, date);
 
+  logger.debug(pathPrefix);
+
   return {
     ...dateToYMD(date),
     circle,
@@ -150,7 +153,7 @@ const getActionData = async ({ request, params }: DataFunctionArgs) => {
   const date = LocalDate.of(year, month, day);
   const rawFormData = await request.formData();
   const formData = Object.fromEntries(rawFormData);
-  console.log(formData);
+  logger.debug(formData);
   const { mode } = actionQuerySchema.parse(formData);
 
   switch (mode) {
@@ -498,7 +501,7 @@ const ScreenShotCard = ({ tabId }: { tabId: TabId }) => {
                 formData.set("mode", ActionMode.enum.uploadScreenShot);
                 for (const result of results) {
                   if (result.status == "rejected") {
-                    console.log(result.reason);
+                    logger.warn(result.reason);
                   } else {
                     formData.append("paths", result.value.ref.fullPath);
                   }

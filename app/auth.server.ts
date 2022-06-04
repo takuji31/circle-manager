@@ -7,6 +7,7 @@ import { Permissions } from "discord.js";
 import { Authenticator } from "remix-auth";
 import { DiscordStrategy } from "remix-auth-discord";
 import invariant from "tiny-invariant";
+import { logger } from "~/lib/logger";
 import { sessionStorage } from "~/session.server";
 import { prisma } from "./db.server";
 
@@ -14,7 +15,7 @@ invariant(process.env.BASE_URL, "BASE_URL must be set");
 invariant(process.env.DISCORD_CLIENT_ID, "DISCORD_CLIENT_ID must be set");
 invariant(
   process.env.DISCORD_CLIENT_SECRET,
-  "DISCORD_CLIENT_SECRET must be set"
+  "DISCORD_CLIENT_SECRET must be set",
 );
 
 // Create an instance of the authenticator, pass a generic with what
@@ -30,7 +31,7 @@ authenticator.use(
       scope: ["identify", "email", "guilds", "guilds.join"],
     },
     async ({ accessToken, refreshToken, extraParams, profile, context }) => {
-      console.log(profile);
+      logger.debug(profile);
       const avatarHash = profile.__json.avatar;
       const profileImageUrl = avatarHash
         ? `https://cdn.discordapp.com/avatars/${profile.id}/${avatarHash}.png`
@@ -49,8 +50,8 @@ authenticator.use(
       const isAdmin =
         permissions != null
           ? new Permissions(BigInt(permissions)).has(
-              Permissions.FLAGS.ADMINISTRATOR
-            )
+            Permissions.FLAGS.ADMINISTRATOR,
+          )
           : false;
 
       return {
@@ -63,7 +64,7 @@ authenticator.use(
         circleKey: member?.circleKey ?? null,
         profileImageUrl,
       };
-    }
+    },
   ),
-  "discord"
+  "discord",
 );
