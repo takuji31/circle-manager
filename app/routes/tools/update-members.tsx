@@ -1,9 +1,9 @@
 import { createDiscordRestClient } from "@/discord";
 import { Circles, Guild } from "@/model";
 import { CircleRole, MemberStatus } from "@prisma/client";
+import type { ActionFunction } from "@remix-run/node";
 import type { RESTGetAPIGuildMembersResult } from "discord-api-types/v9";
 import { Routes } from "discord-api-types/v9";
-import type { ActionFunction } from "@remix-run/node";
 import invariant from "tiny-invariant";
 import { prisma } from "~/db.server";
 
@@ -21,7 +21,7 @@ export const action: ActionFunction = async ({ request }) => {
 
   const members = (
     (await rest.get(
-      `${Routes.guildMembers(Guild.id)}?limit=1000`
+      `${Routes.guildMembers(Guild.id)}?limit=1000`,
     )) as RESTGetAPIGuildMembersResult
   ).filter((member) => !member.user?.bot && member.user);
 
@@ -59,7 +59,7 @@ export const action: ActionFunction = async ({ request }) => {
   for (const member of members) {
     const user = member.user!;
     const circleIdOrNull = member.roles.filter(
-      (role) => circleIds.indexOf(role) != -1
+      (role) => circleIds.indexOf(role) != -1,
     )[0];
     const isOb = member.roles.includes(Guild.roleIds.ob);
     const isNotJoined = member.roles.includes(Guild.roleIds.notJoined);
@@ -70,30 +70,22 @@ export const action: ActionFunction = async ({ request }) => {
     const status = isOb
       ? MemberStatus.OB
       : isNotJoined
-      ? MemberStatus.NotJoined
-      : circle != null
-      ? MemberStatus.Joined
-      : MemberStatus.NotJoined;
+        ? MemberStatus.NotJoined
+        : circle != null
+          ? MemberStatus.Joined
+          : MemberStatus.NotJoined;
     const circleRole = member.roles.includes(Guild.roleIds.leader)
       ? CircleRole.Leader
       : member.roles.includes(Guild.roleIds.subLeader)
-      ? CircleRole.SubLeader
-      : CircleRole.Member;
+        ? CircleRole.SubLeader
+        : CircleRole.Member;
 
-    await prisma.member.upsert({
+    await prisma.member.update({
       select: null,
       where: {
         id: user.id,
       },
-      create: {
-        id: user.id,
-        name: member.nick ?? user.username,
-        circleKey: circle?.key ?? null,
-        circleRole: circleRole,
-        joinedAt: member.joined_at,
-        status,
-      },
-      update: {
+      data: {
         name: member.nick ?? user.username,
         circleKey: circle?.key ?? null,
         circleRole: circleRole,
