@@ -40,5 +40,12 @@
     "noEmit": true,
     "forceConsistentCasingInFileNames": true,
     "allowJs": true
+  },
+  "ts-node": {
+    "transpileOnly": false,
+    "files": true,
+    "require": [
+      "tsconfig-paths/register"
+    ]
   }
 }
