@@ -57,7 +57,7 @@
     "@emotion/server": "^11.4.0",
     "@emotion/styled": "^11.8.1",
     "@google-cloud/vision": "^2.4.2",
-    "@headlessui/react": "^1.6.3",
+    "@headlessui/react": "^1.6.4",
     "@heroicons/react": "^1.0.6",
     "@js-joda/core": "^5.2.0",
     "@js-joda/locale_ja": "^4.7.0",
