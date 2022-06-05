@@ -3364,12 +3364,7 @@ color-name@^1.1.4, color-name@~1.1.4:
   resolved "https://registry.yarnpkg.com/color-name/-/color-name-1.1.4.tgz#c2a09a87acbde69543de6f63fa3995c826c536a2"
   integrity sha512-dOy+3AuW3a2wNbZHIuMZpTcgjGuLU/uBL/ubcZF9OXbDo8ff4O8yVp5Bf0efS8uEoYo5q4Fx7dY9OgQGXgAsQA==
 
-colorette@^2.0.16:
-  version "2.0.16"
-  resolved "https://registry.yarnpkg.com/colorette/-/colorette-2.0.16.tgz#713b9af84fdb000139f04546bd4a93f62a5085da"
-  integrity sha512-hUewv7oMjCp+wkBv5Rm0v87eJhq4woh5rSR+42YSQJKecCqgIqNkZ6lAlQms/BwHPJA5NKMRlpxPRv0n8HQW6g==
-
-colorette@^2.0.7:
+colorette@^2.0.16, colorette@^2.0.7:
   version "2.0.17"
   resolved "https://registry.yarnpkg.com/colorette/-/colorette-2.0.17.tgz#5dd4c0d15e2984b7433cb4a9f2ead45063b80c47"
   integrity sha512-hJo+3Bkn0NCHybn9Tu35fIeoOKGOk5OCC32y4Hz2It+qlCO2Q3DeQ1hRn/tDDMQKRYUEzqsl7jbF6dYKjlE60g==
@@ -3934,10 +3929,10 @@ discord-api-types@^0.31.1:
   resolved "https://registry.yarnpkg.com/discord-api-types/-/discord-api-types-0.31.2.tgz#8d131e25340bd695815af3bb77128a6993c1b516"
   integrity sha512-gpzXTvFVg7AjKVVJFH0oJGC0q0tO34iJGSHZNz9u3aqLxlD6LfxEs9wWVVikJqn9gra940oUTaPFizCkRDcEiA==
 
-discord-api-types@^0.33.0:
-  version "0.33.0"
-  resolved "https://registry.yarnpkg.com/discord-api-types/-/discord-api-types-0.33.0.tgz#4c20b3a85b6d78ce71954a506e98b98ac3105661"
-  integrity sha512-RS1dMM6xuMhdHwQJ0T+XuCD7v1tKnyZ89Eq6q/DbOJWMbIh3ihgAzDhcF70QsFCtk9a5Gn9XU29S7eoEXuwQ5w==
+discord-api-types@^0.33.3:
+  version "0.33.3"
+  resolved "https://registry.yarnpkg.com/discord-api-types/-/discord-api-types-0.33.3.tgz#882c39331871f619035917a1f80d486f605b3e7a"
+  integrity sha512-P3A1RJXKEDmGPHrFTN5+gYLsBPGUVGj+D3+fa3m0K/umc+LMfqGuEad+p7cNq7ry/icReVhS3bz9jvBvne/BRA==
 
 discord.js@^13.7.0:
   version "13.7.0"
