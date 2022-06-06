@@ -113,7 +113,7 @@
     "@faker-js/faker": "^6.3.1",
     "@remix-run/dev": "^1.5.1",
     "@remix-run/eslint-config": "^1.5.1",
-    "@testing-library/cypress": "^8.0.2",
+    "@testing-library/cypress": "^8.0.3",
     "@testing-library/dom": "^8.13.0",
     "@testing-library/jest-dom": "^5.16.4",
     "@testing-library/react": "^13.3.0",
