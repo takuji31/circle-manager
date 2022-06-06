@@ -2,6 +2,7 @@ import { createDiscordRestClient } from "@/discord";
 import { Circles, Guild } from "@/model";
 import { CircleRole, MemberStatus } from "@prisma/client";
 import type { ActionFunction } from "@remix-run/node";
+import { json } from "@remix-run/node";
 import type { RESTGetAPIGuildMembersResult } from "discord-api-types/v9";
 import { Routes } from "discord-api-types/v9";
 import invariant from "tiny-invariant";
@@ -79,19 +80,7 @@ export const action: ActionFunction = async ({ request }) => {
 
   await prisma.$transaction(transactions);
 
-  return prisma.member.findMany({
-    orderBy: [
-      {
-        circleKey: "asc",
-      },
-      {
-        circleRole: "asc",
-      },
-      {
-        joinedAt: "asc",
-      },
-    ],
-  });
+  return json({ status: "ok", created: transactions.length });
 };
 
 export const loader = () => {
