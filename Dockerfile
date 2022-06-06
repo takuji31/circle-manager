@@ -14,17 +14,18 @@ ENV NODE_ENV development
 
 WORKDIR /myapp
 
-ADD package.json yarn.lock ./
+ADD package.json yarn.lock .yarnrc ./
 RUN yarn install --ignore-scripts
 
 
 # Setup production node_modules
-FROM base as production-deps
+FROM deps as production-deps
 
 WORKDIR /myapp
 
-COPY --from=deps /myapp/node_modules /myapp/node_modules
-ADD package.json yarn.lock ./
+ENV NODE_ENV production
+
+ADD package.json yarn.lock .yarnrc ./
 RUN yarn install --production --ignore-scripts --prefer-offline
 
 # Build the app
@@ -41,16 +42,25 @@ RUN yarn generate:db
 ADD . .
 RUN yarn build
 
-# Finally, build the production image with minimal footprint
-FROM base
+FROM base as production
 
-ENV PORT 8080
 ENV NODE_ENV production
+ENV BASE_URL "https://shin-umamusume.takuji31.dev"
+ENV TZ "Asia/Tokyo"
 
 WORKDIR /myapp
 
 COPY --from=production-deps /myapp/node_modules /myapp/node_modules
 COPY --from=build /myapp/node_modules/.prisma /myapp/node_modules/.prisma
+
+FROM production as bot
+
+ADD . .
+
+CMD ["yarn", "start:bot"]
+
+
+FROM production as web
 
 COPY --from=build /myapp/build /myapp/build
 COPY --from=build /myapp/public /myapp/public
