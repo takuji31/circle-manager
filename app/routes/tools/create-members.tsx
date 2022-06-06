@@ -1,5 +1,5 @@
 import { createDiscordRestClient } from "@/discord";
-import { Circles, Guild } from "@/model";
+import { Circle, Circles, Guild } from "@/model";
 import { CircleRole, MemberStatus } from "@prisma/client";
 import type { ActionFunction } from "@remix-run/node";
 import type { RESTGetAPIGuildMembersResult } from "discord-api-types/v9";
@@ -50,34 +50,51 @@ export const action: ActionFunction = async ({ request }) => {
     return { ...member, id: member.user!.id, circle, status, circleRole };
   });
 
+  const obMembers = members.filter(member => member.roles.includes(Guild.roleIds.ob));
+  await prisma.member.updateMany({
+    where: { id: { in: obMembers.map(member => member.id) } },
+    data: { status: MemberStatus.OB },
+  });
+
+  const notJoinedMembers = members.filter(member => member.roles.includes(Guild.roleIds.notJoined));
+  await prisma.member.updateMany({
+    where: { id: { in: notJoinedMembers.map(member => member.id) } },
+    data: { status: MemberStatus.NotJoined },
+  });
+
+  const circles = Object.values(Circle);
+
+  for (const circle of circles) {
+    const circleMembers = members.filter(member => member.circle != null && member.circle.key == circle.key);
+    await prisma.member.updateMany({
+      where: { id: { in: circleMembers.map(member => member.id) } },
+      data: { circleKey: circle.key },
+    });
+  }
+
+
   const dbMembers = await prisma.member.findMany({
     where: { id: { in: members.map(m => m.user!.id) } },
     orderBy: [{ id: "asc" }],
   });
 
-  const transactions = [];
+  const creatingMembers = [];
   for (const member of members) {
     const dbMember = dbMembers.filter(dbm => dbm.id == member.id)[0];
     const user = member.user!;
-    if (dbMember) {
-      const name = member.nick ?? user.username;
-      const joinedAt = new Date(member.joined_at);
-      if (dbMember.name != name || dbMember.joinedAt != joinedAt || dbMember.circleRole != member.circleRole) {
-        transactions.push(prisma.member.update({
-            select: null,
-            where: { id: member.id },
-            data: {
-              name,
-              joinedAt,
-              circleRole: member.circleRole,
-            },
-          }),
-        );
-      }
+    if (!dbMember) {
+      creatingMembers.push({
+        id: member.id,
+        name: member.nick ?? user.username,
+        circleKey: member.circle?.key ?? null,
+        circleRole: member.circleRole,
+        joinedAt: member.joined_at,
+        status: member.status,
+      });
     }
   }
 
-  await prisma.$transaction(transactions);
+  await prisma.member.createMany({ data: creatingMembers, skipDuplicates: true });
 
   return prisma.member.findMany({
     orderBy: [
