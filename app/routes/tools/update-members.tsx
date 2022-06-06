@@ -56,31 +56,28 @@ export const action: ActionFunction = async ({ request }) => {
     orderBy: [{ id: "asc" }],
   });
 
-  const transactions = [];
+  let updated = 0;
   for (const member of members) {
     const dbMember = dbMembers.filter(dbm => dbm.id == member.id)[0];
     const user = member.user!;
     if (dbMember) {
       const name = member.nick ?? user.username;
-      const joinedAt = new Date(member.joined_at);
-      if (dbMember.name != name || dbMember.joinedAt != joinedAt || dbMember.circleRole != member.circleRole) {
-        transactions.push(prisma.member.update({
+      if (dbMember.name != name || dbMember.circleRole != member.circleRole) {
+        await prisma.member.update({
             select: null,
             where: { id: member.id },
             data: {
               name,
-              joinedAt,
               circleRole: member.circleRole,
             },
-          }),
+          },
         );
+        updated++;
       }
     }
   }
 
-  await prisma.$transaction(transactions);
-
-  return json({ status: "ok", created: transactions.length });
+  return json({ status: "ok", updated });
 };
 
 export const loader = () => {
