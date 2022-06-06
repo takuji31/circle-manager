@@ -6,8 +6,6 @@
   "license": "",
   "sideEffects": true,
   "scripts": {
-    "postinstall": "yarn generate",
-    "prebuild": "yarn generate",
     "build": "run-s build:*",
     "build:css": "yarn generate:css --minify",
     "build:remix": "remix build",
