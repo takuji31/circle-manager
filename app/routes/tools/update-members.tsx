@@ -78,29 +78,27 @@ export const action: ActionFunction = async ({ request }) => {
     orderBy: [{ id: "asc" }],
   });
 
-  const transactions = [];
   for (const member of members) {
     const dbMember = dbMembers.filter(dbm => dbm.id == member.id)[0];
     const user = member.user!;
     if (!dbMember) {
-      transactions.push(prisma.member.create({
-          select: null,
-          data: {
-            id: member.id,
-            name: member.nick ?? user.username,
-            circleKey: member.circle?.key ?? null,
-            circleRole: member.circleRole,
-            joinedAt: member.joined_at,
-            status: member.status,
-          },
-        }),
-      );
+      await prisma.member.create({
+        select: null,
+        data: {
+          id: member.id,
+          name: member.nick ?? user.username,
+          circleKey: member.circle?.key ?? null,
+          circleRole: member.circleRole,
+          joinedAt: member.joined_at,
+          status: member.status,
+        },
+      });
       continue;
     }
     const name = member.nick ?? user.username;
     const joinedAt = new Date(member.joined_at);
     if (dbMember.name != name || dbMember.joinedAt != joinedAt || dbMember.circleRole != member.circleRole) {
-      transactions.push(prisma.member.update({
+      await prisma.member.update({
         select: null,
         where: { id: member.id },
         data: {
@@ -108,11 +106,9 @@ export const action: ActionFunction = async ({ request }) => {
           joinedAt,
           circleRole: member.circleRole,
         },
-      }));
+      });
     }
   }
-
-  await prisma.$transaction(transactions);
 
   return prisma.member.findMany({
     orderBy: [
