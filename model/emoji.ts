@@ -10,18 +10,17 @@ export const Emoji = {
 type Emoji = typeof Emoji[keyof typeof Emoji];
 
 export const MonthSurveyEmoji = {
-  saikyo: Emoji.a,
-  umamusume: Emoji.b,
-  leave: Emoji.c,
-  ob: Emoji.d,
+  umamusume: Emoji.a,
+  leave: Emoji.b,
+  ob: Emoji.c,
 } as const;
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 type MonthSurveyEmoji = typeof MonthSurveyEmoji[keyof typeof MonthSurveyEmoji];
 
 export function isValidMonthSurveyEmoji(
-  emoji: string
+  emoji: string,
 ): emoji is MonthSurveyEmoji {
   return !!Object.values(MonthSurveyEmoji).find(
-    (monthSurveyEmoji) => monthSurveyEmoji == emoji
+    (monthSurveyEmoji) => monthSurveyEmoji == emoji,
   );
 }

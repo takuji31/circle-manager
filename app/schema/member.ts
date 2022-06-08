@@ -11,12 +11,11 @@ export const TrainerId = z
 
 export const MemberName = z.preprocess(
   (name) => (name as string).trim(),
-  z.string().min(1)
+  z.string().min(1),
 );
 export const MemberId = z.string().regex(/^0-9+$/);
 
 export const ActiveCircleKey = z.enum([
-  _CircleKey.Saikyo,
   _CircleKey.Shin,
   _CircleKey.Ha,
 ]);
@@ -27,5 +26,5 @@ export const TrainerName = z.preprocess(
   (name) => (name as string).trim(),
   z
     .string({ required_error: "トレーナー名を入力してください" })
-    .min(1, "トレーナー名は1文字以上で入力してください")
+    .min(1, "トレーナー名は1文字以上で入力してください"),
 );

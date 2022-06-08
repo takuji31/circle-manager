@@ -1,20 +1,19 @@
-import { Link } from "@remix-run/react";
+import { Circles } from "@/model";
+import { RadioGroup } from "@headlessui/react";
 import { CheckCircleIcon } from "@heroicons/react/solid";
+import { Button, Grid } from "@mui/material";
 import type { ActionFunction } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
-import { Form, useActionData } from "@remix-run/react";
-import { prisma } from "~/db.server";
-import { ActiveCircleKey, PathnameParams } from "~/schema/member";
-import { classNames } from "~/lib";
-import { z } from "zod";
+import { Form, Link, useActionData } from "@remix-run/react";
+import { useState } from "react";
 import type { Params } from "react-router";
+import { z } from "zod";
+import { prisma } from "~/db.server";
+import { classNames } from "~/lib";
+import { updateMemberSignUpCircle } from "~/model/signup.server";
 import { notFound } from "~/response.server";
 import { useSingUpData } from "~/routes/members/$pathname/setup";
-import { useState } from "react";
-import { RadioGroup } from "@headlessui/react";
-import { Circles } from "@/model";
-import { updateMemberSignUpCircle } from "~/model/signup.server";
-import { Grid, Button } from "@mui/material";
+import { ActiveCircleKey, PathnameParams } from "~/schema/member";
 
 type ActionData = Awaited<ReturnType<typeof getActionData>>;
 
@@ -55,7 +54,6 @@ export const action: ActionFunction = async ({ request, params }) => {
 };
 
 const fanCounts: Record<ActiveCircleKey, string> = {
-  Saikyo: "ノルマ：1億人/月",
   Shin: "ノルマ：2000万人/月、稼働目標：4000万人/月",
   Ha: "ノルマ：2000万人/月",
 };
@@ -85,7 +83,7 @@ export default function MemberPathnameSetupRoot() {
                     classNames(
                       checked ? "border-transparent" : "border-gray-300",
                       active ? "border-indigo-500 ring-2 ring-indigo-500" : "",
-                      "relative flex cursor-pointer rounded-lg border bg-white p-4 shadow-sm focus:outline-none"
+                      "relative flex cursor-pointer rounded-lg border bg-white p-4 shadow-sm focus:outline-none",
                     )
                   }
                 >
@@ -110,7 +108,7 @@ export default function MemberPathnameSetupRoot() {
                       <CheckCircleIcon
                         className={classNames(
                           !checked ? "invisible" : "",
-                          "h-5 w-5 text-indigo-600"
+                          "h-5 w-5 text-indigo-600",
                         )}
                         aria-hidden="true"
                       />
@@ -118,7 +116,7 @@ export default function MemberPathnameSetupRoot() {
                         className={classNames(
                           active ? "border" : "border-2",
                           checked ? "border-indigo-500" : "border-transparent",
-                          "pointer-events-none absolute -inset-px rounded-lg"
+                          "pointer-events-none absolute -inset-px rounded-lg",
                         )}
                         aria-hidden="true"
                       />

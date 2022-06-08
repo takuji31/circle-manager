@@ -21,7 +21,7 @@ export function isCircleId(id: string): id is CircleId {
 }
 
 export function isNotificationChannelId(
-  id: string
+  id: string,
 ): id is NotificationChannelId {
   for (const channelId of Object.values(NotificationChannelId)) {
     if (channelId == id) {
@@ -94,10 +94,6 @@ export const Circle = {
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export type Circle = typeof Circle[keyof typeof Circle];
 
-const specialName: { [key: string]: string } = {
-  "889835308189900810": "脱退(Discord残留)",
-};
-
 export const Circles = {
   maxMembers: 30,
   specialIds: {
@@ -164,22 +160,5 @@ export const Circles = {
         throw new Error(`Unknown id ${channelId}`);
     }
   },
-  activeCircles: [Circle.saikyo, Circle.shin, Circle.ha],
+  activeCircles: [Circle.shin, Circle.ha],
 } as const;
-
-export const getCircleName = (circle: { id: string; name: string }) => {
-  return specialName[circle.id] ?? circle.name;
-};
-
-export const isLeaveCircle = (circle: { id: string }) => {
-  return (
-    circle.id == Circles.specialIds.leave || circle.id == Circles.specialIds.ob
-  );
-};
-
-export const shouldLeaveGuild = (circle: { id: string }) => {
-  return (
-    circle.id == Circles.specialIds.leave ||
-    circle.id == Circles.specialIds.kick
-  );
-};
