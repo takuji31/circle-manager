@@ -636,17 +636,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/types@npm:^7.16.0, @babel/types@npm:^7.16.7, @babel/types@npm:^7.17.0, @babel/types@npm:^7.17.12":
-  version: 7.17.12
-  resolution: "@babel/types@npm:7.17.12"
-  dependencies:
-    "@babel/helper-validator-identifier": ^7.16.7
-    to-fast-properties: ^2.0.0
-  checksum: 5e522081587a0073a577fd05010ab917dbd2acea7aa06027ec42f90894ed1f8df2f03b9bb0713638153839b56a7be8dcf4b8ab2e55796c730a30ca9f0df1ba5c
-  languageName: node
-  linkType: hard
-
-"@babel/types@npm:^7.8.3":
+"@babel/types@npm:^7.16.0, @babel/types@npm:^7.16.7, @babel/types@npm:^7.17.0, @babel/types@npm:^7.17.12, @babel/types@npm:^7.8.3":
   version: 7.18.4
   resolution: "@babel/types@npm:7.18.4"
   dependencies:
@@ -743,26 +733,24 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@discordjs/collection@npm:^0.7.0-dev":
-  version: 0.7.0-dev.1652702622-5e9b757
-  resolution: "@discordjs/collection@npm:0.7.0-dev.1652702622-5e9b757"
-  checksum: 0e2c1decf9efc93ed97a035544b44d66322e1f1533fe4dfefcbde16a45884c0a4458835f383080fc419a06e9fec9369f83fc59cb06afd41397e440bd90af93db
+"@discordjs/collection@npm:^0.7.0":
+  version: 0.7.0
+  resolution: "@discordjs/collection@npm:0.7.0"
+  checksum: 141aa35a5433bacba3617b533557b4948388c7b59cdaecee51ccd721c1b9242e50d95bdef53ee2491535a017095f5072ace3c3e9e594193f67a1c5a8a4b7db93
   languageName: node
   linkType: hard
 
-"@discordjs/rest@npm:^0.4.1":
-  version: 0.4.1
-  resolution: "@discordjs/rest@npm:0.4.1"
+"@discordjs/rest@npm:^0.5.0":
+  version: 0.5.0
+  resolution: "@discordjs/rest@npm:0.5.0"
   dependencies:
-    "@discordjs/collection": ^0.7.0-dev
+    "@discordjs/collection": ^0.7.0
     "@sapphire/async-queue": ^1.3.1
-    "@sapphire/snowflake": ^3.2.1
-    "@types/node-fetch": ^2.6.1
-    discord-api-types: ^0.29.0
-    form-data: ^4.0.0
-    node-fetch: ^2.6.7
-    tslib: ^2.3.1
-  checksum: 93822a9d870d32d52a3a289e703160509a50e89205cc5db651b7a45f524b053d0fa827805e292a64dc1230e43b72a245e502a5d1d937cebd011c82d55cad5aa0
+    "@sapphire/snowflake": ^3.2.2
+    discord-api-types: ^0.33.3
+    tslib: ^2.4.0
+    undici: ^5.4.0
+  checksum: 36427fd77ff11285da4400e9960fccb71aafa657e43c3de4fe4772d1497f20c3d84754c844ad44d2c6f68fed45303ace790191fd811c94414312fde20d0346c2
   languageName: node
   linkType: hard
 
@@ -2473,7 +2461,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sapphire/snowflake@npm:^3.2.1":
+"@sapphire/snowflake@npm:^3.2.2":
   version: 3.2.2
   resolution: "@sapphire/snowflake@npm:3.2.2"
   checksum: 315fecef4738092c2a2f3509b132b811fcbfa6c98d5d45d951adaf3ca21608be69043bcc137cc6933a7c3e55cbdc066daa5bb484603e6575422b335445b59315
@@ -4498,7 +4486,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "circle-manager@workspace:."
   dependencies:
-    "@discordjs/rest": ^0.4.1
+    "@discordjs/rest": ^0.5.0
     "@emotion/cache": ^11.7.1
     "@emotion/react": ^11.9.0
     "@emotion/server": ^11.4.0
@@ -5516,13 +5504,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"discord-api-types@npm:^0.29.0":
-  version: 0.29.0
-  resolution: "discord-api-types@npm:0.29.0"
-  checksum: 1ca74693b4e9c611c3de17f604714425d81d537ee81669d040a8c37fb23fb634a6918dd7d21056ccb90a3f4741bc2750509f6c8dd922bf2b3ed544d18bd0f32a
-  languageName: node
-  linkType: hard
-
 "discord-api-types@npm:^0.30.0":
   version: 0.30.0
   resolution: "discord-api-types@npm:0.30.0"
@@ -5537,7 +5518,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"discord-api-types@npm:^0.33.5":
+"discord-api-types@npm:^0.33.3, discord-api-types@npm:^0.33.5":
   version: 0.33.5
   resolution: "discord-api-types@npm:0.33.5"
   checksum: 6dcaad640c5693a69c9a4f5e444e739dde11ba835164ae6fd3dd5a1ab7b4d7f96cd022ed653eeaff2c8051ead0d998a5d502a2915cfacdde596364b82d9e3b3f
@@ -14224,6 +14205,13 @@ __metadata:
     has-symbols: ^1.0.3
     which-boxed-primitive: ^1.0.2
   checksum: b7a1cf5862b5e4b5deb091672ffa579aa274f648410009c81cca63fed3b62b610c4f3b773f912ce545bb4e31edc3138975b5bc777fc6e4817dca51affb6380e9
+  languageName: node
+  linkType: hard
+
+"undici@npm:^5.4.0":
+  version: 5.4.0
+  resolution: "undici@npm:5.4.0"
+  checksum: 2852397ee1dbb2b3ad58166520ec30f4f0143895f6e7b157dbedfac4e43b522a710a3927be61a67b2ae791190973f206d30785564ece7675e08133427cebaaa1
   languageName: node
   linkType: hard
 
