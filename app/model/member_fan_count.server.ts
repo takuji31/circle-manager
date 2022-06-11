@@ -76,11 +76,11 @@ export async function getCircleFanCountGraph({
   )
     .groupBy((m) => m.memberId)
     .mapValues((l) =>
-      _.orderBy(l, (m) => m.date.getTime(), "desc").map(
+      _.orderBy(l, (m) => m.date.getTime(), "desc").filter(m => m.monthlyTotal != null).map(
         ({ total, monthlyAvg, monthlyTotal, ...m }, idx, list) => {
 
           const beforeFanCount = list[idx + 1];
-          const diffFromBefore = beforeFanCount && beforeFanCount.monthlyTotal != null ? parseInt((monthlyTotal! - beforeFanCount?.monthlyTotal!).toString()) : null;
+          const diffFromBefore = beforeFanCount ? parseInt((monthlyTotal! - beforeFanCount.monthlyTotal!).toString()) : null;
           return {
             ...m,
             total: parseInt(total.toString()),
