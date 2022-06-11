@@ -64,8 +64,6 @@ const Document = withEmotionCache(
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    const data = useLoaderData();
-
     return (
       <html lang="ja" style={{ height: "100%" }}>
       <head>
@@ -88,13 +86,6 @@ const Document = withEmotionCache(
       <Box className="h-full min-h-full">
         {children}
         <ScrollRestoration />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `window.ENV = ${JSON.stringify(
-              data.ENV,
-            )}`,
-          }}
-        />
         <Scripts />
         <LiveReload />
       </Box>
@@ -107,8 +98,17 @@ const Document = withEmotionCache(
 // https://remix.run/api/conventions#default-export
 // https://remix.run/api/conventions#route-filenames
 export default function App() {
+  const data = useLoaderData();
+
   return (
     <Document>
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `window.ENV = ${JSON.stringify(
+            data.ENV,
+          )}`,
+        }}
+      />
       <Outlet />
     </Document>
   );
