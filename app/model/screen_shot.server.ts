@@ -278,7 +278,7 @@ function findMemberNames(paragraphs: Array<Paragraph>, roles: Array<ParsedParagr
 }
 
 // たまに,が.と認識されてしまうことがある。総獲得ファン数は必ず整数なので.を,としても問題ない
-const totalFanCountSeparatorRegex = /[,.]/;
+const totalFanCountSeparatorRegex = /[,.]/g;
 
 function findMemberFanCounts(paragraphs: Array<Paragraph>): Array<ParsedParagraph<number>> {
   const memberFanCounts: Array<ParsedParagraph<number>> = [];
