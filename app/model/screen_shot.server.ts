@@ -277,17 +277,20 @@ function findMemberNames(paragraphs: Array<Paragraph>, roles: Array<ParsedParagr
   });
 }
 
+// たまに,が.と認識されてしまうことがある。総獲得ファン数は必ず整数なので.を,としても問題ない
+const totalFanCountSeparatorRegex = /[,.]/;
+
 function findMemberFanCounts(paragraphs: Array<Paragraph>): Array<ParsedParagraph<number>> {
   const memberFanCounts: Array<ParsedParagraph<number>> = [];
   for (const { words, boundingBox } of paragraphs) {
     const paragraphText = words.join("");
     if (words.length >= 2 && words[0].match(fanCountValueRegex) && words[1] == "人") {
       logger.debug("Maybe fanCounts %o", words);
-      const value = parseInt(words[0].replaceAll(",", ""));
+      const value = parseInt(words[0].replaceAll(totalFanCountSeparatorRegex, ""));
       memberFanCounts.push({ value, boundingBox });
     } else if (words.length >= 6 && paragraphText.startsWith("総獲得ファン数") && words[4].match(fanCountValueRegex) && words[5] == "人" && !paragraphText.match(memberNameNoiseRegex)) {
       logger.debug("Maybe fanCounts with label %o", words);
-      const value = parseInt(words[4].replaceAll(",", ""));
+      const value = parseInt(words[4].replaceAll(totalFanCountSeparatorRegex, ""));
       memberFanCounts.push({ value, boundingBox });
     }
   }
