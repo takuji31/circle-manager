@@ -338,7 +338,7 @@ const parseScreenShot = async ({
     throw new Error(`ScreenShot ${screenShot.id} not uploaded in ${file.name}`);
   }
 
-  const client = new ImageAnnotatorClient({});
+  const client = new ImageAnnotatorClient(process.env.GOOGLE_API_KEY_JSON != undefined ? { credentials: JSON.parse(process.env.GOOGLE_API_KEY_JSON) } : {});
 
   // ユニット数節約のために一度パースしたスクリーンショットは再度Cloud Vision APIに投げない
   const result: IAnnotateImageResponse = screenShot.rawJson as IAnnotateImageResponse | null ?? (await client.annotateImage(
