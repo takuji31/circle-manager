@@ -87,3 +87,4 @@ node_modules/
 /app/styles/tailwind.css
 
 data.json
+.vercel
