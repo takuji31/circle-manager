@@ -2381,6 +2381,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@remix-run/vercel@npm:^1.5.1":
+  version: 1.5.1
+  resolution: "@remix-run/vercel@npm:1.5.1"
+  dependencies:
+    "@remix-run/node": 1.5.1
+  peerDependencies:
+    "@vercel/node": ^1.8.3
+  checksum: b735bc4f9a3a5b29b274fc9768f347736debd92940fd05f0b92d4931f7dd502ef8525d121e11f06bbcf0b180052ae2e0c6233489a7e96ea4e399c5e2898cf566
+  languageName: node
+  linkType: hard
+
 "@remix-run/web-blob@npm:^3.0.3, @remix-run/web-blob@npm:^3.0.4":
   version: 3.0.4
   resolution: "@remix-run/web-blob@npm:3.0.4"
@@ -3258,6 +3269,25 @@ __metadata:
     "@typescript-eslint/types": 5.24.0
     eslint-visitor-keys: ^3.3.0
   checksum: 8001da8101a41ddcaf0931e71883dab7f8b9f1cdb896827afc8401388d23c831ba06c126b7f74cb3cb6fc8b2689564b9da6a3a35b99ab134157cd5381319d418
+  languageName: node
+  linkType: hard
+
+"@vercel/node-bridge@npm:3.0.0":
+  version: 3.0.0
+  resolution: "@vercel/node-bridge@npm:3.0.0"
+  checksum: cead2c1a6eea411249d9e960d395319839824dba3053ab04ee5fa72e3580a509dd1865d9b5c3eaa2e8401ba772f8b834b42fc2f8cb412495e9c3d2a2efb5e1c6
+  languageName: node
+  linkType: hard
+
+"@vercel/node@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "@vercel/node@npm:2.1.0"
+  dependencies:
+    "@types/node": "*"
+    "@vercel/node-bridge": 3.0.0
+    ts-node: 8.9.1
+    typescript: 4.3.4
+  checksum: 212fb78af5723c9db784f7a304779e5607974afbe63ff64e0e2e2e67dc43ced1c058da8b86fc1ef13657f43d948301666cf1eaa923a56063f5256084da5f6502
   languageName: node
   linkType: hard
 
@@ -4521,6 +4551,7 @@ __metadata:
     "@remix-run/react": ^1.5.1
     "@remix-run/serve": ^1.5.1
     "@remix-run/server-runtime": ^1.5.1
+    "@remix-run/vercel": ^1.5.1
     "@remix-validated-form/with-zod": ^2.0.1
     "@testing-library/cypress": ^8.0.3
     "@testing-library/dom": ^8.13.0
@@ -4537,6 +4568,7 @@ __metadata:
     "@types/react": ^18.0.12
     "@types/react-copy-to-clipboard": ^5.0.2
     "@types/react-dom": ^18.0.5
+    "@vercel/node": ^2.1.0
     "@vitejs/plugin-react": ^1.3.2
     autoprefixer: ^10.4.7
     bcryptjs: ^2.4.3
@@ -13207,7 +13239,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"source-map-support@npm:^0.5.16, source-map-support@npm:^0.5.21":
+"source-map-support@npm:^0.5.16, source-map-support@npm:^0.5.17, source-map-support@npm:^0.5.21":
   version: 0.5.21
   resolution: "source-map-support@npm:0.5.21"
   dependencies:
@@ -14009,6 +14041,26 @@ __metadata:
   languageName: node
   linkType: hard
 
+"ts-node@npm:8.9.1":
+  version: 8.9.1
+  resolution: "ts-node@npm:8.9.1"
+  dependencies:
+    arg: ^4.1.0
+    diff: ^4.0.1
+    make-error: ^1.1.1
+    source-map-support: ^0.5.17
+    yn: 3.1.1
+  peerDependencies:
+    typescript: ">=2.7"
+  bin:
+    ts-node: dist/bin.js
+    ts-node-script: dist/bin-script.js
+    ts-node-transpile-only: dist/bin-transpile.js
+    ts-script: dist/bin-script-deprecated.js
+  checksum: 59997e32cfb84323317f9fd33ff62d025b467ff36c296c3ad1ee54f08fd355c58fab37e096e2a63fd01fced929384b16b9d74bf324713a21844e527ddd5f6c17
+  languageName: node
+  linkType: hard
+
 "ts-node@npm:^10.8.1":
   version: 10.8.1
   resolution: "ts-node@npm:10.8.1"
@@ -14195,6 +14247,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"typescript@npm:4.3.4":
+  version: 4.3.4
+  resolution: "typescript@npm:4.3.4"
+  bin:
+    tsc: bin/tsc
+    tsserver: bin/tsserver
+  checksum: 75e1f2769c7ff38c718523d05eaf1c2611dbf92c0ab0f85f603ead9bb23416af2009a5dac46e76ef6a207a8508fa53f51b43a41f2a91b1241b53cd744c16128c
+  languageName: node
+  linkType: hard
+
 "typescript@npm:^4.7.3":
   version: 4.7.3
   resolution: "typescript@npm:4.7.3"
@@ -14202,6 +14264,16 @@ __metadata:
     tsc: bin/tsc
     tsserver: bin/tsserver
   checksum: fd13a1ce53790a36bb8350e1f5e5e384b5f6cb9b0635114a6d01d49cb99916abdcfbc13c7521cdae2f2d3f6d8bc4a8ae7625edf645a04ee940588cd5e7597b2f
+  languageName: node
+  linkType: hard
+
+"typescript@patch:typescript@4.3.4#~builtin<compat/typescript>":
+  version: 4.3.4
+  resolution: "typescript@patch:typescript@npm%3A4.3.4#~builtin<compat/typescript>::version=4.3.4&hash=7ad353"
+  bin:
+    tsc: bin/tsc
+    tsserver: bin/tsserver
+  checksum: 6ccc2e1148e172da119ea4b72c66395a0c18a53884d21fb82bb4503a948a7169e9961defe24a359040a3d77bf5ff338945804296e0e27c87b5bd22ea1d25781b
   languageName: node
   linkType: hard
 
