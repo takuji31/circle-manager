@@ -7,6 +7,8 @@ declare namespace NodeJS {
     readonly BASE_URL: string;
     readonly REDIS_URL: string;
     readonly ADMIN_API_SECRET: string;
+    readonly GOOGLE_API_KEY_JSON?: string;
+    readonly GOOGLE_APPLICATION_CREDENTIALS?: string;
   }
 }
 
