@@ -42,7 +42,7 @@
     "allowJs": true
   },
   "ts-node": {
-    "transpileOnly": false,
+    "transpileOnly": true,
     "files": true,
     "require": [
       "tsconfig-paths/register"
