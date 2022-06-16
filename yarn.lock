@@ -4534,7 +4534,7 @@ __metadata:
     chart.js: ^3.8.0
     concurrently: ^7.2.1
     cross-env: ^7.0.3
-    csv-stringify: ^6.1.0
+    csv-stringify: ^6.1.3
     cypress: ^9.7.0
     date-fns: ^2.28.0
     discord-api-types: ^0.33.5
@@ -5109,10 +5109,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"csv-stringify@npm:^6.1.0":
-  version: 6.1.0
-  resolution: "csv-stringify@npm:6.1.0"
-  checksum: f9d82a5d4ecb8983c7601822444580f0e99c229368ceb999d431c8e917e2787f1e341cc7056e883bae8928b81475ea93818dcaa19b5b15cde6e63badc03ca8aa
+"csv-stringify@npm:^6.1.3":
+  version: 6.1.3
+  resolution: "csv-stringify@npm:6.1.3"
+  checksum: bf31b1047b3b5d7fa290fc5eadadc6a1dab9a4cce73bd79d536d6fe539f8126b2993a2c2d4d4a0a1447b8657bc463a52378c5821a0956f565c93c458e0304025
   languageName: node
   linkType: hard
 
