@@ -14,7 +14,7 @@ ENV NODE_ENV development
 
 WORKDIR /myapp
 
-ADD package.json yarn.lock .yarnrc ./
+ADD package.json yarn.lock .yarnrc.yml ./
 RUN yarn install --ignore-scripts
 
 
@@ -25,7 +25,7 @@ WORKDIR /myapp
 
 ENV NODE_ENV production
 
-ADD package.json yarn.lock .yarnrc ./
+ADD package.json yarn.lock .yarnrc.yml ./
 RUN yarn install --production --ignore-scripts --prefer-offline
 
 # Build the app
