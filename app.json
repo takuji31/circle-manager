@@ -1,0 +1,28 @@
+{
+  "cron": [
+    {
+      "command": "yarn cron:daily-legend-race-reminder",
+      "schedule": "0 21 * * *"
+    },
+    {
+      "command": "yarn cron:team-race-reminder",
+      "schedule": "0 21 * * 0"
+    },
+    {
+      "command": "yarn cron:legend-race-reminder",
+      "schedule": "0 21 24,25,26,27,28,29 6 *"
+    },
+    {
+      "command": "yarn cron:month-circle-notifier",
+      "schedule": "0 21 19 * *"
+    },
+    {
+      "command": "yarn cron:month-survey-reminder",
+      "schedule": "0 21 17,18 * *"
+    },
+    {
+      "command": "yarn cron:start-month-survey",
+      "schedule": "0 21 15 * *"
+    }
+  ]
+}
