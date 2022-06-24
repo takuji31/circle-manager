@@ -1140,6 +1140,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@firebase/component@npm:0.5.16":
+  version: 0.5.16
+  resolution: "@firebase/component@npm:0.5.16"
+  dependencies:
+    "@firebase/util": 1.6.2
+    tslib: ^2.1.0
+  checksum: 98c9da424583afcec068f608abab3d45dd2a7f5f7c315ecf4774acb5f52dd3059a816bf063de57dcdb95e5607f1576c4b3368be5f212740936d9d24cb9a3f0f5
+  languageName: node
+  linkType: hard
+
 "@firebase/database-compat@npm:0.2.0":
   version: 0.2.0
   resolution: "@firebase/database-compat@npm:0.2.0"
@@ -1474,7 +1484,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@firebase/storage@npm:0.9.6, @firebase/storage@npm:^0.9.6":
+"@firebase/storage@npm:0.9.6":
   version: 0.9.6
   resolution: "@firebase/storage@npm:0.9.6"
   dependencies:
@@ -1485,6 +1495,20 @@ __metadata:
   peerDependencies:
     "@firebase/app": 0.x
   checksum: 45b2e67b973092e5c2b6124e38132b5ba0f3a6ac3c076e937d0757b848f5d49e5be6b508b3b3270065be9574b44cde84d48c6dc2131681487bb68ba78981e7df
+  languageName: node
+  linkType: hard
+
+"@firebase/storage@npm:^0.9.8":
+  version: 0.9.8
+  resolution: "@firebase/storage@npm:0.9.8"
+  dependencies:
+    "@firebase/component": 0.5.16
+    "@firebase/util": 1.6.2
+    node-fetch: 2.6.7
+    tslib: ^2.1.0
+  peerDependencies:
+    "@firebase/app": 0.x
+  checksum: 6aad596c04ad02142e8f332348674487bf454dabd30a85489f71c4a49a3573fee31e64b240086c053649a49ed16500bdd184e7914bdcbdc3ffadf9e872e91a03
   languageName: node
   linkType: hard
 
@@ -1503,6 +1527,15 @@ __metadata:
   dependencies:
     tslib: ^2.1.0
   checksum: 9bdd4cc5b2964639bd5f519bbeba4ad101d86cde53f8fe16a285c8ffacd6266186b343674cef886d1949a5e1069b642380758886c81f53c5a9c0145ac4f38363
+  languageName: node
+  linkType: hard
+
+"@firebase/util@npm:1.6.2":
+  version: 1.6.2
+  resolution: "@firebase/util@npm:1.6.2"
+  dependencies:
+    tslib: ^2.1.0
+  checksum: 762360269070853c0a485aed5b353a5a5564df72bbccc34440edcf6fe55ae29779728b5486e9ba052e3f734c0654c7a24ed5577b881eccfeb7e5d558c7819b1e
   languageName: node
   linkType: hard
 
@@ -4493,7 +4526,7 @@ __metadata:
     "@emotion/server": ^11.4.0
     "@emotion/styled": ^11.8.1
     "@faker-js/faker": ^6.3.1
-    "@firebase/storage": ^0.9.6
+    "@firebase/storage": ^0.9.8
     "@google-cloud/vision": ^2.4.2
     "@headlessui/react": ^1.6.4
     "@heroicons/react": ^1.0.6
