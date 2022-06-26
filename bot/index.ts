@@ -2,12 +2,11 @@ import { updateMemberRoleEvent } from "@/bot/member/update_member_role";
 import { sendWelcomeMessage } from "@/discord";
 import type { RedisClient } from "@/lib/redis";
 import { createRedisClient, RedisKeys } from "@/lib/redis";
-import { Circles, Emoji, isCircleKey, MonthSurveyEmoji } from "@/model";
+import { Emoji, MonthSurveyEmoji } from "@/model";
 import { CircleRole, PrismaClient } from "@prisma/client";
 import { Client, Intents, Options } from "discord.js";
 import { config } from "dotenv";
 import { logger } from "~/lib/logger";
-import { updateFanCountEvent, updateFanCountFromChannel } from "./circle/update_fan_count";
 import { createPersonalChannel } from "./member/create_personal_channes";
 import { trainerIdCommand } from "./member/trainer_id";
 import { updateMemberNicknameEvent } from "./member/update_member_nickname";
@@ -89,13 +88,7 @@ client.on("guildMemberUpdate", async (oldMember, newMember) => {
 });
 
 client.on("messageCreate", async (message) => {
-  logger.trace("messageCreated");
-  const notificationCircle = Circles.findByRawNotificationChannelId(
-    message.channel.id,
-  );
-  if (notificationCircle) {
-    updateFanCountEvent(message, notificationCircle);
-  }
+  logger.trace("messageCreated %o", message);
 });
 
 client.on("interactionCreate", async (interaction) => {
@@ -106,47 +99,6 @@ client.on("interactionCreate", async (interaction) => {
     }
     if (interaction.commandName == "trainer-id") {
       await trainerIdCommand(interaction);
-    }
-    if (interaction.commandName == "update-fan-count") {
-      const circleKey = interaction.options.getString("circle");
-      if (!circleKey || !isCircleKey(circleKey)) {
-        interaction.reply({ content: `不明なサークルキーです ${circleKey}` });
-        return;
-      }
-
-      const circle = Circles.findByCircleKey(circleKey);
-      const notificationChannel = interaction.guild?.channels.resolve(
-        circle.notificationChannelId,
-      );
-      if (
-        !notificationChannel ||
-        !notificationChannel?.isText() ||
-        notificationChannel.type != "GUILD_TEXT"
-      ) {
-        interaction.reply({
-          content: `不明なチャンネル: ${circle.notificationChannelId}`,
-        });
-        return;
-      }
-
-      const year = interaction.options.getInteger("year", false);
-      const month = interaction.options.getInteger("month", false);
-      const day = interaction.options.getInteger("day", false);
-
-      await interaction.reply({
-        content: "ファン数取得を開始します",
-        ephemeral: true,
-      });
-
-      await updateFanCountFromChannel({
-        circle,
-        notificationChannel,
-        year,
-        month,
-        day,
-      });
-
-      await interaction.editReply({ content: "ファン数取得完了しました" });
     }
   } catch (e) {
     logger.warn("Error when interactionCreate %s", e);
