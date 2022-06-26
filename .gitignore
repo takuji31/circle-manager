@@ -88,3 +88,4 @@ node_modules/
 
 data.json
 .vercel
+.env.production
