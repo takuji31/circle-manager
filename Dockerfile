@@ -5,7 +5,9 @@ FROM node:16.15.1-bullseye-slim as base
 ENV NODE_ENV production
 
 # Install openssl for Prisma
-RUN apt-get update && apt-get install -y openssl default-mysql-client ca-certificates
+RUN --mount=target=/var/lib/apt/lists,type=cache \
+    --mount=target=/var/cache/apt,type=cache \
+    apt-get update && apt-get install -y openssl default-mysql-client ca-certificates
 
 # Install all node_modules, including dev dependencies
 FROM base as deps
@@ -16,7 +18,9 @@ WORKDIR /myapp
 
 ADD package.json yarn.lock .yarnrc.yml ./
 ADD .yarn/ .yarn/
-RUN yarn install --mode=skip-build
+RUN --mount=target=/myapp/.yarn/cache,type=cache \
+    --mount=target=/myapp/.yarn/unplugged,type=cache \
+    yarn install --mode=skip-build
 
 
 # Setup production node_modules
@@ -28,7 +32,9 @@ ENV NODE_ENV production
 
 ADD package.json yarn.lock .yarnrc.yml ./
 ADD .yarn/ .yarn/
-RUN yarn workspaces focus --all --production
+RUN --mount=target=/myapp/.yarn/cache,type=cache \
+    --mount=target=/myapp/.yarn/unplugged,type=cache \
+    yarn workspaces focus --all --production
 
 # Build the app
 FROM base as build
