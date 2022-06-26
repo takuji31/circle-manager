@@ -1,6 +1,6 @@
 import { createDiscordRestClient } from "@/discord";
-import { Circles, Guild } from "@/model";
-import { SlashCommandBuilder, SlashCommandIntegerOption, SlashCommandStringOption } from "@discordjs/builders";
+import { Guild } from "@/model";
+import { SlashCommandBuilder, SlashCommandStringOption } from "@discordjs/builders";
 import type {
   ApplicationCommandPermissionType,
   RESTPutAPIApplicationCommandPermissionsJSONBody,
@@ -27,42 +27,6 @@ config();
       new SlashCommandBuilder()
         .setName("trainer-id")
         .setDescription("登録されているあなたのトレーナーIDを表示します。"),
-      new SlashCommandBuilder()
-        .setName("update-fan-count")
-        .addStringOption(
-          new SlashCommandStringOption()
-            .addChoices(
-              ...Circles.activeCircles.map((circle) => {
-                return {
-                  name: circle.name,
-                  value: circle.key,
-                };
-              }),
-            )
-            .setName("circle")
-            .setRequired(true)
-            .setDescription("対象のサークル"),
-        )
-        .addIntegerOption(
-          new SlashCommandIntegerOption()
-            .setName("year")
-            .setRequired(false)
-            .setDescription("年、指定しない場合は今年"),
-        )
-        .addIntegerOption(
-          new SlashCommandIntegerOption()
-            .setName("month")
-            .setRequired(false)
-            .setDescription("月、指定しない場合は今月"),
-        )
-        .addIntegerOption(
-          new SlashCommandIntegerOption()
-            .setName("day")
-            .setRequired(false)
-            .setDescription("日、指定しない場合は昨日"),
-        )
-        .setDefaultPermission(false)
-        .setDescription("(運営メンバー専用)ファン数更新をトリガーします。"),
     ].map((command) => command.toJSON());
 
     const rest = createDiscordRestClient();
