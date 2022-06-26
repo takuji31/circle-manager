@@ -12,7 +12,7 @@ config();
 
 (async () => {
   const { year, month } = nextMonthInt();
-  const expiredAt = LocalDate.firstDayOfNextMonth().minusDays(12);
+  const expiredAt = LocalDate.firstDayOfNextMonth().withDayOfMonth(25).atStartOfDayJST();
 
   if (await prisma.monthSurvey.count({ where: { year, month } })) {
     throw new Error("Next month survey already started");
@@ -35,7 +35,7 @@ config();
     )
     .addField(
       "期限",
-      `${expiredAt.atStartOfDay().format(DateFormats.dateWithHour)}まで`,
+      `${expiredAt.format(DateFormats.dateWithHour)}まで`,
     )
     .addField("回答方法", "このメッセージにリアクション");
 
@@ -61,7 +61,7 @@ config();
       id: messageId,
       year,
       month,
-      expiredAt: expiredAt.atStartOfDayJST().toDate(),
+      expiredAt: expiredAt.toDate(),
     },
   });
 
