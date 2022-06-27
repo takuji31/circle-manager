@@ -95,7 +95,7 @@
     "react-dom": "^18.1.0",
     "react-dropzone": "^14.2.1",
     "react-hot-toast": "^2.2.0",
-    "recoil": "^0.7.3",
+    "recoil": "^0.7.4",
     "redis": "^4.1.0",
     "remix-auth": "^3.2.2",
     "remix-auth-discord": "^1.0.0",
