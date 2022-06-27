@@ -30,8 +30,6 @@ config();
   await prisma.monthSurvey.deleteMany({});
   await prisma.monthSurveyAnswer.deleteMany({});
   await prisma.signUp.deleteMany({});
-  await prisma.umastagramMemberFanCount.deleteMany({});
-  await prisma.umastagramCircleFanCount.deleteMany({});
   await prisma.personalChannel.deleteMany({});
   await prisma.circleFanCount.deleteMany({});
   await prisma.memberFanCount.deleteMany({});
@@ -55,14 +53,6 @@ config();
   });
   await prisma.signUp.createMany({
     data: data.signUps,
-    skipDuplicates: true,
-  });
-  await prisma.umastagramMemberFanCount.createMany({
-    data: data.umastagramMemberFanCount,
-    skipDuplicates: true,
-  });
-  await prisma.umastagramCircleFanCount.createMany({
-    data: data.umastagramCircleFanCount,
     skipDuplicates: true,
   });
   await prisma.personalChannel.createMany({

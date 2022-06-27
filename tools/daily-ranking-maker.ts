@@ -10,7 +10,7 @@ import {
   thisMonthInt,
   ZonedDateTime,
 } from "@/model";
-import type { Member, MonthCircle, UmastagramMemberFanCount } from "@prisma/client";
+import type { Member, MemberFanCount, MonthCircle } from "@prisma/client";
 import { CircleKey, CircleRole } from "@prisma/client";
 import { stringify } from "csv-stringify/sync";
 import { Routes } from "discord-api-types/v9";
@@ -31,11 +31,11 @@ config();
     monthSurvey != null &&
     now.isAfter(ZonedDateTime.fromDate(monthSurvey.expiredAt));
 
-  const groupBy = await prisma.umastagramMemberFanCount.groupBy({
+  const groupBy = await prisma.memberFanCount.groupBy({
     _max: {
       date: true,
     },
-    by: ["circle"],
+    by: ["circleKey"],
     where: {
       date: {
         gte: LocalDate.firstDayOfThisMonth().toUTCDate(),
@@ -44,7 +44,7 @@ config();
     },
   });
 
-  let memberFanCounts: Array<UmastagramMemberFanCount & {
+  let memberFanCounts: Array<MemberFanCount & {
     member: (Member & { monthCircles: Array<MonthCircle> }) | null;
   }> = [];
   const circleToUpdatedAt: Record<CircleKey, LocalDate | null> = {
@@ -55,21 +55,21 @@ config();
   };
   for (const group of groupBy) {
     const date = group._max.date;
-    const circle = group.circle;
+    const circleKey = group.circleKey;
     if (!date) {
       continue;
     }
 
-    circleToUpdatedAt[circle] = LocalDate.fromUTCDate(date);
+    circleToUpdatedAt[circleKey] = LocalDate.fromUTCDate(date);
 
-    if (!useMonthSurveyAnswer && circle == CircleKey.Saikyo) {
+    if (!useMonthSurveyAnswer && circleKey == CircleKey.Saikyo) {
       continue;
     }
 
-    const fanCounts = await prisma.umastagramMemberFanCount.findMany({
+    const fanCounts = await prisma.memberFanCount.findMany({
       where: {
         date,
-        circle,
+        circleKey,
       },
       include: {
         member: {
@@ -116,12 +116,12 @@ config();
               "トレーナー名",
               "メンバー情報不明",
               "現在のサークル",
-              "予測ファン数",
+              "月間獲得ファン数",
               "来月のサークル(確定)",
             ],
             ...memberFanCounts
               //TODO: int
-              .sort((a, b) => parseInt((b.avg - a.avg).toString()))
+              .sort((a, b) => parseInt(((b.monthlyAvg ?? 0n) - (a.monthlyAvg ?? 0n)).toString()))
               .map((fanCount, idx) => {
                 let ranking: number;
                 if (fanCount.member?.circleRole == CircleRole.Leader) {
@@ -134,10 +134,11 @@ config();
                 return [
                   idx + 1,
                   ranking,
-                  fanCount.member?.name ?? fanCount.name,
+                  fanCount.member?.name ?? fanCount.parsedName,
                   fanCount.member == null,
-                  Circles.findByCircleKey(fanCount.circle).name,
-                  fanCount.predicted.toString(),
+                  Circles.findByCircleKey(fanCount.circleKey).name,
+                  // TODO: 予測ファン数に戻す
+                  fanCount.monthlyTotal?.toString(),
                   monthCircleState
                     ? monthCircleStateLabel(monthCircleState)
                     : "未確定",

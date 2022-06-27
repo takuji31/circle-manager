@@ -130,7 +130,7 @@ config();
   const rankingMembers = (
     await prisma.member.findMany({
       include: {
-        fanCounts: {
+        memberFanCounts: {
           where: {
             date: {
               gte: LocalDate.firstDayOfThisMonth().toUTCDate(),
@@ -163,13 +163,13 @@ config();
         },
       },
     })
-  ).sort((a, b) => {
-    logger.debug("%s %s", a, b);
-    return parseInt(
-      (
-        (b.fanCounts[0]?.avg ?? BigInt(0)) - (a.fanCounts[0]?.avg ?? BigInt(0))
-      ).toString(),
-    );
+  ).map(({ memberFanCounts, ...m }) => {
+    return {
+      ...m,
+      memberFanCounts: memberFanCounts.filter(f => f.monthlyAvg != null),
+    };
+  }).sort((a, b) => {
+    return parseInt((b.memberFanCounts[0]?.monthlyAvg! - a.memberFanCounts[0]?.monthlyAvg!).toString());
   });
 
   await prisma.$transaction([
