@@ -27,7 +27,6 @@ model Member {
   signUp            SignUp?
   monthSurveyAnswer MonthSurveyAnswer[]
   PersonalChannel   PersonalChannel[]
-  fanCounts         UmastagramMemberFanCount[]
   ScreenShot        ScreenShot[]
   memberFanCounts   MemberFanCount[]
   createdSignUpUrl  SignUpUrl[]                @relation(name: "creator")
@@ -117,40 +116,6 @@ model SignUp {
   updatedAt DateTime   @updatedAt
 
   @@index([joined])
-}
-
-/// Umastagramから取得した各メンバーのファン数
-model UmastagramMemberFanCount {
-  id        String    @id @default(cuid()) @db.VarChar(255)
-  date      DateTime  @db.Date
-  circle    CircleKey
-  name      String    @db.VarChar(255)
-  total     BigInt
-  avg       BigInt
-  predicted BigInt
-  memberId  String?   @db.VarChar(255)
-  member    Member?   @relation(fields: [memberId], references: [id])
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-
-  @@index([date, circle])
-  @@index([memberId, date])
-}
-
-/// Umastagramから取得したサークルごとのファン数
-model UmastagramCircleFanCount {
-  id           String    @id @default(cuid()) @db.VarChar(255)
-  date         DateTime  @db.Date
-  circle       CircleKey
-  total        BigInt
-  avg          BigInt
-  predicted    BigInt
-  predictedAvg BigInt
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-
-  @@unique([circle, date])
-  @@index([date])
 }
 
 /// 個人チャンネル

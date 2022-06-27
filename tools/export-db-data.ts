@@ -30,17 +30,6 @@ config();
       orderBy: [{ year: "asc" }, { month: "asc" }, { memberId: "asc" }],
     }),
     signUps: await prisma.signUp.findMany({ orderBy: [{ id: "asc" }] }),
-    umastagramMemberFanCount: await prisma.umastagramMemberFanCount.findMany({
-      orderBy: [
-        { date: "asc" },
-        { member: { circleKey: "asc" } },
-        { member: { circleRole: "asc" } },
-        { member: { joinedAt: "asc" } },
-      ],
-    }),
-    umastagramCircleFanCount: await prisma.umastagramCircleFanCount.findMany({
-      orderBy: [{ date: "asc" }, { circle: "asc" }],
-    }),
     memberFanCounts: await prisma.memberFanCount.findMany({
       orderBy: [
         { date: "asc" },

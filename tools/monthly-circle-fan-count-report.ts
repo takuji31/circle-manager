@@ -32,10 +32,10 @@ type CircleFanCount = {
       Ha: BigInt(0),
       Jo: BigInt(0),
     };
-    for (const circle of Object.values(CircleKey)) {
-      const circleFanCount = await prisma.umastagramCircleFanCount.findFirst({
+    for (const circleKey of Object.values(CircleKey)) {
+      const circleFanCount = await prisma.circleFanCount.findFirst({
         where: {
-          circle,
+          circleKey,
           date: {
             gte: month.toUTCDate(),
             lt: month.plusMonths(1).toUTCDate(),
@@ -50,7 +50,7 @@ type CircleFanCount = {
           },
         ],
       });
-      monthCircleFanCount[circle] = circleFanCount?.predictedAvg ?? BigInt(0);
+      monthCircleFanCount[circleKey] = circleFanCount?.predictedAvg ?? BigInt(0);
     }
     circleFanCounts.push(monthCircleFanCount);
   }
