@@ -13,7 +13,8 @@ invariant(process.env.GOOGLE_API_KEY_JSON != undefined || process.env.GOOGLE_APP
 if (!global._firebase) {
   global._firebase = initializeApp({
     storageBucket: "shin-umamusume-336911.appspot.com",
-    credential: process.env.GOOGLE_API_KEY_JSON != undefined ? cert(JSON.parse(process.env.GOOGLE_API_KEY_JSON)) : undefined,
+    ...(process.env.GOOGLE_API_KEY_JSON != undefined ?
+      { credential: cert(JSON.parse(process.env.GOOGLE_API_KEY_JSON)) } : {}),
   });
 }
 
