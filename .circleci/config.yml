@@ -31,7 +31,7 @@ jobs:
           command: yarn test
   Dokku-Deploy:
     docker:
-      - image: cimg/base:2021.04
+      - image: cimg/base:2021.12
     steps:
       - checkout
       - add_ssh_keys:
