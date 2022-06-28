@@ -1,1 +1,26 @@
 name: 🚀 Deploy to Dokku
+on:
+  push:
+    branches: 
+      - main
+  pull_request:
+    branches: 
+      - dokku-deploy-github-actions
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.4.0
+        with:
+          access_token: ${{ github.token }}
+      - name: Cloning repo
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Dokku
+        uses: dokku/github-action@v1.0.1
+        with:
+          git_push_flags: '--force'
+          git_remote_url: 'ssh://dokku@takuji31.dev:22/shin-umamusume'
+          ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
