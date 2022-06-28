@@ -19,6 +19,7 @@ jobs:
       - name: Dokku
         uses: dokku/github-action@v1.0.1
         with:
+          branch: main
           git_push_flags: '--force'
           git_remote_url: 'ssh://dokku@takuji31.dev:22/shin-umamusume'
           ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
