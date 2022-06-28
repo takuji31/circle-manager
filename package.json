@@ -80,7 +80,7 @@
     "discord.js": "^13.8.1",
     "dotenv": "^16.0.1",
     "firebase": "^9.8.4",
-    "firebase-admin": "^10.2.0",
+    "firebase-admin": "^10.3.0",
     "lodash": "^4.17.21",
     "luxon": "^2.4.0",
     "material-ui-confirm": "^3.0.4",
