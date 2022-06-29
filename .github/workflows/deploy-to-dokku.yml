@@ -16,7 +16,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Dokku
-        uses: dokku/github-action@v1.0.1
+        uses: dokku/github-action@v1.0.2
         with:
           branch: main
           git_push_flags: '--force'
