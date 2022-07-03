@@ -14,15 +14,15 @@
     },
     {
       "command": "yarn cron:month-circle-notifier",
-      "schedule": "0 21 19 * *"
+      "schedule": "0 21 17,19 * *"
     },
     {
       "command": "yarn cron:month-survey-reminder",
-      "schedule": "0 21 17,18 * *"
+      "schedule": "0 21 16,18 * *"
     },
     {
       "command": "yarn cron:start-month-survey",
-      "schedule": "0 21 15 * *"
+      "schedule": "0 21 14 * *"
     }
   ]
 }
