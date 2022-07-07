@@ -1744,10 +1744,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@faker-js/faker@npm:^6.3.1":
-  version: 6.3.1
-  resolution: "@faker-js/faker@npm:6.3.1"
-  checksum: 05071e952248f4565218a95b089ef8f616130c6ff914bb416ba7c891f81d123b637c2abe8aa2eb7b207b5d4b8bd9c75c8c2133019d2d11db4176948737a95813
+"@faker-js/faker@npm:^7.3.0":
+  version: 7.3.0
+  resolution: "@faker-js/faker@npm:7.3.0"
+  checksum: ef5b64af30ce0ec76cb22798fbbe50184946fac389b4d81235f9d8d9eaaa77d67a80f46954fa993996b7c774bae23314529a95a42a6b68794f0795976c9be82b
   languageName: node
   linkType: hard
 
@@ -5273,7 +5273,7 @@ __metadata:
     "@emotion/react": ^11.9.3
     "@emotion/server": ^11.4.0
     "@emotion/styled": ^11.9.3
-    "@faker-js/faker": ^6.3.1
+    "@faker-js/faker": ^7.3.0
     "@firebase/storage": ^0.9.8
     "@google-cloud/vision": ^2.4.2
     "@headlessui/react": ^1.6.5
