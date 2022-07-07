@@ -5331,7 +5331,7 @@ __metadata:
     luxon: ^2.4.0
     material-ui-confirm: ^3.0.4
     material-ui-popup-state: ^3.1.1
-    msw: ^0.42.3
+    msw: ^0.43.1
     npm-run-all: ^4.1.5
     numeral: ^2.0.6
     pino: ^8.1.0
@@ -11455,9 +11455,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"msw@npm:^0.42.3":
-  version: 0.42.3
-  resolution: "msw@npm:0.42.3"
+"msw@npm:^0.43.1":
+  version: 0.43.1
+  resolution: "msw@npm:0.43.1"
   dependencies:
     "@mswjs/cookies": ^0.2.0
     "@mswjs/interceptors": ^0.16.3
@@ -11486,7 +11486,7 @@ __metadata:
       optional: true
   bin:
     msw: cli/index.js
-  checksum: 6eda5102dcdfd405d13d75c8557fc8b0ceb06bcd37851d919d5392971dd43d1dd524b7d2a46f2ffa580aadc2b12eac81776cd51e7d085c41d1e4236b57cc921c
+  checksum: de84cb729619bdcfd7b7b537b1000b0b6677099055d9903a46aec20b8c94d1c2f4e8f576775a143f50e68720193a7b22a9b4d30fc7276905114664c3e6e695df
   languageName: node
   linkType: hard
 
