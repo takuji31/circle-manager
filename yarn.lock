@@ -2917,14 +2917,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@redis/client@npm:1.1.1":
-  version: 1.1.1
-  resolution: "@redis/client@npm:1.1.1"
+"@redis/client@npm:1.2.0":
+  version: 1.2.0
+  resolution: "@redis/client@npm:1.2.0"
   dependencies:
     cluster-key-slot: 1.1.0
     generic-pool: 3.8.2
     yallist: 4.0.0
-  checksum: a96fa8e6125b006b3b027fb42354cfc3fc056f0225160d0b4b60808a23659002cfde39eedf648c94208cefa788a71fb8b3107c6d2a1ff2bede97213e4e07b34e
+  checksum: 098a550a6728d9d3babb432a1c32f1678cbda5ad7fa3d59316fc334be42ef05d778fc4cf2e3d873a34817447870a5fc0486e62793698a279404b3b086ba7422e
   languageName: node
   linkType: hard
 
@@ -5348,7 +5348,7 @@ __metadata:
     react-dropzone: ^14.2.1
     react-hot-toast: ^2.2.0
     recoil: ^0.7.4
-    redis: ^4.1.1
+    redis: ^4.2.0
     remix-auth: ^3.2.2
     remix-auth-discord: ^1.0.0
     remix-validated-form: ^4.5.0
@@ -13099,17 +13099,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"redis@npm:^4.1.1":
-  version: 4.1.1
-  resolution: "redis@npm:4.1.1"
+"redis@npm:^4.2.0":
+  version: 4.2.0
+  resolution: "redis@npm:4.2.0"
   dependencies:
     "@redis/bloom": 1.0.2
-    "@redis/client": 1.1.1
+    "@redis/client": 1.2.0
     "@redis/graph": 1.0.1
     "@redis/json": 1.0.3
     "@redis/search": 1.0.6
     "@redis/time-series": 1.0.3
-  checksum: 8c9b4e068edb6cd64c0379bed9e0822e2b8e7ee3f25cb63eb5e758fbc4bfc8eba8e88d6a0288dee84a1e6a9450850ba26c235afacdbd87969e645361e483f536
+  checksum: 6c35b56c6b685e82973c5698c5736c07ccbc59f3bc18d8de61e45ead2df4b8fc82062e5618452f4d3f8c23f02ff8c0b847c8d6a681f909c403a0fb96adcc2b98
   languageName: node
   linkType: hard
 
