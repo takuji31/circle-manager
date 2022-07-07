@@ -2,7 +2,7 @@ import type { SessionUser } from "@/model";
 import { Circles, LocalDate } from "@/model";
 import { ref, uploadBytes } from "@firebase/storage";
 import { UploadIcon, XIcon } from "@heroicons/react/solid";
-import { Edit } from "@mui/icons-material";
+import { Delete, Edit } from "@mui/icons-material";
 import {
   Alert,
   Autocomplete,
@@ -27,6 +27,7 @@ import {
 } from "@mui/material";
 import type { ActionFunction, DataFunctionArgs, LoaderFunction } from "@remix-run/node";
 import { Form, useActionData, useLoaderData, useSubmit, useTransition } from "@remix-run/react";
+import { useConfirm } from "material-ui-confirm";
 import numeral from "numeral";
 import React, { useMemo, useState } from "react";
 import { useDropzone } from "react-dropzone";
@@ -93,6 +94,7 @@ type ActionData = {
   parseScreenShots: Awaited<ReturnType<typeof parseScreenShots>>;
 };
 type Member = Awaited<ReturnType<typeof getCircleMembers>>[0];
+type MemberFanCount = LoaderData["memberFanCounts"][0];
 
 const paramsSchema = z.intersection(
   z.object({
@@ -583,32 +585,61 @@ const EditCard = () => {
         </TableHead>
         <TableBody>
           {memberFanCounts.map((m) => {
-            return (
-              <TableRow key={m.id}>
-                <TableCell>{m.member?.name ?? "(不明なメンバー)"}</TableCell>
-                <TableCell>
-                  {numeral(m.monthlyTotal).format("0,0")} (
-                  {numeral(m.total).format("0,0")})
-                </TableCell>
-                <TableCell>
-                  {m.source == "ScreenShot"
-                    ? "スクリーンショット"
-                    : m.source == "Paste"
-                      ? "まとめて貼り付け"
-                      : "手入力"}
-                </TableCell>
-                <TableCell>{m.parsedName ?? "(なし)"}</TableCell>
-                <TableCell>
-                  <IconButton>
-                    <Edit />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            );
+            return <MemberFanCountTableRow memberFanCount={m} key={m.id} />;
           })}
         </TableBody>
       </Table>
     </Card>
+  );
+};
+
+const MemberFanCountTableRow: React.FC<{ memberFanCount: MemberFanCount }> = ({ memberFanCount }) => {
+  const confirm = useConfirm();
+  const submit = useSubmit();
+  return (
+    <TableRow>
+      <TableCell>{memberFanCount.member?.name ?? "(不明なメンバー)"}</TableCell>
+      <TableCell>
+        {numeral(memberFanCount.monthlyTotal).format("0,0")} (
+        {numeral(memberFanCount.total).format("0,0")})
+      </TableCell>
+      <TableCell>
+        {memberFanCount.source == "ScreenShot"
+          ? "スクリーンショット"
+          : memberFanCount.source == "Paste"
+            ? "まとめて貼り付け"
+            : "手入力"}
+      </TableCell>
+      <TableCell>{memberFanCount.parsedName ?? "(なし)"}</TableCell>
+      <TableCell>
+        <IconButton>
+          <Edit />
+        </IconButton>
+
+
+        <IconButton
+          onClick={() =>
+            confirm({
+              title: "確認",
+              description:
+                "一度削除すると取り消せません、再度スクリーンショットのアップロードを行う必要があります。",
+            }).then(() => {
+              logger.info("%o", memberFanCount);
+              const date = LocalDate.fromUTCDate(new Date(memberFanCount.date));
+              submit(new FormData(), {
+                action: `/admin/circles/${memberFanCount.circleKey}/fans/${date.year()}/${date.monthValue()}/${date.dayOfMonth()}/${memberFanCount.id}/delete`,
+                replace: true,
+                method: "post",
+              });
+            }).catch((e) => {
+              logger.error(e);
+            })
+          }
+        >
+          <Delete />
+        </IconButton>
+      </TableCell>
+    </TableRow>
   );
 };
 
