@@ -54,7 +54,7 @@
     "@emotion/react": "^11.9.3",
     "@emotion/server": "^11.4.0",
     "@emotion/styled": "^11.9.3",
-    "@firebase/storage": "^0.9.8",
+    "@firebase/storage": "^0.9.9",
     "@google-cloud/vision": "^2.4.2",
     "@headlessui/react": "^1.6.5",
     "@heroicons/react": "^1.0.6",
