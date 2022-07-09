@@ -1937,6 +1937,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@firebase/component@npm:0.5.17":
+  version: 0.5.17
+  resolution: "@firebase/component@npm:0.5.17"
+  dependencies:
+    "@firebase/util": 1.6.3
+    tslib: ^2.1.0
+  checksum: 5f9a98bb2bd795fd7a211c9c3b95b893e0e4e83fbae6678995dc730f750fb5c2e76b730dd60790c6fafe4c8323dc8da8d885bf69f99da6cbda5ab28c3a005eef
+  languageName: node
+  linkType: hard
+
 "@firebase/database-compat@npm:0.2.2, @firebase/database-compat@npm:^0.2.0":
   version: 0.2.2
   resolution: "@firebase/database-compat@npm:0.2.2"
@@ -2229,7 +2239,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@firebase/storage@npm:0.9.8, @firebase/storage@npm:^0.9.8":
+"@firebase/storage@npm:0.9.8":
   version: 0.9.8
   resolution: "@firebase/storage@npm:0.9.8"
   dependencies:
@@ -2243,12 +2253,35 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@firebase/storage@npm:^0.9.9":
+  version: 0.9.9
+  resolution: "@firebase/storage@npm:0.9.9"
+  dependencies:
+    "@firebase/component": 0.5.17
+    "@firebase/util": 1.6.3
+    node-fetch: 2.6.7
+    tslib: ^2.1.0
+  peerDependencies:
+    "@firebase/app": 0.x
+  checksum: 99692bf66d7a8d253a885d9371f5c8208f581cfde85a1f41e0987cf9ff2af17a6091963ee4e2a1d6e260146b0576fe3dc973a3a76cbc1a931b2ed173484df4c9
+  languageName: node
+  linkType: hard
+
 "@firebase/util@npm:1.6.2":
   version: 1.6.2
   resolution: "@firebase/util@npm:1.6.2"
   dependencies:
     tslib: ^2.1.0
   checksum: 762360269070853c0a485aed5b353a5a5564df72bbccc34440edcf6fe55ae29779728b5486e9ba052e3f734c0654c7a24ed5577b881eccfeb7e5d558c7819b1e
+  languageName: node
+  linkType: hard
+
+"@firebase/util@npm:1.6.3":
+  version: 1.6.3
+  resolution: "@firebase/util@npm:1.6.3"
+  dependencies:
+    tslib: ^2.1.0
+  checksum: ccdbb1993f0316c511672025fde5d2d0b52dd4d209040e8d375eda673b8a7ec21ebaa231b05a8663c53daec2c9a65174c6c2615d7ff18a9e8577be958906abb6
   languageName: node
   linkType: hard
 
@@ -5235,7 +5268,7 @@ __metadata:
     "@emotion/server": ^11.4.0
     "@emotion/styled": ^11.9.3
     "@faker-js/faker": ^7.3.0
-    "@firebase/storage": ^0.9.8
+    "@firebase/storage": ^0.9.9
     "@google-cloud/vision": ^2.4.2
     "@headlessui/react": ^1.6.5
     "@heroicons/react": ^1.0.6
