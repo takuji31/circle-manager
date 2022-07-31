@@ -91,38 +91,53 @@ config();
     },
   });
 
-  const totalMemberCount = (
-    await prisma.monthSurveyAnswer.aggregate({
-      _count: {
-        id: true,
-      },
-      where: {
-        year,
-        month,
-        value: MonthSurveyAnswerValue.Umamusume,
-      },
-    })
-  )._count.id;
-  const newMembers = 60 - totalMemberCount;
-  const newMembersPerCircle = Math.floor(newMembers / 2);
-  const remainderNewMembers = newMembers % 2;
+  // const totalMemberCount = (
+  //   await prisma.monthSurveyAnswer.aggregate({
+  //     _count: {
+  //       id: true,
+  //     },
+  //     where: {
+  //       year,
+  //       month,
+  //       value: MonthSurveyAnswerValue.Umamusume,
+  //     },
+  //   })
+  // )._count.id;
+  // const newMembers = 60 - totalMemberCount;
+  // const newMembersPerCircle = Math.floor(newMembers / 2);
+  // const remainderNewMembers = newMembers % 2;
+  // const maxMemberCount: Record<Exclude<CircleKey, "Saikyo" | "Jo">, number> = {
+  //   Shin:
+  //     30 -
+  //     leaders.filter((m) => m.circleKey == CircleKey.Shin).length -
+  //     lockedMembers.filter(
+  //       (m) => m.monthCircles[0].state == MonthCircleState.Shin,
+  //     ).length -
+  //     newMembersPerCircle,
+  //
+  //   Ha:
+  //     30 -
+  //     leaders.filter((m) => m.circleKey == CircleKey.Ha).length -
+  //     lockedMembers.filter(
+  //       (m) => m.monthCircles[0].state == MonthCircleState.Ha,
+  //     ).length -
+  //     newMembersPerCircle -
+  //     (remainderNewMembers > 0 ? 1 : 0),
+  // };
   const maxMemberCount: Record<Exclude<CircleKey, "Saikyo" | "Jo">, number> = {
     Shin:
       30 -
       leaders.filter((m) => m.circleKey == CircleKey.Shin).length -
       lockedMembers.filter(
         (m) => m.monthCircles[0].state == MonthCircleState.Shin,
-      ).length -
-      newMembersPerCircle,
+      ).length,
 
     Ha:
       30 -
       leaders.filter((m) => m.circleKey == CircleKey.Ha).length -
       lockedMembers.filter(
         (m) => m.monthCircles[0].state == MonthCircleState.Ha,
-      ).length -
-      newMembersPerCircle -
-      (remainderNewMembers > 0 ? 1 : 0),
+      ).length,
   };
 
   logger.debug("Max member count %s", maxMemberCount);
@@ -223,7 +238,7 @@ config();
             ? MonthCircleState.Shin
             : idx < maxMemberCount.Shin + maxMemberCount.Ha
               ? MonthCircleState.Ha
-              : MonthCircleState.OB,
+              : MonthCircleState.Ha,
         currentCircleKey: circleKey,
       })),
       skipDuplicates: true,
