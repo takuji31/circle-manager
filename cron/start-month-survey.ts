@@ -12,7 +12,7 @@ config();
 
 (async () => {
   const { year, month } = nextMonthInt();
-  const expiredAt = LocalDate.firstDayOfNextMonth().withDayOfMonth(20).atStartOfDayJST();
+  const expiredAt = LocalDate.firstDayOfThisMonth().withDayOfMonth(20).atStartOfDayJST();
 
   if (await prisma.monthSurvey.count({ where: { year, month } })) {
     throw new Error("Next month survey already started");
