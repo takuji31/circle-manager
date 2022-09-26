@@ -153,7 +153,7 @@
     "vitest": "^0.16.0"
   },
   "engines": {
-    "node": "~v16.15.1"
+    "node": "~v16.17.1"
   },
   "prisma": {
     "seed": "ts-node --require tsconfig-paths/register prisma/seed.ts"
