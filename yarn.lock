@@ -2417,13 +2417,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@headlessui/react@npm:^1.6.5":
-  version: 1.6.5
-  resolution: "@headlessui/react@npm:1.6.5"
+"@headlessui/react@npm:^1.7.3":
+  version: 1.7.3
+  resolution: "@headlessui/react@npm:1.7.3"
   peerDependencies:
     react: ^16 || ^17 || ^18
     react-dom: ^16 || ^17 || ^18
-  checksum: 6e3db77c992b5346b7835ea23ab78f251dc2165f2848db38904e6e84a44a2039cf3d5ea94a3a709dd4fc783bccfa638fe3c7bb450216f02ebbac5bb54f29947e
+  checksum: c9391e15e63dc7e459d42125a94e22f964419c440d9f37fd85f6f501612aad42b3e30e79f712e8097c66e08891c26dcd662863e572ff21cc6cf34a3185ae4aa5
   languageName: node
   linkType: hard
 
@@ -5270,7 +5270,7 @@ __metadata:
     "@faker-js/faker": ^7.3.0
     "@firebase/storage": ^0.9.9
     "@google-cloud/vision": ^2.4.2
-    "@headlessui/react": ^1.6.5
+    "@headlessui/react": ^1.7.3
     "@heroicons/react": ^1.0.6
     "@js-joda/core": ^5.2.0
     "@js-joda/locale_ja": ^4.7.0
